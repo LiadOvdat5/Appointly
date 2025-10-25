@@ -32,6 +32,6 @@ namespace WebAPI.Repositories
             return BusinessMapper.ToBusinessDTO(business);
         }
 
-        // Implement methods for business operations here
+
     }
 }
