@@ -182,5 +182,32 @@ namespace WebAPI.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [Authorize]
+        [HttpPut("{businessId}/services/{serviceId}")]
+        public async Task<IActionResult> UpdateService(Guid businessId, Guid serviceId, [FromBody] UpdateServiceDTO updateServiceDto)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var service = await _serviceRepository.UpdateServiceAsync(businessId, serviceId, userId, updateServiceDto);
+                return Ok(service);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

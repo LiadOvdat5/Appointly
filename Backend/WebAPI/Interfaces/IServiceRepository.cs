@@ -6,6 +6,6 @@ namespace WebAPI.Interfaces
     {
         Task<ServiceDTO> CreateServiceAsync(Guid businessId, Guid ownerId, CreateServiceDTO createServiceDto);
         Task<IEnumerable<ServiceDTO>> GetServicesForBusinessAsync(Guid businessId);
-        Task<ServiceDTO> UpdateServiceAsync(Guid serviceId, Guid ownerId, UpdateServiceDTO updateServiceDto);
+        Task<ServiceDTO> UpdateServiceAsync(Guid businessId, Guid serviceId, Guid ownerId, UpdateServiceDTO updateServiceDto);
     }
 }

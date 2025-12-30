@@ -51,10 +51,13 @@ namespace WebAPI.Repositories
             return services.Select(ServiceMapper.ToServiceDTO).ToList();
         }
 
-        public async Task<ServiceDTO> UpdateServiceAsync(Guid serviceId, Guid ownerId, UpdateServiceDTO updateServiceDto)
+        public async Task<ServiceDTO> UpdateServiceAsync(Guid businessId, Guid serviceId, Guid ownerId, UpdateServiceDTO updateServiceDto)
         {
             var service = await _context.Services.FindAsync(serviceId)
                 ?? throw new KeyNotFoundException("Service not found.");
+
+            if (service.BusinessId != businessId)
+                throw new KeyNotFoundException("Service does not belong to this business.");
 
             var business = await _context.Businesses
                 .Include(b => b.Partners)
