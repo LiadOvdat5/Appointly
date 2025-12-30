@@ -15,6 +15,6 @@ namespace WebAPI.DTOs
         [Range(0, double.MaxValue, ErrorMessage = "Price cannot be negative.")]
         public decimal? Price { get; set; }
 
-        public Guid? PartnerId { get; set; }
+        public Guid? UserId { get; set; }
     }
 }

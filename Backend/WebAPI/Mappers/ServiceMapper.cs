@@ -11,7 +11,7 @@ namespace WebAPI.Mappers
             {
                 Id = Guid.NewGuid(),
                 BusinessId = businessId,
-                PartnerId = dto.PartnerId,
+                UserId = dto.UserId,
                 Name = dto.Name,
                 Description = dto.Description,
                 Duration = dto.Duration,
@@ -27,7 +27,7 @@ namespace WebAPI.Mappers
             {
                 Id = service.Id,
                 BusinessId = service.BusinessId,
-                PartnerId = service.PartnerId,
+                UserId = service.UserId,
                 Name = service.Name,
                 Description = service.Description,
                 Duration = service.Duration,
@@ -51,9 +51,9 @@ namespace WebAPI.Mappers
             if (dto.Price.HasValue)
                 service.Price = dto.Price.Value;
 
-            // PartnerId will be validated externally, only set if provided
-            if (dto.PartnerId.HasValue)
-                service.PartnerId = dto.PartnerId.Value;
+            // UserId will be validated externally, only set if provided
+            if (dto.UserId.HasValue)
+                service.UserId = dto.UserId.Value;
 
             service.UpdatedAt = DateTime.UtcNow;
         }

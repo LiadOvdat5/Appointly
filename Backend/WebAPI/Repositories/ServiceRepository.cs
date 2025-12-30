@@ -26,9 +26,9 @@ namespace WebAPI.Repositories
             if (business.OwnerId != ownerId)
                 throw new UnauthorizedAccessException("Only the business owner can add services.");
 
-            var partnerExists = business.Partners.Any(p => p.UserId == createServiceDto.PartnerId);
+            var partnerExists = business.Partners.Any(p => p.UserId == createServiceDto.UserId);
             if (!partnerExists)
-                throw new KeyNotFoundException($"Partner with ID {createServiceDto.PartnerId} is not associated with this business.");
+                throw new KeyNotFoundException($"User with ID {createServiceDto.UserId} is not a partner of this business.");
 
             var service = ServiceMapper.ToService(createServiceDto, businessId);
 
@@ -64,11 +64,11 @@ namespace WebAPI.Repositories
             if (business.OwnerId != ownerId)
                 throw new UnauthorizedAccessException("Only the business owner can update services.");
 
-            if (updateServiceDto.PartnerId.HasValue)
+            if (updateServiceDto.UserId.HasValue)
             {
-                var partnerExists = business.Partners.Any(p => p.UserId == updateServiceDto.PartnerId.Value);
+                var partnerExists = business.Partners.Any(p => p.UserId == updateServiceDto.UserId.Value);
                 if (!partnerExists)
-                    throw new KeyNotFoundException("New partner is not associated with this business.");
+                    throw new KeyNotFoundException("New user is not a partner of this business.");
             }
 
             ServiceMapper.UpdateServiceFromDTO(service, updateServiceDto);

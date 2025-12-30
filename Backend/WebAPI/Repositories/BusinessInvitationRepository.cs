@@ -52,7 +52,6 @@ namespace WebAPI.Repositories
             {
                 var partner = new BusinessPartner
                 {
-                    Id = Guid.NewGuid(),
                     BusinessId = businessId,
                     UserId = workerId.Value,
                     Status = InvitationStatus.Pending,
@@ -148,7 +147,6 @@ namespace WebAPI.Repositories
             {
                 partner = new BusinessPartner
                 {
-                    Id = Guid.NewGuid(),
                     BusinessId = business.Id,
                     UserId = workerId,
                     InvitationId = invitation.Id,

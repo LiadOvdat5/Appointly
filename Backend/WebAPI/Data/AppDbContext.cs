@@ -24,6 +24,13 @@ namespace WebAPI.Data
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
 
+            // Configure BusinessPartner composite key
+            modelBuilder.Entity<BusinessPartner>()
+                .HasKey(bp => new { bp.UserId, bp.BusinessId });
+        }
     }
 }

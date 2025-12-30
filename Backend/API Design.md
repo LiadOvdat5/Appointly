@@ -47,10 +47,10 @@ Each table describes **method, path, description, input, and output**.
 
 ## 🗓 Schedule & Availability (under Business)
 
-| Method | Path                                                       | Description                    | Input                                                                          | Output                     |
-| ------ | ---------------------------------------------------------- | ------------------------------ | ------------------------------------------------------------------------------ | -------------------------- |
-| POST   | `/businesses/{businessId}/workers/{workerId}/schedule`     | Define worker schedule.        | `CreateScheduleDTO`                                                            | `ScheduleDTO`              |
-| GET    | `/businesses/{businessId}/workers/{workerId}/availability` | Get available slots on a date. | `businessId: number (path)`, `workerId: number (path)`, `date: string (query)` | `string[]` (list of times) |
+| Method | Path                                                         | Description                                  | Input                                                                           | Output                     |
+| ------ | ------------------------------------------------------------ | -------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------- |
+| POST   | `/businesses/{businessId}/services/{serviceId}/schedule`     | create service schedule.                     | `CreateScheduleDTO`                                                             | `ScheduleDTO`              |
+| GET    | `/businesses/{businessId}/services/{serviceId}/availability` | Get all available slots, possibly on a date. | `businessId: number (path)`, `workerId: number (path)`, `date?: string (query)` | `string[]` (list of times) |
 
 ---
 

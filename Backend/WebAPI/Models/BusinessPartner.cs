@@ -6,9 +6,6 @@ namespace WebAPI.Models
 {
     public class BusinessPartner
     {
-        [Key]
-        public Guid Id { get; set; }
-
         [Required(ErrorMessage = "BusinessId is required.")]
         public Guid BusinessId { get; set; }
 
