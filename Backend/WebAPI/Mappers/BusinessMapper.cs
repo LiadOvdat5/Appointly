@@ -29,5 +29,22 @@ namespace WebAPI.Mappers
                 Phone = business.Phone ?? string.Empty
             };
         }
+
+        public static void UpdateBusinessFromDTO(Business business, UpdateBusinessDTO updateDto)
+        {
+            if (!string.IsNullOrEmpty(updateDto.Name))
+                business.Name = updateDto.Name;
+
+            if (updateDto.Address != null)
+                business.Address = updateDto.Address;
+
+            if (updateDto.Phone != null)
+                business.Phone = updateDto.Phone;
+
+            if (updateDto.Description != null)
+                business.Description = updateDto.Description;
+
+            business.UpdatedAt = DateTime.UtcNow;
+        }
     }
 }

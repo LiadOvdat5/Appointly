@@ -12,7 +12,7 @@ namespace WebAPI.Models
         [Required(ErrorMessage = "OwnerId is required.")]
         public Guid OwnerId { get; set; }
 
-        public List<Guid> PartnerIds { get; set; } = new();
+        public List<BusinessPartner> Partners { get; set; } = new();
         public List<Guid> ServiceIds { get; set; } = new();
 
         [Required(ErrorMessage = "Business name is required.")]

@@ -28,6 +28,8 @@ builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
+builder.Services.AddScoped<IBusinessInvitationRepository, BusinessInvitationRepository>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 
 // Add authorization services
 builder.Services.AddAuthorization();
