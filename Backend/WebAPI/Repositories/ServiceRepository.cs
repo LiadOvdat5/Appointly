@@ -81,5 +81,13 @@ namespace WebAPI.Repositories
 
             return ServiceMapper.ToServiceDTO(service);
         }
+
+        public async Task<Service?> GetByIdAsync(Guid serviceId)
+        {
+            return await _context.Services
+                .Include(s => s.Business)
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.Id == serviceId);
+        }
     }
 }

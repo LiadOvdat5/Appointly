@@ -19,6 +19,13 @@ namespace WebAPI.Data
         public DbSet<Appointment> Appointments => Set<Appointment>();
         public DbSet<AppointmentSlot> AppointmentSlots => Set<AppointmentSlot>();
 
+        // Schedule & Availability Models
+        public DbSet<WeeklyWorkingRule> WeeklyWorkingRules => Set<WeeklyWorkingRule>();
+        public DbSet<BreakRule> BreakRules => Set<BreakRule>();
+        public DbSet<RecurringRule> RecurringRules => Set<RecurringRule>();
+        public DbSet<DateException> DateExceptions => Set<DateException>();
+        public DbSet<ServiceSchedule> ServiceSchedules => Set<ServiceSchedule>();
+
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
         {
@@ -31,6 +38,50 @@ namespace WebAPI.Data
             // Configure BusinessPartner composite key
             modelBuilder.Entity<BusinessPartner>()
                 .HasKey(bp => new { bp.UserId, bp.BusinessId });
+
+            // =====================================================
+            // Schedule & Availability Relationships
+            // =====================================================
+
+            // WeeklyWorkingRule Configuration
+            modelBuilder.Entity<WeeklyWorkingRule>()
+                .HasOne(wwr => wwr.Service)
+                .WithMany()
+                .HasForeignKey(wwr => wwr.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // BreakRule Configuration
+            modelBuilder.Entity<BreakRule>()
+                .HasOne(br => br.Service)
+                .WithMany()
+                .HasForeignKey(br => br.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // RecurringRule Configuration
+            modelBuilder.Entity<RecurringRule>()
+                .HasOne(rr => rr.Service)
+                .WithMany()
+                .HasForeignKey(rr => rr.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // DateException Configuration
+            modelBuilder.Entity<DateException>()
+                .HasOne(de => de.Service)
+                .WithMany()
+                .HasForeignKey(de => de.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // ServiceSchedule Configuration
+            modelBuilder.Entity<ServiceSchedule>()
+                .HasOne(ss => ss.Service)
+                .WithMany(s => s.ServiceSchedules)
+                .HasForeignKey(ss => ss.ServiceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique constraint: Prevent duplicate slots
+            modelBuilder.Entity<ServiceSchedule>()
+                .HasIndex(ss => new { ss.ServiceId, ss.StartDateTime })
+                .IsUnique();
         }
     }
 }

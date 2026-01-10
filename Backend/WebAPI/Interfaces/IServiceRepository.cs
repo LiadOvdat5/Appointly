@@ -1,4 +1,5 @@
 using WebAPI.DTOs;
+using WebAPI.Models;
 
 namespace WebAPI.Interfaces
 {
@@ -7,5 +8,6 @@ namespace WebAPI.Interfaces
         Task<ServiceDTO> CreateServiceAsync(Guid businessId, Guid ownerId, CreateServiceDTO createServiceDto);
         Task<IEnumerable<ServiceDTO>> GetServicesForBusinessAsync(Guid businessId);
         Task<ServiceDTO> UpdateServiceAsync(Guid businessId, Guid serviceId, Guid ownerId, UpdateServiceDTO updateServiceDto);
+        Task<Service?> GetByIdAsync(Guid serviceId);
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Data;
 
@@ -11,9 +12,11 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251231152144_AddScheduleAndAvailabilitySystem")]
+    partial class AddScheduleAndAvailabilitySystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,7 +160,7 @@ namespace WebAPI.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time");
 
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid>("SchedulePolicyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("StartDate")
@@ -168,7 +171,7 @@ namespace WebAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceId");
+                    b.HasIndex("SchedulePolicyId");
 
                     b.ToTable("BreakRules");
                 });
@@ -181,9 +184,6 @@ namespace WebAPI.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("AdvanceBookingDays")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -206,11 +206,6 @@ namespace WebAPI.Migrations
                     b.PrimitiveCollection<string>("ServiceIds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Timezone")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -317,21 +312,18 @@ namespace WebAPI.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<TimeSpan?>("EndTime")
-                        .HasColumnType("time");
-
                     b.Property<bool>("IsWorkingDay")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid>("SchedulePolicyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<TimeSpan?>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<string>("WorkingIntervals")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceId");
+                    b.HasIndex("SchedulePolicyId");
 
                     b.ToTable("DateExceptions");
                 });
@@ -352,23 +344,54 @@ namespace WebAPI.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid>("SchedulePolicyId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<string>("WorkingIntervals")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceId");
+                    b.HasIndex("SchedulePolicyId");
 
                     b.ToTable("RecurringRules");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.SchedulePolicy", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastGeneratedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("OpenWeeksAhead")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Timezone")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId");
+
+                    b.ToTable("SchedulePolicies");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Service", b =>
@@ -397,6 +420,9 @@ namespace WebAPI.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<Guid?>("SchedulePolicyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -406,6 +432,8 @@ namespace WebAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BusinessId");
+
+                    b.HasIndex("SchedulePolicyId");
 
                     b.HasIndex("UserId");
 
@@ -496,34 +524,32 @@ namespace WebAPI.Migrations
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
-
                     b.Property<bool>("IsWorkingDay")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("ServiceId")
+                    b.Property<Guid>("SchedulePolicyId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                    b.Property<string>("WorkingIntervals")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServiceId");
+                    b.HasIndex("SchedulePolicyId");
 
                     b.ToTable("WeeklyWorkingRules");
                 });
 
             modelBuilder.Entity("WebAPI.Models.BreakRule", b =>
                 {
-                    b.HasOne("WebAPI.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
+                    b.HasOne("WebAPI.Models.SchedulePolicy", "SchedulePolicy")
+                        .WithMany("BreakRules")
+                        .HasForeignKey("SchedulePolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Service");
+                    b.Navigation("SchedulePolicy");
                 });
 
             modelBuilder.Entity("WebAPI.Models.BusinessPartner", b =>
@@ -537,24 +563,35 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Models.DateException", b =>
                 {
-                    b.HasOne("WebAPI.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
+                    b.HasOne("WebAPI.Models.SchedulePolicy", "SchedulePolicy")
+                        .WithMany("DateExceptions")
+                        .HasForeignKey("SchedulePolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Service");
+                    b.Navigation("SchedulePolicy");
                 });
 
             modelBuilder.Entity("WebAPI.Models.RecurringRule", b =>
                 {
-                    b.HasOne("WebAPI.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
+                    b.HasOne("WebAPI.Models.SchedulePolicy", "SchedulePolicy")
+                        .WithMany("RecurringRules")
+                        .HasForeignKey("SchedulePolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Service");
+                    b.Navigation("SchedulePolicy");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.SchedulePolicy", b =>
+                {
+                    b.HasOne("WebAPI.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Business");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Service", b =>
@@ -565,6 +602,11 @@ namespace WebAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("WebAPI.Models.SchedulePolicy", "SchedulePolicy")
+                        .WithMany("Services")
+                        .HasForeignKey("SchedulePolicyId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("WebAPI.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -572,6 +614,8 @@ namespace WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Business");
+
+                    b.Navigation("SchedulePolicy");
 
                     b.Navigation("User");
                 });
@@ -589,18 +633,31 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Models.WeeklyWorkingRule", b =>
                 {
-                    b.HasOne("WebAPI.Models.Service", "Service")
-                        .WithMany()
-                        .HasForeignKey("ServiceId")
+                    b.HasOne("WebAPI.Models.SchedulePolicy", "SchedulePolicy")
+                        .WithMany("WeeklyWorkingRules")
+                        .HasForeignKey("SchedulePolicyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Service");
+                    b.Navigation("SchedulePolicy");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Business", b =>
                 {
                     b.Navigation("Partners");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.SchedulePolicy", b =>
+                {
+                    b.Navigation("BreakRules");
+
+                    b.Navigation("DateExceptions");
+
+                    b.Navigation("RecurringRules");
+
+                    b.Navigation("Services");
+
+                    b.Navigation("WeeklyWorkingRules");
                 });
 
             modelBuilder.Entity("WebAPI.Models.Service", b =>

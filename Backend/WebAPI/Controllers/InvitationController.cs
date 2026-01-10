@@ -17,9 +17,12 @@ namespace WebAPI.Controllers
             _businessInvitationRepository = businessInvitationRepository;
         }
 
-        // GET /invitations/my
         [Authorize]
         [HttpGet("my")]
+        [EndpointSummary("Get My Invitations")]
+        [EndpointDescription("Retrieve all pending business invitations for the current user. Returns invitations with status (Pending/Expired). " +
+            "Includes: invitation ID, business name, inviter name, message, invitation date, and expiration date. " +
+            "Automatically expires invitations older than 7 days. Authorization: Users can only view their own invitations.")]
         public async Task<IActionResult> GetMyInvitations()
         {
             try
@@ -37,9 +40,14 @@ namespace WebAPI.Controllers
             }
         }
 
-        // POST /invitations/{id}/respond
         [Authorize]
         [HttpPost("{invitationId}/respond")]
+        [EndpointSummary("Respond to Invitation")]
+        [EndpointDescription("Accept or decline a business invitation. Once accepted, the user becomes a partner of the business. " +
+            "The request body should be a boolean: true to accept, false to decline. " +
+            "Example: true (in request body). " +
+            "Status changes to 'Accepted' or 'Declined' accordingly. " +
+            "Authorization: Users can only respond to their own invitations.")]
         public async Task<IActionResult> RespondToInvitation(Guid invitationId, [FromBody] bool respond)
         {
             try
@@ -48,7 +56,7 @@ namespace WebAPI.Controllers
                 if (userIdString == null) return Unauthorized();
                 Guid userId = Guid.Parse(userIdString);
 
-                
+
                 var invitation = await _businessInvitationRepository.RespondToInvitationAsync(invitationId, userId, respond);
                 return Ok(invitation);
             }

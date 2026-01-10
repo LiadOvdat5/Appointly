@@ -31,6 +31,17 @@ builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IBusinessInvitationRepository, BusinessInvitationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 
+// Register Schedule & Availability Repositories
+builder.Services.AddScoped<IWeeklyWorkingRuleRepository, WeeklyWorkingRuleRepository>();
+builder.Services.AddScoped<IBreakRuleRepository, BreakRuleRepository>();
+builder.Services.AddScoped<IRecurringRuleRepository, RecurringRuleRepository>();
+builder.Services.AddScoped<IDateExceptionRepository, DateExceptionRepository>();
+builder.Services.AddScoped<IServiceScheduleRepository, ServiceScheduleRepository>();
+
+// Register Schedule & Availability Services
+builder.Services.AddScoped<SlotGenerationService>();
+// builder.Services.AddScoped<AvailabilityRulesService>(); // Disabled during refactor
+
 // Add authorization services
 builder.Services.AddAuthorization();
 

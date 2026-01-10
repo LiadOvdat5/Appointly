@@ -24,6 +24,15 @@ namespace WebAPI.Models
         [MaxLength(20, ErrorMessage = "Phone number cannot exceed 20 characters.")]
         public string? Phone { get; set; }
 
+        // Schedule settings
+        [Required]
+        [MaxLength(100)]
+        public string Timezone { get; set; } = "UTC";
+
+        [Required]
+        [Range(1, 365, ErrorMessage = "AdvanceBookingDays must be between 1 and 365.")]
+        public int AdvanceBookingDays { get; set; } = 90;
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]

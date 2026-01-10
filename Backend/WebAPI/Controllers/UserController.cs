@@ -20,6 +20,9 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpGet("{id}")]
+        [EndpointSummary("Get User Details")]
+        [EndpointDescription("Retrieve user information by ID. Returns user profile including name, email, and role. " +
+            "Authorization: User can retrieve any user's profile. Example ID: 550e8400-e29b-41d4-a716-446655440000")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             try
@@ -35,6 +38,10 @@ namespace WebAPI.Controllers
 
         [Authorize]
         [HttpPatch("{id}")]
+        [EndpointSummary("Update User Profile")]
+        [EndpointDescription("Update user profile information. Supports partial updates - only include fields you want to change. " +
+            "Fields: name (string, optional), email (string, optional, must be unique), password (string, optional). " +
+            "Example: { \"name\": \"Jane Doe\", \"email\": \"jane@example.com\" }. Authorization: Users can only update their own profile.")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
         {
             try

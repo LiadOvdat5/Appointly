@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace WebAPI.Models
@@ -29,5 +30,10 @@ namespace WebAPI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation properties
+        public Business? Business { get; set; }
+        public User? User { get; set; }
+        public ICollection<ServiceSchedule> ServiceSchedules { get; set; } = new List<ServiceSchedule>();
     }
 }
