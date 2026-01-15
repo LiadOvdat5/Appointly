@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Data;
 
@@ -11,9 +12,11 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260112203013_RefactorAppointmentAddTimesAndScheduleRelationship")]
+    partial class RefactorAppointmentAddTimesAndScheduleRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +75,8 @@ namespace WebAPI.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.HasIndex("ServiceScheduleId");
+                    b.HasIndex("ServiceScheduleId")
+                        .IsUnique();
 
                     b.ToTable("Appointments");
                 });
@@ -551,8 +555,8 @@ namespace WebAPI.Migrations
                         .IsRequired();
 
                     b.HasOne("WebAPI.Models.ServiceSchedule", "ServiceSchedule")
-                        .WithMany("Appointments")
-                        .HasForeignKey("ServiceScheduleId")
+                        .WithOne("Appointment")
+                        .HasForeignKey("WebAPI.Models.Appointment", "ServiceScheduleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -662,7 +666,7 @@ namespace WebAPI.Migrations
 
             modelBuilder.Entity("WebAPI.Models.ServiceSchedule", b =>
                 {
-                    b.Navigation("Appointments");
+                    b.Navigation("Appointment");
                 });
 #pragma warning restore 612, 618
         }

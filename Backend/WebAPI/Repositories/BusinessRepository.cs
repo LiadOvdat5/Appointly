@@ -42,6 +42,11 @@ namespace WebAPI.Repositories
             return BusinessMapper.ToBusinessDTO(business);
         }
 
+        public async Task<Business?> GetBusinessEntityByIdAsync(Guid id)
+        {
+            return await _context.Businesses.FindAsync(id);
+        }
+
         public async Task<IEnumerable<BusinessDTO>> GetAllBusinessesAsync()
         {
             var businesses = await _context.Businesses.ToListAsync();

@@ -17,7 +17,6 @@ namespace WebAPI.Data
         public DbSet<AvailabilityRule> AvailabilityRules => Set<AvailabilityRule>();
         public DbSet<AvailabilitySlot> AvailabilitySlots => Set<AvailabilitySlot>();
         public DbSet<Appointment> Appointments => Set<Appointment>();
-        public DbSet<AppointmentSlot> AppointmentSlots => Set<AppointmentSlot>();
 
         // Schedule & Availability Models
         public DbSet<WeeklyWorkingRule> WeeklyWorkingRules => Set<WeeklyWorkingRule>();
@@ -82,6 +81,46 @@ namespace WebAPI.Data
             modelBuilder.Entity<ServiceSchedule>()
                 .HasIndex(ss => new { ss.ServiceId, ss.StartDateTime })
                 .IsUnique();
+
+            // =====================================================
+            // Appointment Relationships
+            // =====================================================
+
+            // Appointment → Service
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Service)
+                .WithMany()
+                .HasForeignKey(a => a.ServiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Appointment → Client (User)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Client)
+                .WithMany()
+                .HasForeignKey(a => a.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Appointment → Partner (User)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Partner)
+                .WithMany()
+                .HasForeignKey(a => a.PartnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Appointment → Business
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Business)
+                .WithMany()
+                .HasForeignKey(a => a.BusinessId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Appointment → ServiceSchedule (One-to-Many)
+            // Changed from one-to-one to allow multiple appointments per schedule (history tracking)
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.ServiceSchedule)
+                .WithMany(ss => ss.Appointments)
+                .HasForeignKey(a => a.ServiceScheduleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

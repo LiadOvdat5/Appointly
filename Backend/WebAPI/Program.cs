@@ -4,6 +4,7 @@ using WebAPI.Data;
 using WebAPI.Interfaces;
 using WebAPI.Repositories;
 using WebAPI.Services;
+using WebAPI.Utilities;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Options;
@@ -30,6 +31,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IBusinessInvitationRepository, BusinessInvitationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 
 // Register Schedule & Availability Repositories
 builder.Services.AddScoped<IWeeklyWorkingRuleRepository, WeeklyWorkingRuleRepository>();
@@ -41,6 +43,10 @@ builder.Services.AddScoped<IServiceScheduleRepository, ServiceScheduleRepository
 // Register Schedule & Availability Services
 builder.Services.AddScoped<SlotGenerationService>();
 // builder.Services.AddScoped<AvailabilityRulesService>(); // Disabled during refactor
+
+// Register Appointment Services
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+builder.Services.AddScoped<AppointmentValidator>();
 
 // Add authorization services
 builder.Services.AddAuthorization();

@@ -27,13 +27,17 @@ namespace WebAPI.Models
         [Required(ErrorMessage = "Status is required.")]
         public ScheduleStatus Status { get; set; } = ScheduleStatus.AVAILABLE;
 
+        // Optional: Track which appointment booked this slot
+        public Guid? AppointmentId { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Required]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation property
+        // Navigation properties
         public Service? Service { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }
