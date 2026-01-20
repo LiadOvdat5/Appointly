@@ -32,7 +32,7 @@ function App() {
 
   return (
     <div className="flex">
-      <Sidebar isLoggedIn={false} />
+      {/*<Sidebar isLoggedIn={false} />*/}
       <div className="flex-1">
         <Header
           onThemeToggle={handleThemeToggle}

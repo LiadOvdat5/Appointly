@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+/* Tailwind v4 theme tokens */
+@theme {
+  --color-primary: #197fe6;
+  --color-background-light: #f6f7f8;
+  --color-background-dark: #111921;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --font-display: Inter, system-ui, sans-serif;
+}
+
+/* optional, matches your old HTML behavior */
+html, body, #root {
+  min-height: max(884px, 100dvh);
+}

@@ -2,8 +2,8 @@ import React from "react";
 import { Label } from "../Topography/Label";
 
 export type CheckboxProps = {
-  label?: string;
-  checked: boolean;
+  label?: string; // Label displayed next to the checkbox
+  checked: boolean; // Whether the checkbox is checked
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   disabled?: boolean;

@@ -13,6 +13,7 @@ const router = createBrowserRouter([
     children: [
       { path: "ui-showcase", element: <UIShowcase /> },
       { path: "*", element: <NotFoundPage /> },
+      { path: "not-found", element: <NotFoundPage /> },
       { path: "login", element: <LoginPage /> },
     ],
   },

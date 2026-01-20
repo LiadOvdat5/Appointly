@@ -1,270 +1,362 @@
-import React from "react";
-import Heading from "../components/UI/Topography/Heading";
-import { Paragraph } from "../components/UI/Topography/Paragraph";
-import { Label } from "../components/UI/Topography/Label";
-import { Button } from "../components/UI/Button/Button";
-import { GoSearch } from "react-icons/go";
-import { IoMdClose } from "react-icons/io";
-import { InputField } from "../components/UI/Form/InputField";
-import { Textarea } from "../components/UI/Form/Textarea";
-import { Select } from "../components/UI/Form/Select";
-import { RadioGroup } from "../components/UI/Form/RadioGroup";
+import { useState } from "react";
+import { TopNavBar } from "../components/UI/TopNavBar";
+import { Card } from "../components/UI/Card";
+import {
+  SectionTitle,
+  Label,
+  H1,
+  H2,
+  H3,
+  Paragraph,
+  Caption,
+} from "../components/UI/Typography";
+import { Button } from "../components/UI/Button";
+import { Input } from "../components/UI/Input";
+import { Select } from "../components/UI/Select";
+import { Toggle } from "../components/UI/Toggle";
+import { Chip } from "../components/UI/Chip";
+import { TimeSlot } from "../components/UI/TimeSlot";
+import { Badge, PillBadge } from "../components/UI/Badge";
+import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { Checkbox } from "../components/UI/Form/Checkbox";
 import { FileUpload } from "../components/UI/Form/FileUpload";
-import { ToggleSwitch } from "../components/UI/Form/ToggleSwitch";
+import { RadioGroup } from "../components/UI/Form/RadioGroup";
+import { Select as FormSelect } from "../components/UI/Form/Select";
+import { Textarea } from "../components/UI/Form/Textarea";
+import { SelectableGroup } from "../components/UI/SelectableGroup";
 
-const UIShowcase: React.FC = () => {
-  const [textValue, setTextValue] = React.useState("");
-  const [emailValue, setEmailValue] = React.useState("");
-  const [passwordValue, setPasswordValue] = React.useState("");
-  const [textareaValue, setTextareaValue] = React.useState("");
-  const [selectValue, setSelectValue] = React.useState("");
-  const [radioValue, setRadioValue] = React.useState("");
-  const [fileValue, setFileValue] = React.useState<File | null>(null);
-  const [fileError, setFileError] = React.useState("");
-  const [fileDisabled, setFileDisabled] = React.useState(false);
-  const [fileRequired, setFileRequired] = React.useState(false);
-  const [toggleValue, setToggleValue] = React.useState(false);
-  const [toggleDisabled, setToggleDisabled] = React.useState(false);
+export default function UIShowcasePage() {
+  const [push, setPush] = useState(true);
+  const [category, setCategory] = useState("barbershop");
+  const [checked, setChecked] = useState(false);
+  const [contactMethod, setContactMethod] = useState("email");
+  const [notes, setNotes] = useState("");
+
+  type Filter = "haircut" | "massage" | "facial" | "yoga";
+  const [filter, setFilter] = useState<Filter>("haircut");
+
+  type Slot = "09:00" | "10:30" | "11:45";
+  const [slot, setSlot] = useState<Slot>("09:00");
 
   return (
-    <div className="min-h-screen bg-white text-black p-8">
-      {/* Page Title */}
-      <Heading level={1} className="mb-6">
-        UI Components Showcase
-      </Heading>
+    <div className="min-h-screen bg-background-light font-display text-[#111418] dark:bg-background-dark dark:text-gray-100">
+      <TopNavBar
+        title="BizSlot UI Style Guide"
+        version="v1.0.0"
+        onBack={() => history.back()}
+      />
 
-      {/* Typography */}
-      <section className="mb-8">
-        <Heading level={2} className="mb-4" style="underline">
-          Typography
-        </Heading>
-        {/** Headings */}
-        <Heading level={1} className="mb-2">
-          Heading 1
-        </Heading>
-        <Heading level={2} className="mb-2">
-          Heading 2
-        </Heading>
-        <Heading level={3} className="mb-2">
-          Heading 3
-        </Heading>
-        {/* Paragraphs */}
-        <section className="mb-8">
-          <Heading level={3} className="mb-4" style="underline">
-            Paragraphs
-          </Heading>
-          <Paragraph size="sm" color="black" weight="normal" align="left">
-            Small, black, normal weight, left aligned
-          </Paragraph>
-          <Paragraph size="md" color="gray" weight="medium" align="center">
-            Medium, gray, medium weight, center aligned
-          </Paragraph>
-          <Paragraph
-            size="lg"
-            color="white"
-            weight="bold"
-            align="right"
-            style="bg-gray-400"
-          >
-            Large, white, bold, right aligned (on black background)
-          </Paragraph>
+      <div className="mx-auto max-w-lg pb-20">
+        {/* 1. Typography */}
+        <section className="mt-4">
+          <SectionTitle>1. Typography</SectionTitle>
+
+          <div className="space-y-1 bg-white p-4 dark:bg-gray-900/50">
+            <div>
+              <Label>Headline H1 - 32px Bold</Label>
+              <H1>BizSlot App</H1>
+            </div>
+
+            <div className="pt-4">
+              <Label>Headline H2 - 28px Bold</Label>
+              <H2>Book an Appointment</H2>
+            </div>
+
+            <div className="pt-4">
+              <Label>Headline H3 - 24px Bold</Label>
+              <H3>Service Details</H3>
+            </div>
+
+            <div className="pt-4">
+              <Label>Body Text - 16px Regular</Label>
+              <Paragraph>
+                BizSlot connects clients with professionals. Easily manage your
+                schedule and appointments in one place.
+              </Paragraph>
+            </div>
+
+            <div className="pt-4">
+              <Label>Caption - 12px Medium</Label>
+              <Caption>Last updated: Oct 24, 2023</Caption>
+            </div>
+          </div>
         </section>
 
-        {/* Labels */}
+        {/* 2. Color Palette */}
         <section>
-          <Heading level={3} className="mb-4" style="underline">
-            Labels
-          </Heading>
+          <SectionTitle>2. Color Palette</SectionTitle>
 
-          <Label
-            htmlFor="input1"
-            size="sm"
-            color="gray"
-            weight="normal"
-            align="left"
-            style="mb-1 block"
-          >
-            Small gray label (for form field)
-          </Label>
-          <Label
-            htmlFor="input2"
-            size="md"
-            color="black"
-            weight="medium"
-            align="left"
-            style="mb-1 block"
-          >
-            Medium black label, medium weight
-          </Label>
-          <Label
-            size="md"
-            color="gray"
-            weight="normal"
-            align="center"
-            style="mb-1 block"
-          >
-            Centered UI hint label
-          </Label>
+          <div className="grid grid-cols-2 gap-4 p-4">
+            <div className="space-y-2">
+              <div className="flex h-16 w-full items-end rounded-lg bg-primary p-2">
+                <span className="text-[10px] font-bold text-white">
+                  PRIMARY (#197fe6)
+                </span>
+              </div>
+              <div className="flex h-16 w-full items-end rounded-lg bg-success p-2">
+                <span className="text-[10px] font-bold text-white">
+                  SUCCESS (#10b981)
+                </span>
+              </div>
+              <div className="flex h-16 w-full items-end rounded-lg bg-warning p-2">
+                <span className="text-[10px] font-bold text-white">
+                  WARNING (#f59e0b)
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex h-16 w-full items-end rounded-lg bg-danger p-2">
+                <span className="text-[10px] font-bold text-white">
+                  DANGER (#ef4444)
+                </span>
+              </div>
+              <div className="flex h-16 w-full items-end rounded-lg border border-gray-200 bg-background-light p-2">
+                <span className="text-[10px] font-bold text-gray-600">
+                  BG LIGHT (#f6f7f8)
+                </span>
+              </div>
+              <div className="flex h-16 w-full items-end rounded-lg border border-gray-700 bg-background-dark p-2">
+                <span className="text-[10px] font-bold text-gray-400">
+                  BG DARK (#111921)
+                </span>
+              </div>
+            </div>
+          </div>
         </section>
-      </section>
 
-      {/* Buttons */}
-      <section className="mb-8">
-        <Heading level={2} className="mb-4" style="underline">
-          Buttons
-        </Heading>
-        <div className="flex flex-col gap-4 max-w-md">
-          <Button variant="primary" size="md">
-            Primary Button
-          </Button>
-          <Button variant="secondary" size="md">
-            Secondary Button
-          </Button>
-          <Button variant="outline" size="md">
-            Outline Button
-          </Button>
-          <Button variant="outline" size="md" color="border-red-500">
-            Red Outline Button
-          </Button>
-          <Button
-            variant="primary"
-            size="md"
-            color="bg-green-500"
-            icon={<GoSearch size={20} />}
-          >
-            Icon Button (Search)
-          </Button>
-          <Button variant="primary" size="md" icon={<IoMdClose size={20} />}>
-            Icon Button (Close)
-          </Button>
-          <Button variant="primary" size="md" loading>
-            Loading Button
-          </Button>
-          <Button variant="primary" size="lg" fullWidth>
-            Full Width Button
-          </Button>
-          <Button variant="primary" size="sm" disabled>
-            Disabled Button
-          </Button>
-        </div>
-      </section>
+        {/* 3. Buttons */}
+        <section>
+          <SectionTitle>3. Buttons</SectionTitle>
 
-      {/* Form Inputs */}
-      <section className="mb-8">
-        <Heading level={2} className="mb-4" style="underline">
-          Inputs
-        </Heading>
+          <div className="space-y-4 p-4">
+            <Button variant="primary">Primary Action</Button>
+            <Button variant="secondary">Secondary Action</Button>
+            <Button variant="outline">Outline / Ghost</Button>
+            <Button disabled>Disabled State</Button>
+            <Button isLoading>Loading State</Button>
+          </div>
+        </section>
 
-        {/* Text Inputs */}
-        <div className="max-w-md space-y-6">
-          <InputField
-            type="text"
-            label="Text Input"
-            value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
-            placeholder="Enter text..."
-          />
-          <InputField
-            type="email"
-            label="Email Input"
-            value={emailValue}
-            onChange={(e) => setEmailValue(e.target.value)}
-            placeholder="Enter email..."
-          />
-          <InputField
-            type="password"
-            label="Password Input"
-            value={passwordValue}
-            onChange={(e) => setPasswordValue(e.target.value)}
-            placeholder="Enter password..."
-          />
-        </div>
+        {/* 4. Form Elements */}
+        <section>
+          <SectionTitle>4. Form Elements</SectionTitle>
 
-        {/* Textarea Inputs */}
-        <div className="max-w-md space-y-6">
-          <Textarea
-            label="Textarea Input"
-            value={textareaValue}
-            onChange={(e) => setTextareaValue(e.target.value)}
-            placeholder="Enter text..."
-          />
-        </div>
+          <div className="space-y-4 p-4">
+            <Input label="Full Name" placeholder="John Doe" />
+            <Select
+              label="Service Category"
+              value={category}
+              onChange={setCategory}
+              options={[
+                { value: "barbershop", label: "Barbershop" },
+                { value: "nail", label: "Nail Salon" },
+                { value: "consulting", label: "Consulting" },
+              ]}
+            />
 
-        {/* Select Inputs */}
-        <div className="max-w-md space-y-6">
-          <Select
-            label="Select Input"
-            value={selectValue}
-            onChange={(e) => setSelectValue(e.target.value)}
-            options={[
-              { value: "option1", label: "Option 1" },
-              { value: "option2", label: "Option 2" },
-              { value: "option3", label: "Option 3" },
-            ]}
-          />
-          <Select
-            label="Select Input"
-            value={selectValue}
-            onChange={(e) => setSelectValue(e.target.value)}
-            options={[
-              { value: "option1", label: "Option 1" },
-              { value: "option2", label: "Option 2" },
-              { value: "option3", label: "Option 3" },
-            ]}
-          />
-        </div>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm font-semibold text-[#111418] dark:text-gray-200">
+                Push Notifications
+              </span>
+              <Toggle
+                checked={push}
+                onChange={setPush}
+                selectedColor="bg-black"
+              />
+            </div>
 
-        {/* Radio Inputs */}
-        <div className="max-w-md space-y-6">
-          <RadioGroup
-            label="Radio Group"
-            value={radioValue}
-            onChange={(e) => setRadioValue(e.target.value)}
-            options={[
-              { value: "radio1", label: "Radio 1" },
-              { value: "radio2", label: "Radio 2" },
-              { value: "radio3", label: "Radio 3" },
-            ]}
-          />
-        </div>
+            {/* Checkbox */}
+            <Checkbox
+              label="I agree to the Terms and Conditions"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+            />
 
-        {/* File Upload */}
-        <div className="max-w-md space-y-6">
-          <FileUpload
-            label="File Upload"
-            value={fileValue}
-            onChange={(e) => {
-              const files = e.target.files;
-              if (files && files[0]) {
-                setFileValue(files[0]);
-              }
-            }}
-            accept=".jpg,.jpeg,.png"
-            error={fileError}
-            disabled={fileDisabled}
-            required={fileRequired}
-          />
-        </div>
+            {/* File Upload */}
+            <FileUpload
+              label="Upload Profile Picture"
+              onChange={(e) => {
+                const file = e.target.files ? e.target.files[0] : null;
+                console.log("Selected file:", file);
+              }}
+              accept="image/*"
+            />
 
-        {/* Toggle Switch */}
-        <div className="max-w-md space-y-6">
-          <ToggleSwitch
-            label="Toggle Switch"
-            checked={toggleValue}
-            onChange={(e) => setToggleValue(e.target.checked)}
-            disabled={toggleDisabled}
-          />
-        </div>
-      </section>
+            {/* Radio Buttons */}
+            <RadioGroup
+              label="Choose your preferred contact method"
+              options={[
+                { label: "Email", value: "email" },
+                { label: "Phone", value: "phone" },
+                { label: "SMS", value: "sms" },
+              ]}
+              value={contactMethod}
+              onChange={(e) => {
+                setContactMethod(e.target.value);
+                console.log("Selected contact method:", e.target.value);
+              }}
+            />
 
-      {/* Modal Placeholder */}
-      <section>
-        <Heading level={2} className="mb-4" style="underline">
-          Modal (Coming Soon)
-        </Heading>
-      </section>
+            {/* Textarea */}
+            <Textarea
+              label="Additional Notes"
+              placeholder="Enter any special requests or information here..."
+              value={notes}
+              onChange={(e) => {
+                console.log("Textarea content:", e.target.value);
+                setNotes(e.target.value);
+              }}
+            />
+          </div>
+        </section>
+
+        {/* 5. Selection UI */}
+        <section>
+          <SectionTitle>5. Selection UI</SectionTitle>
+
+          <div className="p-4">
+            <p className="mb-3 text-sm font-semibold text-[#111418] dark:text-gray-200">
+              Popular Filters
+            </p>
+            <SelectableGroup<Filter>
+              label="Popular Filters"
+              mode="multi"
+              value={filter}
+              onChange={(v) => setFilter(v as Filter)}
+              options={[
+                { value: "haircut", label: "Haircut" },
+                { value: "massage", label: "Massage" },
+                { value: "facial", label: "Facial" },
+                { value: "yoga", label: "Yoga" },
+              ]}
+              className="p-4"
+              renderItem={({ option, selected, toggle }) => (
+                <span key={option.value} className="mr-2 inline-block mb-2">
+                  <Chip selected={selected} onClick={toggle}>
+                    {option.label}
+                  </Chip>
+                </span>
+              )}
+            />
+
+            <p className="mb-3 mt-6 text-sm font-semibold text-[#111418] dark:text-gray-200">
+              Available Time Slots
+            </p>
+            <SelectableGroup<Slot>
+              label="Available Time Slots"
+              mode="single"
+              value={slot}
+              onChange={(v) => setSlot(v as Slot)}
+              options={[
+                { value: "09:00", label: "09:00 AM" },
+                { value: "10:30", label: "10:30 AM" },
+                { value: "11:45", label: "11:45 AM" },
+              ]}
+              className="p-4"
+              renderItem={({ option, selected, toggle }) => (
+                <span key={option.value} className="inline-block w-1/3 pr-2">
+                  <TimeSlot
+                    selected={selected}
+                    onClick={toggle}
+                    className="w-full"
+                  >
+                    {option.label}
+                  </TimeSlot>
+                </span>
+              )}
+            />
+          </div>
+        </section>
+
+        {/* 6. Component Blocks */}
+        <section>
+          <SectionTitle>6. Component Blocks</SectionTitle>
+
+          <div className="space-y-6 p-4">
+            {/* Business Card (built from Card + regular HTML layout) */}
+            <Card className="overflow-hidden">
+              <div className="relative h-32 w-full bg-gradient-to-r from-primary to-blue-400">
+                <img
+                  className="h-full w-full object-cover mix-blend-overlay"
+                  alt="Interior of a modern barbershop with leather chairs"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2Wc4aj59UpfYHDc54507r3t6wcAoPAv1DoQQzrwQWT0xGJsmlBO5Q6r7f45wjEkOft7LODk2aIayoO7EmQk9by1eraPWhGvm0he_LWbx2RDKMzU5bSVo2srWNdqJFeU072acJz6xExLgpGwdnfFVNpj5-wue7piby_3uJaC0SL2mZunORVwEWE1813rHxvA_CjfyU4Qr8wwoAT83dTTdkRGF9o_oubcEceBME--CNzzc2NOaYnGEqUCIw7svfIQzi7LEasqa8uw"
+                />
+
+                <div className="absolute right-2 top-2 flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-xs font-bold dark:bg-black/50">
+                  <MaterialIcon
+                    name="star"
+                    className="!text-xs text-yellow-500"
+                  />{" "}
+                  4.9
+                </div>
+              </div>
+
+              <div className="p-4">
+                <h4 className="text-lg font-bold dark:text-white">
+                  Royal Cuts Barber Shop
+                </h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Downtown • 1.2 miles away
+                </p>
+              </div>
+            </Card>
+
+            {/* Appointment Card */}
+            <Card className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex size-12 items-center justify-center rounded-lg bg-primary/10">
+                  <MaterialIcon
+                    name="event_upcoming"
+                    className="text-primary"
+                  />
+                </div>
+
+                <div>
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    Tomorrow, 10:30 AM
+                  </p>
+                  <h4 className="text-sm font-bold dark:text-white">
+                    Men&apos;s Classic Haircut
+                  </h4>
+                </div>
+              </div>
+
+              <PillBadge variant="confirmed">Confirmed</PillBadge>
+            </Card>
+
+            {/* Status Badges */}
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="pending">PENDING</Badge>
+              <Badge variant="active">ACTIVE</Badge>
+              <Badge variant="cancelled">CANCELLED</Badge>
+              <Badge variant="rescheduled">RESCHEDULED</Badge>
+            </div>
+          </div>
+        </section>
+
+        {/* 7. Other */}
+        <section>
+          <SectionTitle>7. Other </SectionTitle>
+
+          <div className="space-y-6 p-4">
+            {/* Select Dropdown */}
+            <FormSelect
+              label="Choose your preferred contact method"
+              options={[
+                { label: "Email", value: "email" },
+                { label: "Phone", value: "phone" },
+                { label: "SMS", value: "sms" },
+              ]}
+              value={contactMethod}
+              onChange={(e) => {
+                setContactMethod(e.target.value);
+                console.log("Selected contact method:", e.target.value);
+              }}
+            />
+          </div>
+        </section>
+      </div>
     </div>
   );
-};
-
-export default UIShowcase;
+}
