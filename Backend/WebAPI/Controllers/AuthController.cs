@@ -42,14 +42,30 @@ namespace WebAPI.Controllers
 
         [HttpPost("login")]
         [EndpointSummary("User Login")]
-        [EndpointDescription("Authenticate user with email and password. Returns a JWT token for subsequent authenticated requests. " +
-            "Include the token in the Authorization header as: Bearer {token}. Example: { \"email\": \"john@example.com\", \"password\": \"SecurePass123!\" }")]
+        [EndpointDescription("Authenticate user with email and password. Returns user data and sets JWT token in HttpOnly cookie. " +
+            "The token will be automatically included in subsequent requests. Example: { \"email\": \"john@example.com\", \"password\": \"SecurePass123!\" }")]
         public async Task<IActionResult> Login([FromBody] LoginDTO loginDto)
         {
             try
             {
-                var token = await _authRepository.LoginAsync(loginDto);
-                return Ok(new { token });
+                var loginResult = await _authRepository.LoginAsync(loginDto);
+
+                // Set token in HttpOnly cookie
+                Response.Cookies.Append("access_token", loginResult.Token, new CookieOptions
+                {
+                    HttpOnly = true,        // Cannot be accessed by JavaScript
+                    Secure = false,         // Set to true in production (HTTPS)
+                    SameSite = SameSiteMode.Lax,
+                    Expires = loginResult.ExpiresAt,
+                    Path = "/"              // Available for all endpoints
+                });
+
+                // Return only non-sensitive data in response body
+                return Ok(new
+                {
+                    user = loginResult.User,
+                    expiresAt = loginResult.ExpiresAt
+                });
             }
             catch (Exception ex)
             {
@@ -60,12 +76,51 @@ namespace WebAPI.Controllers
         [HttpPost("logout")]
         [Authorize]
         [EndpointSummary("User Logout")]
-        [EndpointDescription("Log out the current user. Clear the JWT token on the client side to complete logout. " +
+        [EndpointDescription("Log out the current user. Clears the JWT token cookie. " +
             "For added security, consider implementing a token blacklist on the server.")]
         public async Task<IActionResult> Logout()
         {
-            // JWT invalidation is typically handled client-side or via token blacklist
+            // Clear the access token cookie
+            Response.Cookies.Delete("access_token");
+
             return Ok(new { success = true });
+        }
+
+        [HttpGet("me")]
+        [Authorize]
+        [EndpointSummary("Get Current User")]
+        [EndpointDescription("Returns the authenticated user's information including userId, name, and role. " +
+            "Requires a valid JWT token in the access_token cookie.")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                // Extract user ID from JWT claims
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { error = "Invalid token" });
+                }
+
+                var userId = userIdClaim.Value;
+                var user = await _authRepository.GetUserByEmailAsync(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "");
+
+                if (user == null)
+                {
+                    return NotFound(new { error = "User not found" });
+                }
+
+                return Ok(new
+                {
+                    userId = user.Id,
+                    name = user.Name,
+                    role = user.Role
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
     }
 }

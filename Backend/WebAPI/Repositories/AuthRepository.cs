@@ -41,7 +41,7 @@ namespace WebAPI.Repositories
             return user.ToUserDTO();
         }
 
-        public async Task<string> LoginAsync(LoginDTO loginDto)
+        public async Task<LoginResponseDTO> LoginAsync(LoginDTO loginDto)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
             if (user == null)
@@ -54,9 +54,14 @@ namespace WebAPI.Repositories
                 throw new Exception("Invalid credentials.");
 
             //Generate JWT token
-            var token = _jwtService.GenerateToken(user);
+            var tokenResult = _jwtService.GenerateToken(user);
 
-            return token;
+            return new LoginResponseDTO
+            {
+                Token = tokenResult.Token,
+                ExpiresAt = tokenResult.ExpiresAt,
+                User = user.ToUserDTO()
+            };
         }
 
         public async Task<bool> LogoutAsync(string userId)

@@ -1,16 +1,57 @@
 import { useState } from "react";
+import { AxiosError } from "axios";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
+import { login } from "../api/auth";
+import { Alert } from "../components/UI/Alert";
+import { useAppDispatch } from "../redux/hooks";
+import { setSession } from "../redux/authSlice";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const dispatch = useAppDispatch();
+
+  function toEpochMs(expiresAt: string) {
+    const ms = new Date(expiresAt).getTime();
+    return Number.isFinite(ms) ? ms : Date.now();
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Add authentication logic here
+
     console.log("Login attempt:", { email, password });
+    try {
+      const session = await login({ email, password });
+
+      //store JWT
+      dispatch(
+        setSession({
+          user: session.user,
+          expiresAt: toEpochMs(session.expiresAt),
+        }),
+      );
+
+      setError("");
+
+      // TODO: redirect to dashboard
+      // navigate("/dashboard");
+    } catch (err: unknown) {
+      // Axios error handling
+      const error = err as AxiosError<{ message?: string }>;
+      if (error.response) {
+        // Backend responded with 4xx / 5xx
+        setError(error.response.data?.error ?? "Login failed");
+      } else {
+        setError("Network error. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -22,7 +63,12 @@ export default function LoginPage() {
           <H1>Welcome Back</H1>
           <Paragraph>Sign in to manage your appointments.</Paragraph>
         </div>
-
+        {} {/* Error Message */}
+        {error && (
+          <Alert variant="error" className="mb-4">
+            {error}
+          </Alert>
+        )}
         {/* Form Fields */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Email Field */}
@@ -61,11 +107,11 @@ export default function LoginPage() {
           </div>
 
           {/* Primary Action */}
-          <Button type="submit">Sign In</Button>
+          <Button type="submit" isLoading={loading}>
+            Sign In
+          </Button>
         </form>
-
         {/* Divider */}
-
         <div className="relative py-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
@@ -76,7 +122,6 @@ export default function LoginPage() {
             </Paragraph>
           </div>
         </div>
-
         {/* Social Actions */}
         <Button
           variant="outline"
@@ -105,7 +150,6 @@ export default function LoginPage() {
           </svg>
           Google
         </Button>
-
         {/* Footer */}
         <div className="mt-auto py-8 text-center">
           <p className="text-slate-600 dark:text-slate-400 text-sm">

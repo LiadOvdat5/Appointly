@@ -1,7 +1,7 @@
 import React from "react";
 
 type Variant = "primary" | "secondary" | "outline";
-type Size = "md";
+type Size = "md" | "sm";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
@@ -25,7 +25,10 @@ export function Button({
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 " +
     "ring-offset-white dark:ring-offset-background-dark";
 
-  const sizes: Record<Size, string> = { md: "py-3 px-4" };
+  const sizes: Record<Size, string> = {
+    md: "py-3 px-4",
+    sm: "py-2 px-3 text-sm",
+  };
 
   const variants: Record<Variant, string> = {
     primary:

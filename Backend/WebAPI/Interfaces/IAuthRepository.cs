@@ -7,9 +7,9 @@ namespace WebAPI.Interfaces
     public interface IAuthRepository
     {
         Task<UserDTO?> RegisterAsync(RegisterUserDTO registerDto);
-        Task<string?> LoginAsync(LoginDTO loginDto);
+        Task<LoginResponseDTO?> LoginAsync(LoginDTO loginDto);
         Task<bool> LogoutAsync(string userId);
         Task<User?> GetUserByEmailAsync(string email);
-        
+
     }
 }

@@ -10,7 +10,7 @@ namespace WebAPI.Services
 {
     public interface IJwtService
     {
-        string GenerateToken(User user);
+        JwtTokenResult GenerateToken(User user);
     }
 
     public class JwtService : IJwtService
@@ -22,7 +22,7 @@ namespace WebAPI.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(User user)
+        public JwtTokenResult GenerateToken(User user)
         {
             var claims = new[]
             {
@@ -44,7 +44,17 @@ namespace WebAPI.Services
                 signingCredentials: creds
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtTokenResult
+            {
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                ExpiresAt = expires
+            };
         }
+    }
+
+    public class JwtTokenResult
+    {
+        public string Token { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
     }
 }
