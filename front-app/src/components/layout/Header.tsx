@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { H1 } from "../UI/Typography";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -6,50 +5,55 @@ import { selectIsAuthenticated } from "../../redux/authSelectors";
 import { clearSession } from "../../redux/authSlice";
 import { logout } from "../../api/auth";
 import { Button } from "../UI/Button";
+//import { useCanGoBack } from "../../navigation/NavigationContext"; // if you added it
 
-export const Header = () => {
+export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
   const navigate = useNavigate();
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const dispatch = useAppDispatch();
-
-  const handleLogout = async () => {
-    await logout(); // backend clears cookie
-    dispatch(clearSession());
-  };
+  //const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  //const dispatch = useAppDispatch();
+  //const canGoBack = typeof useCanGoBack === "function" ? useCanGoBack() : true;
+  const canGoBack = true;
 
   return (
-    <div className="flex items-center p-4 justify-between sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm">
-      {/* Top Navigation */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
-      >
-        <span
-          className="material-symbols-outlined text-slate-900 dark:text-white"
-          style={{ fontSize: "24px" }}
-        >
-          arrow_back
-        </span>
-      </button>
-      <H1 className="flex-1 text-center pr-10">BizSlot</H1>
-
-      {/* Logout Button */}
-      <div>
-        {isAuthenticated ? (
-          <Button variant="secondary" size="sm" onClick={handleLogout}>
-            Logout
-          </Button>
-        ) : (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => navigate("/login")}
+    <div className="sticky top-0 z-10 flex items-center justify-between bg-background-light/90 p-4 backdrop-blur-sm dark:bg-background-dark/90">
+      {/* Left: Back only when meaningful */}
+      <div className="w-10">
+        {canGoBack && (
+          <button
+            onClick={() => navigate(-1)}
+            className="flex size-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
+            aria-label="Back"
           >
-            Login
-          </Button>
+            <span
+              className="material-symbols-outlined text-slate-900 dark:text-white"
+              style={{ fontSize: "24px" }}
+            >
+              arrow_back
+            </span>
+          </button>
         )}
+      </div>
+
+      {/* Center */}
+      <H1 className="flex-1 text-center">BizSlot</H1>
+
+      {/* Right: menu if logged in, else login */}
+      <div className="w-10 flex justify-end">
+        <button
+          onClick={onOpenMenu}
+          className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
+          aria-label="Open menu"
+        >
+          <span
+            className="material-symbols-outlined text-slate-900 dark:text-white"
+            style={{ fontSize: "24px" }}
+          >
+            menu
+          </span>
+        </button>
       </div>
     </div>
   );
 };
+
 export default Header;
