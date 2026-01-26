@@ -2,7 +2,7 @@
 import React, { useMemo } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { selectUser } from "../../redux/authSelectors";
+import { selectIsAuthenticated, selectUser } from "../../redux/authSelectors";
 import { Button } from "../UI/Button";
 import { logout } from "../../api/auth";
 import { clearSession } from "../../redux/authSlice";
@@ -33,6 +33,7 @@ type Props = {
   collapsedWidth?: string; // tailwind width classes
   expandedWidth?: string;
   sections?: SidebarSection[]; // override if you want
+  onClose?: () => void;
 };
 
 /**
@@ -46,7 +47,9 @@ export function RoleSidebar({
   className,
   expandedWidth = "w-[279px]",
   sections,
+  onClose,
 }: Props) {
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
   const role = (user?.role ?? Role.Guest) as Role;
   const navigate = useNavigate();
@@ -211,6 +214,7 @@ export function RoleSidebar({
                   key={item.key}
                   to={item.to}
                   end={item.matchExact}
+                  onClick={() => onClose && onClose()}
                   className={({ isActive }) =>
                     [
                       "group flex items-center gap-3 rounded-xl px-3 py-2",
@@ -255,15 +259,25 @@ export function RoleSidebar({
                 </div>
               </div>
               <div>
-                {user ? (
-                  <Button variant="secondary" size="sm" onClick={handleLogout}>
+                {isAuthenticated ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      handleLogout();
+                      onClose?.();
+                    }}
+                  >
                     Logout
                   </Button>
                 ) : (
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => navigate("/login")}
+                    onClick={() => {
+                      navigate("/login");
+                      onClose?.();
+                    }}
                   >
                     Login
                   </Button>

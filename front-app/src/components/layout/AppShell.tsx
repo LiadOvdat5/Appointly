@@ -18,7 +18,7 @@ export function AppShell() {
 
       {/* Sidebar overlay (always available; contents filter by role) */}
       <SidebarOverlay open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
-        <RoleSidebar />
+        <RoleSidebar onClose={() => setSidebarOpen(false)} />
       </SidebarOverlay>
     </div>
   );
