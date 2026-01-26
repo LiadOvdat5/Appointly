@@ -7,14 +7,18 @@ import { ProtectedRoute } from "./ProtectedRoute.tsx";
 import LoginPage from "../pages/LoginPage.tsx";
 import RegisterPage from "../pages/RegisterPage.tsx";
 import NotFoundPage from "../pages/NotFoundPage.tsx";
-import LandingPage from "../pages/LandingPage.tsx";
+import SelectionPage from "../pages/SelectionPage.tsx";
+import BusinessOwnerLandingPage from "../pages/BusinessOwnerLandingPage.tsx";
+import CustomerLandingPage from "../pages/CustomerLandingPage.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <LandingPage /> },
+      { index: true, element: <SelectionPage /> },
+      { path: "business-owner", element: <BusinessOwnerLandingPage /> },
+      { path: "customer", element: <CustomerLandingPage /> },
       { path: "ui-showcase", element: <UIShowcase /> },
       { path: "*", element: <NotFoundPage /> },
       { path: "not-found", element: <NotFoundPage /> },
