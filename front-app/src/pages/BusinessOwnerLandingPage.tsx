@@ -2,6 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { FeatureCard } from "../components/UI/FeatureCard";
 import { StatCard } from "../components/UI/StatCard";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { IMAGES } from "../assets/images";
+import {
+  MOCK_BUSINESS_FEATURES,
+  MOCK_BUSINESS_STATS,
+  MOCK_TESTIMONIAL,
+} from "../constants/mockData";
 
 /**
  * BusinessOwnerLandingPage - Landing page for business owners
@@ -10,29 +16,13 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 const BusinessOwnerLandingPage = () => {
   const navigate = useNavigate();
 
-  const features = [
-    {
-      icon: <MaterialIcon name="calendar_month" className="!text-3xl" />,
-      title: "Smart Availability",
-      description:
-        "Intelligent sync with your personal calendar and buffer times between sessions.",
-      iconBgColor: "bg-blue-50 text-[#1980e6]",
-    },
-    {
-      icon: <MaterialIcon name="group" className="!text-3xl" />,
-      title: "Team Coordination",
-      description:
-        "Manage staff schedules, permissions, and performance metrics in one dashboard.",
-      iconBgColor: "bg-purple-50 text-purple-600",
-    },
-    {
-      icon: <MaterialIcon name="insights" className="!text-3xl" />,
-      title: "Client Growth",
-      description:
-        "Built-in marketing tools and loyalty programs to keep your clients coming back.",
-      iconBgColor: "bg-orange-50 text-orange-600",
-    },
-  ];
+  // Map mock features data with icon components
+  const features = MOCK_BUSINESS_FEATURES.map((feature) => ({
+    icon: <MaterialIcon name={feature.iconName} className="!text-3xl" />,
+    title: feature.title,
+    description: feature.description,
+    iconBgColor: feature.iconBgColor,
+  }));
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 dark:bg-background-dark">
@@ -41,8 +31,7 @@ const BusinessOwnerLandingPage = () => {
           <div
             className="flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-2xl items-start justify-end px-6 pb-12"
             style={{
-              backgroundImage:
-                'linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuDNOLSapDQO3Ra98PspY5doe5KJ-sdNiYavW9TYa6vXpQZfvgxE4ce7to_13Pn9NYWR_QfHlTvjG5oK7iMxedp8yG1OfLGoJl22hLmfFeE3bzq_wVAwyJMN4MxYYK0vq1y1KcQ5PFWPuuPlQ4dQ2qe8r4CpxdEQYJ-AGzznUwzNwz_GiTKWkLUvN_4Ub5qwy6hQgyBbeORiISxyL710zKuNt0_dM1wnFJbBzBtGSarYlxBw2Bo47Q68YhlO4mXCZ3kJ6jNGDFxcgQ")',
+              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%), url("${IMAGES.businessOwner.heroBackground}")`,
             }}
           >
             <div className="flex flex-col gap-3 text-left">
@@ -74,16 +63,16 @@ const BusinessOwnerLandingPage = () => {
 
       <div className="px-4 pt-8">
         <StatCard
-          label="Business Impact"
-          value="Save 10 hours/week"
-          description="Average time saved on admin tasks"
+          label={MOCK_BUSINESS_STATS.label}
+          value={MOCK_BUSINESS_STATS.value}
+          description={MOCK_BUSINESS_STATS.description}
           icon={
             <MaterialIcon
-              name="trending_up"
-              className="text-green-600 !text-3xl"
+              name={MOCK_BUSINESS_STATS.iconName}
+              className={`${MOCK_BUSINESS_STATS.iconColor} !text-3xl`}
             />
           }
-          iconBgColor="bg-green-100"
+          iconBgColor={MOCK_BUSINESS_STATS.iconBgColor}
         />
       </div>
 
@@ -102,17 +91,15 @@ const BusinessOwnerLandingPage = () => {
           <div
             className="w-full h-full bg-cover bg-center"
             style={{
-              backgroundImage:
-                'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDAez7ST3KGntoyQpUt3Je16G2cvuVC5XFaSRex-8VuX8_7AtNuRnCACZPkxZNmVfOjZi_QrLDqLgeF1Z6f6e5y7eREE79vpOVkfzZn5R594oI9IMHbJ4adZvqkAJoFsifQCtPpWl_1l2augxHcirBRYv_eZFTW1miI9KrvvaZpGHEE-ACJQKUY3augxgbE3bUkWGSc4NSAaN2_mVixdGNxV0snXpn3Gc0wcQB8D7-rFfNVvYdDw7pZuJnSJWe5U31pi1kC-QRvWQ")',
+              backgroundImage: `url("${IMAGES.businessOwner.testimonialBackground}")`,
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6">
             <p className="text-white text-lg font-semibold italic">
-              "The transition was seamless. I finally feel back in control of my
-              studio's growth."
+              "{MOCK_TESTIMONIAL.quote}"
             </p>
             <p className="text-white/80 text-sm mt-2">
-              — Sarah J., Studio Owner
+              — {MOCK_TESTIMONIAL.author}
             </p>
           </div>
         </div>

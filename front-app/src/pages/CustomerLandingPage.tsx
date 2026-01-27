@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { ServiceCard } from "../components/UI/ServiceCard";
 import { PillBadge } from "../components/UI/PillBadge";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { IMAGES } from "../assets/images";
+import { MOCK_SERVICE_CATEGORIES } from "../constants/mockData";
 
 /**
  * CustomerLandingPage - Landing page for customers
@@ -10,32 +12,13 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 const CustomerLandingPage = () => {
   const navigate = useNavigate();
 
-  const services = [
-    {
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuDAez7ST3KGntoyQpUt3Je16G2cvuVC5XFaSRex-8VuX8_7AtNuRnCACZPkxZNmVfOjZi_QrLDqLgeF1Z6f6e5y7eREE79vpOVkfzZn5R594oI9IMHbJ4adZvqkAJoFsifQCtPpWl_1l2augxHcirBRYv_eZFTW1miI9KrvvaZpGHEE-ACJQKUY3augxgbE3bUkWGSc4NSAaN2_mVixdGNxV0snXpn3Gc0wcQB8D7-rFfNVvYdDw7pZuJnSJWe5U31pi1kC-QRvWQ",
-      title: "Barbershops",
-      subtitle: "120+ Nearby",
-    },
-    {
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBet0ZpTVwjFnBIK50iBJq4j4sR3rYLzcBijna-J4LZI4xdq3iKjC27bTW-O7yb97ZT2Cq3ABfAbxZWAJMbiaC4BvVSf6rSDh8DV7B0GP3LwmtM9gvWyObR_bY9_CSCL_LQ9QhufFHsLr_7g-ieZs7GkhgeREosDLvjjkM23kI6uhHe8oTll_XQQsGdrI4uhFNxbPfbtng3dLtOuV_7ajhI7fdi-5jN5xvr_22cXeJ_3bxtHybk507jAicZ-R4f_LZB5OVYGfnE4Q",
-      title: "Medical Clinics",
-      subtitle: "45+ Nearby",
-    },
-    {
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuD-l0DrJlK7DjaZcNNJBz0_LADbg1tHjsUeJ0a0i5-rI8L7dkcccaMlS4ELPpJvzB_9AonxsV51KBaUU7BWJuWmV_Za0E9oQcuDlhXm6Ouhpb1NZ8PWh-RUK9QqsrtPu_035_KHB97c1OP0A_eWwQ6SFDYVisrW9eAzlvWSvLUmA_Sh6zkrDOjvEWcVs9o-y4nf7xtkg4JGU3kvHrmpzvx_nB6eogMJ9yjjn0gRRl0AuOSPlZSRtaZpvDdziwVa1EKPHpYmsOMi_w",
-      title: "Gyms & Studios",
-      subtitle: "80+ Nearby",
-    },
-    {
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuDNOLSapDQO3Ra98PspY5doe5KJ-sdNiYavW9TYa6vXpQZfvgxE4ce7to_13Pn9NYWR_QfHlTvjG5oK7iMxedp8yG1OfLGoJl22hLmfFeE3bzq_wVAwyJMN4MxYYK0vq1y1KcQ5PFWPuuPlQ4dQ2qe8r4CpxdEQYJ-AGzznUwzNwz_GiTKWkLUvN_4Ub5qwy6hQgyBbeORiISxyL710zKuNt0_dM1wnFJbBzBtGSarYlxBw2Bo47Q68YhlO4mXCZ3kJ6jNGDFxcgQ",
-      title: "Beauty Salons",
-      subtitle: "200+ Nearby",
-    },
-  ];
+  // Map mock data with corresponding images
+  const services = MOCK_SERVICE_CATEGORIES.map((category) => ({
+    image:
+      IMAGES.categories[category.category as keyof typeof IMAGES.categories],
+    title: category.title,
+    subtitle: category.subtitle,
+  }));
 
   return (
     <div className="relative flex h-auto min-h-screen w-full flex-col bg-slate-50 dark:bg-background-dark">

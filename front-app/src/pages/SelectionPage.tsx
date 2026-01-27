@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { SelectionCard } from "../components/UI/SelectionCard";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { MOCK_ACCOUNT_TYPES } from "../constants/mockData";
 
 /**
  * SelectionPage - User type selection landing page
@@ -25,32 +26,41 @@ const SelectionPage = () => {
         <div className="flex flex-col gap-4">
           <SelectionCard
             icon={
-              <div className="bg-blue-50 p-3 rounded-xl">
+              <div
+                className={
+                  MOCK_ACCOUNT_TYPES.businessOwner.iconBgColor +
+                  " p-3 rounded-xl"
+                }
+              >
                 <MaterialIcon
-                  name="storefront"
-                  className="text-[#1980e6] !text-4xl"
+                  name={MOCK_ACCOUNT_TYPES.businessOwner.iconName}
+                  className={`${MOCK_ACCOUNT_TYPES.businessOwner.iconColor} !text-4xl`}
                 />
               </div>
             }
-            title="Business Owner"
-            description="Manage services, team, and growth. Everything you need to scale your local business."
-            buttonLabel="Get Started as Owner"
+            title={MOCK_ACCOUNT_TYPES.businessOwner.title}
+            description={MOCK_ACCOUNT_TYPES.businessOwner.description}
+            buttonLabel={MOCK_ACCOUNT_TYPES.businessOwner.buttonLabel}
             buttonVariant="primary"
             onClick={() => navigate("/business-owner")}
           />
 
           <SelectionCard
             icon={
-              <div className="bg-orange-50 p-3 rounded-xl">
+              <div
+                className={
+                  MOCK_ACCOUNT_TYPES.customer.iconBgColor + " p-3 rounded-xl"
+                }
+              >
                 <MaterialIcon
-                  name="person_search"
-                  className="text-orange-500 !text-4xl"
+                  name={MOCK_ACCOUNT_TYPES.customer.iconName}
+                  className={`${MOCK_ACCOUNT_TYPES.customer.iconColor} !text-4xl`}
                 />
               </div>
             }
-            title="Customer"
-            description="Discover local services and book instantly. Manage all your appointments in one place."
-            buttonLabel="Book a Service"
+            title={MOCK_ACCOUNT_TYPES.customer.title}
+            description={MOCK_ACCOUNT_TYPES.customer.description}
+            buttonLabel={MOCK_ACCOUNT_TYPES.customer.buttonLabel}
             buttonVariant="dark"
             onClick={() => navigate("/customer")}
           />

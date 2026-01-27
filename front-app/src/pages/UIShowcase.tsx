@@ -24,6 +24,8 @@ import { RadioGroup } from "../components/UI/Form/RadioGroup";
 import { Select as FormSelect } from "../components/UI/Form/Select";
 import { Textarea } from "../components/UI/Form/Textarea";
 import { SelectableGroup } from "../components/UI/SelectableGroup";
+import { IMAGES } from "../assets/images";
+import { MOCK_BUSINESS_CARD, MOCK_APPOINTMENT } from "../constants/mockData";
 
 export default function UIShowcasePage() {
   const [push, setPush] = useState(true);
@@ -280,7 +282,7 @@ export default function UIShowcasePage() {
                 <img
                   className="h-full w-full object-cover mix-blend-overlay"
                   alt="Interior of a modern barbershop with leather chairs"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2Wc4aj59UpfYHDc54507r3t6wcAoPAv1DoQQzrwQWT0xGJsmlBO5Q6r7f45wjEkOft7LODk2aIayoO7EmQk9by1eraPWhGvm0he_LWbx2RDKMzU5bSVo2srWNdqJFeU072acJz6xExLgpGwdnfFVNpj5-wue7piby_3uJaC0SL2mZunORVwEWE1813rHxvA_CjfyU4Qr8wwoAT83dTTdkRGF9o_oubcEceBME--CNzzc2NOaYnGEqUCIw7svfIQzi7LEasqa8uw"
+                  src={IMAGES.showcase.royalCutsBarberShop}
                 />
 
                 <div className="absolute right-2 top-2 flex items-center gap-1 rounded bg-white/90 px-2 py-1 text-xs font-bold dark:bg-black/50">
@@ -288,16 +290,16 @@ export default function UIShowcasePage() {
                     name="star"
                     className="!text-xs text-yellow-500"
                   />{" "}
-                  4.9
+                  {MOCK_BUSINESS_CARD.rating}
                 </div>
               </div>
 
               <div className="p-4">
                 <h4 className="text-lg font-bold dark:text-white">
-                  Royal Cuts Barber Shop
+                  {MOCK_BUSINESS_CARD.name}
                 </h4>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Downtown • 1.2 miles away
+                  {MOCK_BUSINESS_CARD.location} • {MOCK_BUSINESS_CARD.distance}
                 </p>
               </div>
             </Card>
@@ -314,15 +316,17 @@ export default function UIShowcasePage() {
 
                 <div>
                   <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Tomorrow, 10:30 AM
+                    {MOCK_APPOINTMENT.time}
                   </p>
                   <h4 className="text-sm font-bold dark:text-white">
-                    Men&apos;s Classic Haircut
+                    {MOCK_APPOINTMENT.serviceName}
                   </h4>
                 </div>
               </div>
 
-              <PillBadge variant="confirmed">Confirmed</PillBadge>
+              <PillBadge variant="confirmed">
+                {MOCK_APPOINTMENT.status}
+              </PillBadge>
             </Card>
 
             {/* Status Badges */}
