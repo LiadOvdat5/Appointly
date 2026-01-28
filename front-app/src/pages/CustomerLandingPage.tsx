@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ServiceCard } from "../components/UI/ServiceCard";
 import { PillBadge } from "../components/UI/PillBadge";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
@@ -10,6 +11,7 @@ import { MOCK_SERVICE_CATEGORIES } from "../constants/mockData";
  * Features search, service categories, and quick booking
  */
 const CustomerLandingPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Map mock data with corresponding images
@@ -27,11 +29,10 @@ const CustomerLandingPage = () => {
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-3">
               <h2 className="text-[#0e141b] dark:text-white text-3xl font-black leading-tight tracking-tight">
-                Find and book the best local services
+                {t("landing.customer.title")}
               </h2>
               <p className="text-[#4e7397] dark:text-gray-400 text-base font-medium">
-                The easiest way to schedule your life. Verified pros at your
-                fingertips.
+                {t("landing.customer.subtitle")}
               </p>
             </div>
 
@@ -41,7 +42,7 @@ const CustomerLandingPage = () => {
               </div>
               <input
                 className="w-full bg-white dark:bg-gray-900 border-none rounded-2xl py-4 pl-10 pr-4 shadow-xl shadow-blue-100/50 dark:shadow-none text-base focus:ring-2 focus:ring-[#1980e6] placeholder:text-slate-400 dark:text-white"
-                placeholder="Barber, Dentist, Yoga..."
+                placeholder={t("landing.customer.searchPlaceholder")}
                 type="text"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") navigate("/search");
@@ -87,7 +88,7 @@ const CustomerLandingPage = () => {
         <div className="px-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-[#0e141b] dark:text-white text-lg font-bold">
-              Explore Services
+              {t("landing.customer.categories")}
             </h3>
             <button
               onClick={() => navigate("/search")}

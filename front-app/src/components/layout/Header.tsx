@@ -1,10 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { H1 } from "../UI/Typography";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { selectIsAuthenticated } from "../../redux/authSelectors";
-import { clearSession } from "../../redux/authSlice";
-import { logout } from "../../api/auth";
-import { Button } from "../UI/Button";
+import { LanguageToggle } from "../LanguageToggle";
 //import { useCanGoBack } from "../../navigation/NavigationContext"; // if you added it
 
 export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
@@ -15,7 +11,10 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
   const canGoBack = true;
 
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between bg-background-light/90 p-4 backdrop-blur-sm dark:bg-background-dark/90">
+    <div
+      className="sticky top-0 z-10 flex items-center justify-between bg-background-light/90 p-4 backdrop-blur-sm dark:bg-background-dark/90 ltr"
+      dir="ltr"
+    >
       {/* Left: Back only when meaningful */}
       <div className="w-10">
         {canGoBack && (
@@ -37,8 +36,9 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
       {/* Center */}
       <H1 className="flex-1 text-center">BizSlot</H1>
 
-      {/* Right: menu if logged in, else login */}
-      <div className="w-10 flex justify-end">
+      {/* Right: Language toggle and menu */}
+      <div className="flex items-center gap-2 w-20 justify-end">
+        <LanguageToggle compact={true} />
         <button
           onClick={onOpenMenu}
           className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"

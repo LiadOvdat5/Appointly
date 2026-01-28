@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
@@ -9,6 +10,7 @@ import { useAppDispatch } from "../redux/hooks";
 import { setSession } from "../redux/authSlice";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -42,12 +44,12 @@ export default function LoginPage() {
       // navigate("/dashboard");
     } catch (err: unknown) {
       // Axios error handling
-      const error = err as AxiosError<{ message?: string }>;
+      const error = err as AxiosError<{ error?: string; message?: string }>;
       if (error.response) {
         // Backend responded with 4xx / 5xx
-        setError(error.response.data?.error ?? "Login failed");
+        setError(error.response.data?.error ?? t("login.error"));
       } else {
-        setError("Network error. Please try again.");
+        setError(t("login.networkError"));
       }
     } finally {
       setLoading(false);
@@ -60,8 +62,8 @@ export default function LoginPage() {
       <main className="flex-1 flex flex-col px-6 max-w-md mx-auto w-full">
         {/* Header Text */}
         <div className="pt-4 pb-8 text-center">
-          <H1>Welcome Back</H1>
-          <Paragraph>Sign in to manage your appointments.</Paragraph>
+          <H1>{t("login.title")}</H1>
+          <Paragraph>{t("login.subtitle")}</Paragraph>
         </div>
         {} {/* Error Message */}
         {error && (
@@ -74,10 +76,10 @@ export default function LoginPage() {
           {/* Email Field */}
 
           <Input
-            label="Email"
+            label={t("login.email")}
             id="email"
             type="email"
-            placeholder="name@example.com"
+            placeholder={t("login.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -87,10 +89,10 @@ export default function LoginPage() {
 
           <div>
             <Input
-              label="Password"
+              label={t("login.password")}
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder={t("login.passwordPlaceholder")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -108,7 +110,7 @@ export default function LoginPage() {
 
           {/* Primary Action */}
           <Button type="submit" isLoading={loading}>
-            Sign In
+            {t("login.button")}
           </Button>
         </form>
         {/* Divider */}
@@ -153,12 +155,12 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-auto py-8 text-center">
           <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Don't have an account?{" "}
+            {t("login.noAccount")}{" "}
             <a
               href="/register"
               className="font-bold text-primary hover:text-blue-600 transition-colors"
             >
-              Register
+              {t("login.signUp")}
             </a>
           </p>
         </div>

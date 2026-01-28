@@ -1,10 +1,11 @@
 /**
  * Mock Data
  * Temporary hardcoded data to be replaced with real API data in the future
- * This file centralizes all mock/placeholder data used across the application
+ * This file contains ONLY visual/placeholder data (images, icons, categories, etc.)
+ * ALL TEXT content should come from i18n translations
  */
 
-// Customer Landing Page - Service Categories
+// Customer Landing Page - Service Category Icons & Images
 export const MOCK_SERVICE_CATEGORIES = [
   {
     title: "Barbershops",
@@ -28,68 +29,61 @@ export const MOCK_SERVICE_CATEGORIES = [
   },
 ];
 
-// Business Owner Landing Page - Features
+// Business Owner Landing Page - Feature Icons & Colors (Text comes from i18n)
 export const MOCK_BUSINESS_FEATURES = [
   {
-    title: "Smart Availability",
-    description:
-      "Intelligent sync with your personal calendar and buffer times between sessions.",
     iconName: "calendar_month",
     iconBgColor: "bg-blue-50 text-[#1980e6]",
   },
   {
-    title: "Team Coordination",
-    description:
-      "Manage staff schedules, permissions, and performance metrics in one dashboard.",
     iconName: "group",
     iconBgColor: "bg-purple-50 text-purple-600",
   },
   {
-    title: "Client Growth",
-    description:
-      "Built-in marketing tools and loyalty programs to keep your clients coming back.",
     iconName: "insights",
     iconBgColor: "bg-orange-50 text-orange-600",
   },
 ];
 
-// Business Owner Landing Page - Statistics
+// Business Owner Landing Page - Statistics Icon & Colors (Text comes from i18n)
 export const MOCK_BUSINESS_STATS = {
-  label: "Business Impact",
-  value: "Save 10 hours/week",
-  description: "Average time saved on admin tasks",
   iconName: "trending_up",
   iconColor: "text-green-600",
   iconBgColor: "bg-green-100",
 };
 
-// Business Owner Landing Page - Testimonial
-export const MOCK_TESTIMONIAL = {
-  quote:
-    "The transition was seamless. I finally feel back in control of my studio's growth.",
-  author: "Sarah J., Studio Owner",
-};
+// Business Owner Landing Page - How It Works Icons & Colors (Text comes from i18n)
+export const MOCK_HOW_IT_WORKS_STEPS = [
+  {
+    iconName: "storefront",
+  },
+  {
+    iconName: "event_available",
+  },
+  {
+    iconName: "rocket_launch",
+  },
+];
 
-// Selection Page - Account Types
+// Selection Page - Account Type Icons & Colors (Text comes from i18n)
 export const MOCK_ACCOUNT_TYPES = {
   businessOwner: {
-    title: "Business Owner",
-    description:
-      "Manage services, team, and growth. Everything you need to scale your local business.",
-    buttonLabel: "Get Started as Owner",
     iconName: "storefront",
     iconBgColor: "bg-blue-50",
     iconColor: "text-[#1980e6]",
   },
   customer: {
-    title: "Customer",
-    description:
-      "Discover local services and book instantly. Manage all your appointments in one place.",
-    buttonLabel: "Book a Service",
     iconName: "person_search",
     iconBgColor: "bg-orange-50",
     iconColor: "text-orange-500",
   },
+};
+
+// Business Owner Landing Page - Example Testimonial (Actual mock content, NOT text UI)
+export const MOCK_TESTIMONIAL = {
+  quote:
+    "The transition was seamless. I finally feel back in control of my studio's growth.",
+  author: "Sarah J., Studio Owner",
 };
 
 // UI Showcase - Business Card Example

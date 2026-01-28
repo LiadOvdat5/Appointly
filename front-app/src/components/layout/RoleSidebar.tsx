@@ -7,6 +7,7 @@ import { Button } from "../UI/Button";
 import { logout } from "../../api/auth";
 import { clearSession } from "../../redux/authSlice";
 import { Role } from "../../constants/roles";
+import { LanguageToggle } from "../LanguageToggle";
 
 // If you have a roles enum in backend, mirror it here.
 // Removed the local Role definition as it is now imported from constants.
@@ -239,7 +240,8 @@ export function RoleSidebar({
       </nav>
 
       {/* Bottom */}
-      <div className="p-3 border-t border-gray-200 dark:border-gray-800">
+      <div className="p-3 border-t border-gray-200 dark:border-gray-800 space-y-2">
+        {/* User Card */}
         <div className="flex items-center gap-3 rounded-xl px-3 py-2 bg-gray-50 dark:bg-gray-900/40">
           <div className="size-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center shrink-0">
             <Icon

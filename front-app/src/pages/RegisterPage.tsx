@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
@@ -9,6 +10,7 @@ import { useAppDispatch } from "../redux/hooks";
 import { setSession } from "../redux/authSlice";
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,13 +49,13 @@ export default function RegisterPage() {
       // navigate("/dashboard");
     } catch (err: unknown) {
       // Axios error handling
-      const error = err as AxiosError<{ error?: string }>;
+      const error = err as AxiosError<{ error?: string; title?: string }>;
       console.error("Registration error:", err);
       if (error.response) {
         // Backend responded with 4xx / 5xx
-        setError(error.response.data?.title ?? "Registration failed");
+        setError(error.response.data?.error ?? t("register.error"));
       } else {
-        setError("Network error. Please try again.");
+        setError(t("register.networkError"));
       }
     } finally {
       setLoading(false);
@@ -66,8 +68,8 @@ export default function RegisterPage() {
       <main className="flex-1 flex flex-col px-6 max-w-md mx-auto w-full">
         {/* Header Text */}
         <div className="pt-4 pb-8 text-center">
-          <H1>Create Account</H1>
-          <Paragraph>Sign up to start managing your appointments.</Paragraph>
+          <H1>{t("register.title")}</H1>
+          <Paragraph>{t("register.subtitle")}</Paragraph>
         </div>
 
         {/* Error Message */}
@@ -81,10 +83,10 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Name Field */}
           <Input
-            label="Full Name"
+            label={t("register.name")}
             id="name"
             type="text"
-            placeholder="John Doe"
+            placeholder={t("register.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -92,10 +94,10 @@ export default function RegisterPage() {
 
           {/* Email Field */}
           <Input
-            label="Email"
+            label={t("register.email")}
             id="email"
             type="email"
-            placeholder="name@example.com"
+            placeholder={t("register.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -103,10 +105,10 @@ export default function RegisterPage() {
 
           {/* Password Field */}
           <Input
-            label="Password"
+            label={t("register.password")}
             id="password"
             type="password"
-            placeholder="Enter your password"
+            placeholder={t("register.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -114,7 +116,7 @@ export default function RegisterPage() {
 
           {/* Primary Action */}
           <Button type="submit" isLoading={loading}>
-            Create Account
+            {t("register.button")}
           </Button>
         </form>
 
@@ -162,12 +164,12 @@ export default function RegisterPage() {
         {/* Footer */}
         <div className="mt-auto py-8 text-center">
           <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Already have an account?{" "}
+            {t("register.haveAccount")}{" "}
             <a
               href="/login"
               className="font-bold text-primary hover:text-blue-600 transition-colors"
             >
-              Sign In
+              {t("register.signIn")}
             </a>
           </p>
         </div>

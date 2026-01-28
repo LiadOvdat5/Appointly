@@ -1,5 +1,5 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SelectionCard } from "../components/UI/SelectionCard";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { MOCK_ACCOUNT_TYPES } from "../constants/mockData";
@@ -7,8 +7,10 @@ import { MOCK_ACCOUNT_TYPES } from "../constants/mockData";
 /**
  * SelectionPage - User type selection landing page
  * Allows users to choose between Business Owner or Customer flow
+ * Text comes from i18n translations
  */
 const SelectionPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -16,10 +18,10 @@ const SelectionPage = () => {
       <div className="flex-1 flex flex-col px-6 pt-8 pb-10 justify-center gap-8">
         <div className="text-center space-y-2">
           <h1 className="text-[#0e141b] dark:text-white text-3xl font-black leading-tight tracking-tight">
-            How would you like to use BizSlot?
+            {t("selection.title")}
           </h1>
           <p className="text-[#4e7397] dark:text-gray-400 text-base">
-            Select your account type to get started.
+            {t("selection.subtitle")}
           </p>
         </div>
 
@@ -34,13 +36,13 @@ const SelectionPage = () => {
               >
                 <MaterialIcon
                   name={MOCK_ACCOUNT_TYPES.businessOwner.iconName}
-                  className={`${MOCK_ACCOUNT_TYPES.businessOwner.iconColor} !text-4xl`}
+                  className={`${MOCK_ACCOUNT_TYPES.businessOwner.iconColor} text-4xl!`}
                 />
               </div>
             }
-            title={MOCK_ACCOUNT_TYPES.businessOwner.title}
-            description={MOCK_ACCOUNT_TYPES.businessOwner.description}
-            buttonLabel={MOCK_ACCOUNT_TYPES.businessOwner.buttonLabel}
+            title={t("selection.businessOwner.title")}
+            description={t("selection.businessOwner.description")}
+            buttonLabel={t("selection.businessOwner.buttonLabel")}
             buttonVariant="primary"
             onClick={() => navigate("/business-owner")}
           />
@@ -54,13 +56,13 @@ const SelectionPage = () => {
               >
                 <MaterialIcon
                   name={MOCK_ACCOUNT_TYPES.customer.iconName}
-                  className={`${MOCK_ACCOUNT_TYPES.customer.iconColor} !text-4xl`}
+                  className={`${MOCK_ACCOUNT_TYPES.customer.iconColor} text-4xl!`}
                 />
               </div>
             }
-            title={MOCK_ACCOUNT_TYPES.customer.title}
-            description={MOCK_ACCOUNT_TYPES.customer.description}
-            buttonLabel={MOCK_ACCOUNT_TYPES.customer.buttonLabel}
+            title={t("selection.customer.title")}
+            description={t("selection.customer.description")}
+            buttonLabel={t("selection.customer.buttonLabel")}
             buttonVariant="dark"
             onClick={() => navigate("/customer")}
           />
@@ -69,7 +71,7 @@ const SelectionPage = () => {
 
       <div className="p-6 text-center">
         <p className="text-xs text-[#4e7397] dark:text-gray-400">
-          By continuing, you agree to our Terms of Service and Privacy Policy.
+          {t("selection.termsNotice")}
         </p>
         <div className="h-8"></div>
       </div>
