@@ -39,7 +39,23 @@ namespace WebAPI.Repositories
             if (business == null)
                 throw new KeyNotFoundException($"Business with ID {id} not found.");
 
-            return BusinessMapper.ToBusinessDTO(business);
+            // Convert stored string IDs to GUIDs and load categories
+            var categoryGuids = new List<Guid>();
+            if (business.CategoryIds != null && business.CategoryIds.Any())
+            {
+                categoryGuids = business.CategoryIds.Select(Guid.Parse).ToList();
+            }
+
+            var categories = new List<CategoryDTO>();
+            if (categoryGuids.Any())
+            {
+                categories = await _context.Categories
+                    .Where(c => categoryGuids.Contains(c.Id))
+                    .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description })
+                    .ToListAsync();
+            }
+
+            return BusinessMapper.ToBusinessDTO(business, categories);
         }
 
         public async Task<Business?> GetBusinessEntityByIdAsync(Guid id)
@@ -47,10 +63,33 @@ namespace WebAPI.Repositories
             return await _context.Businesses.FindAsync(id);
         }
 
-        public async Task<IEnumerable<BusinessDTO>> GetAllBusinessesAsync()
+        public async Task<IEnumerable<BusinessDTO>> GetAllBusinessesAsync(Guid? categoryId = null)
         {
+            // Load all businesses and apply category filter in memory to handle string storage of category IDs
             var businesses = await _context.Businesses.ToListAsync();
-            return businesses.Select(b => BusinessMapper.ToBusinessDTO(b)).ToList();
+            if (categoryId.HasValue)
+            {
+                var categoryIdString = categoryId.Value.ToString();
+                businesses = businesses.Where(b => b.CategoryIds != null && b.CategoryIds.Contains(categoryIdString)).ToList();
+            }
+
+            var result = new List<BusinessDTO>();
+            foreach (var b in businesses)
+            {
+                var categories = new List<CategoryDTO>();
+                if (b.CategoryIds != null && b.CategoryIds.Any())
+                {
+                    var categoryGuids = b.CategoryIds.Select(Guid.Parse).ToList();
+                    categories = await _context.Categories
+                        .Where(c => categoryGuids.Contains(c.Id))
+                        .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description })
+                        .ToListAsync();
+                }
+
+                result.Add(BusinessMapper.ToBusinessDTO(b, categories));
+            }
+
+            return result;
         }
 
         public async Task<BusinessDTO> UpdateBusinessAsync(Guid businessId, Guid userId, UpdateBusinessDTO updateBusinessDto)

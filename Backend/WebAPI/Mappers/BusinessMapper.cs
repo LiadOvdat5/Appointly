@@ -19,14 +19,15 @@ namespace WebAPI.Mappers
             };
         }
 
-        public static BusinessDTO ToBusinessDTO(Business business)
+        public static BusinessDTO ToBusinessDTO(Business business, IEnumerable<CategoryDTO>? categories = null)
         {
             return new BusinessDTO
             {
                 Id = business.Id,
                 Name = business.Name,
                 Address = business.Address ?? string.Empty,
-                Phone = business.Phone ?? string.Empty
+                Phone = business.Phone ?? string.Empty,
+                Categories = categories?.ToList() ?? new List<CategoryDTO>()
             };
         }
 

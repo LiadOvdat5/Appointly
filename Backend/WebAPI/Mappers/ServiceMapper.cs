@@ -33,7 +33,8 @@ namespace WebAPI.Mappers
                 Duration = service.Duration,
                 Price = service.Price,
                 CreatedAt = service.CreatedAt,
-                UpdatedAt = service.UpdatedAt
+                UpdatedAt = service.UpdatedAt,
+                CategoryId = service.CategoryId
             };
         }
 
@@ -54,6 +55,10 @@ namespace WebAPI.Mappers
             // UserId will be validated externally, only set if provided
             if (dto.UserId.HasValue)
                 service.UserId = dto.UserId.Value;
+
+            // Category changes are validated by repository, set if provided
+            if (dto.CategoryId.HasValue)
+                service.CategoryId = dto.CategoryId.Value;
 
             service.UpdatedAt = DateTime.UtcNow;
         }

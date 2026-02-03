@@ -19,5 +19,8 @@ namespace WebAPI.DTOs
 
         [Required(ErrorMessage = "UserId is required.")]
         public Guid UserId { get; set; }
+
+        [Required(ErrorMessage = "CategoryId is required.")]
+        public Guid CategoryId { get; set; }
     }
 }

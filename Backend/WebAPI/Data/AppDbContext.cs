@@ -24,6 +24,7 @@ namespace WebAPI.Data
         public DbSet<RecurringRule> RecurringRules => Set<RecurringRule>();
         public DbSet<DateException> DateExceptions => Set<DateException>();
         public DbSet<ServiceSchedule> ServiceSchedules => Set<ServiceSchedule>();
+        public DbSet<Category> Categories => Set<Category>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -82,6 +83,8 @@ namespace WebAPI.Data
                 .HasIndex(ss => new { ss.ServiceId, ss.StartDateTime })
                 .IsUnique();
 
+
+
             // =====================================================
             // Appointment Relationships
             // =====================================================
@@ -92,6 +95,33 @@ namespace WebAPI.Data
                 .WithMany()
                 .HasForeignKey(a => a.ServiceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Service → Category (service owns category assignment)
+            modelBuilder.Entity<Service>()
+                .HasOne(s => s.Category)
+                .WithMany()
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Category name unique index
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.Name)
+                .IsUnique();
+
+            // Seed initial categories (including an 'Uncategorized' used as a safe default for existing services)
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = Guid.Parse("11111111-1111-1111-1111-111111111111"), Name = "Uncategorized" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e01"), Name = "Men's Haircut" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e02"), Name = "Women's Haircut" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e03"), Name = "Beard Trim" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e04"), Name = "Hair Coloring" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e05"), Name = "Nail Polish" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e06"), Name = "Gel Nails" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e07"), Name = "Manicure" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e08"), Name = "Pedicure" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e09"), Name = "Eyebrow Shaping" },
+                new Category { Id = Guid.Parse("4b9a5c9a-6d9f-4f6e-8b9d-1a2b3c4d5e10"), Name = "Facial Treatment" }
+            );
 
             // Appointment → Client (User)
             modelBuilder.Entity<Appointment>()

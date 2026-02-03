@@ -26,6 +26,10 @@ namespace WebAPI.Models
 
         public decimal? Price { get; set; }
 
+        [Required(ErrorMessage = "CategoryId is required.")]
+        public Guid CategoryId { get; set; }
+        public Category? Category { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]

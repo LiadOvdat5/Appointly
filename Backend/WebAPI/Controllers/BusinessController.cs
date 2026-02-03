@@ -112,11 +112,11 @@ namespace WebAPI.Controllers
         [EndpointSummary("List All Businesses")]
         [EndpointDescription("Retrieve a list of all businesses in the system. Returns business summary information for each business. " +
             "Includes: ID, name, address, phone, owner ID. Authorization: Any authenticated user can list businesses.")]
-        public async Task<IActionResult> GetAllBusinesses()
+        public async Task<IActionResult> GetAllBusinesses([FromQuery] Guid? categoryId = null)
         {
             try
             {
-                var businesses = await _businessRepository.GetAllBusinessesAsync();
+                var businesses = await _businessRepository.GetAllBusinessesAsync(categoryId);
                 return Ok(businesses);
             }
             catch (Exception ex)
@@ -231,6 +231,35 @@ namespace WebAPI.Controllers
 
                 var service = await _serviceRepository.UpdateServiceAsync(businessId, serviceId, userId, updateServiceDto);
                 return Ok(service);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("{businessId}/services/{serviceId}")]
+        [EndpointSummary("Delete Service")]
+        [EndpointDescription("Delete a service from the business. Authorization: Only the business owner can delete services.")]
+        public async Task<IActionResult> DeleteService(Guid businessId, Guid serviceId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                await _serviceRepository.DeleteServiceAsync(businessId, serviceId, userId);
+                return NoContent();
             }
             catch (UnauthorizedAccessException ex)
             {

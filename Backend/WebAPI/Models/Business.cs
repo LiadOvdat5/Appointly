@@ -14,6 +14,8 @@ namespace WebAPI.Models
 
         public List<BusinessPartner> Partners { get; set; } = new();
         public List<Guid> ServiceIds { get; set; } = new();
+        // Derived Category IDs aggregated from current services (maintained by Service repository)
+        public List<string> CategoryIds { get; set; } = new();
 
         [Required(ErrorMessage = "Business name is required.")]
         [MaxLength(100, ErrorMessage = "Business name cannot exceed 100 characters.")]

@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi("v1", options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddDocumentTransformer<CookieSecuritySchemeTransformer>();
+
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -46,6 +49,7 @@ builder.Services.AddScoped<IBusinessRepository, BusinessRepository>();
 builder.Services.AddScoped<IBusinessInvitationRepository, BusinessInvitationRepository>();
 builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
 // Register Schedule & Availability Repositories
 builder.Services.AddScoped<IWeeklyWorkingRuleRepository, WeeklyWorkingRuleRepository>();

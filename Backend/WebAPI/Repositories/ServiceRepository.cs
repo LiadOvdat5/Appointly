@@ -30,10 +30,18 @@ namespace WebAPI.Repositories
             if (!partnerExists)
                 throw new KeyNotFoundException($"User with ID {createServiceDto.UserId} is not a partner of this business.");
 
+            // Validate category exists
+            var category = await _context.Categories.FindAsync(createServiceDto.CategoryId);
+            if (category == null)
+                throw new KeyNotFoundException("Category not found.");
+
             var service = ServiceMapper.ToService(createServiceDto, businessId);
 
             _context.Services.Add(service);
             await _context.SaveChangesAsync();
+
+            // Recalculate business categories after adding service
+            await RecalculateBusinessCategories(businessId);
 
             return ServiceMapper.ToServiceDTO(service);
         }
@@ -74,12 +82,45 @@ namespace WebAPI.Repositories
                     throw new KeyNotFoundException("New user is not a partner of this business.");
             }
 
+            // Validate category if provided
+            if (updateServiceDto.CategoryId.HasValue)
+            {
+                var category = await _context.Categories.FindAsync(updateServiceDto.CategoryId.Value);
+                if (category == null)
+                    throw new KeyNotFoundException("Category not found.");
+            }
+
             ServiceMapper.UpdateServiceFromDTO(service, updateServiceDto);
 
             _context.Services.Update(service);
             await _context.SaveChangesAsync();
 
+            // Recalculate business categories after updating service
+            await RecalculateBusinessCategories(service.BusinessId);
+
             return ServiceMapper.ToServiceDTO(service);
+        }
+
+        public async Task DeleteServiceAsync(Guid businessId, Guid serviceId, Guid ownerId)
+        {
+            var service = await _context.Services.FindAsync(serviceId)
+                ?? throw new KeyNotFoundException("Service not found.");
+
+            if (service.BusinessId != businessId)
+                throw new KeyNotFoundException("Service does not belong to this business.");
+
+            var business = await _context.Businesses
+                .FirstOrDefaultAsync(b => b.Id == businessId)
+                ?? throw new KeyNotFoundException("Business not found.");
+
+            if (business.OwnerId != ownerId)
+                throw new UnauthorizedAccessException("Only the business owner can delete services.");
+
+            _context.Services.Remove(service);
+            await _context.SaveChangesAsync();
+
+            // Recalculate business categories after removing service
+            await RecalculateBusinessCategories(businessId);
         }
 
         public async Task<Service?> GetByIdAsync(Guid serviceId)
@@ -88,6 +129,23 @@ namespace WebAPI.Repositories
                 .Include(s => s.Business)
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.Id == serviceId);
+        }
+
+        private async Task RecalculateBusinessCategories(Guid businessId)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null) return;
+
+            var categoryIds = await _context.Services
+                .Where(s => s.BusinessId == businessId && s.CategoryId != Guid.Empty)
+                .Select(s => s.CategoryId)
+                .Distinct()
+                .ToListAsync();
+
+            // Store as string representations to match primitive collection storage
+            business.CategoryIds = categoryIds.Select(g => g.ToString()).ToList();
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
         }
     }
 }
