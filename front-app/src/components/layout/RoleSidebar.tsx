@@ -7,7 +7,6 @@ import { Button } from "../UI/Button";
 import { logout } from "../../api/auth";
 import { clearSession } from "../../redux/authSlice";
 import { Role } from "../../constants/roles";
-import { LanguageToggle } from "../LanguageToggle";
 
 // If you have a roles enum in backend, mirror it here.
 // Removed the local Role definition as it is now imported from constants.

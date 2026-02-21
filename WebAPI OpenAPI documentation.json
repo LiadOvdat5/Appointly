@@ -1,0 +1,2733 @@
+{
+  "openapi": "3.1.1",
+  "info": { "title": "WebAPI | v1", "version": "1.0.0" },
+  "servers": [{ "url": "http://localhost:5142/" }],
+  "paths": {
+    "/api/Appointment/{id}": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Appointment Details",
+        "description": "Retrieve detailed information about a specific appointment including client, partner, service, and business details. Authorization: Only the client, partner, or business owner can access appointment details. Returns complete appointment information with all related entity data. Example ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "patch": {
+        "tags": ["Appointment"],
+        "summary": "Update Appointment",
+        "description": "Update appointment notes or status. Allows partial updates - only provided fields will be modified. Authorization: Client or partner can update appointment details. Common use cases: adding notes, updating preferences, or modifying appointment metadata. Status can be updated but use dedicated endpoints for cancel/complete operations. Example Appointment ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAppointmentDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAppointmentDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/UpdateAppointmentDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/client": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Client Appointments",
+        "description": "Retrieve all appointments for the authenticated user as a client. Returns paginated list of appointments booked by the current user. Results are ordered by start date (newest first). Includes scheduled, canceled, and completed appointments. Supports pagination with page and pageSize query parameters.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/partner": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Partner Appointments",
+        "description": "Retrieve all appointments for the authenticated user as a service partner. Returns paginated list of appointments where the current user is the service provider. Results are ordered by start date (newest first). Useful for partners to view their schedule and upcoming appointments. Supports pagination with page and pageSize query parameters.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/service/{serviceId}": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Service Appointments",
+        "description": "Retrieve all appointments for a specific service. Returns paginated list of appointments for the specified service. Authorization: Only the service owner or business owner can access this data. Results are ordered by start date (newest first). Useful for analyzing service utilization and booking patterns. Example Service ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/business/{businessId}": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Business Appointments",
+        "description": "Retrieve all appointments for a specific business across all services. Returns paginated list of all business appointments. Authorization: Only the business owner can access this data. Results are ordered by start date (newest first). Useful for business-wide scheduling and analytics. Example Business ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/business/{businessId}/range": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Appointments By Date Range",
+        "description": "Retrieve appointments for a business within a specific date range. Returns list of appointments between startDate and endDate. Authorization: Only the business owner can access this data. Results are ordered by start date chronologically. Useful for calendar views and reporting. Date format: YYYY-MM-DDTHH:mm:ss Example Business ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/AppointmentDTO" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment": {
+      "post": {
+        "tags": ["Appointment"],
+        "summary": "Book New Appointment",
+        "description": "Create a new appointment booking for a service time slot. Validates slot availability, service schedule match, and business booking rules. Automatically updates the slot status to BOOKED upon successful booking. Checks advance booking days limit and prevents booking in the past. Returns the created appointment with complete details including client, partner, and service information. The authenticated user becomes the client for the appointment.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateAppointmentDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CreateAppointmentDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CreateAppointmentDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/{id}/cancel": {
+      "patch": {
+        "tags": ["Appointment"],
+        "summary": "Cancel Appointment",
+        "description": "Cancel an existing appointment and release the time slot. Updates appointment status to canceled and returns the slot to AVAILABLE. Authorization: Client, partner, or business owner can cancel. Optional cancellation reason can be provided and will be appended to notes. Cannot cancel already canceled or completed appointments. Example Appointment ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CancelAppointmentDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CancelAppointmentDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CancelAppointmentDTO" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/{id}/complete": {
+      "patch": {
+        "tags": ["Appointment"],
+        "summary": "Complete Appointment",
+        "description": "Mark an appointment as completed after service is rendered. Updates appointment status to completed. Authorization: Only the service partner or business owner can mark appointments as completed. Cannot complete already completed or canceled appointments. Use this endpoint after successfully providing the service to the client. Example Appointment ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/AppointmentDTO" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/client/count": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Client Appointment Count",
+        "description": "Retrieve the total number of appointments for the authenticated client. Returns count of all appointments (scheduled, canceled, and completed). Useful for displaying statistics and user dashboards. Counts all historical appointments for the current user.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "integer", "format": "int32" }
+              },
+              "application/json": {
+                "schema": { "type": "integer", "format": "int32" }
+              },
+              "text/json": {
+                "schema": { "type": "integer", "format": "int32" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Appointment/partner/count": {
+      "get": {
+        "tags": ["Appointment"],
+        "summary": "Get Partner Appointment Count",
+        "description": "Retrieve the total number of appointments for the authenticated partner. Returns count of all appointments where the user is the service provider. Useful for displaying partner statistics and performance metrics. Counts all historical appointments across all services provided by the partner.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "type": "integer", "format": "int32" }
+              },
+              "application/json": {
+                "schema": { "type": "integer", "format": "int32" }
+              },
+              "text/json": {
+                "schema": { "type": "integer", "format": "int32" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetails" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User Registration",
+        "description": "Create a new user account. Email must be unique. Password will be securely hashed. Returns the created user with ID. Example: { \"name\": \"John Doe\", \"email\": \"john@example.com\", \"password\": \"SecurePass123!\" }",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterUserDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/RegisterUserDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/RegisterUserDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User Login",
+        "description": "Authenticate user with email and password. Returns user data and sets JWT token in HttpOnly cookie. The token will be automatically included in subsequent requests. Example: { \"email\": \"john@example.com\", \"password\": \"SecurePass123!\" }",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/LoginDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/LoginDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User Logout",
+        "description": "Log out the current user. Clears the JWT token cookie. For added security, consider implementing a token blacklist on the server.",
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get Current User",
+        "description": "Returns the authenticated user's information including userId, name, and role. Requires a valid JWT token in the access_token cookie.",
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/service/{serviceId}/weekly-rules": {
+      "get": {
+        "tags": ["Availability"],
+        "summary": "Get Service Weekly Working Rules",
+        "description": "Retrieve all weekly working rules for a service. Returns rules defining which days of the week the service is available. Each rule specifies: day of week (0=Monday to 6=Sunday), start time, end time, and whether it's a working day. Useful for displaying recurring availability patterns to customers. Authorization: Authorized users can view any service's rules. Example ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/weekly-rule": {
+      "post": {
+        "tags": ["Availability"],
+        "summary": "Create Weekly Working Rule",
+        "description": "Create a new weekly working rule for a service. Defines when the service is available on a specific day of the week. Required fields: ServiceId (Guid), DayOfWeek (0=Monday to 6=Sunday), IsWorkingDay (boolean), StartTime (HH:mm:ss), EndTime (HH:mm:ss). Example: { \"serviceId\": \"550e8400-e29b-41d4-a716-446655440000\", \"dayOfWeek\": 1, \"isWorkingDay\": true, \"startTime\": \"09:00:00\", \"endTime\": \"17:00:00\" }. Authorization: Only business owners can create rules for their services.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWeeklyWorkingRuleDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWeeklyWorkingRuleDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWeeklyWorkingRuleDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/weekly-rule/{ruleId}": {
+      "put": {
+        "tags": ["Availability"],
+        "summary": "Update Weekly Working Rule",
+        "description": "Update an existing weekly working rule. Supports partial updates - only include fields to change. Optional fields: DayOfWeek (0-6), IsWorkingDay (boolean), StartTime (HH:mm:ss), EndTime (HH:mm:ss). Example: { \"dayOfWeek\": 2, \"startTime\": \"10:00:00\", \"endTime\": \"18:00:00\" }. Changes will affect future slot generation. Authorization: Only business owners can update rules for their services.",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWeeklyWorkingRuleDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWeeklyWorkingRuleDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateWeeklyWorkingRuleDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyWorkingRuleDTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Availability"],
+        "summary": "Delete Weekly Working Rule",
+        "description": "Delete a weekly working rule. Returns 204 No Content on success. Deleting a rule changes the service's availability pattern. To regenerate slots after deletion, use /schedule/service/{serviceId}/regenerate-slots. Authorization: Only business owners can delete rules for their services.",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/service/{serviceId}/break-rules": {
+      "get": {
+        "tags": ["Availability"],
+        "summary": "Get Service Break Rules",
+        "description": "Retrieve all break rules for a service. Break rules define when the service provider is unavailable (lunch, maintenance, etc.).\n Each rule specifies: start time, end time, optional day of week, optional date range. Breaks are subtracted from working hours when generating slots. Authorization: Authorized users can view any service's break rules.",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BreakRuleDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BreakRuleDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BreakRuleDTO" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/break-rule": {
+      "post": {
+        "tags": ["Availability"],
+        "summary": "Create Break Rule",
+        "description": "Create a new break rule for a service. Defines periods when the service is unavailable. Required fields: ServiceId (Guid), StartTime (HH:mm:ss), EndTime (HH:mm:ss). Optional fields: DayOfWeek (0-6, if null applies to all days), StartDate, EndDate (for date-specific breaks like vacations). Example: { \"serviceId\": \"550e8400-e29b-41d4-a716-446655440000\", \"startTime\": \"12:00:00\", \"endTime\": \"13:00:00\" }. Authorization: Only business owners can create break rules for their services.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBreakRuleDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBreakRuleDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CreateBreakRuleDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/BreakRuleDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BreakRuleDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/BreakRuleDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/break-rule/{ruleId}": {
+      "put": {
+        "tags": ["Availability"],
+        "summary": "Update Break Rule",
+        "description": "Update an existing break rule. Supports partial updates - only include fields to change. Optional fields: StartTime, EndTime, DayOfWeek, StartDate, EndDate. Example: { \"endDate\": \"2026-02-15\" } (for extending a vacation break). Changes will affect future slot generation. Authorization: Only business owners can update break rules for their services.",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBreakRuleDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBreakRuleDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBreakRuleDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/BreakRuleDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BreakRuleDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/BreakRuleDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Availability"],
+        "summary": "Delete Break Rule",
+        "description": "Delete a break rule. Returns 204 No Content on success. Deleting a rule removes the break period from the service's unavailability. Authorization: Only business owners can delete break rules for their services.",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/service/{serviceId}/recurring-rules": {
+      "get": {
+        "tags": ["Availability"],
+        "summary": "Get Service Recurring Rules",
+        "description": "Retrieve all recurring rules for a service. Recurring rules define temporary availability patterns that override weekly rules. Each rule specifies: date range, days of week, and working hours for that period. Useful for seasonal availability or temporary schedule changes. Priority: Recurring rules override weekly working rules. Authorization: Authorized users can view any service's recurring rules.",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/recurring-rule": {
+      "post": {
+        "tags": ["Availability"],
+        "summary": "Create Recurring Rule",
+        "description": "Create a new recurring rule for a service. Defines a temporary availability pattern for a specific date range. Required fields: ServiceId (Guid), StartDate, EndDate, DaysOfWeek (JSON array of 0-6), StartTime (HH:mm:ss), EndTime (HH:mm:ss). Example: { \"serviceId\": \"550e8400-e29b-41d4-a716-446655440000\", \"startDate\": \"2026-03-01\", \"endDate\": \"2026-03-31\", \"daysOfWeek\": \"[1,2,3,4,5]\", \"startTime\": \"10:00:00\", \"endTime\": \"18:00:00\" }. Authorization: Only business owners can create recurring rules for their services.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRecurringRuleDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRecurringRuleDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRecurringRuleDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/recurring-rule/{ruleId}": {
+      "put": {
+        "tags": ["Availability"],
+        "summary": "Update Recurring Rule",
+        "description": "Update an existing recurring rule. Supports partial updates - only include fields to change. Optional fields: StartDate, EndDate, DaysOfWeek, StartTime (HH:mm:ss), EndTime (HH:mm:ss). Example: { \"endDate\": \"2026-04-15\", \"startTime\": \"09:00:00\" } (extending rule duration and changing hours). Changes affect slot generation for affected dates. Authorization: Only business owners can update recurring rules for their services.",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRecurringRuleDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRecurringRuleDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRecurringRuleDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/RecurringRuleDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Availability"],
+        "summary": "Delete Recurring Rule",
+        "description": "Delete a recurring rule. Returns 204 No Content on success. Deleting removes the temporary availability pattern, reverting to weekly rules for that date range. Authorization: Only business owners can delete recurring rules for their services.",
+        "parameters": [
+          {
+            "name": "ruleId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/service/{serviceId}/date-exceptions": {
+      "get": {
+        "tags": ["Availability"],
+        "summary": "Get Service Date Exceptions",
+        "description": "Retrieve all date exceptions for a service. Date exceptions define specific date overrides for availability. Useful for holidays, special closures, or one-off schedule changes. Each exception specifies: date, whether it's a working day, and optional working hours. Priority: Date exceptions have the highest priority in availability resolution. Authorization: Authorized users can view any service's date exceptions.",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DateExceptionDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DateExceptionDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/DateExceptionDTO" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/date-exception": {
+      "post": {
+        "tags": ["Availability"],
+        "summary": "Create Date Exception",
+        "description": "Create a new date exception for a service. Overrides normal availability for a specific date. Required fields: ServiceId (Guid), Date, IsWorkingDay (boolean). Optional fields: StartTime (HH:mm:ss), EndTime (HH:mm:ss) - only if IsWorkingDay=true for custom hours. Example: { \"serviceId\": \"550e8400-e29b-41d4-a716-446655440000\", \"date\": \"2026-01-15\", \"isWorkingDay\": false } (holiday closure). Authorization: Only business owners can create date exceptions for their services.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDateExceptionDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDateExceptionDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDateExceptionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/DateExceptionDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DateExceptionDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/DateExceptionDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Availability/date-exception/{exceptionId}": {
+      "put": {
+        "tags": ["Availability"],
+        "summary": "Update Date Exception",
+        "description": "Update an existing date exception. Supports partial updates - only include fields to change. Optional fields: Date, IsWorkingDay, StartTime (HH:mm:ss), EndTime (HH:mm:ss). Example: { \"isWorkingDay\": true, \"startTime\": \"14:00:00\", \"endTime\": \"18:00:00\" } (changing a holiday to a half-day). Authorization: Only business owners can update date exceptions for their services.",
+        "parameters": [
+          {
+            "name": "exceptionId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDateExceptionDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDateExceptionDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDateExceptionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/DateExceptionDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DateExceptionDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/DateExceptionDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Availability"],
+        "summary": "Delete Date Exception",
+        "description": "Delete a date exception. Returns 204 No Content on success. Deleting removes the override, reverting to normal weekly/recurring rules for that date. Authorization: Only business owners can delete date exceptions for their services.",
+        "parameters": [
+          {
+            "name": "exceptionId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/businesses": {
+      "post": {
+        "tags": ["Business"],
+        "summary": "Create Business",
+        "description": "Create a new business. The authenticated user becomes the business owner. Required fields: name (string, 1-200 chars), address (string, 1-500 chars). Optional: phone (string), description (string). Example: { \"name\": \"John's Salon\", \"address\": \"123 Main St\", \"phone\": \"+1-555-0123\", \"description\": \"Professional hair salon\" }",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBusinessDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBusinessDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CreateBusinessDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "get": {
+        "tags": ["Business"],
+        "summary": "List All Businesses",
+        "description": "Retrieve a list of all businesses in the system. Returns business summary information for each business. Includes: ID, name, address, phone, owner ID. Authorization: Any authenticated user can list businesses.",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": { "type": "string", "format": "uuid", "default": null }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/businesses/{id}/invite": {
+      "post": {
+        "tags": ["Business"],
+        "summary": "Invite Worker to Business",
+        "description": "Send an invitation to a worker (by email) to join your business as a partner. Invitation expires in 7 days. Fields: workerEmail (string, valid email), message (string, optional, up to 500 chars). Example: { \"workerEmail\": \"worker@example.com\", \"message\": \"Would like to have you on our team!\" }. Authorization: Only the business owner can send invitations.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InviteWorkerDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/InviteWorkerDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/InviteWorkerDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/businesses/{id}": {
+      "get": {
+        "tags": ["Business"],
+        "summary": "Get Business Details",
+        "description": "Retrieve full business information including name, address, phone, owner ID, and list of partners. Example ID: 550e8400-e29b-41d4-a716-446655440000. Authorization: Any authenticated user can view business details.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "put": {
+        "tags": ["Business"],
+        "summary": "Update Business Information",
+        "description": "Update business details. Supports partial updates - only include fields to change. Optional fields: name (string, 1-200 chars), address (string, 1-500 chars), phone (string), description (string). Example: { \"phone\": \"+1-555-0456\", \"description\": \"Now open 7 days a week\" }. Authorization: Only the business owner can update the business.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBusinessDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBusinessDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBusinessDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/businesses/{businessId}/services": {
+      "post": {
+        "tags": ["Business"],
+        "summary": "Create Service",
+        "description": "Create a new service for a business. Service is assigned to an existing business partner (employee). Required fields: name (string, 1-200 chars), duration (integer, minutes, > 0), price (decimal, >= 0). Optional: description (string). userId must reference an existing business partner. Example: { \"name\": \"Haircut\", \"description\": \"Professional haircut\", \"duration\": 30, \"price\": 25.00, \"userId\": \"550e8400-e29b-41d4-a716-446655440000\" }. Authorization: Only the business owner can create services.",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateServiceDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CreateServiceDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CreateServiceDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "get": {
+        "tags": ["Business"],
+        "summary": "List Business Services",
+        "description": "Retrieve all services offered by a specific business. Returns list of services with details: name, description, duration (minutes), price, assigned partner (userId). Useful for customers browsing available services. Authorization: Any authenticated user can view services.",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/businesses/{businessId}/services/{serviceId}": {
+      "put": {
+        "tags": ["Business"],
+        "summary": "Update Service",
+        "description": "Update an existing service. Supports partial updates - only include fields to change. Optional fields: name (string, 1-200 chars), description (string), duration (integer, minutes, > 0), price (decimal, >= 0), userId (Guid, must be existing business partner for reassignment). Example: { \"duration\": 45, \"price\": 35.00 }. Validation: Service must belong to the specified business. Authorization: Only the business owner can update services.",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateServiceDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateServiceDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/UpdateServiceDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Business"],
+        "summary": "Delete Service",
+        "description": "Delete a service from the business. Authorization: Only the business owner can delete services.",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/categories": {
+      "post": {
+        "tags": ["Category"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "get": {
+        "tags": ["Category"],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/categories/{id}": {
+      "put": {
+        "tags": ["Category"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/CreateCategoryDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "delete": {
+        "tags": ["Category"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/invitations/my": {
+      "get": {
+        "tags": ["Invitation"],
+        "summary": "Get My Invitations",
+        "description": "Retrieve all pending business invitations for the current user. Returns invitations with status (Pending/Expired). Includes: invitation ID, business name, inviter name, message, invitation date, and expiration date. Automatically expires invitations older than 7 days. Authorization: Users can only view their own invitations.",
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/invitations/{invitationId}/respond": {
+      "post": {
+        "tags": ["Invitation"],
+        "summary": "Respond to Invitation",
+        "description": "Accept or decline a business invitation. Once accepted, the user becomes a partner of the business. The request body should be a boolean: true to accept, false to decline. Example: true (in request body). Status changes to 'Accepted' or 'Declined' accordingly. Authorization: Users can only respond to their own invitations.",
+        "parameters": [
+          {
+            "name": "invitationId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": { "schema": { "type": "boolean" } },
+            "text/json": { "schema": { "type": "boolean" } },
+            "application/*+json": { "schema": { "type": "boolean" } }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/service/{serviceId}/slots": {
+      "get": {
+        "tags": ["Schedule"],
+        "summary": "Get Service Slots",
+        "description": "Retrieve all available appointment slots for a specific service. Returns a list of time slots where appointments can be booked, respecting the service's duration and availability rules. Each slot includes start time and end time. Authorization: Authorized users can view any service's slots. Example ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/service/{serviceId}/slots/range": {
+      "get": {
+        "tags": ["Schedule"],
+        "summary": "Get Service Slots by Date Range",
+        "description": "Retrieve available slots for a service within a specified date range. Query parameters: startDate (yyyy-MM-dd), endDate (yyyy-MM-dd). Returns all slots that fall within the date range, useful for UI slot pickers. Authorization: Authorized users can view any service's slots. Example: /api/schedule/service/550e8400-e29b-41d4-a716-446655440000/slots/range?startDate=2026-01-10&endDate=2026-01-20",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/business/{businessId}/services-schedule": {
+      "get": {
+        "tags": ["Schedule"],
+        "summary": "Get Business Services Schedule Status",
+        "description": "Retrieve all services for a business with their slot generation status and configuration. Returns service details including duration, timezone settings, and whether slots have been generated. Useful for business owner dashboard showing scheduling status of all services. Authorization: Authorized users can view any business's services.",
+        "parameters": [
+          {
+            "name": "businessId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/slot/{slotId}": {
+      "delete": {
+        "tags": ["Schedule"],
+        "summary": "Delete Available Slot",
+        "description": "Delete a single available slot (must be unbooked/unblocked). Returns 204 No Content on success. Useful for removing unavailable time periods. Cannot delete slots that are already booked. Authorization: Only business owners can delete slots for their services.",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/service/{serviceId}/clear-slots": {
+      "delete": {
+        "tags": ["Schedule"],
+        "summary": "Clear All Service Slots",
+        "description": "Delete ALL slots for a service (available, booked, and blocked). Warning: This will clear all appointment slots including booked ones - use with caution. Returns count of deleted slots. Authorization: Only business owners can clear slots for their services.",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/slot/{slotId}/block": {
+      "put": {
+        "tags": ["Schedule"],
+        "summary": "Block Slot",
+        "description": "Mark a slot as blocked (unavailable for booking). Returns the updated slot. Useful for maintenance windows or administrative blocks. Blocked slots cannot be booked but can be unblocked. Authorization: Only business owners can block slots for their services.",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/slot/{slotId}/unblock": {
+      "put": {
+        "tags": ["Schedule"],
+        "summary": "Unblock Slot",
+        "description": "Mark a blocked slot as available again. Returns the updated slot. Can only unblock slots with BLOCKED status. Authorization: Only business owners can unblock slots for their services.",
+        "parameters": [
+          {
+            "name": "slotId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+              },
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+              },
+              "text/json": {
+                "schema": { "$ref": "#/components/schemas/ServiceScheduleDTO" }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/Schedule/service/{serviceId}/generate-slots-range": {
+      "post": {
+        "tags": ["Schedule"],
+        "summary": "Generate Schedule Slots for Date Range",
+        "description": "Generate available appointment slots for a service across a specified date range. Generates slots from StartDate to EndDate (inclusive), respecting all availability rules. Rule priority: Date Exceptions (highest) > Recurring Rules > Weekly Working Rules (lowest), then Break Rules subtracted. Slots are only created if they don't already exist (idempotent operation). Example request: { \"startDate\": \"2026-01-15\", \"endDate\": \"2026-01-31\" }. Returns count of newly created slots and summary statistics. Authorization: Only business owners or service owners can generate slots.",
+        "parameters": [
+          {
+            "name": "serviceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateSlotsDateRangeDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateSlotsDateRangeDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateSlotsDateRangeDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotsGenerationResultDTO"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotsGenerationResultDTO"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SlotsGenerationResultDTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/search/businesses/by-category": {
+      "get": {
+        "tags": ["Search"],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/search/businesses/by-category-availability": {
+      "get": {
+        "tags": ["Search"],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "durationMinutes",
+            "in": "query",
+            "schema": { "type": "integer", "format": "int32", "default": null }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/api/search/businesses/by-name": {
+      "get": {
+        "tags": ["Search"],
+        "parameters": [
+          { "name": "text", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get User Details",
+        "description": "Retrieve user information by ID. Returns user profile including name, email, and role. Authorization: User can retrieve any user's profile. Example ID: 550e8400-e29b-41d4-a716-446655440000",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      },
+      "patch": {
+        "tags": ["User"],
+        "summary": "Update User Profile",
+        "description": "Update user profile information. Supports partial updates - only include fields you want to change. Fields: name (string, optional), email (string, optional, must be unique), password (string, optional). Example: { \"name\": \"Jane Doe\", \"email\": \"jane@example.com\" }. Authorization: Users can only update their own profile.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserDTO" }
+            },
+            "text/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserDTO" }
+            },
+            "application/*+json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserDTO" }
+            }
+          },
+          "required": true
+        },
+        "responses": { "200": { "description": "OK" } },
+        "security": [{ "Bearer": [] }, { "cookieAuth": [] }]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AppointmentDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "clientId": { "type": "string", "format": "uuid" },
+          "clientName": { "type": "string" },
+          "clientEmail": { "type": ["string", "null"] },
+          "clientPhone": { "type": ["string", "null"] },
+          "partnerId": { "type": "string", "format": "uuid" },
+          "partnerName": { "type": "string" },
+          "partnerEmail": { "type": ["string", "null"] },
+          "serviceId": { "type": "string", "format": "uuid" },
+          "serviceName": { "type": "string" },
+          "serviceDescription": { "type": ["string", "null"] },
+          "serviceDuration": { "type": "integer", "format": "int32" },
+          "servicePrice": { "type": ["number", "null"], "format": "double" },
+          "businessId": { "type": "string", "format": "uuid" },
+          "businessName": { "type": "string" },
+          "businessAddress": { "type": ["string", "null"] },
+          "businessPhone": { "type": ["string", "null"] },
+          "serviceScheduleId": { "type": "string", "format": "uuid" },
+          "startDateTime": { "type": "string", "format": "date-time" },
+          "endDateTime": { "type": "string", "format": "date-time" },
+          "notes": { "type": ["string", "null"] },
+          "status": { "$ref": "#/components/schemas/AppointmentStatus" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AppointmentStatus": { "type": "integer" },
+      "BreakRuleDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "serviceId": { "type": "string", "format": "uuid" },
+          "dayOfWeek": { "type": ["integer", "null"], "format": "int32" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "startDate": { "type": ["string", "null"], "format": "date-time" },
+          "endDate": { "type": ["string", "null"], "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CancelAppointmentDTO": {
+        "type": ["object", "null"],
+        "properties": {
+          "cancellationReason": { "maxLength": 500, "type": ["string", "null"] }
+        },
+        "default": null
+      },
+      "CreateAppointmentDTO": {
+        "required": ["serviceId", "serviceScheduleId"],
+        "type": "object",
+        "properties": {
+          "serviceId": { "type": "string", "format": "uuid" },
+          "serviceScheduleId": { "type": "string", "format": "uuid" },
+          "notes": { "maxLength": 1000, "type": ["string", "null"] }
+        }
+      },
+      "CreateBreakRuleDTO": {
+        "required": ["serviceId", "startTime", "endTime"],
+        "type": "object",
+        "properties": {
+          "serviceId": { "type": "string", "format": "uuid" },
+          "dayOfWeek": {
+            "maximum": 6,
+            "minimum": 0,
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "startDate": { "type": ["string", "null"], "format": "date-time" },
+          "endDate": { "type": ["string", "null"], "format": "date-time" }
+        }
+      },
+      "CreateBusinessDTO": {
+        "required": ["name", "address", "phone"],
+        "type": "object",
+        "properties": {
+          "name": { "maxLength": 100, "type": "string" },
+          "address": { "type": "string" },
+          "phone": { "maxLength": 20, "type": "string" },
+          "description": { "type": ["string", "null"] }
+        }
+      },
+      "CreateCategoryDTO": {
+        "required": ["name"],
+        "type": "object",
+        "properties": {
+          "name": { "maxLength": 100, "type": "string" },
+          "description": { "type": ["string", "null"] }
+        }
+      },
+      "CreateDateExceptionDTO": {
+        "required": ["serviceId", "date", "isWorkingDay"],
+        "type": "object",
+        "properties": {
+          "serviceId": { "type": "string", "format": "uuid" },
+          "date": { "type": "string", "format": "date-time" },
+          "isWorkingDay": { "type": "boolean" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "CreateRecurringRuleDTO": {
+        "required": [
+          "serviceId",
+          "startDate",
+          "endDate",
+          "daysOfWeek",
+          "startTime",
+          "endTime"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceId": { "type": "string", "format": "uuid" },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "daysOfWeek": { "type": "string" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          }
+        }
+      },
+      "CreateServiceDTO": {
+        "required": ["name", "duration", "userId", "categoryId"],
+        "type": "object",
+        "properties": {
+          "name": { "maxLength": 100, "type": "string" },
+          "description": { "type": ["string", "null"] },
+          "duration": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "minimum": 0,
+            "type": ["number", "null"],
+            "format": "double"
+          },
+          "userId": { "type": "string", "format": "uuid" },
+          "categoryId": { "type": "string", "format": "uuid" }
+        }
+      },
+      "CreateWeeklyWorkingRuleDTO": {
+        "required": [
+          "serviceId",
+          "dayOfWeek",
+          "isWorkingDay",
+          "startTime",
+          "endTime"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceId": { "type": "string", "format": "uuid" },
+          "dayOfWeek": {
+            "maximum": 6,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "isWorkingDay": { "type": "boolean" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          }
+        }
+      },
+      "DateExceptionDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "serviceId": { "type": "string", "format": "uuid" },
+          "date": { "type": "string", "format": "date-time" },
+          "isWorkingDay": { "type": "boolean" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "GenerateSlotsDateRangeDTO": {
+        "required": ["startDate", "endDate"],
+        "type": "object",
+        "properties": {
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" }
+        }
+      },
+      "InviteWorkerDTO": {
+        "required": ["workerEmail"],
+        "type": "object",
+        "properties": {
+          "workerEmail": { "maxLength": 100, "type": "string" },
+          "message": { "maxLength": 500, "type": ["string", "null"] }
+        }
+      },
+      "LoginDTO": {
+        "required": ["email", "password"],
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" }
+        }
+      },
+      "NullableOfAppointmentStatus": { "type": ["integer", "null"] },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": { "type": ["string", "null"] },
+          "title": { "type": ["string", "null"] },
+          "status": { "type": ["integer", "null"], "format": "int32" },
+          "detail": { "type": ["string", "null"] },
+          "instance": { "type": ["string", "null"] }
+        }
+      },
+      "RecurringRuleDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "serviceId": { "type": "string", "format": "uuid" },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "daysOfWeek": { "type": "string" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RegisterUserDTO": {
+        "required": ["name", "email", "password"],
+        "type": "object",
+        "properties": {
+          "name": { "maxLength": 100, "type": "string" },
+          "email": { "maxLength": 100, "type": "string" },
+          "password": { "minLength": 6, "type": "string" }
+        }
+      },
+      "ScheduleStatus": { "type": "integer" },
+      "ServiceScheduleDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "serviceId": { "type": "string", "format": "uuid" },
+          "startDateTime": { "type": "string", "format": "date-time" },
+          "endDateTime": { "type": "string", "format": "date-time" },
+          "status": { "$ref": "#/components/schemas/ScheduleStatus" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "SlotsGenerationResultDTO": {
+        "type": "object",
+        "properties": {
+          "totalSlotsCreated": { "type": "integer", "format": "int32" },
+          "averageSlotsPerDay": { "type": "integer", "format": "int32" },
+          "generationStartDate": { "type": "string", "format": "date-time" },
+          "generationEndDate": { "type": "string", "format": "date-time" },
+          "daysInRange": { "type": "integer", "format": "int32" },
+          "message": { "type": "string" }
+        }
+      },
+      "UpdateAppointmentDTO": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/NullableOfAppointmentStatus"
+          },
+          "notes": { "maxLength": 1000, "type": ["string", "null"] }
+        }
+      },
+      "UpdateBreakRuleDTO": {
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "maximum": 6,
+            "minimum": 0,
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "startDate": { "type": ["string", "null"], "format": "date-time" },
+          "endDate": { "type": ["string", "null"], "format": "date-time" }
+        }
+      },
+      "UpdateBusinessDTO": {
+        "type": "object",
+        "properties": {
+          "name": { "maxLength": 100, "type": ["string", "null"] },
+          "address": { "type": ["string", "null"] },
+          "phone": { "maxLength": 20, "type": ["string", "null"] },
+          "description": { "type": ["string", "null"] }
+        }
+      },
+      "UpdateDateExceptionDTO": {
+        "type": "object",
+        "properties": {
+          "date": { "type": ["string", "null"], "format": "date-time" },
+          "isWorkingDay": { "type": ["boolean", "null"] },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "UpdateRecurringRuleDTO": {
+        "type": "object",
+        "properties": {
+          "startDate": { "type": ["string", "null"], "format": "date-time" },
+          "endDate": { "type": ["string", "null"], "format": "date-time" },
+          "daysOfWeek": { "type": ["string", "null"] },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "UpdateServiceDTO": {
+        "type": "object",
+        "properties": {
+          "name": { "maxLength": 100, "type": ["string", "null"] },
+          "description": { "type": ["string", "null"] },
+          "duration": {
+            "maximum": 2147483647,
+            "minimum": 1,
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "price": {
+            "minimum": 0,
+            "type": ["number", "null"],
+            "format": "double"
+          },
+          "userId": { "type": ["string", "null"], "format": "uuid" },
+          "categoryId": { "type": ["string", "null"], "format": "uuid" }
+        }
+      },
+      "UpdateUserDTO": {
+        "type": "object",
+        "properties": {
+          "email": { "type": ["string", "null"] },
+          "password": { "type": ["string", "null"] },
+          "name": { "type": ["string", "null"] }
+        }
+      },
+      "UpdateWeeklyWorkingRuleDTO": {
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "maximum": 6,
+            "minimum": 0,
+            "type": ["integer", "null"],
+            "format": "int32"
+          },
+          "isWorkingDay": { "type": ["boolean", "null"] },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "WeeklyWorkingRuleDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "serviceId": { "type": "string", "format": "uuid" },
+          "dayOfWeek": { "type": "integer", "format": "int32" },
+          "isWorkingDay": { "type": "boolean" },
+          "startTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "endTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" },
+      "cookieAuth": {
+        "type": "apiKey",
+        "description": "JWT stored in HttpOnly cookie",
+        "name": "access_token",
+        "in": "cookie"
+      }
+    }
+  },
+  "tags": [
+    { "name": "Appointment" },
+    { "name": "Auth" },
+    { "name": "Availability" },
+    { "name": "Business" },
+    { "name": "Category" },
+    { "name": "Invitation" },
+    { "name": "Schedule" },
+    { "name": "Search" },
+    { "name": "User" }
+  ]
+}

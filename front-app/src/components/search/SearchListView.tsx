@@ -1,0 +1,232 @@
+import { useCallback, useRef, useEffect } from "react";
+import type { Business } from "../../types/search";
+import { BusinessCard } from "./BusinessCard";
+import { MaterialIcon } from "../UI/MaterialIcon";
+
+interface SearchListViewProps {
+  results: Business[];
+  loading: boolean;
+  error: string | null;
+  hasMore: boolean;
+  totalCount: number;
+  currentPage: number;
+  onLoadMore: () => void;
+  onFavoriteClick?: (businessId: string, isFavorite: boolean) => void;
+  onBusinessClick?: (businessId: string) => void;
+  onViewServicesClick?: (businessId: string) => void;
+  favorites: Set<string>;
+  featuredResults?: Business[];
+  className?: string;
+}
+
+/**
+ * SearchListView Component
+ * Displays search results in a scrollable list format
+ * Includes featured businesses section and near you section
+ * Supports infinite scroll or pagination
+ */
+export function SearchListView({
+  results,
+  loading,
+  error,
+  hasMore,
+  totalCount,
+  onLoadMore,
+  onFavoriteClick,
+  onBusinessClick,
+  onViewServicesClick,
+  favorites,
+  featuredResults,
+  className,
+}: SearchListViewProps) {
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, onLoadMore]);
+
+  const handleFavorite = useCallback(
+    (businessId: string, isFavorite: boolean) => {
+      onFavoriteClick?.(businessId, isFavorite);
+    },
+    [onFavoriteClick],
+  );
+
+  const handleViewServices = useCallback(
+    (businessId: string) => {
+      onViewServicesClick?.(businessId);
+    },
+    [onViewServicesClick],
+  );
+
+  const handleCardClick = useCallback(
+    (businessId: string) => {
+      onBusinessClick?.(businessId);
+    },
+    [onBusinessClick],
+  );
+
+  // Show error state
+  if (error) {
+    return (
+      <main
+        className={[
+          "flex-1 flex items-center justify-center px-4 py-8",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <MaterialIcon
+              name="error_outline"
+              className="text-[48px] text-red-500"
+            />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            Something went wrong
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">{error}</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Show empty state
+  if (!loading && results.length === 0 && !featuredResults?.length) {
+    return (
+      <main
+        className={[
+          "flex-1 flex items-center justify-center px-4 py-8",
+          className,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <MaterialIcon
+              name="search_off"
+              className="text-[48px] text-gray-400"
+            />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+            No results found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            Try adjusting your search or filters
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main
+      className={[
+        "flex-1 pb-24 w-full max-w-2xl mx-auto overflow-y-auto",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {/* Featured Businesses Section */}
+      {featuredResults && featuredResults.length > 0 && (
+        <section className="flex flex-col">
+          <div className="px-4 pb-3 pt-6 flex justify-between items-end">
+            <h3 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
+              Featured Businesses
+            </h3>
+            <a
+              href="#"
+              className="text-primary text-sm font-medium hover:underline"
+            >
+              See all
+            </a>
+          </div>
+
+          <div className="space-y-4 px-4 pb-4">
+            {featuredResults.map((business) => (
+              <BusinessCard
+                key={business.id}
+                business={business}
+                variant="vertical"
+                isFavorite={favorites.has(business.id)}
+                onFavoriteClick={handleFavorite}
+                onViewServicesClick={handleViewServices}
+                onCardClick={handleCardClick}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Main Results Section */}
+      <section className="flex flex-col">
+        <div className="px-4 pb-3 pt-6 flex justify-between items-end">
+          <h3 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
+            {featuredResults?.length ? "Near You" : "Search Results"}
+          </h3>
+          {totalCount > 0 && (
+            <span className="text-gray-600 dark:text-gray-400 text-sm">
+              {results.length} of {totalCount}
+            </span>
+          )}
+        </div>
+
+        <div className="space-y-4 px-4 pb-4">
+          {results.map((business) => (
+            <BusinessCard
+              key={business.id}
+              business={business}
+              variant="vertical"
+              isFavorite={favorites.has(business.id)}
+              onFavoriteClick={handleFavorite}
+              onViewServicesClick={handleViewServices}
+              onCardClick={handleCardClick}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="px-4 py-8 flex justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Loading more results...
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Load More Observer */}
+      {hasMore && <div ref={observerTarget} className="py-8" />}
+
+      {/* End of Results */}
+      {!hasMore && results.length > 0 && (
+        <div className="px-4 py-8 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            No more results to load
+          </p>
+        </div>
+      )}
+    </main>
+  );
+}

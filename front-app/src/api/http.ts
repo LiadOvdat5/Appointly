@@ -1,5 +1,4 @@
 import axios from "axios";
-import { store } from "../redux/store";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -8,9 +7,7 @@ export const http = axios.create({
 });
 
 http.interceptors.request.use((config) => {
-  const token = store.getState().auth.token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // Token is derived from user session stored in expiresAt
+  // Credentials already handled via withCredentials: true
   return config;
 });

@@ -10,6 +10,7 @@ import NotFoundPage from "../pages/NotFoundPage.tsx";
 import SelectionPage from "../pages/SelectionPage.tsx";
 import BusinessOwnerLandingPage from "../pages/BusinessOwnerLandingPage.tsx";
 import CustomerLandingPage from "../pages/CustomerLandingPage.tsx";
+import { SearchPage } from "../pages/SearchPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "ui-showcase", element: <UIShowcase /> },
       { path: "*", element: <NotFoundPage /> },
       { path: "not-found", element: <NotFoundPage /> },
+      { path: "search", element: <SearchPage /> },
       {
         path: "login",
         element: (
