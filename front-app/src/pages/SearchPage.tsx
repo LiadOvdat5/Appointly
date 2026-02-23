@@ -10,6 +10,7 @@ import {
   setResults,
   selectBusiness,
   toggleFavorite,
+  setCategories,
 } from "../features/search/searchSlice";
 import {
   selectSearchQuery,
@@ -22,13 +23,14 @@ import {
   selectTotalCount,
   selectHasMore,
   selectCurrentPage,
+  selectCategories,
 } from "../features/search/searchSelectors";
 import {
   searchBusinesses,
   getFeaturedBusinesses,
   getNearbyBusinesses,
 } from "../services/businessService";
-import { BUSINESS_CATEGORIES } from "../constants/googleMapsConfig";
+import { fetchCategories } from "../services/categoryService";
 import { useLocationTracking } from "../hooks/useLocationTracking";
 import { SearchHeader } from "../components/search/SearchHeader";
 import { SearchListView } from "../components/search/SearchListView";
@@ -61,6 +63,20 @@ export function SearchPage() {
 
   // Local state for featured businesses
   const [featuredResults, setFeaturedResults] = React.useState<Business[]>([]);
+
+  // Load categories on mount (so filter popup is populated quickly)
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories();
+        dispatch(setCategories(cats));
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+      }
+    };
+
+    loadCategories();
+  }, [dispatch]);
 
   // Load featured businesses on mount
   useEffect(() => {
@@ -114,8 +130,10 @@ export function SearchPage() {
   }, [location, searchQuery, selectedCategories, dispatch]);
 
   // Handle search
+  // performs search using the provided query and optionally an explicit
+  // set of categories (useful when categories have just been updated).
   const handleSearch = useCallback(
-    async (query: string) => {
+    async (query: string, catOverride?: string[]) => {
       dispatch(setSearchQuery(query));
       dispatch(setLoading(true));
       dispatch(setError(null));
@@ -123,7 +141,7 @@ export function SearchPage() {
       try {
         const result = await searchBusinesses({
           searchQuery: query,
-          selectedCategories,
+          selectedCategories: catOverride ?? selectedCategories,
         });
         dispatch(setResults(result));
       } catch (err) {
@@ -153,10 +171,8 @@ export function SearchPage() {
 
       dispatch(setSelectedCategories(updatedCategories));
 
-      // Re-run search with new categories
-      if (searchQuery) {
-        handleSearch(searchQuery);
-      }
+      // immediately search using the updated categories list
+      handleSearch(searchQuery, updatedCategories);
     },
     [dispatch, selectedCategories, searchQuery, handleSearch],
   );
@@ -206,15 +222,16 @@ export function SearchPage() {
   }, [dispatch]);
 
   // Category options for filter
-  const categoryOptions = useMemo(
-    () =>
-      BUSINESS_CATEGORIES.map((cat) => ({
-        id: cat.id,
-        label: cat.name,
-        icon: cat.icon,
-      })),
-    [],
-  );
+  const categories = useSelector(selectCategories);
+
+  const categoryOptions = useMemo(() => {
+    const dynamic = categories.map((cat) => ({
+      id: cat.id,
+      label: cat.name,
+      icon: cat.iconName || "category", // fallback icon when none provided
+    }));
+    return [{ id: "all", label: "All", icon: "star" }, ...dynamic];
+  }, [categories]);
 
   // Map controls removed (maps disabled for now)
 
@@ -229,8 +246,7 @@ export function SearchPage() {
         categoryOptions={categoryOptions}
         onClear={handleClearSearch}
       />
-      {/* Main Content - List View (maps disabled) */}
-      <div className="sticky top-35 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-4 py-3" />
+
       {/* Main Content - List View */}
 
       <SearchListView

@@ -55,6 +55,13 @@ export interface HoursOfOperation {
 /**
  * Search filter configuration
  */
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  iconName?: string;
+}
+
 export interface SearchFilters {
   searchQuery: string;
   selectedCategories: string[];

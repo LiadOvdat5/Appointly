@@ -13,5 +13,8 @@ namespace WebAPI.Models
         public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
+
+        // optional icon name to display on the frontend
+        public string? IconName { get; set; }
     }
-} 
+}

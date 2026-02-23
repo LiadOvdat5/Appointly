@@ -59,7 +59,16 @@ export const searchBusinesses = async (
 ): Promise<SearchResult> => {
   try {
     if (!filters.searchQuery) {
-      // Return empty result if no query provided
+      // If no text query but category filter exists, use category endpoint
+      if (
+        filters.selectedCategories &&
+        filters.selectedCategories.length > 0 &&
+        filters.selectedCategories[0] !== "all"
+      ) {
+        return await searchBusinessesByCategory(filters.selectedCategories[0]);
+      }
+
+      // otherwise return empty result
       return {
         businesses: [],
         totalCount: 0,

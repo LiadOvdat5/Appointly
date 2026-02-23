@@ -9,5 +9,8 @@ namespace WebAPI.DTOs
         public string Name { get; set; } = string.Empty;
 
         public string? Description { get; set; }
+
+        // optional icon name for frontend material icon usage
+        public string? IconName { get; set; }
     }
-} 
+}

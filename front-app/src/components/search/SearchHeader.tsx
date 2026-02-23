@@ -15,7 +15,8 @@ interface SearchHeaderProps {
 
 /**
  * SearchHeader Component
- * Sticky header with search input and category filter chips
+ * Sticky header with search input and filter button
+ * On small screens the filter button opens a popup with category options.
  * Supports dark mode and responsive design
  */
 export function SearchHeader({
@@ -28,6 +29,7 @@ export function SearchHeader({
   className,
 }: SearchHeaderProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const [isFilterOpen, setFilterOpen] = useState(false);
 
   const handleClear = () => {
     onSearchChange("");
@@ -97,13 +99,45 @@ export function SearchHeader({
         </div>
       </div>
 
-      {/* Category Filter Chips */}
+      {/* Category filter button / popup */}
       <div className="px-4 py-3">
-        <CategoryFilter
-          options={categoryOptions}
-          selectedCategories={selectedCategories}
-          onCategoryChange={onCategoryChange}
-        />
+        <button
+          onClick={() => setFilterOpen((o) => !o)}
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          aria-label="Filter categories"
+        >
+          <MaterialIcon name="filter_list" className="text-[20px]" />
+          <span className="text-sm font-medium">Filters</span>
+        </button>
+
+        {isFilterOpen && (
+          <div
+            className="fixed inset-0 bg-black/30 z-40 flex items-start justify-center pt-20"
+            onClick={() => setFilterOpen(false)}
+          >
+            <div
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-11/12 max-w-md p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-3">
+                <h4 className="text-lg font-bold">Select categories</h4>
+                <button
+                  onClick={() => setFilterOpen(false)}
+                  className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  aria-label="Close filter panel"
+                >
+                  <MaterialIcon name="close" className="text-[20px]" />
+                </button>
+              </div>
+              <CategoryFilter
+                options={categoryOptions}
+                selectedCategories={selectedCategories}
+                onCategoryChange={onCategoryChange}
+                wrap
+              />
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

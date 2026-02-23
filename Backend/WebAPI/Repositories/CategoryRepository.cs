@@ -25,19 +25,20 @@ namespace WebAPI.Repositories
             {
                 Id = Guid.NewGuid(),
                 Name = createCategoryDto.Name,
-                Description = createCategoryDto.Description
+                Description = createCategoryDto.Description,
+                IconName = createCategoryDto.IconName
             };
 
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
-            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description };
+            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description, IconName = category.IconName };
         }
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
         {
             return await _context.Categories
-                .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description })
+                .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description, IconName = c.IconName })
                 .ToListAsync();
         }
 
@@ -52,11 +53,12 @@ namespace WebAPI.Repositories
                 throw new InvalidOperationException("Another category with the same name exists.");
             category.Name = updateDto.Name;
             category.Description = updateDto.Description;
+            category.IconName = updateDto.IconName;
 
             _context.Categories.Update(category);
             await _context.SaveChangesAsync();
 
-            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description };
+            return new CategoryDTO { Id = category.Id, Name = category.Name, Description = category.Description, IconName = category.IconName };
         }
 
         public async Task DeleteCategoryAsync(Guid categoryId)

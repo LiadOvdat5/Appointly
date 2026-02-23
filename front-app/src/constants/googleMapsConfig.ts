@@ -281,20 +281,6 @@ export const PAGINATION = {
 };
 
 /**
- * Business categories
- */
-export const BUSINESS_CATEGORIES = [
-  { id: "all", name: "All", icon: "star" },
-  { id: "hair", name: "Hair", icon: "content_cut" },
-  { id: "medical", name: "Medical", icon: "medical_services" },
-  { id: "fitness", name: "Fitness", icon: "fitness_center" },
-  { id: "spa", name: "Spa", icon: "spa" },
-  { id: "dental", name: "Dental", icon: "local_pharmacy" },
-  { id: "cafe", name: "Cafe", icon: "local_cafe" },
-  { id: "restaurant", name: "Restaurant", icon: "restaurant" },
-];
-
-/**
  * Sort options for search results
  */
 export const SORT_OPTIONS = [

@@ -6,12 +6,16 @@ import type {
   SearchResult,
   LocationCoords,
   LocationPermissionState,
+  Category,
 } from "../../types/search";
 
 export interface SearchState {
   // Search query and filters
   searchQuery: string;
   filters: SearchFilters;
+
+  // Categories loaded from backend
+  categories: Category[];
 
   // Results
   results: Business[];
@@ -51,6 +55,7 @@ const initialState: SearchState = {
     sortBy: "relevance",
     radiusFilter: 5,
   },
+  categories: [],
   results: [],
   totalCount: 0,
   hasMore: true,
@@ -106,6 +111,12 @@ const searchSlice = createSlice({
     setRadiusFilter: (state, action: PayloadAction<number>) => {
       state.filters.radiusFilter = action.payload;
       state.currentPage = 1;
+    },
+    /**
+     * Set categories retrieved from backend
+     */
+    setCategories: (state, action: PayloadAction<Category[]>) => {
+      state.categories = action.payload;
     },
 
     /**
@@ -277,6 +288,7 @@ export const {
   setSortBy,
   setRadiusFilter,
   setMinRating,
+  setCategories,
   setResults,
   appendResults,
   setLoading,

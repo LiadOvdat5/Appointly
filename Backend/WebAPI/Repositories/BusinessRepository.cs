@@ -51,7 +51,7 @@ namespace WebAPI.Repositories
             {
                 categories = await _context.Categories
                     .Where(c => categoryGuids.Contains(c.Id))
-                    .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description })
+                    .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description, IconName = c.IconName })
                     .ToListAsync();
             }
 
@@ -82,7 +82,7 @@ namespace WebAPI.Repositories
                     var categoryGuids = b.CategoryIds.Select(Guid.Parse).ToList();
                     categories = await _context.Categories
                         .Where(c => categoryGuids.Contains(c.Id))
-                        .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description })
+                        .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description, IconName = c.IconName })
                         .ToListAsync();
                 }
 

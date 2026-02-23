@@ -118,6 +118,8 @@ export const selectFavoritedBusinesses = (state: RootState): Business[] => {
 export const selectSelectedCategories = (state: RootState) =>
   state.search.filters.selectedCategories;
 
+export const selectCategories = (state: RootState) => state.search.categories;
+
 /**
  * Select sort option
  */
