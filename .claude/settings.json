@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node \"C:/Users/liado/AppData/Local/npm-cache/_npx/e23b069b9efbbb8f/node_modules/@bytebase/dbhub/dist/index.js\" --dsn \"sqlserver://bizslot_mcp:BizSlot_MCP_2024!@MSI:50474/BizSlot?trustServerCertificate=true\")"
+    ]
+  }
+}
