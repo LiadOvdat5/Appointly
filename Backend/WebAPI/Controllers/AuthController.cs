@@ -89,32 +89,32 @@ namespace WebAPI.Controllers
         [HttpGet("me")]
         [Authorize]
         [EndpointSummary("Get Current User")]
-        [EndpointDescription("Returns the authenticated user's information including userId, name, and role. " +
-            "Requires a valid JWT token in the access_token cookie.")]
+        [EndpointDescription("Returns the authenticated user's information in the same shape as /auth/login: " +
+            "{ user: { id, name, role }, expiresAt }. Requires a valid JWT token in the access_token cookie.")]
         public async Task<IActionResult> GetCurrentUser()
         {
             try
             {
-                // Extract user ID from JWT claims
                 var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
-                {
                     return Unauthorized(new { error = "Invalid token" });
-                }
 
-                var userId = userIdClaim.Value;
-                var user = await _authRepository.GetUserByEmailAsync(User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "");
+                var user = await _authRepository.GetUserByEmailAsync(
+                    User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "");
 
                 if (user == null)
-                {
                     return NotFound(new { error = "User not found" });
-                }
+
+                // Read token expiry from the JWT exp claim (Unix seconds → DateTime)
+                var expClaim = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Exp)?.Value;
+                var expiresAt = expClaim != null && long.TryParse(expClaim, out var expSeconds)
+                    ? DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime
+                    : DateTime.UtcNow.AddDays(7);
 
                 return Ok(new
                 {
-                    userId = user.Id,
-                    name = user.Name,
-                    role = user.Role
+                    user = new { id = user.Id, name = user.Name, role = user.Role },
+                    expiresAt
                 });
             }
             catch (Exception ex)

@@ -107,6 +107,27 @@ namespace WebAPI.Controllers
             }
         }
 
+        [Authorize]
+        [HttpGet("my")]
+        [EndpointSummary("List My Businesses")]
+        [EndpointDescription("Retrieve all businesses owned by the authenticated user.")]
+        public async Task<IActionResult> GetMyBusinesses()
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var businesses = await _businessRepository.GetBusinessesByOwnerAsync(userId);
+                return Ok(businesses);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         //[Authorize]
         [HttpGet]
         [EndpointSummary("List All Businesses")]

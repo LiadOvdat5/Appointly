@@ -25,6 +25,18 @@ namespace WebAPI.Repositories
 
             var business = BusinessMapper.ToBusiness(ownerId, createBusinessDto);
 
+            // Auto-add owner as an Accepted partner so they can be assigned to services
+            business.Partners.Add(new BusinessPartner
+            {
+                BusinessId = business.Id,
+                UserId = ownerId,
+                Status = InvitationStatus.Accepted,
+                InvitationId = null,
+                JoinedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+            });
+
             _context.Businesses.Add(business);
             await _context.SaveChangesAsync();
 
@@ -86,6 +98,30 @@ namespace WebAPI.Repositories
                         .ToListAsync();
                 }
 
+                result.Add(BusinessMapper.ToBusinessDTO(b, categories));
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<BusinessDTO>> GetBusinessesByOwnerAsync(Guid ownerId)
+        {
+            var businesses = await _context.Businesses
+                .Where(b => b.OwnerId == ownerId)
+                .ToListAsync();
+
+            var result = new List<BusinessDTO>();
+            foreach (var b in businesses)
+            {
+                var categories = new List<CategoryDTO>();
+                if (b.CategoryIds != null && b.CategoryIds.Any())
+                {
+                    var categoryGuids = b.CategoryIds.Select(Guid.Parse).ToList();
+                    categories = await _context.Categories
+                        .Where(c => categoryGuids.Contains(c.Id))
+                        .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description, IconName = c.IconName })
+                        .ToListAsync();
+                }
                 result.Add(BusinessMapper.ToBusinessDTO(b, categories));
             }
 

@@ -12,6 +12,8 @@ import BusinessOwnerLandingPage from "../pages/BusinessOwnerLandingPage.tsx";
 import CustomerLandingPage from "../pages/CustomerLandingPage.tsx";
 import { SearchPage } from "../pages/SearchPage.tsx";
 import ProfilePage from "../pages/ProfilePage.tsx";
+import OnboardingPage from "../pages/OnboardingPage.tsx";
+import DashboardPage from "../pages/DashboardPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +32,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "onboarding",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <OnboardingPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <DashboardPage />
           </ProtectedRoute>
         ),
       },

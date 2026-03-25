@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
+import { Role } from "../constants/roles";
 import { ServiceCard } from "../components/UI/ServiceCard";
 import { PillBadge } from "../components/UI/PillBadge";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
@@ -13,6 +16,8 @@ import { MOCK_SERVICE_CATEGORIES } from "../constants/mockData";
 const CustomerLandingPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const user = useSelector((s: RootState) => s.auth.user);
+  const isClient = user?.role === Role.Client;
 
   // Map mock data with corresponding images
   const services = MOCK_SERVICE_CATEGORIES.map((category) => ({
@@ -120,6 +125,30 @@ const CustomerLandingPage = () => {
             <MaterialIcon name="arrow_forward" />
           </button>
         </div>
+
+        {isClient && (
+          <div className="px-4 pb-10">
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                <MaterialIcon name="add_business" className="text-primary text-[26px]!" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-[#111418] dark:text-white text-sm">
+                  Do you own a business?
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  List your services and start accepting bookings today.
+                </p>
+              </div>
+              <button
+                onClick={() => navigate("/onboarding")}
+                className="shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-white hover:brightness-95 transition-all"
+              >
+                Get started
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

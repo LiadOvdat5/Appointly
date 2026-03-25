@@ -12,6 +12,7 @@ namespace WebAPI.Mappers
                 Id = Guid.NewGuid(),
                 BusinessId = businessId,
                 UserId = dto.UserId,
+                CategoryId = dto.CategoryId,
                 Name = dto.Name,
                 Description = dto.Description,
                 Duration = dto.Duration,

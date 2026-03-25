@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node \"C:/Users/liado/AppData/Local/npm-cache/_npx/e23b069b9efbbb8f/node_modules/@bytebase/dbhub/dist/index.js\" --dsn \"sqlserver://bizslot_mcp:BizSlot_MCP_2024!@MSI:50474/BizSlot?trustServerCertificate=true\")"
+      "Bash(node \"C:/Users/liado/AppData/Local/npm-cache/_npx/e23b069b9efbbb8f/node_modules/@bytebase/dbhub/dist/index.js\" --dsn \"sqlserver://bizslot_mcp:BizSlot_MCP_2024!@MSI:50474/BizSlot?trustServerCertificate=true\")",
+      "Bash(dotnet build:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5142/auth/me)",
+      "mcp__browser__browser_click",
+      "mcp__browser__browser_fill_form",
+      "mcp__browser__browser_evaluate",
+      "mcp__database__execute_sql",
+      "Bash(cmd /c \"taskkill /PID 37424 /F && taskkill /PID 38300 /F && taskkill /PID 18212 /F\")",
+      "mcp__browser__browser_snapshot"
     ]
   }
 }
