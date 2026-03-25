@@ -11,6 +11,7 @@ import SelectionPage from "../pages/SelectionPage.tsx";
 import BusinessOwnerLandingPage from "../pages/BusinessOwnerLandingPage.tsx";
 import CustomerLandingPage from "../pages/CustomerLandingPage.tsx";
 import { SearchPage } from "../pages/SearchPage.tsx";
+import ProfilePage from "../pages/ProfilePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,14 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
       { path: "not-found", element: <NotFoundPage /> },
       { path: "search", element: <SearchPage /> },
+      {
+        path: "profile",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <ProfilePage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "login",
         element: (

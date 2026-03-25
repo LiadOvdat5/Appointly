@@ -53,6 +53,10 @@ namespace WebAPI.Controllers
             {
                 return Forbid(ex.Message);
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
             catch (Exception ex)
             {
                 return NotFound(new { error = ex.Message });

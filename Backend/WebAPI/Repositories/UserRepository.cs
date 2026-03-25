@@ -55,10 +55,17 @@ namespace WebAPI.Repositories
             }
 
 
-            if (!string.IsNullOrEmpty(updateUserDto.Password))
+            if (!string.IsNullOrEmpty(updateUserDto.NewPassword))
             {
+                if (string.IsNullOrEmpty(updateUserDto.CurrentPassword))
+                    throw new ArgumentException("Current password is required to set a new password.");
+
                 var passwordHasher = new PasswordHasher<User>();
-                user.Password = passwordHasher.HashPassword(user, updateUserDto.Password);
+                var verifyResult = passwordHasher.VerifyHashedPassword(user, user.Password, updateUserDto.CurrentPassword);
+                if (verifyResult == PasswordVerificationResult.Failed)
+                    throw new ArgumentException("Current password is incorrect.");
+
+                user.Password = passwordHasher.HashPassword(user, updateUserDto.NewPassword);
             }
 
             user.UpdatedAt = DateTime.UtcNow;
