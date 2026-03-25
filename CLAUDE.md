@@ -116,12 +116,14 @@ MCP database connection: `sqlserver://bizslot_mcp:BizSlot1234@MSI:50474/BizSlot?
 | `/login` | `LoginPage` | Redirects to `/` if already logged in |
 | `/register` | `RegisterPage` | Redirects to `/` if already logged in |
 | `/search` | `SearchPage` | List + map view with category filter |
+| `/onboarding` | `OnboardingPage` | 3-step business creation wizard (protected) |
+| `/dashboard` | `DashboardPage` | Business owner dashboard (stub) |
 | `/ui-showcase` | `UIShowcase` | Dev-only component showcase |
 | `*` | `NotFoundPage` | 404 |
 
 Missing routes (not yet implemented — see Planning/):
 - `/business/:id` — Public business page
-- `/dashboard` — Business owner dashboard
+- `/dashboard/:businessId` — Per-business owner dashboard
 - `/dashboard/customer` — Customer dashboard
 - `/book/:businessId/:serviceId` — Booking flow
 
@@ -162,7 +164,7 @@ All epics, features, and user stories live in `Planning/` as Obsidian-linked mar
 Planning/
   README.md               ← Start here — full index with status
   EPIC-01-Authentication/ ✅ Done
-  EPIC-02-Business-Pages/ 🔄 In Progress (BE done, FE pending)
+  EPIC-02-Business-Pages/ 🔄 In Progress (F-02-A ✅ Done, F-02-B/C/D FE pending)
   EPIC-03-Schedule-and-Availability/ 🔄 In Progress (BE done, FE pending)
   EPIC-04-Booking-Flow/   🔲 Not Started (BE done, FE stub exists)
   EPIC-05-Search-and-Discovery/ ✅ Done
@@ -200,7 +202,7 @@ Each user story file contains: story, tasks tagged `[BE]`/`[FE]`/`[DB]`, and acc
 
 The immediate next areas to implement (in order):
 
-1. **EPIC-02 FE** — Public business page (`/business/:id`) + owner edit mode
+1. **EPIC-02 F-02-B/C** — Public business page (`/business/:id`) + owner edit mode
 2. **EPIC-03 FE** — Visual schedule editor UI
 3. **EPIC-04 FE** — Full booking flow (`BookingPage.tsx` stub exists)
 4. **EPIC-06 FE** — Business + customer dashboards (`DashboardPage.tsx` stub exists)
