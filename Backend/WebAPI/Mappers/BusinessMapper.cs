@@ -25,6 +25,7 @@ namespace WebAPI.Mappers
             {
                 Id = business.Id,
                 Name = business.Name,
+                Description = business.Description,
                 Address = business.Address ?? string.Empty,
                 Phone = business.Phone ?? string.Empty,
                 Categories = categories?.ToList() ?? new List<CategoryDTO>()

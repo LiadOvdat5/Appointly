@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-B-Public-Business-Page|F-02-B: Public Business Page]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **customer**, I want to **see the business's services with their price and 
 - `[FE]` "Book" button navigates to the booking flow with the selected service pre-loaded
 
 ## Acceptance Criteria
-- [ ] All active services are displayed on the page
-- [ ] Each service card shows name, price, and duration clearly
-- [ ] "Book" button on each service card links to the booking flow (EPIC-04)
-- [ ] Empty state is shown if the business has no services listed
+- [x] All active services are displayed on the page
+- [x] Each service card shows name, price, and duration clearly
+- [x] "Book" button on each service card links to the booking flow (EPIC-04)
+- [x] Empty state is shown if the business has no services listed

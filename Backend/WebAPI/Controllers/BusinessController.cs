@@ -85,11 +85,11 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{id}")]
         [EndpointSummary("Get Business Details")]
-        [EndpointDescription("Retrieve full business information including name, address, phone, owner ID, and list of partners. " +
-            "Example ID: 550e8400-e29b-41d4-a716-446655440000. Authorization: Any authenticated user can view business details.")]
+        [EndpointDescription("Retrieve full business information including name, description, address, phone, and categories. " +
+            "Example ID: 550e8400-e29b-41d4-a716-446655440000. Authorization: Public — no authentication required.")]
         public async Task<IActionResult> GetBusinessById(Guid id)
         {
             try
@@ -211,12 +211,12 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{businessId}/services")]
         [EndpointSummary("List Business Services")]
         [EndpointDescription("Retrieve all services offered by a specific business. Returns list of services with details: " +
             "name, description, duration (minutes), price, assigned partner (userId). Useful for customers browsing available services. " +
-            "Authorization: Any authenticated user can view services.")]
+            "Authorization: Public — no authentication required.")]
         public async Task<IActionResult> GetServices(Guid businessId)
         {
             try

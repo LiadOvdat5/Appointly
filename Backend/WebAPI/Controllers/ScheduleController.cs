@@ -99,6 +99,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Get available slots for a service within a date range
         /// </summary>
+        [AllowAnonymous]
         [HttpGet("service/{serviceId}/slots/range")]
         [EndpointSummary("Get Service Slots by Date Range")]
         [EndpointDescription("Retrieve available slots for a service within a specified date range. " +

@@ -9,7 +9,12 @@
       "mcp__browser__browser_evaluate",
       "mcp__database__execute_sql",
       "Bash(cmd /c \"taskkill /PID 37424 /F && taskkill /PID 38300 /F && taskkill /PID 18212 /F\")",
-      "mcp__browser__browser_snapshot"
+      "mcp__browser__browser_snapshot",
+      "Bash(curl -s -c /tmp/bizslot_cookies.txt -X POST \"http://localhost:5142/auth/login\" -H \"Content-Type: application/json\" -d \"{\"\"email\"\":\"\"claude_test@bizslot.com\"\",\"\"password\"\":\"\"Test1234!\"\"}\")",
+      "Bash(START=\"2026-03-26\")",
+      "Bash(END=\"2026-04-26\")",
+      "Bash(curl -s -b /tmp/bizslot_cookies.txt -X POST \"http://localhost:5142/api/schedule/service/8c95daf1-e867-42ac-b7e5-862e30775929/generate-slots-range\" -H \"Content-Type: application/json\" -d \"{\"\"startDate\"\":\"\"$START\"\",\"\"endDate\"\":\"\"$END\"\"}\")",
+      "Bash(cmd /c \"taskkill /F /IM dotnet.exe\")"
     ]
   }
 }

@@ -14,6 +14,7 @@ import { SearchPage } from "../pages/SearchPage.tsx";
 import ProfilePage from "../pages/ProfilePage.tsx";
 import OnboardingPage from "../pages/OnboardingPage.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
+import PublicBusinessPage from "../pages/PublicBusinessPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
       { path: "not-found", element: <NotFoundPage /> },
       { path: "search", element: <SearchPage /> },
+      { path: "business/:businessId", element: <PublicBusinessPage /> },
       {
         path: "profile",
         element: (

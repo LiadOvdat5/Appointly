@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-B-Public-Business-Page|F-02-B: Public Business Page]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **customer**, I want to **view a business's public page** so that **I can l
 - `[FE]` Display: business name, description, category, contact info, logo/banner
 
 ## Acceptance Criteria
-- [ ] Page loads correctly for any valid `businessId`
-- [ ] HTTP 404 is shown for an invalid or non-existent `businessId`
-- [ ] No edit controls or owner-only UI elements are visible to customers
-- [ ] Page is accessible without authentication
+- [x] Page loads correctly for any valid `businessId`
+- [x] HTTP 404 is shown for an invalid or non-existent `businessId`
+- [x] No edit controls or owner-only UI elements are visible to customers
+- [x] Page is accessible without authentication

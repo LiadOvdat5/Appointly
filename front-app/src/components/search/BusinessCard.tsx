@@ -238,7 +238,7 @@ export function BusinessCard({
             .filter(Boolean)
             .join(" ")}
         >
-          View Services
+          View Business
         </button>
       </div>
     </div>

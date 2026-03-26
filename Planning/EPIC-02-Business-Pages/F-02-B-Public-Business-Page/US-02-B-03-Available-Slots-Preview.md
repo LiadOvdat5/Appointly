@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-B-Public-Business-Page|F-02-B: Public Business Page]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **customer**, I want to **see the business's next available booking slots o
 - `[FE]` Depends on [[EPIC-03-Schedule-and-Availability|EPIC-03]] slot generation being complete
 
 ## Acceptance Criteria
-- [ ] Up to 3 upcoming available slots are shown on the public page
-- [ ] Slots reflect real availability (respects booked slots, breaks, and exceptions)
-- [ ] Fully-booked days are not shown in the preview
-- [ ] Clicking a slot navigates to the booking flow with that date/time pre-filled
+- [x] Up to 3 upcoming available slots are shown on the public page
+- [x] Slots reflect real availability (respects booked slots, breaks, and exceptions)
+- [x] Fully-booked days are not shown in the preview
+- [x] Clicking a slot navigates to the booking flow with that date/time pre-filled

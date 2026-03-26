@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../redux/store";
 import type { Business } from "../types/search";
@@ -48,6 +49,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
  */
 export function SearchPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   // Redux selectors
   const searchQuery = useSelector(selectSearchQuery);
@@ -199,18 +201,18 @@ export function SearchPage() {
   const handleBusinessClick = useCallback(
     (businessId: string) => {
       dispatch(selectBusiness(businessId));
-      // TODO: Navigate to business detail view in Phase 6
+      navigate(`/business/${businessId}`);
     },
-    [dispatch],
+    [dispatch, navigate],
   );
 
-  // Handle view services click
+  // Handle "View Business" button click
   const handleViewServicesClick = useCallback(
     (businessId: string) => {
       dispatch(selectBusiness(businessId));
-      // TODO: Navigate to booking flow in Phase 6
+      navigate(`/business/${businessId}`);
     },
-    [dispatch],
+    [dispatch, navigate],
   );
 
   // View mode is list-only for now
