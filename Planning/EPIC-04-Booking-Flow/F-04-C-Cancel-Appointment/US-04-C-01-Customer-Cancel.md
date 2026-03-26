@@ -2,7 +2,7 @@
 
 **Feature:** [[F-04-C-Cancel-Appointment|F-04-C: Cancel Appointment]]
 **Epic:** [[EPIC-04-Booking-Flow|EPIC-04: Booking Flow]]
-**Status:** ✅ BE Done / 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **customer**, I want to **cancel an upcoming appointment** so that **the sl
 - `[FE]` Update the appointment status in the UI immediately after cancellation
 
 ## Acceptance Criteria
-- [ ] Only future (upcoming) appointments can be canceled; past appointments cannot
-- [ ] Canceled status is shown on the appointment entry after cancellation
-- [ ] The freed time slot becomes available for other customers to book
-- [ ] A confirmation dialog is shown before the cancellation is submitted
+- [x] Only future (upcoming) appointments can be canceled; past appointments cannot
+- [x] Canceled status is shown on the appointment entry after cancellation
+- [x] The freed time slot becomes available for other customers to book
+- [x] A confirmation dialog is shown before the cancellation is submitted

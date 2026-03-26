@@ -209,8 +209,8 @@ export default function BookingPage() {
             )}
           </Card>
           <div className="flex flex-col gap-3 w-full">
-            <Button variant="primary" onClick={() => navigate("/dashboard")}>
-              View in Dashboard
+            <Button variant="primary" onClick={() => navigate("/dashboard/customer")}>
+              View in your appointments
             </Button>
             <Button variant="ghost" onClick={() => navigate(`/business/${confirmedAppointment.businessId}`)}>
               Back to Business Page

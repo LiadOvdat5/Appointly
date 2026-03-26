@@ -14,6 +14,8 @@ import { SearchPage } from "../pages/SearchPage.tsx";
 import ProfilePage from "../pages/ProfilePage.tsx";
 import OnboardingPage from "../pages/OnboardingPage.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
+import CustomerDashboardPage from "../pages/CustomerDashboardPage.tsx";
+import BusinessSchedulePage from "../pages/BusinessSchedulePage.tsx";
 import PublicBusinessPage from "../pages/PublicBusinessPage.tsx";
 import ScheduleEditorPage from "../pages/ScheduleEditorPage.tsx";
 import BookingPage from "../pages/BookingPage.tsx";
@@ -60,6 +62,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/customer",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <CustomerDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "business/:businessId/schedule",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <BusinessSchedulePage />
           </ProtectedRoute>
         ),
       },

@@ -84,7 +84,7 @@ export function RoleSidebar({
             {
               key: "appointments",
               label: "My Appointments",
-              to: "/appointments",
+              to: "/dashboard/customer",
               minRole: Role.Client,
               icon: <Icon name="event_upcoming" />,
             },

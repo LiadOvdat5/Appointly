@@ -2,7 +2,7 @@
 
 **Feature:** [[F-04-B-View-Appointments|F-04-B: View Appointments]]
 **Epic:** [[EPIC-04-Booking-Flow|EPIC-04: Booking Flow]]
-**Status:** ✅ BE Done / 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **see all upcoming appointments for my busine
 - `[FE]` Add date filter to allow viewing by specific date range
 
 ## Acceptance Criteria
-- [ ] Appointment list shows customer name, service, and date/time
-- [ ] List is filterable by date range
-- [ ] Canceled appointments are excluded from the default view
-- [ ] Only the business owner can access their business's appointment list
+- [x] Appointment list shows customer name, service, and date/time
+- [x] List is filterable by date range
+- [x] Canceled appointments are excluded from the default view
+- [x] Only the business owner can access their business's appointment list
