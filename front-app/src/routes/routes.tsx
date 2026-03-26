@@ -16,6 +16,7 @@ import OnboardingPage from "../pages/OnboardingPage.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
 import PublicBusinessPage from "../pages/PublicBusinessPage.tsx";
 import ScheduleEditorPage from "../pages/ScheduleEditorPage.tsx";
+import BookingPage from "../pages/BookingPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,14 @@ const router = createBrowserRouter([
       { path: "not-found", element: <NotFoundPage /> },
       { path: "search", element: <SearchPage /> },
       { path: "business/:businessId", element: <PublicBusinessPage /> },
+      {
+        path: "book/:businessId/:serviceId",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <BookingPage />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "profile",
         element: (

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-03-C-Slot-Generation|F-03-C: Slot Generation]]
 **Epic:** [[EPIC-03-Schedule-and-Availability|EPIC-03: Schedule & Availability]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **customer**, I want to **use a date picker that only allows me to select d
 - `[FE]` Integrate this date picker into the booking flow (see [[EPIC-04-Booking-Flow|EPIC-04]])
 
 ## Acceptance Criteria
-- [ ] Fully-booked dates are visually disabled and not selectable
-- [ ] Exception / blocked dates are visually disabled
-- [ ] The picker fetches availability data per month when navigated
-- [ ] Past dates are always disabled
+- [x] Fully-booked dates are visually disabled and not selectable
+- [x] Exception / blocked dates are visually disabled
+- [x] The picker fetches availability data per month when navigated
+- [x] Past dates are always disabled

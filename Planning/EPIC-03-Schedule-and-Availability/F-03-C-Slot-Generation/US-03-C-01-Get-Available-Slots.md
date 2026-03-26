@@ -2,7 +2,7 @@
 
 **Feature:** [[F-03-C-Slot-Generation|F-03-C: Slot Generation]]
 **Epic:** [[EPIC-03-Schedule-and-Availability|EPIC-03: Schedule & Availability]]
-**Status:** ✅ BE Done
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **customer**, I want to **see available time slots for a specific service o
 - `[BE]` Slot duration is derived from the service's configured duration
 
 ## Acceptance Criteria
-- [ ] Slots that are already booked are excluded from the response
-- [ ] Slots during break times are excluded
-- [ ] Slots on blocked dates return an empty array
-- [ ] Slot duration matches the service's configured duration
+- [x] Slots that are already booked are excluded from the response
+- [x] Slots during break times are excluded
+- [x] Slots on blocked dates return an empty array
+- [x] Slot duration matches the service's configured duration
