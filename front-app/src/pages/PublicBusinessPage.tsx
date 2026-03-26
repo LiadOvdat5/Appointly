@@ -343,6 +343,7 @@ function ServiceCardItem({
   isBeingEdited,
   onEdit,
   onDelete,
+  onManageSchedule,
 }: {
   service: ServiceProfile;
   businessId: string;
@@ -353,6 +354,7 @@ function ServiceCardItem({
   isBeingEdited: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  onManageSchedule: () => void;
 }) {
   const navigate = useNavigate();
   const bookingPath = `/book/${businessId}/${service.id}`;
@@ -393,6 +395,14 @@ function ServiceCardItem({
           </div>
           {isEditing && (
             <div className="flex items-center gap-1 ml-1">
+              <button
+                type="button"
+                onClick={onManageSchedule}
+                className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
+                aria-label="Manage schedule"
+              >
+                <MaterialIcon name="calendar_month" className="text-base" />
+              </button>
               <button
                 type="button"
                 onClick={onEdit}
@@ -1168,6 +1178,7 @@ export default function PublicBusinessPage() {
                     isBeingEdited={isEditing && editingServiceId !== null && editingServiceId !== svc.id}
                     onEdit={() => handleEditService(svc)}
                     onDelete={() => handleDeleteService(svc.id)}
+                    onManageSchedule={() => navigate(`/schedule/${businessId}/${svc.id}`)}
                   />
                 ),
               )}

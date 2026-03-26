@@ -165,7 +165,7 @@ Planning/
   README.md               ← Start here — full index with status
   EPIC-01-Authentication/ ✅ Done
   EPIC-02-Business-Pages/ 🔄 In Progress (F-02-A ✅ Done, F-02-B ✅ Done, F-02-C ✅ Done, F-02-D pending)
-  EPIC-03-Schedule-and-Availability/ 🔄 In Progress (BE done, FE pending)
+  EPIC-03-Schedule-and-Availability/ 🔄 In Progress (F-03-A ✅ Done, F-03-B FE pending, F-03-C FE pending)
   EPIC-04-Booking-Flow/   🔲 Not Started (BE done, FE stub exists)
   EPIC-05-Search-and-Discovery/ ✅ Done
   EPIC-06-Dashboards/     🔲 Not Started (FE stub exists)
@@ -203,7 +203,8 @@ Each user story file contains: story, tasks tagged `[BE]`/`[FE]`/`[DB]`, and acc
 The immediate next areas to implement (in order):
 
 1. **EPIC-02 F-02-D** — Worker/staff management on business page
-2. **EPIC-03 FE** — Visual schedule editor UI
-3. **EPIC-04 FE** — Full booking flow (`BookingPage.tsx` stub exists)
-4. **EPIC-06 FE** — Business + customer dashboards (`DashboardPage.tsx` stub exists)
-5. **EPIC-07** — Follow system (BE + FE both needed)
+2. **EPIC-03 F-03-B FE** — Date exceptions UI (block dates / holidays)
+3. **EPIC-03 F-03-C FE** — Customer-facing date picker showing only available slot dates
+4. **EPIC-04 FE** — Full booking flow (`BookingPage.tsx` stub exists)
+5. **EPIC-06 FE** — Business + customer dashboards (`DashboardPage.tsx` stub exists)
+6. **EPIC-07** — Follow system (BE + FE both needed)

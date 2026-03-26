@@ -15,6 +15,7 @@ import ProfilePage from "../pages/ProfilePage.tsx";
 import OnboardingPage from "../pages/OnboardingPage.tsx";
 import DashboardPage from "../pages/DashboardPage.tsx";
 import PublicBusinessPage from "../pages/PublicBusinessPage.tsx";
+import ScheduleEditorPage from "../pages/ScheduleEditorPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <DashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "schedule/:businessId/:serviceId",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <ScheduleEditorPage />
           </ProtectedRoute>
         ),
       },

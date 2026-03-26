@@ -2,7 +2,7 @@
 
 **Feature:** [[F-03-A-Working-Hours|F-03-A: Working Hours]]
 **Epic:** [[EPIC-03-Schedule-and-Availability|EPIC-03: Schedule & Availability]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **business owner**, I want to **use a visual weekly schedule editor** so th
 - `[FE]` Save changes per-day to `POST /businesses/{businessId}/services/{serviceId}/schedule`
 
 ## Acceptance Criteria
-- [ ] Each day can be individually toggled on (working) or off (closed)
-- [ ] Time pickers enforce valid ranges (e.g., start must be before end)
-- [ ] Break time pickers enforce that breaks fall within the working hours for the day
-- [ ] Changes are saved per-day and confirmed with a success message
+- [x] Each day can be individually toggled on (working) or off (closed)
+- [x] Time pickers enforce valid ranges (e.g., start must be before end)
+- [x] Break time pickers enforce that breaks fall within the working hours for the day
+- [x] Changes are saved (single "Save All") and confirmed with a success message
