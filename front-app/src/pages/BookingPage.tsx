@@ -8,6 +8,10 @@ import {
   getAvailableSlotsForDate,
   type SlotDTO,
 } from "../services/scheduleService";
+import {
+  bookAppointment,
+  type AppointmentDTO,
+} from "../services/appointmentService";
 import type { BusinessProfile, ServiceProfile } from "../types/business";
 import { AvailableDatePicker } from "../components/UI/AvailableDatePicker";
 import { TimeSlot } from "../components/UI/TimeSlot";
@@ -66,6 +70,11 @@ export default function BookingPage() {
     searchParams.get("slotId"),
   );
 
+  // ─ Booking submission
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [confirmedAppointment, setConfirmedAppointment] = useState<AppointmentDTO | null>(null);
+
   // Load business + service metadata
   useEffect(() => {
     if (!businessId || !serviceId) return;
@@ -121,6 +130,96 @@ export default function BookingPage() {
   }
 
   const selectedSlot = slots.find((s) => s.id === selectedSlotId) ?? null;
+
+  async function handleConfirmBooking() {
+    if (!selectedSlot || !serviceId) return;
+    setIsSubmitting(true);
+    setBookingError(null);
+    try {
+      const appointment = await bookAppointment(serviceId, selectedSlot.id);
+      setConfirmedAppointment(appointment);
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      if (status === 409) {
+        setBookingError("That slot was just taken. Please pick another time.");
+        setSelectedSlotId(null);
+        setSlots([]);
+      } else {
+        setBookingError("Something went wrong. Please try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  // ─ Success screen
+  if (confirmedAppointment) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+        <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm text-[#111418] dark:text-white">Booking Confirmed</p>
+          </div>
+        </div>
+        <div className="max-w-lg mx-auto px-4 py-10 flex flex-col items-center gap-6 text-center">
+          <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+            <MaterialIcon name="check_circle" className="text-4xl text-green-500" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-[#111418] dark:text-white">You're booked!</h1>
+            <p className="text-sm text-gray-500 mt-1">Your appointment has been confirmed.</p>
+          </div>
+          <Card className="p-5 w-full text-left space-y-3">
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>Confirmation #</span>
+              <span className="font-mono font-medium text-[#111418] dark:text-white text-xs">
+                {confirmedAppointment.confirmationCode}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>Business</span>
+              <span className="font-medium text-[#111418] dark:text-white">{confirmedAppointment.businessName}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>Service</span>
+              <span className="font-medium text-[#111418] dark:text-white">{confirmedAppointment.serviceName}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>Date</span>
+              <span className="font-medium text-[#111418] dark:text-white">
+                {new Date(confirmedAppointment.startDateTime).toLocaleDateString(undefined, {
+                  weekday: "short",
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>Time</span>
+              <span className="font-medium text-[#111418] dark:text-white">
+                {formatTime(confirmedAppointment.startDateTime)} – {formatTime(confirmedAppointment.endDateTime)}
+              </span>
+            </div>
+            {confirmedAppointment.servicePrice != null && (
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+                <span className="font-semibold">Total</span>
+                <span className="font-bold text-primary">${confirmedAppointment.servicePrice.toFixed(2)}</span>
+              </div>
+            )}
+          </Card>
+          <div className="flex flex-col gap-3 w-full">
+            <Button variant="primary" onClick={() => navigate("/dashboard")}>
+              View in Dashboard
+            </Button>
+            <Button variant="ghost" onClick={() => navigate(`/business/${confirmedAppointment.businessId}`)}>
+              Back to Business Page
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
@@ -255,17 +354,19 @@ export default function BookingPage() {
               )}
             </div>
 
-            {/* EPIC-04 placeholder — booking confirmation not yet implemented */}
+            {bookingError && (
+              <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3">
+                <MaterialIcon name="error_outline" className="text-red-500 text-base mt-0.5 shrink-0" />
+                <p className="text-sm text-red-600 dark:text-red-400">{bookingError}</p>
+              </div>
+            )}
             <Button
               variant="primary"
-              disabled
-              title="Full booking confirmation coming soon (EPIC-04)"
+              disabled={isSubmitting}
+              onClick={handleConfirmBooking}
             >
-              Confirm booking
+              {isSubmitting ? "Confirming…" : "Confirm Booking"}
             </Button>
-            <p className="text-center text-xs text-gray-400">
-              Online booking confirmation coming soon.
-            </p>
           </Card>
         )}
       </div>

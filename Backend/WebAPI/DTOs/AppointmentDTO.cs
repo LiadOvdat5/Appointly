@@ -6,6 +6,7 @@ namespace WebAPI.DTOs
     public class AppointmentDTO
     {
         public Guid Id { get; set; }
+        public string ConfirmationCode { get; set; } = string.Empty;
 
         // Client Information
         public Guid ClientId { get; set; }

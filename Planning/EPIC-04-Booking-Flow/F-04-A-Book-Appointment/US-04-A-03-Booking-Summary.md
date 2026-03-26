@@ -2,7 +2,7 @@
 
 **Feature:** [[F-04-A-Book-Appointment|F-04-A: Book Appointment]]
 **Epic:** [[EPIC-04-Booking-Flow|EPIC-04: Booking Flow]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 

@@ -15,6 +15,10 @@ namespace WebAPI.Models
         [Key]
         public Guid Id { get; set; }
 
+        [Required]
+        [MaxLength(12)]
+        public string ConfirmationCode { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "ClientId is required.")]
         public Guid ClientId { get; set; }
 

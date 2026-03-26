@@ -17,6 +17,7 @@ namespace WebAPI.Mappers
             return new AppointmentDTO
             {
                 Id = appointment.Id,
+                ConfirmationCode = appointment.ConfirmationCode,
 
                 // Client Information
                 ClientId = appointment.ClientId,
@@ -68,6 +69,7 @@ namespace WebAPI.Mappers
             return new Appointment
             {
                 Id = Guid.NewGuid(),
+                ConfirmationCode = Guid.NewGuid().ToString("N")[..8].ToUpper(),
                 ClientId = clientId,
                 ServiceId = dto.ServiceId,
                 BusinessId = businessId,
