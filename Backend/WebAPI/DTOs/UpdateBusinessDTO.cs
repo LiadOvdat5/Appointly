@@ -13,5 +13,8 @@ namespace WebAPI.DTOs
         public string? Phone { get; set; }
 
         public string? Description { get; set; }
+
+        [MaxLength(20, ErrorMessage = "Theme color cannot exceed 20 characters.")]
+        public string? ThemeColor { get; set; }
     }
 }

@@ -24,10 +24,14 @@ namespace WebAPI.Mappers
             return new BusinessDTO
             {
                 Id = business.Id,
+                OwnerId = business.OwnerId,
                 Name = business.Name,
                 Description = business.Description,
                 Address = business.Address ?? string.Empty,
                 Phone = business.Phone ?? string.Empty,
+                ThemeColor = business.ThemeColor,
+                LogoUrl = business.LogoUrl,
+                BannerUrl = business.BannerUrl,
                 Categories = categories?.ToList() ?? new List<CategoryDTO>()
             };
         }
@@ -45,6 +49,9 @@ namespace WebAPI.Mappers
 
             if (updateDto.Description != null)
                 business.Description = updateDto.Description;
+
+            if (updateDto.ThemeColor != null)
+                business.ThemeColor = updateDto.ThemeColor;
 
             business.UpdatedAt = DateTime.UtcNow;
         }

@@ -5,11 +5,15 @@
 
 export interface BusinessProfile {
   id: string;
+  ownerId: string;
   name: string;
   address: string;
   phone: string;
   description?: string;
   categories: BusinessCategory[];
+  themeColor?: string;
+  logoUrl?: string;
+  bannerUrl?: string;
 }
 
 export interface BusinessCategory {
@@ -24,6 +28,14 @@ export interface CreateBusinessInput {
   address: string;
   phone: string;
   description?: string;
+}
+
+export interface UpdateBusinessInput {
+  name?: string;
+  address?: string;
+  phone?: string;
+  description?: string;
+  themeColor?: string;
 }
 
 export interface ServiceProfile {
@@ -43,4 +55,11 @@ export interface CreateServiceInput {
   price?: number;
   categoryId: string;
   userId: string;
+}
+
+export interface UpdateServiceInput {
+  name?: string;
+  description?: string;
+  duration?: number;
+  price?: number;
 }

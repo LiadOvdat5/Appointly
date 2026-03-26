@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-C-Owner-Edit-Mode|F-02-C: Owner Edit Mode]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **add, edit, and delete services** so that **
 - `[FE]` Build service management panel visible in edit mode with add/edit/delete controls
 
 ## Acceptance Criteria
-- [ ] New services appear on the public page immediately after saving
-- [ ] Deleted services are removed from the page immediately
-- [ ] Price and duration fields enforce valid numeric values
-- [ ] Only the business owner can manage services for their business
+- [x] New services appear on the public page immediately after saving
+- [x] Deleted services are removed from the page immediately
+- [x] Price and duration fields enforce valid numeric values
+- [x] Only the business owner can manage services for their business

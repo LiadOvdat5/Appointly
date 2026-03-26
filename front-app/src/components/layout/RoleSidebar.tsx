@@ -374,6 +374,7 @@ function BusinessNavItem({
       {subExpanded && (
         <div className="ml-4 space-y-0.5 border-l border-gray-200 dark:border-gray-700 pl-3">
           {[
+            { label: "Business Page", icon: "storefront", to: `/business/${business.id}` },
             { label: "Dashboard", icon: "dashboard", to: `/dashboard/${business.id}` },
             { label: "Services", icon: "content_cut", to: `/business/${business.id}/services` },
             { label: "Schedule", icon: "calendar_month", to: `/business/${business.id}/schedule` },

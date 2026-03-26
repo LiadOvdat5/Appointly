@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-C-Owner-Edit-Mode|F-02-C: Owner Edit Mode]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ As a **business owner**, I want to **customize my business page's theme color** 
 - `[FE]` Apply theme color to buttons, accents, and highlights on the public business page
 
 ## Acceptance Criteria
-- [ ] Selected color is persisted after saving and survives page refresh
-- [ ] Theme color is applied to buttons and accent elements on the public page
-- [ ] Live preview updates the page appearance immediately as the color is selected
+- [x] Selected color is persisted after saving and survives page refresh
+- [x] Theme color is applied to buttons and accent elements on the public page
+- [x] Live preview updates the page appearance immediately as the color is selected

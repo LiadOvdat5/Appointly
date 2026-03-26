@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-C-Owner-Edit-Mode|F-02-C: Owner Edit Mode]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **upload a logo and banner image for my busin
 - `[FE]` Display uploaded logo and banner on the public business page
 
 ## Acceptance Criteria
-- [ ] Only image file types are accepted (jpg, png, webp); non-image files are rejected with an error
-- [ ] Preview of the uploaded image is shown before the user confirms the upload
-- [ ] Logo and banner are displayed on the public page after a successful upload
-- [ ] Requires a file storage solution (e.g., AWS S3 or Azure Blob Storage)
+- [x] Only image file types are accepted (jpg, png, webp); non-image files are rejected with an error
+- [x] Preview of the uploaded image is shown before the user confirms the upload
+- [x] Logo and banner are displayed on the public page after a successful upload
+- [x] Requires a file storage solution (e.g., AWS S3 or Azure Blob Storage) — implemented with local disk storage (wwwroot/uploads/); swap to cloud later

@@ -268,6 +268,100 @@ namespace WebAPI.Controllers
         }
 
         [Authorize]
+        [HttpPost("{id}/upload-logo")]
+        [EndpointSummary("Upload Business Logo")]
+        [EndpointDescription("Upload a logo image (jpg, png, webp) for the business. Stored on local disk. Authorization: Only the business owner.")]
+        public async Task<IActionResult> UploadLogo(Guid id, IFormFile file)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                if (file == null || file.Length == 0)
+                    return BadRequest(new { error = "No file provided." });
+
+                var allowed = new[] { "image/jpeg", "image/png", "image/webp" };
+                if (!allowed.Contains(file.ContentType.ToLower()))
+                    return BadRequest(new { error = "Only jpg, png, and webp images are accepted." });
+
+                var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "logos");
+                Directory.CreateDirectory(uploadsPath);
+
+                var ext = Path.GetExtension(file.FileName).ToLower();
+                var fileName = $"{id}-{Guid.NewGuid()}{ext}";
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                    await file.CopyToAsync(stream);
+
+                var logoUrl = $"/uploads/logos/{fileName}";
+                var business = await _businessRepository.UpdateBusinessLogoAsync(id, userId, logoUrl);
+                return Ok(business);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPost("{id}/upload-banner")]
+        [EndpointSummary("Upload Business Banner")]
+        [EndpointDescription("Upload a banner image (jpg, png, webp) for the business. Stored on local disk. Authorization: Only the business owner.")]
+        public async Task<IActionResult> UploadBanner(Guid id, IFormFile file)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                if (file == null || file.Length == 0)
+                    return BadRequest(new { error = "No file provided." });
+
+                var allowed = new[] { "image/jpeg", "image/png", "image/webp" };
+                if (!allowed.Contains(file.ContentType.ToLower()))
+                    return BadRequest(new { error = "Only jpg, png, and webp images are accepted." });
+
+                var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "banners");
+                Directory.CreateDirectory(uploadsPath);
+
+                var ext = Path.GetExtension(file.FileName).ToLower();
+                var fileName = $"{id}-{Guid.NewGuid()}{ext}";
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                    await file.CopyToAsync(stream);
+
+                var bannerUrl = $"/uploads/banners/{fileName}";
+                var business = await _businessRepository.UpdateBusinessBannerAsync(id, userId, bannerUrl);
+                return Ok(business);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
         [HttpDelete("{businessId}/services/{serviceId}")]
         [EndpointSummary("Delete Service")]
         [EndpointDescription("Delete a service from the business. Authorization: Only the business owner can delete services.")]

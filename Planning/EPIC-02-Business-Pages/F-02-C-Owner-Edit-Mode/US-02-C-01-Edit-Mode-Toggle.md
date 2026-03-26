@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-C-Owner-Edit-Mode|F-02-C: Owner Edit Mode]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **toggle Edit Mode on my business page** so t
 - `[FE]` "Save" button submits changes; "Cancel" reverts to read-only view
 
 ## Acceptance Criteria
-- [ ] Only the owner of the business sees the Edit Mode toggle
-- [ ] Customers and unauthenticated users never see the edit button or editable fields
-- [ ] Changes are saved on confirm and immediately reflected in the page
-- [ ] Cancel reverts all unsaved changes
+- [x] Only the owner of the business sees the Edit Mode toggle
+- [x] Customers and unauthenticated users never see the edit button or editable fields
+- [x] Changes are saved on confirm and immediately reflected in the page
+- [x] Cancel reverts all unsaved changes

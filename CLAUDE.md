@@ -164,7 +164,7 @@ All epics, features, and user stories live in `Planning/` as Obsidian-linked mar
 Planning/
   README.md               ← Start here — full index with status
   EPIC-01-Authentication/ ✅ Done
-  EPIC-02-Business-Pages/ 🔄 In Progress (F-02-A ✅ Done, F-02-B ✅ Done, F-02-C/D pending)
+  EPIC-02-Business-Pages/ 🔄 In Progress (F-02-A ✅ Done, F-02-B ✅ Done, F-02-C ✅ Done, F-02-D pending)
   EPIC-03-Schedule-and-Availability/ 🔄 In Progress (BE done, FE pending)
   EPIC-04-Booking-Flow/   🔲 Not Started (BE done, FE stub exists)
   EPIC-05-Search-and-Discovery/ ✅ Done
@@ -202,7 +202,7 @@ Each user story file contains: story, tasks tagged `[BE]`/`[FE]`/`[DB]`, and acc
 
 The immediate next areas to implement (in order):
 
-1. **EPIC-02 F-02-C** — Owner edit mode on public business page
+1. **EPIC-02 F-02-D** — Worker/staff management on business page
 2. **EPIC-03 FE** — Visual schedule editor UI
 3. **EPIC-04 FE** — Full booking flow (`BookingPage.tsx` stub exists)
 4. **EPIC-06 FE** — Business + customer dashboards (`DashboardPage.tsx` stub exists)

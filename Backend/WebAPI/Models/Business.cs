@@ -25,6 +25,10 @@ namespace WebAPI.Models
         public string? Address { get; set; }
         [MaxLength(20, ErrorMessage = "Phone number cannot exceed 20 characters.")]
         public string? Phone { get; set; }
+        [MaxLength(20)]
+        public string? ThemeColor { get; set; }
+        public string? LogoUrl { get; set; }
+        public string? BannerUrl { get; set; }
 
         // Schedule settings
         [Required]
