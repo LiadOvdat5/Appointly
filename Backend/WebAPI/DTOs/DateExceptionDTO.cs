@@ -11,6 +11,7 @@ namespace WebAPI.DTOs
         public bool IsWorkingDay { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
+        public string? Reason { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -28,6 +29,9 @@ namespace WebAPI.DTOs
         public TimeSpan? StartTime { get; set; }
 
         public TimeSpan? EndTime { get; set; }
+
+        [MaxLength(255)]
+        public string? Reason { get; set; }
     }
 
     public class UpdateDateExceptionDTO
@@ -36,5 +40,6 @@ namespace WebAPI.DTOs
         public bool? IsWorkingDay { get; set; }
         public TimeSpan? StartTime { get; set; }
         public TimeSpan? EndTime { get; set; }
+        public string? Reason { get; set; }
     }
 }

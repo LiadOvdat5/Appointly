@@ -13,9 +13,13 @@ import {
   getBreakRules,
   createBreakRule,
   deleteBreakRule,
+  getDateExceptions,
+  createDateException,
+  deleteDateException,
   generateSlots,
   type WeeklyRuleDTO,
   type BreakRuleDTO,
+  type DateExceptionDTO,
   type GenerateSlotsResult,
 } from "../services/availabilityService";
 import { getPublicServicesForBusiness } from "../services/businessManagementService";
@@ -146,6 +150,13 @@ export default function ScheduleEditorPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
+  // ── Date exceptions state ────────────────────────────────────────────────
+  const [dateExceptions, setDateExceptions] = useState<DateExceptionDTO[]>([]);
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth()); // 0-indexed
+  const [togglingDate, setTogglingDate] = useState<string | null>(null); // "YYYY-MM-DD" being toggled
+  const [exceptionsError, setExceptionsError] = useState<string | null>(null);
+
   // ── Generate slots state ─────────────────────────────────────────────────
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
@@ -162,14 +173,16 @@ export default function ScheduleEditorPage() {
   const loadData = useCallback(async () => {
     if (!businessId || !serviceId) return;
     try {
-      const [services, rules, breaks] = await Promise.all([
+      const [services, rules, breaks, exceptions] = await Promise.all([
         getPublicServicesForBusiness(businessId),
         getWeeklyRules(serviceId),
         getBreakRules(serviceId),
+        getDateExceptions(serviceId),
       ]);
       const svc = services.find((s) => s.id === serviceId);
       setServiceName(svc?.name ?? "Service");
       setDayStates(buildInitialDayStates(rules, breaks));
+      setDateExceptions(exceptions);
       setPageStatus("ready");
     } catch {
       setPageStatus("error");
@@ -320,6 +333,35 @@ export default function ScheduleEditorPage() {
       setGenerateError(`Failed to generate slots. ${msg}`);
     } finally {
       setIsGenerating(false);
+    }
+  }
+
+  // ── Date exception toggle ─────────────────────────────────────────────────
+
+  async function handleToggleDate(dateStr: string, reason?: string) {
+    if (!serviceId) return;
+    setTogglingDate(dateStr);
+    setExceptionsError(null);
+    try {
+      const existing = dateExceptions.find(
+        (e) => e.date.slice(0, 10) === dateStr && !e.isWorkingDay,
+      );
+      if (existing) {
+        await deleteDateException(existing.id);
+        setDateExceptions((prev) => prev.filter((e) => e.id !== existing.id));
+      } else {
+        const created = await createDateException({
+          serviceId,
+          date: `${dateStr}T00:00:00`,
+          isWorkingDay: false,
+          reason,
+        });
+        setDateExceptions((prev) => [...prev, created]);
+      }
+    } catch {
+      setExceptionsError("Failed to update blocked dates. Please try again.");
+    } finally {
+      setTogglingDate(null);
     }
   }
 
@@ -587,6 +629,29 @@ export default function ScheduleEditorPage() {
       {/* ── Divider ── */}
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
+      {/* ── Blocked Dates ── */}
+      <BlockedDatesCalendar
+        year={calendarYear}
+        month={calendarMonth}
+        blockedDates={dateExceptions
+          .filter((e) => !e.isWorkingDay)
+          .map((e) => ({ dateStr: e.date.slice(0, 10), reason: e.reason }))}
+        togglingDate={togglingDate}
+        error={exceptionsError}
+        onPrevMonth={() => {
+          if (calendarMonth === 0) { setCalendarMonth(11); setCalendarYear((y) => y - 1); }
+          else setCalendarMonth((m) => m - 1);
+        }}
+        onNextMonth={() => {
+          if (calendarMonth === 11) { setCalendarMonth(0); setCalendarYear((y) => y + 1); }
+          else setCalendarMonth((m) => m + 1);
+        }}
+        onToggleDate={handleToggleDate}
+      />
+
+      {/* ── Divider ── */}
+      <div className="border-t border-gray-200 dark:border-gray-700" />
+
       {/* ── Generate slots ── */}
       <div className="flex flex-col gap-4">
         <div>
@@ -652,6 +717,218 @@ export default function ScheduleEditorPage() {
         </Button>
       </div>
 
+    </div>
+  );
+}
+
+// ─── BlockedDatesCalendar ─────────────────────────────────────────────────────
+
+const MONTH_NAMES = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December",
+];
+
+interface BlockedEntry { dateStr: string; reason: string | null; }
+
+interface BlockedDatesCalendarProps {
+  year: number;
+  month: number; // 0-indexed
+  blockedDates: BlockedEntry[];
+  togglingDate: string | null;
+  error: string | null;
+  onPrevMonth: () => void;
+  onNextMonth: () => void;
+  onToggleDate: (dateStr: string, reason?: string) => void;
+}
+
+function BlockedDatesCalendar({
+  year, month, blockedDates, togglingDate, error,
+  onPrevMonth, onNextMonth, onToggleDate,
+}: BlockedDatesCalendarProps) {
+  const [pendingDate, setPendingDate] = useState<string | null>(null);
+  const [reasonInput, setReasonInput] = useState("");
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Build calendar grid: weeks × 7 days (Mon-first), null = padding
+  const firstDayOfMonth = new Date(year, month, 1);
+  // getDay() returns 0=Sun…6=Sat; convert to Mon-first (0=Mon…6=Sun)
+  const startPad = (firstDayOfMonth.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const cells: (number | null)[] = [
+    ...Array(startPad).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  // Pad to full weeks
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const blockedSet = new Set(blockedDates.map((b) => b.dateStr));
+
+  function dateStr(day: number) {
+    return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  function handleCellClick(day: number) {
+    const ds = dateStr(day);
+    if (ds <= todayStr) return; // past dates not allowed
+    if (blockedSet.has(ds)) {
+      // Unblock immediately
+      onToggleDate(ds);
+    } else {
+      // Ask for reason before blocking
+      setPendingDate(ds);
+      setReasonInput("");
+    }
+  }
+
+  function confirmBlock() {
+    if (!pendingDate) return;
+    onToggleDate(pendingDate, reasonInput.trim() || undefined);
+    setPendingDate(null);
+    setReasonInput("");
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h2 className="text-base font-semibold text-[#111418] dark:text-white">Blocked Dates</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Click a future date to block it. Click a blocked date to unblock it.
+        </p>
+      </div>
+
+      {/* Month navigation */}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={onPrevMonth}
+          className="p-1.5 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
+          aria-label="Previous month"
+        >
+          <MaterialIcon name="chevron_left" />
+        </button>
+        <span className="text-sm font-semibold text-[#111418] dark:text-white">
+          {MONTH_NAMES[month]} {year}
+        </span>
+        <button
+          type="button"
+          onClick={onNextMonth}
+          className="p-1.5 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
+          aria-label="Next month"
+        >
+          <MaterialIcon name="chevron_right" />
+        </button>
+      </div>
+
+      {/* Day-of-week headers */}
+      <div className="grid grid-cols-7 gap-1 text-center">
+        {["Mo","Tu","We","Th","Fr","Sa","Su"].map((d) => (
+          <div key={d} className="text-[11px] font-semibold text-gray-400 py-1">{d}</div>
+        ))}
+
+        {cells.map((day, i) => {
+          if (day === null) return <div key={`pad-${i}`} />;
+          const ds = dateStr(day);
+          const isPast = ds <= todayStr;
+          const isBlocked = blockedSet.has(ds);
+          const isToggling = togglingDate === ds;
+          const blockedEntry = blockedDates.find((b) => b.dateStr === ds);
+
+          return (
+            <button
+              key={ds}
+              type="button"
+              disabled={isPast || isToggling}
+              onClick={() => handleCellClick(day)}
+              title={isBlocked && blockedEntry?.reason ? blockedEntry.reason : undefined}
+              className={[
+                "relative flex flex-col items-center justify-center rounded-lg py-1.5 text-sm transition-all",
+                isPast
+                  ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                  : isBlocked
+                  ? "bg-danger/15 text-danger font-semibold hover:bg-danger/25 ring-1 ring-danger/30"
+                  : "text-[#111418] dark:text-white hover:bg-primary/10 hover:text-primary",
+                isToggling ? "opacity-50 cursor-wait" : "",
+              ].join(" ")}
+            >
+              <span className={isBlocked ? "line-through" : ""}>{day}</span>
+              {isBlocked && (
+                <span className="text-[8px] leading-none mt-0.5 text-danger/70">blocked</span>
+              )}
+              {isToggling && (
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-3 h-3 rounded-full border-2 border-danger border-t-transparent animate-spin" />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {error && <Alert variant="error">{error}</Alert>}
+
+      {/* Blocked dates list */}
+      {blockedDates.length > 0 && (
+        <div className="rounded-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 px-3 py-2 bg-gray-50 dark:bg-gray-900">
+            Blocked dates
+          </p>
+          <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+            {[...blockedDates]
+              .sort((a, b) => a.dateStr.localeCompare(b.dateStr))
+              .map((b) => (
+                <li key={b.dateStr} className="flex items-center justify-between px-3 py-2 gap-2">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-[#111418] dark:text-white">{b.dateStr}</span>
+                    {b.reason && (
+                      <span className="text-xs text-gray-500">{b.reason}</span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    disabled={togglingDate === b.dateStr || b.dateStr <= todayStr}
+                    onClick={() => onToggleDate(b.dateStr)}
+                    className="p-1 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-40"
+                    aria-label="Unblock date"
+                  >
+                    <MaterialIcon name="close" className="text-base" />
+                  </button>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Reason dialog */}
+      {pendingDate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4">
+            <h3 className="text-base font-semibold text-[#111418] dark:text-white">
+              Block {pendingDate}
+            </h3>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs text-gray-500">Reason (optional)</label>
+              <input
+                type="text"
+                value={reasonInput}
+                onChange={(e) => setReasonInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") confirmBlock(); if (e.key === "Escape") setPendingDate(null); }}
+                placeholder="e.g. Public Holiday"
+                maxLength={255}
+                autoFocus
+                className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900
+                  px-3 py-2 text-sm text-[#111418] dark:text-white
+                  focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => setPendingDate(null)}>Cancel</Button>
+              <Button variant="primary" onClick={confirmBlock}>Block Date</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

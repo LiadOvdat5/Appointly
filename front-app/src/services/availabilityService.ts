@@ -23,6 +23,17 @@ export interface BreakRuleDTO {
   createdAt: string;
 }
 
+export interface DateExceptionDTO {
+  id: string;
+  serviceId: string;
+  date: string;        // ISO date string "YYYY-MM-DDT..."
+  isWorkingDay: boolean;
+  startTime: string | null;  // "HH:mm:ss"
+  endTime: string | null;    // "HH:mm:ss"
+  reason: string | null;
+  createdAt: string;
+}
+
 export interface GenerateSlotsResult {
   totalSlotsCreated: number;
   averageSlotsPerDay: number;
@@ -76,6 +87,24 @@ export const createBreakRule = (dto: {
 
 export const deleteBreakRule = (ruleId: string): Promise<void> =>
   apiClient.delete(`/api/availability/break-rule/${ruleId}`).then(() => undefined);
+
+// ─── Date Exceptions ──────────────────────────────────────────────────────────
+
+export const getDateExceptions = (serviceId: string): Promise<DateExceptionDTO[]> =>
+  apiClient
+    .get<DateExceptionDTO[]>(`/api/availability/service/${serviceId}/date-exceptions`)
+    .then((r) => r.data);
+
+export const createDateException = (dto: {
+  serviceId: string;
+  date: string;        // "YYYY-MM-DDT00:00:00"
+  isWorkingDay: boolean;
+  reason?: string;
+}): Promise<DateExceptionDTO> =>
+  apiClient.post<DateExceptionDTO>("/api/availability/date-exception", dto).then((r) => r.data);
+
+export const deleteDateException = (exceptionId: string): Promise<void> =>
+  apiClient.delete(`/api/availability/date-exception/${exceptionId}`).then(() => undefined);
 
 // ─── Slot Generation ──────────────────────────────────────────────────────────
 

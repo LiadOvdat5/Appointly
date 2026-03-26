@@ -15,6 +15,7 @@ namespace WebAPI.Mappers
                 IsWorkingDay = exception.IsWorkingDay,
                 StartTime = exception.StartTime,
                 EndTime = exception.EndTime,
+                Reason = exception.Reason,
                 CreatedAt = exception.CreatedAt
             };
         }
@@ -27,7 +28,8 @@ namespace WebAPI.Mappers
                 Date = dto.Date,
                 IsWorkingDay = dto.IsWorkingDay,
                 StartTime = dto.StartTime,
-                EndTime = dto.EndTime
+                EndTime = dto.EndTime,
+                Reason = dto.Reason
             };
         }
 
@@ -44,6 +46,9 @@ namespace WebAPI.Mappers
 
             if (dto.EndTime.HasValue)
                 exception.EndTime = dto.EndTime;
+
+            if (dto.Reason != null)
+                exception.Reason = dto.Reason;
         }
     }
 }

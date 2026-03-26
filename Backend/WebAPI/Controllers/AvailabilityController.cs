@@ -18,19 +18,22 @@ namespace WebAPI.Controllers
         private readonly IRecurringRuleRepository _recurringRuleRepository;
         private readonly IDateExceptionRepository _dateExceptionRepository;
         private readonly IServiceRepository _serviceRepository;
+        private readonly IServiceScheduleRepository _serviceScheduleRepository;
 
         public AvailabilityController(
             IWeeklyWorkingRuleRepository weeklyWorkingRuleRepository,
             IBreakRuleRepository breakRuleRepository,
             IRecurringRuleRepository recurringRuleRepository,
             IDateExceptionRepository dateExceptionRepository,
-            IServiceRepository serviceRepository)
+            IServiceRepository serviceRepository,
+            IServiceScheduleRepository serviceScheduleRepository)
         {
             _weeklyWorkingRuleRepository = weeklyWorkingRuleRepository;
             _breakRuleRepository = breakRuleRepository;
             _recurringRuleRepository = recurringRuleRepository;
             _dateExceptionRepository = dateExceptionRepository;
             _serviceRepository = serviceRepository;
+            _serviceScheduleRepository = serviceScheduleRepository;
         }
 
         private Guid? GetCurrentUserId()
@@ -453,6 +456,10 @@ namespace WebAPI.Controllers
                 var exception = DateExceptionMapper.FromCreateDTO(dto);
                 var created = await _dateExceptionRepository.CreateAsync(exception);
 
+                // Block any already-generated slots for this date
+                if (!created.IsWorkingDay)
+                    await _serviceScheduleRepository.BlockAvailableSlotsForDateAsync(created.ServiceId, created.Date);
+
                 return CreatedAtAction(
                     nameof(GetDateExceptions),
                     new { serviceId = created.ServiceId },
@@ -512,6 +519,10 @@ namespace WebAPI.Controllers
                 var (_, error) = await AuthorizeServiceOwnerAsync(existing.ServiceId);
                 if (error != null)
                     return error;
+
+                // Restore slots blocked by this exception before deleting it
+                if (!existing.IsWorkingDay)
+                    await _serviceScheduleRepository.UnblockSlotsForDateAsync(existing.ServiceId, existing.Date);
 
                 var success = await _dateExceptionRepository.DeleteAsync(exceptionId);
                 if (!success)

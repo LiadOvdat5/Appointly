@@ -165,7 +165,7 @@ Planning/
   README.md               ← Start here — full index with status
   EPIC-01-Authentication/ ✅ Done
   EPIC-02-Business-Pages/ 🔄 In Progress (F-02-A ✅ Done, F-02-B ✅ Done, F-02-C ✅ Done, F-02-D pending)
-  EPIC-03-Schedule-and-Availability/ 🔄 In Progress (F-03-A ✅ Done, F-03-B FE pending, F-03-C FE pending)
+  EPIC-03-Schedule-and-Availability/ 🔄 In Progress (F-03-A ✅ Done, F-03-B ✅ Done, F-03-C FE pending)
   EPIC-04-Booking-Flow/   🔲 Not Started (BE done, FE stub exists)
   EPIC-05-Search-and-Discovery/ ✅ Done
   EPIC-06-Dashboards/     🔲 Not Started (FE stub exists)

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-03-B-Date-Exceptions|F-03-B: Date Exceptions]]
 **Epic:** [[EPIC-03-Schedule-and-Availability|EPIC-03: Schedule & Availability]]
-**Status:** ✅ BE Done
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **business owner**, I want to **block off specific dates such as holidays o
 - `[BE]` Expose endpoints to create and delete date exceptions
 
 ## Acceptance Criteria
-- [ ] Blocked dates return an empty slot list from the availability API
-- [ ] Date exception can optionally include a reason (e.g., "Public Holiday")
-- [ ] Multiple dates can be blocked independently
+- [x] Blocked dates return an empty slot list from the availability API
+- [x] Date exception can optionally include a reason (e.g., "Public Holiday")
+- [x] Multiple dates can be blocked independently

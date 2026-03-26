@@ -22,6 +22,9 @@ namespace WebAPI.Models
 
         public TimeSpan? EndTime { get; set; }
 
+        [MaxLength(255)]
+        public string? Reason { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

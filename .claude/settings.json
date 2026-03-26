@@ -14,7 +14,8 @@
       "Bash(START=\"2026-03-26\")",
       "Bash(END=\"2026-04-26\")",
       "Bash(curl -s -b /tmp/bizslot_cookies.txt -X POST \"http://localhost:5142/api/schedule/service/8c95daf1-e867-42ac-b7e5-862e30775929/generate-slots-range\" -H \"Content-Type: application/json\" -d \"{\"\"startDate\"\":\"\"$START\"\",\"\"endDate\"\":\"\"$END\"\"}\")",
-      "Bash(cmd /c \"taskkill /F /IM dotnet.exe\")"
+      "Bash(cmd /c \"taskkill /F /IM dotnet.exe\")",
+      "Bash(dotnet ef:*)"
     ]
   }
 }

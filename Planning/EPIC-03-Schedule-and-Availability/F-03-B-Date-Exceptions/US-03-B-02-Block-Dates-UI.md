@@ -2,7 +2,7 @@
 
 **Feature:** [[F-03-B-Date-Exceptions|F-03-B: Date Exceptions]]
 **Epic:** [[EPIC-03-Schedule-and-Availability|EPIC-03: Schedule & Availability]]
-**Status:** 🔲 FE Pending
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **business owner**, I want to **block specific dates through a calendar UI 
 - `[FE]` Clicking a blocked date unblocks it; clicking an available future date blocks it
 
 ## Acceptance Criteria
-- [ ] Blocked dates are visually distinguished on the calendar
-- [ ] Blocked dates can be unblocked by clicking them again
-- [ ] Past dates cannot be blocked
-- [ ] Changes are persisted immediately via the API
+- [x] Blocked dates are visually distinguished on the calendar
+- [x] Blocked dates can be unblocked by clicking them again
+- [x] Past dates cannot be blocked
+- [x] Changes are persisted immediately via the API

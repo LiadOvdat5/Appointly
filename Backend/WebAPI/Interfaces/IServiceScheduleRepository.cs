@@ -15,5 +15,9 @@ namespace WebAPI.Interfaces
         Task<ServiceSchedule> UpdateAsync(ServiceSchedule schedule);
         Task<bool> DeleteAsync(Guid id);
         Task<bool> InsertIfNotExistsAsync(Guid serviceId, DateTime startDateTime, DateTime endDateTime);
+        /// <summary>Block all AVAILABLE slots on a specific date. Returns the count blocked.</summary>
+        Task<int> BlockAvailableSlotsForDateAsync(Guid serviceId, DateTime date);
+        /// <summary>Restore all BLOCKED slots on a specific date back to AVAILABLE. Returns the count restored.</summary>
+        Task<int> UnblockSlotsForDateAsync(Guid serviceId, DateTime date);
     }
 }

@@ -82,6 +82,50 @@ namespace WebAPI.Repositories
             return true;
         }
 
+        public async Task<int> BlockAvailableSlotsForDateAsync(Guid serviceId, DateTime date)
+        {
+            var dayStart = date.Date;
+            var dayEnd = dayStart.AddDays(1);
+
+            var slots = await _context.ServiceSchedules
+                .Where(ss => ss.ServiceId == serviceId
+                    && ss.Status == ScheduleStatus.AVAILABLE
+                    && ss.StartDateTime >= dayStart
+                    && ss.StartDateTime < dayEnd)
+                .ToListAsync();
+
+            foreach (var slot in slots)
+            {
+                slot.Status = ScheduleStatus.BLOCKED;
+                slot.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+            return slots.Count;
+        }
+
+        public async Task<int> UnblockSlotsForDateAsync(Guid serviceId, DateTime date)
+        {
+            var dayStart = date.Date;
+            var dayEnd = dayStart.AddDays(1);
+
+            var slots = await _context.ServiceSchedules
+                .Where(ss => ss.ServiceId == serviceId
+                    && ss.Status == ScheduleStatus.BLOCKED
+                    && ss.StartDateTime >= dayStart
+                    && ss.StartDateTime < dayEnd)
+                .ToListAsync();
+
+            foreach (var slot in slots)
+            {
+                slot.Status = ScheduleStatus.AVAILABLE;
+                slot.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+            return slots.Count;
+        }
+
         public async Task<bool> InsertIfNotExistsAsync(Guid serviceId, DateTime startDateTime, DateTime endDateTime)
         {
             // Check if slot already exists
