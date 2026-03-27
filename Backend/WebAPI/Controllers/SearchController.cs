@@ -30,7 +30,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("by-category-availability")]
-        public async Task<IActionResult> GetByCategoryAvailability([FromQuery] Guid categoryId, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int? durationMinutes = null)
+        public async Task<IActionResult> GetByCategoryAvailability([FromQuery] Guid? categoryId, [FromQuery] DateTime from, [FromQuery] DateTime to, [FromQuery] int? durationMinutes = null)
         {
             try
             {

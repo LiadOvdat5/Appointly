@@ -15,4 +15,4 @@
 | B | [[F-05-B-List-View\|Feature B: List View]] | ✅ Done |
 | C | [[F-05-C-Map-View\|Feature C: Map View]] | ✅ Done |
 | D | [[F-05-D-Location-Tracking\|Feature D: Location Tracking]] | ✅ Done |
-| E | [[F-05-E-Future-Enhancements\|Feature E: Future Enhancements]] | 🔲 Not Started |
+| E | [[F-05-E-Future-Enhancements\|Feature E: Future Enhancements]] | 🔄 In Progress (US-05-E-01 ✅, US-05-E-02 🔲) |

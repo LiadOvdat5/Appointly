@@ -40,7 +40,12 @@ export interface SearchState {
   selectedBusinessId: string | null;
 
   // Favorites
-  favorites: Set<string>;
+  favorites: string[];
+
+  // Availability filter (date + optional time range)
+  availabilityDate: string | null;   // ISO date string, e.g. "2026-03-27"
+  availabilityTimeFrom: string | null; // "HH:mm", e.g. "09:00"
+  availabilityTimeTo: string | null;   // "HH:mm", e.g. "18:00"
 
   // Cache
   lastSearchQuery: string;
@@ -68,7 +73,10 @@ const initialState: SearchState = {
   locationError: null,
   locationPermission: "unknown",
   selectedBusinessId: null,
-  favorites: new Set<string>(),
+  favorites: [],
+  availabilityDate: null,
+  availabilityTimeFrom: null,
+  availabilityTimeTo: null,
   lastSearchQuery: "",
   lastSearchTimestamp: 0,
 };
@@ -112,6 +120,36 @@ const searchSlice = createSlice({
       state.filters.radiusFilter = action.payload;
       state.currentPage = 1;
     },
+    /**
+     * Set availability date filter (ISO date string "YYYY-MM-DD" or null to clear)
+     */
+    setAvailabilityDate: (state, action: PayloadAction<string | null>) => {
+      state.availabilityDate = action.payload;
+      state.currentPage = 1;
+    },
+
+    /**
+     * Set availability time range (HH:mm strings or null to clear)
+     */
+    setAvailabilityTime: (
+      state,
+      action: PayloadAction<{ from: string | null; to: string | null }>,
+    ) => {
+      state.availabilityTimeFrom = action.payload.from;
+      state.availabilityTimeTo = action.payload.to;
+      state.currentPage = 1;
+    },
+
+    /**
+     * Clear all availability filters
+     */
+    clearAvailabilityFilter: (state) => {
+      state.availabilityDate = null;
+      state.availabilityTimeFrom = null;
+      state.availabilityTimeTo = null;
+      state.currentPage = 1;
+    },
+
     /**
      * Set categories retrieved from backend
      */
@@ -220,10 +258,11 @@ const searchSlice = createSlice({
      */
     toggleFavorite: (state, action: PayloadAction<string>) => {
       const businessId = action.payload;
-      if (state.favorites.has(businessId)) {
-        state.favorites.delete(businessId);
+      const index = state.favorites.indexOf(businessId);
+      if (index > -1) {
+        state.favorites.splice(index, 1);
       } else {
-        state.favorites.add(businessId);
+        state.favorites.push(businessId);
       }
     },
 
@@ -231,21 +270,23 @@ const searchSlice = createSlice({
      * Add business to favorites
      */
     addFavorite: (state, action: PayloadAction<string>) => {
-      state.favorites.add(action.payload);
+      if (!state.favorites.includes(action.payload)) {
+        state.favorites.push(action.payload);
+      }
     },
 
     /**
      * Remove business from favorites
      */
     removeFavorite: (state, action: PayloadAction<string>) => {
-      state.favorites.delete(action.payload);
+      state.favorites = state.favorites.filter((id) => id !== action.payload);
     },
 
     /**
      * Set favorites (bulk operation)
      */
     setFavorites: (state, action: PayloadAction<string[]>) => {
-      state.favorites = new Set(action.payload);
+      state.favorites = action.payload;
     },
 
     /**
@@ -270,6 +311,9 @@ const searchSlice = createSlice({
         radiusFilter: 5,
       };
       state.searchQuery = "";
+      state.availabilityDate = null;
+      state.availabilityTimeFrom = null;
+      state.availabilityTimeTo = null;
       state.currentPage = 1;
     },
 
@@ -288,6 +332,9 @@ export const {
   setSortBy,
   setRadiusFilter,
   setMinRating,
+  setAvailabilityDate,
+  setAvailabilityTime,
+  clearAvailabilityFilter,
   setCategories,
   setResults,
   appendResults,

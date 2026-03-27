@@ -96,20 +96,22 @@ export const selectFavorites = (state: RootState) => state.search.favorites;
  * Select if a specific business is favorited
  */
 export const selectIsFavorited = (state: RootState, businessId: string) =>
-  state.search.favorites.has(businessId);
+  state.search.favorites.includes(businessId);
 
 /**
  * Select all favorited business IDs as array
  */
 export const selectFavoritedBusinessIds = (state: RootState) =>
-  Array.from(state.search.favorites);
+  state.search.favorites;
 
 /**
  * Select favorited businesses from results
  */
 export const selectFavoritedBusinesses = (state: RootState): Business[] => {
   const favorites = state.search.favorites;
-  return state.search.results.filter((business) => favorites.has(business.id));
+  return state.search.results.filter((business) =>
+    favorites.includes(business.id),
+  );
 };
 
 /**
@@ -119,6 +121,24 @@ export const selectSelectedCategories = (state: RootState) =>
   state.search.filters.selectedCategories;
 
 export const selectCategories = (state: RootState) => state.search.categories;
+
+/**
+ * Select availability date filter
+ */
+export const selectAvailabilityDate = (state: RootState) =>
+  state.search.availabilityDate;
+
+/**
+ * Select availability time from
+ */
+export const selectAvailabilityTimeFrom = (state: RootState) =>
+  state.search.availabilityTimeFrom;
+
+/**
+ * Select availability time to
+ */
+export const selectAvailabilityTimeTo = (state: RootState) =>
+  state.search.availabilityTimeTo;
 
 /**
  * Select sort option

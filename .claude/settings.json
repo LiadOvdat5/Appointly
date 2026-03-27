@@ -16,7 +16,17 @@
       "Bash(curl -s -b /tmp/bizslot_cookies.txt -X POST \"http://localhost:5142/api/schedule/service/8c95daf1-e867-42ac-b7e5-862e30775929/generate-slots-range\" -H \"Content-Type: application/json\" -d \"{\"\"startDate\"\":\"\"$START\"\",\"\"endDate\"\":\"\"$END\"\"}\")",
       "Bash(cmd /c \"taskkill /F /IM dotnet.exe\")",
       "Bash(dotnet ef:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(find 'd:/Coding/.Net + React/BizSlot/Backend' -type d -name *Search*)",
+      "mcp__browser__browser_navigate",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "mcp__browser__browser_take_screenshot",
+      "mcp__browser__browser_type",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5142/categories)",
+      "Bash(curl -s \"http://localhost:5142/api/search/businesses/by-category-availability?from=2026-03-28T00:00:00&to=2026-03-28T23:59:00\" -w \"\\\\nHTTP %{http_code}\")",
+      "Bash(taskkill /F /IM WebAPI.exe)",
+      "Bash(taskkill /F /IM dotnet.exe)",
+      "Bash(cmd /c \"taskkill /F /IM WebAPI.exe & taskkill /F /IM dotnet.exe\")"
     ]
   }
 }

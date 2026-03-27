@@ -12,6 +12,8 @@ import {
   selectBusiness,
   toggleFavorite,
   setCategories,
+  setAvailabilityDate,
+  setAvailabilityTime,
 } from "../features/search/searchSlice";
 import {
   selectSearchQuery,
@@ -25,11 +27,15 @@ import {
   selectHasMore,
   selectCurrentPage,
   selectCategories,
+  selectAvailabilityDate,
+  selectAvailabilityTimeFrom,
+  selectAvailabilityTimeTo,
 } from "../features/search/searchSelectors";
 import {
   searchBusinesses,
   getFeaturedBusinesses,
   getNearbyBusinesses,
+  searchByAvailability,
 } from "../services/businessService";
 import { fetchCategories } from "../services/categoryService";
 import { useLocationTracking } from "../hooks/useLocationTracking";
@@ -62,6 +68,11 @@ export function SearchPage() {
   const totalCount = useSelector(selectTotalCount);
   const hasMore = useSelector(selectHasMore);
   const currentPage = useSelector(selectCurrentPage);
+
+  // Availability filter selectors
+  const availabilityDate = useSelector(selectAvailabilityDate);
+  const availabilityTimeFrom = useSelector(selectAvailabilityTimeFrom);
+  const availabilityTimeTo = useSelector(selectAvailabilityTimeTo);
 
   // Local state for featured businesses
   const [featuredResults, setFeaturedResults] = React.useState<Business[]>([]);
@@ -104,9 +115,18 @@ export function SearchPage() {
     requestLocation();
   }, [requestLocation]);
 
-  // When location becomes available and there's no query, fetch nearby businesses using category
+  // When location becomes available and there's no active search, fetch nearby businesses.
+  // Guard: skip if we already have results (e.g. user navigated back from a business page)
+  // or if any filter is already active.
   useEffect(() => {
-    if (!location || searchQuery) return;
+    if (
+      !location ||
+      searchQuery ||
+      availabilityDate ||
+      selectedCategories.length > 0 ||
+      results.length > 0
+    )
+      return;
 
     const fetchNearby = async () => {
       dispatch(setLoading(true));
@@ -129,30 +149,58 @@ export function SearchPage() {
     };
 
     fetchNearby();
-  }, [location, searchQuery, selectedCategories, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
 
   // Handle search
-  // performs search using the provided query and optionally an explicit
-  // set of categories (useful when categories have just been updated).
+  // When an availability date is set, delegates to searchByAvailability.
+  // Otherwise performs a standard keyword/category search.
   const handleSearch = useCallback(
-    async (query: string, catOverride?: string[]) => {
+    async (
+      query: string,
+      catOverride?: string[],
+      dateOverride?: string | null,
+      timeFromOverride?: string | null,
+      timeToOverride?: string | null,
+    ) => {
       dispatch(setSearchQuery(query));
       dispatch(setLoading(true));
       dispatch(setError(null));
 
+      const cats = catOverride ?? selectedCategories;
+      const date = dateOverride !== undefined ? dateOverride : availabilityDate;
+      const timeFrom =
+        timeFromOverride !== undefined ? timeFromOverride : availabilityTimeFrom;
+      const timeTo =
+        timeToOverride !== undefined ? timeToOverride : availabilityTimeTo;
+
       try {
-        const result = await searchBusinesses({
-          searchQuery: query,
-          selectedCategories: catOverride ?? selectedCategories,
-        });
-        dispatch(setResults(result));
+        if (date) {
+          // Build from/to datetimes
+          const fromDate = new Date(`${date}T${timeFrom ?? "00:00"}:00`);
+          const toDate = new Date(`${date}T${timeTo ?? "23:59"}:00`);
+          const categoryId =
+            cats.length > 0 && cats[0] !== "all" ? cats[0] : undefined;
+          const result = await searchByAvailability(
+            categoryId ?? "",
+            fromDate,
+            toDate,
+          );
+          dispatch(setResults(result));
+        } else {
+          const result = await searchBusinesses({
+            searchQuery: query,
+            selectedCategories: cats,
+          });
+          dispatch(setResults(result));
+        }
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to search businesses";
         dispatch(setError(errorMessage));
       }
     },
-    [dispatch, selectedCategories],
+    [dispatch, selectedCategories, availabilityDate, availabilityTimeFrom, availabilityTimeTo],
   );
 
   // Handle category filter change
@@ -215,12 +263,35 @@ export function SearchPage() {
     [dispatch, navigate],
   );
 
+  // Handle availability date change
+  const handleAvailabilityDateChange = useCallback(
+    (date: string | null) => {
+      dispatch(setAvailabilityDate(date));
+      handleSearch(searchQuery, undefined, date, availabilityTimeFrom, availabilityTimeTo);
+    },
+    [dispatch, handleSearch, searchQuery, availabilityTimeFrom, availabilityTimeTo],
+  );
+
+  // Handle availability time range change
+  const handleAvailabilityTimeChange = useCallback(
+    (from: string | null, to: string | null) => {
+      dispatch(setAvailabilityTime({ from, to }));
+      if (availabilityDate) {
+        handleSearch(searchQuery, undefined, availabilityDate, from, to);
+      }
+    },
+    [dispatch, handleSearch, searchQuery, availabilityDate],
+  );
+
   // View mode is list-only for now
 
-  // Handle clear search
+  // Handle clear search (also clears availability filter)
   const handleClearSearch = useCallback(() => {
     dispatch(setSearchQuery(""));
     dispatch(setSelectedCategories([]));
+    dispatch(setAvailabilityDate(null));
+    dispatch(setAvailabilityTime({ from: null, to: null }));
+    dispatch(setResults({ businesses: [], totalCount: 0, hasMore: false }));
   }, [dispatch]);
 
   // Category options for filter
@@ -246,6 +317,11 @@ export function SearchPage() {
         selectedCategories={selectedCategories}
         onCategoryChange={handleCategoryChange}
         categoryOptions={categoryOptions}
+        availabilityDate={availabilityDate}
+        availabilityTimeFrom={availabilityTimeFrom}
+        availabilityTimeTo={availabilityTimeTo}
+        onAvailabilityDateChange={handleAvailabilityDateChange}
+        onAvailabilityTimeChange={handleAvailabilityTimeChange}
         onClear={handleClearSearch}
       />
 
@@ -263,6 +339,7 @@ export function SearchPage() {
         onBusinessClick={handleBusinessClick}
         onViewServicesClick={handleViewServicesClick}
         favorites={favorites}
+        hasActiveSearch={!!searchQuery || selectedCategories.length > 0 || !!availabilityDate}
         featuredResults={
           searchQuery
             ? undefined
@@ -277,6 +354,8 @@ export function SearchPage() {
       {!loading &&
         results.length === 0 &&
         !searchQuery &&
+        !availabilityDate &&
+        selectedCategories.length === 0 &&
         viewMode === "list" && (
           <div className="flex-1 flex items-center justify-center px-4 py-8">
             <div className="text-center">

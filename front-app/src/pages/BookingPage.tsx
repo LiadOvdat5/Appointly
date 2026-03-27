@@ -61,7 +61,15 @@ export default function BookingPage() {
   const [metaError, setMetaError] = useState<string | null>(null);
 
   // ─ Date selection
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  // If the user clicked a specific slot chip on the business page, pre-select that date.
+  const slotDateParam = searchParams.get("slotDate");
+  const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
+    if (slotDateParam) {
+      const d = new Date(slotDateParam);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  });
 
   // ─ Time slot selection
   const [slots, setSlots] = useState<SlotDTO[]>([]);

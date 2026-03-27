@@ -24,12 +24,13 @@ namespace WebAPI.Repositories
             return allBusinesses.Where(b => b.Name != null && b.Name.ToLower().Contains(normalized)).ToList();
         }
 
-        public async Task<IEnumerable<BusinessSearchResultDTO>> SearchByCategoryAvailabilityAsync(Guid categoryId, DateTime from, DateTime to, int? durationMinutes = null)
+        public async Task<IEnumerable<BusinessSearchResultDTO>> SearchByCategoryAvailabilityAsync(Guid? categoryId, DateTime from, DateTime to, int? durationMinutes = null)
         {
-            // Find services in the category
-            var services = await _context.Services
-                .Where(s => s.CategoryId == categoryId)
-                .ToListAsync();
+            // Find services — optionally filtered by category
+            var query = _context.Services.AsQueryable();
+            if (categoryId.HasValue)
+                query = query.Where(s => s.CategoryId == categoryId.Value);
+            var services = await query.ToListAsync();
 
             var businesses = new Dictionary<Guid, BusinessSearchResultDTO>();
 

@@ -15,7 +15,7 @@ As a **customer**, I want to **search for businesses by name or keyword** so tha
 - `[BE]` Return results ranked by relevance; empty query returns all businesses
 
 ## Acceptance Criteria
-- [ ] Results are ranked by relevance to the search query
-- [ ] An empty query returns all businesses (not an error)
-- [ ] Partial name matches are included in results
-- [ ] Response includes all fields needed to render a business card
+- [x] Results are ranked by relevance to the search query
+- [x] An empty query returns all businesses (not an error)
+- [x] Partial name matches are included in results
+- [x] Response includes all fields needed to render a business card

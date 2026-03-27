@@ -272,39 +272,33 @@ export const searchBusinessesByCategory = async (
  * @returns Promise<SearchResult>
  */
 export const searchByAvailability = async (
-  categoryId: string,
+  categoryId: string | undefined,
   fromDate: Date,
   toDate: Date,
   durationMinutes?: number,
 ): Promise<SearchResult> => {
   try {
-    if (!categoryId || categoryId === "all") {
-      return {
-        businesses: [],
-        totalCount: 0,
-        page: 1,
-        pageSize: 0,
-        hasMore: false,
-      };
-    }
-
     const params = new URLSearchParams();
-    params.append("categoryId", categoryId);
+    if (categoryId && categoryId !== "all") {
+      params.append("categoryId", categoryId);
+    }
     params.append("from", fromDate.toISOString());
     params.append("to", toDate.toISOString());
     if (durationMinutes) {
       params.append("durationMinutes", durationMinutes.toString());
     }
 
-    const response = await apiClient.get<Partial<Business>[]>(
+    const response = await apiClient.get<
+      Array<{ business: Partial<Business>; services: unknown[] }>
+    >(
       `/api/search/businesses/by-category-availability?${params.toString()}`,
       {
         timeout: API_REQUEST_TIMEOUT,
       },
     );
 
-    const rawBusinesses = Array.isArray(response.data) ? response.data : [];
-    const businesses = rawBusinesses.map(enrichBusiness);
+    const rawResults = Array.isArray(response.data) ? response.data : [];
+    const businesses = rawResults.map((r) => enrichBusiness(r.business ?? r as unknown as Partial<Business>));
     return {
       businesses,
       totalCount: businesses.length,

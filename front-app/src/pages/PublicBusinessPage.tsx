@@ -3,6 +3,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import {
+  selectAvailabilityDate,
+  selectAvailabilityTimeFrom,
+  selectAvailabilityTimeTo,
+} from "../features/search/searchSelectors";
+import {
   getPublicBusinessById,
   getPublicServicesForBusiness,
   updateBusiness,
@@ -435,7 +440,11 @@ function ServiceCardItem({
                   <button
                     key={slot.id}
                     type="button"
-                    onClick={() => handleBook(`?slotId=${slot.id}`)}
+                    onClick={() =>
+                      handleBook(
+                        `?slotId=${slot.id}&slotDate=${encodeURIComponent(slot.startDateTime)}`,
+                      )
+                    }
                     className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary
                       hover:bg-primary/10 active:scale-95 transition-all"
                   >
@@ -584,6 +593,11 @@ export default function PublicBusinessPage() {
   const authStatus = useSelector((state: RootState) => state.auth.status);
   const isAuthenticated = authStatus === "authenticated";
 
+  // If the user arrived from a date/time availability search, scope slots to that window
+  const searchAvailabilityDate = useSelector(selectAvailabilityDate);
+  const searchAvailabilityTimeFrom = useSelector(selectAvailabilityTimeFrom);
+  const searchAvailabilityTimeTo = useSelector(selectAvailabilityTimeTo);
+
   const [page, dispatch] = useReducer(pageReducer, { status: "loading" });
 
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -618,16 +632,31 @@ export default function PublicBusinessPage() {
   }, [businessId]);
 
   // ── Load slots once services are known ────────────────────────────────────
+  // If the user arrived from an availability search, use that date/time window.
+  // Otherwise default to the next 30 days.
   useEffect(() => {
     if (page.status !== "ready" || !page.services.length) return;
 
-    const today = new Date();
-    const in30Days = new Date();
-    in30Days.setDate(today.getDate() + 30);
+    let fromDate: Date;
+    let toDate: Date;
+
+    if (searchAvailabilityDate) {
+      fromDate = new Date(
+        `${searchAvailabilityDate}T${searchAvailabilityTimeFrom ?? "00:00"}:00`,
+      );
+      toDate = new Date(
+        `${searchAvailabilityDate}T${searchAvailabilityTimeTo ?? "23:59"}:59`,
+      );
+    } else {
+      fromDate = new Date();
+      toDate = new Date();
+      toDate.setDate(toDate.getDate() + 30);
+    }
+
     let cancelled = false;
 
     page.services.forEach((svc) => {
-      getAvailableSlotsForService(svc.id, today, in30Days)
+      getAvailableSlotsForService(svc.id, fromDate, toDate)
         .then((slots) => {
           if (!cancelled) dispatch({ type: "SLOTS_READY", serviceId: svc.id, slots });
         })

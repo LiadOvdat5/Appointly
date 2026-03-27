@@ -2,20 +2,24 @@
 
 **Feature:** [[F-05-E-Future-Enhancements|F-05-E: Future Enhancements]]
 **Epic:** [[EPIC-05-Search-and-Discovery|EPIC-05: Search & Discovery]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
 ## Story
-As a **customer**, I want to **filter search results by availability** (e.g., "available today") so that **I can find businesses I can book immediately**.
+As a **customer**, I want to **filter search results by availability** (date and optional time range) so that **I can find businesses I can book immediately**.
 
 ## Tasks
-- `[BE]` Extend search endpoint to accept an availability filter parameter (e.g., `availableToday=true`)
-- `[BE]` Query slot generation for each result business to determine if slots exist for the target date
-- `[FE]` Add an "Available Today" (or date-based) filter chip to `CategoryFilter`
-- `[FE]` Combine availability filter with existing category filter
+- `[BE]` ✅ Made `categoryId` optional on `GET /api/search/businesses/by-category-availability` — when omitted, queries all services across all categories
+- `[BE]` ✅ Backend already queries `AvailabilitySlots` for the given date/time range per service
+- `[FE]` ✅ Added date picker + optional time-range (from / to) to the filters modal in `SearchHeader`
+- `[FE]` ✅ Availability filter combines with category filter; `SearchPage` routes to `searchByAvailability()` when a date is set
+- `[FE]` ✅ Active date shown as a badge chip on the Filters button
+- `[FE]` ✅ Availability date/time state added to Redux slice with `setAvailabilityDate`, `setAvailabilityTime`, `clearAvailabilityFilter` actions
+- `[FE]` ✅ Business page slot preview respects the searched date/time window when navigating from an availability search
+- `[FE]` ✅ Clearing search also clears the availability filter
 
 ## Acceptance Criteria
-- [ ] Only businesses with available slots on the target date are shown when the filter is active
-- [ ] Availability filter can be combined with category filters
-- [ ] Filter chip clearly shows it is active
+- [x] Only businesses with available slots on the target date are shown when the filter is active
+- [x] Availability filter can be combined with category filters
+- [x] Filter chip (badge) clearly shows the active date

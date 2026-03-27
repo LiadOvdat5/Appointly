@@ -9,6 +9,11 @@ interface SearchHeaderProps {
   selectedCategories: string[];
   onCategoryChange: (categoryId: string) => void;
   categoryOptions: CategoryFilterOption[];
+  availabilityDate: string | null;
+  availabilityTimeFrom: string | null;
+  availabilityTimeTo: string | null;
+  onAvailabilityDateChange: (date: string | null) => void;
+  onAvailabilityTimeChange: (from: string | null, to: string | null) => void;
   onClear?: () => void;
   className?: string;
 }
@@ -25,6 +30,11 @@ export function SearchHeader({
   selectedCategories,
   onCategoryChange,
   categoryOptions,
+  availabilityDate,
+  availabilityTimeFrom,
+  availabilityTimeTo,
+  onAvailabilityDateChange,
+  onAvailabilityTimeChange,
   onClear,
   className,
 }: SearchHeaderProps) {
@@ -67,7 +77,7 @@ export function SearchHeader({
 
           {/* Search Input */}
           <input
-            type="search"
+            type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
@@ -108,6 +118,11 @@ export function SearchHeader({
         >
           <MaterialIcon name="filter_list" className="text-[20px]" />
           <span className="text-sm font-medium">Filters</span>
+          {availabilityDate && (
+            <span className="ml-1 px-2 py-0.5 rounded-full bg-primary text-white text-xs font-medium">
+              {availabilityDate}
+            </span>
+          )}
         </button>
 
         {isFilterOpen && (
@@ -120,7 +135,7 @@ export function SearchHeader({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-3">
-                <h4 className="text-lg font-bold">Select categories</h4>
+                <h4 className="text-lg font-bold">Filters</h4>
                 <button
                   onClick={() => setFilterOpen(false)}
                   className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -129,12 +144,78 @@ export function SearchHeader({
                   <MaterialIcon name="close" className="text-[20px]" />
                 </button>
               </div>
+
+              {/* Category filter */}
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Categories
+              </p>
               <CategoryFilter
                 options={categoryOptions}
                 selectedCategories={selectedCategories}
                 onCategoryChange={onCategoryChange}
                 wrap
               />
+
+              {/* Availability date/time filter */}
+              <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    Available on
+                  </p>
+                  {availabilityDate && (
+                    <button
+                      onClick={() => {
+                        onAvailabilityDateChange(null);
+                        onAvailabilityTimeChange(null, null);
+                      }}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="date"
+                  value={availabilityDate ?? ""}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) =>
+                    onAvailabilityDateChange(e.target.value || null)
+                  }
+                  className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                {availabilityDate && (
+                  <div className="mt-3">
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                      Time range (optional)
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="time"
+                        value={availabilityTimeFrom ?? ""}
+                        onChange={(e) =>
+                          onAvailabilityTimeChange(
+                            e.target.value || null,
+                            availabilityTimeTo,
+                          )
+                        }
+                        className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                      <span className="text-gray-500 text-sm">to</span>
+                      <input
+                        type="time"
+                        value={availabilityTimeTo ?? ""}
+                        onChange={(e) =>
+                          onAvailabilityTimeChange(
+                            availabilityTimeFrom,
+                            e.target.value || null,
+                          )
+                        }
+                        className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

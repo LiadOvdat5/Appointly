@@ -16,7 +16,7 @@ As a **customer**, I want to **see search results displayed as business cards** 
 - `[FE]` Clicking a card navigates to `/business/:id`
 
 ## Acceptance Criteria
-- [ ] All returned search result fields are rendered on the card
-- [ ] Clicking a business card navigates to the correct public business page
-- [ ] Loading skeleton is shown while search results are being fetched
-- [ ] Empty state is shown if no results match the search query
+- [x] All returned search result fields are rendered on the card
+- [x] Clicking a business card navigates to the correct public business page
+- [x] Loading skeleton is shown while search results are being fetched
+- [x] Empty state is shown if no results match the search query

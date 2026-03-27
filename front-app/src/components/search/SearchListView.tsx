@@ -14,8 +14,9 @@ interface SearchListViewProps {
   onFavoriteClick?: (businessId: string, isFavorite: boolean) => void;
   onBusinessClick?: (businessId: string) => void;
   onViewServicesClick?: (businessId: string) => void;
-  favorites: Set<string>;
+  favorites: string[];
   featuredResults?: Business[];
+  hasActiveSearch?: boolean;
   className?: string;
 }
 
@@ -37,6 +38,7 @@ export function SearchListView({
   onViewServicesClick,
   favorites,
   featuredResults,
+  hasActiveSearch = false,
   className,
 }: SearchListViewProps) {
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -107,8 +109,13 @@ export function SearchListView({
     );
   }
 
-  // Show empty state
-  if (!loading && results.length === 0 && !featuredResults?.length) {
+  // Show nothing when there's no active search and no results — let the parent render its initial explore state
+  if (!loading && results.length === 0 && !featuredResults?.length && !hasActiveSearch) {
+    return null;
+  }
+
+  // Show empty state only when there's an active search that returned nothing
+  if (!loading && results.length === 0 && !featuredResults?.length && hasActiveSearch) {
     return (
       <main
         className={[
@@ -166,7 +173,7 @@ export function SearchListView({
                 key={business.id}
                 business={business}
                 variant="vertical"
-                isFavorite={favorites.has(business.id)}
+                isFavorite={favorites.includes(business.id)}
                 onFavoriteClick={handleFavorite}
                 onViewServicesClick={handleViewServices}
                 onCardClick={handleCardClick}
@@ -195,7 +202,7 @@ export function SearchListView({
               key={business.id}
               business={business}
               variant="vertical"
-              isFavorite={favorites.has(business.id)}
+              isFavorite={favorites.includes(business.id)}
               onFavoriteClick={handleFavorite}
               onViewServicesClick={handleViewServices}
               onCardClick={handleCardClick}

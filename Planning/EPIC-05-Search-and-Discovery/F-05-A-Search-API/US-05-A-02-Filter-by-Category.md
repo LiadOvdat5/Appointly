@@ -15,6 +15,6 @@ As a **customer**, I want to **filter businesses by category** so that **I can n
 - `[BE]` `GET /search?category=` filters results by the specified category
 
 ## Acceptance Criteria
-- [ ] Categories are loaded dynamically from the backend (not hardcoded on the frontend)
-- [ ] Filtering by category updates search results in real time
-- [ ] Each category returns its `IconName` for use in the UI
+- [x] Categories are loaded dynamically from the backend (not hardcoded on the frontend)
+- [x] Filtering by category updates search results in real time
+- [x] Each category returns its `IconName` for use in the UI

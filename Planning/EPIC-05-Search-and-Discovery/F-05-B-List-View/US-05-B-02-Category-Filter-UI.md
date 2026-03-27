@@ -15,7 +15,7 @@ As a **customer**, I want to **filter search results by category using visual ch
 - `[FE]` Support multiple category selection; update search results on selection change
 
 ## Acceptance Criteria
-- [ ] Category chips display the category icon from `IconName`
-- [ ] Multiple categories can be selected simultaneously
-- [ ] Search results update immediately when the category selection changes
-- [ ] Clearing the filter returns all results
+- [x] Category chips display the category icon from `IconName`
+- [x] Multiple categories can be selected simultaneously
+- [x] Search results update immediately when the category selection changes
+- [x] Clearing the filter returns all results
