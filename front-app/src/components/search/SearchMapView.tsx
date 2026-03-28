@@ -18,6 +18,7 @@ interface SearchMapViewProps {
   userLocation?: { latitude: number; longitude: number } | null;
   selectedMarkerId?: string | null;
   onMarkerClick?: (businessId: string) => void;
+  onBusinessClick?: (businessId: string) => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
   onCenterLocation?: () => void;
@@ -36,6 +37,7 @@ export function SearchMapView({
   userLocation,
   selectedMarkerId,
   onMarkerClick,
+  onBusinessClick,
   onZoomIn,
   onZoomOut,
   onCenterLocation,
@@ -245,34 +247,6 @@ export function SearchMapView({
     onCenterLocation?.();
   };
 
-  if (error) {
-    return (
-      <div
-        className={[
-          "flex-1 flex items-center justify-center px-4 py-8 bg-gray-50 dark:bg-gray-900",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" ")}
-      >
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <MaterialIcon
-              name="error_outline"
-              className="text-[48px] text-red-500"
-            />
-          </div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Map failed to load
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {String(error)}
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       className={[
@@ -393,7 +367,13 @@ export function SearchMapView({
                         • {business.reviewCount} reviews
                       </span>
                     </div>
-                    <button className="w-full bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg py-2 text-xs font-bold transition-colors hover:bg-gray-200 dark:hover:bg-gray-500">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onBusinessClick?.(business.id);
+                      }}
+                      className="w-full bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg py-2 text-xs font-bold transition-colors hover:bg-gray-200 dark:hover:bg-gray-500"
+                    >
                       Book Now
                     </button>
                   </div>

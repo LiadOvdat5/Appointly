@@ -75,5 +75,10 @@ namespace WebAPI.Repositories
         {
             return await _businessRepository.GetAllBusinessesAsync(categoryId);
         }
+
+        public async Task<IEnumerable<BusinessDTO>> GetAllAsync()
+        {
+            return await _businessRepository.GetAllBusinessesAsync(null);
+        }
     }
 }

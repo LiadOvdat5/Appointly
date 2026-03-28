@@ -43,6 +43,20 @@ namespace WebAPI.Controllers
             }
         }
 
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var results = await _searchRepository.GetAllAsync();
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpGet("by-name")]
         public async Task<IActionResult> GetByName([FromQuery] string text)
         {

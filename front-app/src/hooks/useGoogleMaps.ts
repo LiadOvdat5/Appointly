@@ -124,10 +124,14 @@ export function useGoogleMaps(
   }, []);
 
   /**
-   * Load script on mount
+   * Load script on mount — or mark as loaded if the API is already available
+   * (e.g. when the component remounts after navigating away and back)
    */
   useEffect(() => {
-    if (!window.google?.maps) {
+    if (window.google?.maps) {
+      setIsLoaded(true);
+      setIsLoading(false);
+    } else {
       loadGoogleMapsScript();
     }
   }, [loadGoogleMapsScript]);

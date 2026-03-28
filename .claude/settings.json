@@ -26,7 +26,12 @@
       "Bash(curl -s \"http://localhost:5142/api/search/businesses/by-category-availability?from=2026-03-28T00:00:00&to=2026-03-28T23:59:00\" -w \"\\\\nHTTP %{http_code}\")",
       "Bash(taskkill /F /IM WebAPI.exe)",
       "Bash(taskkill /F /IM dotnet.exe)",
-      "Bash(cmd /c \"taskkill /F /IM WebAPI.exe & taskkill /F /IM dotnet.exe\")"
+      "Bash(cmd /c \"taskkill /F /IM WebAPI.exe & taskkill /F /IM dotnet.exe\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":5173\")",
+      "Bash(cmd /c \"del /F \"\"d:/Coding/.Net + React/BizSlot/Backend/WebAPI/bin/Debug/net9.0/WebAPI.exe\"\" 2>&1\")",
+      "Bash(cmd /c \"netstat -ano | findstr :5142\")",
+      "Bash(sqlcmd -S \"MSI\\\\SQLEXPRESS\" -d BizSlot -E -Q \"SELECT Id, Name, Address FROM Businesses\")"
     ]
   }
 }

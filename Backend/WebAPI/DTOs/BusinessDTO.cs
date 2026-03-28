@@ -12,6 +12,9 @@ namespace WebAPI.DTOs
         public string? LogoUrl { get; set; }
         public string? BannerUrl { get; set; }
 
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+
         // Derived categories aggregated from services
         public List<CategoryDTO> Categories { get; set; } = new();
     }

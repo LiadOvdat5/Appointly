@@ -14,6 +14,7 @@ import {
   setCategories,
   setAvailabilityDate,
   setAvailabilityTime,
+  setViewMode,
 } from "../features/search/searchSlice";
 import {
   selectSearchQuery,
@@ -30,17 +31,20 @@ import {
   selectAvailabilityDate,
   selectAvailabilityTimeFrom,
   selectAvailabilityTimeTo,
+  selectSelectedBusinessId,
 } from "../features/search/searchSelectors";
 import {
   searchBusinesses,
   getFeaturedBusinesses,
   getNearbyBusinesses,
+  getAllBusinesses,
   searchByAvailability,
 } from "../services/businessService";
 import { fetchCategories } from "../services/categoryService";
 import { useLocationTracking } from "../hooks/useLocationTracking";
 import { SearchHeader } from "../components/search/SearchHeader";
 import { SearchListView } from "../components/search/SearchListView";
+import { SearchMapView } from "../components/search/SearchMapView";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 
 /**
@@ -68,6 +72,9 @@ export function SearchPage() {
   const totalCount = useSelector(selectTotalCount);
   const hasMore = useSelector(selectHasMore);
   const currentPage = useSelector(selectCurrentPage);
+
+  // Selected business (for map marker highlight)
+  const selectedBusinessId = useSelector(selectSelectedBusinessId);
 
   // Availability filter selectors
   const availabilityDate = useSelector(selectAvailabilityDate);
@@ -115,9 +122,8 @@ export function SearchPage() {
     requestLocation();
   }, [requestLocation]);
 
-  // When location becomes available and there's no active search, fetch nearby businesses.
-  // Guard: skip if we already have results (e.g. user navigated back from a business page)
-  // or if any filter is already active.
+  // When location becomes available (or map view is activated) with no active search,
+  // fetch nearby businesses sorted by distance.
   useEffect(() => {
     if (
       !location ||
@@ -131,26 +137,19 @@ export function SearchPage() {
     const fetchNearby = async () => {
       dispatch(setLoading(true));
       dispatch(setError(null));
-
       try {
-        const result = await getNearbyBusinesses(
-          location,
-          5,
-          selectedCategories,
-        );
+        const result = await getNearbyBusinesses(location, 50, []);
         dispatch(setResults(result));
       } catch (err) {
         const errorMessage =
-          err instanceof Error
-            ? err.message
-            : "Failed to fetch nearby businesses";
+          err instanceof Error ? err.message : "Failed to fetch nearby businesses";
         dispatch(setError(errorMessage));
       }
     };
 
     fetchNearby();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location]);
+  }, [location, viewMode]);
 
   // Handle search
   // When an availability date is set, delegates to searchByAvailability.
@@ -283,7 +282,13 @@ export function SearchPage() {
     [dispatch, handleSearch, searchQuery, availabilityDate],
   );
 
-  // View mode is list-only for now
+  // Handle view mode toggle
+  const handleViewChange = useCallback(
+    (view: "list" | "map") => {
+      dispatch(setViewMode(view));
+    },
+    [dispatch],
+  );
 
   // Handle clear search (also clears availability filter)
   const handleClearSearch = useCallback(() => {
@@ -306,8 +311,6 @@ export function SearchPage() {
     return [{ id: "all", label: "All", icon: "star" }, ...dynamic];
   }, [categories]);
 
-  // Map controls removed (maps disabled for now)
-
   return (
     <div className="flex flex-col h-screen w-full bg-white dark:bg-gray-900">
       {/* Header with Search and Filters */}
@@ -323,58 +326,75 @@ export function SearchPage() {
         onAvailabilityDateChange={handleAvailabilityDateChange}
         onAvailabilityTimeChange={handleAvailabilityTimeChange}
         onClear={handleClearSearch}
+        currentView={viewMode}
+        onViewChange={handleViewChange}
       />
 
-      {/* Main Content - List View */}
+      {/* Map View */}
+      {viewMode === "map" && (
+        <SearchMapView
+          results={results}
+          loading={loading}
+          error={error}
+          userLocation={location}
+          selectedMarkerId={selectedBusinessId}
+          onMarkerClick={(id) => dispatch(selectBusiness(id))}
+          onBusinessClick={handleBusinessClick}
+        />
+      )}
 
-      <SearchListView
-        results={results}
-        loading={loading}
-        error={error}
-        hasMore={hasMore}
-        totalCount={totalCount}
-        currentPage={currentPage}
-        onLoadMore={handleLoadMore}
-        onFavoriteClick={handleFavoriteClick}
-        onBusinessClick={handleBusinessClick}
-        onViewServicesClick={handleViewServicesClick}
-        favorites={favorites}
-        hasActiveSearch={!!searchQuery || selectedCategories.length > 0 || !!availabilityDate}
-        featuredResults={
-          searchQuery
-            ? undefined
-            : featuredResults.filter(
-                (b) =>
-                  !selectedCategories.length ||
-                  selectedCategories.includes(b.category),
-              )
-        }
-      />
-      {/* Initial Empty State */}
-      {!loading &&
-        results.length === 0 &&
-        !searchQuery &&
-        !availabilityDate &&
-        selectedCategories.length === 0 &&
-        viewMode === "list" && (
-          <div className="flex-1 flex items-center justify-center px-4 py-8">
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <MaterialIcon
-                  name="travel_explore"
-                  className="text-[64px] text-primary opacity-30"
-                />
+      {/* List View */}
+      {viewMode === "list" && (
+        <>
+          <SearchListView
+            results={results}
+            loading={loading}
+            error={error}
+            hasMore={hasMore}
+            totalCount={totalCount}
+            currentPage={currentPage}
+            onLoadMore={handleLoadMore}
+            onFavoriteClick={handleFavoriteClick}
+            onBusinessClick={handleBusinessClick}
+            onViewServicesClick={handleViewServicesClick}
+            favorites={favorites}
+            hasActiveSearch={!!searchQuery || selectedCategories.length > 0 || !!availabilityDate}
+            featuredResults={
+              searchQuery
+                ? undefined
+                : featuredResults.filter(
+                    (b) =>
+                      !selectedCategories.length ||
+                      selectedCategories.includes(b.category),
+                  )
+            }
+          />
+          {/* Initial Empty State */}
+          {!loading &&
+            results.length === 0 &&
+            !searchQuery &&
+            !availabilityDate &&
+            selectedCategories.length === 0 && (
+              <div className="flex-1 flex items-center justify-center px-4 py-8">
+                <div className="text-center">
+                  <div className="flex justify-center mb-4">
+                    <MaterialIcon
+                      name="travel_explore"
+                      className="text-[64px] text-primary opacity-30"
+                    />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                    Explore Businesses
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm max-w-xs mx-auto">
+                    Search for your favorite salons, doctors, fitness centers, and
+                    more
+                  </p>
+                </div>
               </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                Explore Businesses
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm max-w-xs mx-auto">
-                Search for your favorite salons, doctors, fitness centers, and
-                more
-              </p>
-            </div>
-          </div>
-        )}
+            )}
+        </>
+      )}
     </div>
   );
 }

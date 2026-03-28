@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MaterialIcon } from "../UI/MaterialIcon";
 import { CategoryFilter } from "./CategoryFilter";
 import type { CategoryFilterOption } from "./CategoryFilter";
+import { SearchViewToggle } from "./SearchViewToggle";
 
 interface SearchHeaderProps {
   searchQuery: string;
@@ -15,6 +16,8 @@ interface SearchHeaderProps {
   onAvailabilityDateChange: (date: string | null) => void;
   onAvailabilityTimeChange: (from: string | null, to: string | null) => void;
   onClear?: () => void;
+  currentView?: "list" | "map";
+  onViewChange?: (view: "list" | "map") => void;
   className?: string;
 }
 
@@ -36,6 +39,8 @@ export function SearchHeader({
   onAvailabilityDateChange,
   onAvailabilityTimeChange,
   onClear,
+  currentView = "list",
+  onViewChange,
   className,
 }: SearchHeaderProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -109,8 +114,8 @@ export function SearchHeader({
         </div>
       </div>
 
-      {/* Category filter button / popup */}
-      <div className="px-4 py-3">
+      {/* Filter row: filter button + view toggle */}
+      <div className="px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => setFilterOpen((o) => !o)}
           className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -218,6 +223,10 @@ export function SearchHeader({
               </div>
             </div>
           </div>
+        )}
+
+        {onViewChange && (
+          <SearchViewToggle currentView={currentView} onViewChange={onViewChange} />
         )}
       </div>
     </header>

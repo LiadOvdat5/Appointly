@@ -21,24 +21,47 @@ import { apiClient } from "./apiClient";
  * Enrich business object with default values for optional fields
  * The backend may not return all fields, so we provide sensible defaults
  */
-const enrichBusiness = (business: Partial<Business>): Business => {
+const enrichBusiness = (business: Partial<Business> & {
+  // Backend DTO flat fields (camelCase from ASP.NET Core)
+  address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  logoUrl?: string;
+  categories?: Array<{ id: string; name: string; iconName?: string }>;
+}): Business => {
+  // Derive category name from the first category in the categories array
+  const categoryName =
+    business.category ||
+    (business.categories && business.categories.length > 0
+      ? business.categories[0].name
+      : "Other");
+
+  // Derive image URL from logoUrl if imageUrl not present
+  const imageUrl = business.imageUrl || business.logoUrl;
+
+  // Map flat address string to location object
+  const location = business.location || {
+    address: business.address || "Address not available",
+    city: "",
+  };
+
+  // Map flat lat/lng from backend to coordinates object
+  const coordinates = business.coordinates || {
+    latitude: business.latitude ?? 0,
+    longitude: business.longitude ?? 0,
+  };
+
   return {
     id: business.id || "",
     name: business.name || "Unknown Business",
     description: business.description,
     rating: business.rating ?? 0,
     reviewCount: business.reviewCount ?? 0,
-    category: business.category || "Other",
-    location: business.location || {
-      address: "Address not available",
-      city: "",
-    },
-    coordinates: business.coordinates || {
-      latitude: 0,
-      longitude: 0,
-    },
+    category: categoryName,
+    location,
+    coordinates,
     distance: business.distance,
-    imageUrl: business.imageUrl,
+    imageUrl,
     services: business.services || [],
     phone: business.phone,
     email: business.email,
@@ -108,45 +131,66 @@ export const searchBusinesses = async (
 };
 
 /**
- * Get nearby businesses based on user location
- * NOTE: Backend does not have a dedicated "nearby" endpoint.
- * Falls back to by-category if categories provided, otherwise returns empty.
- * @param location - User's coordinates (not used due to backend limitation)
- * @param radius - Search radius in miles (not used due to backend limitation)
- * @param categories - Optional category filters
- * @returns Promise<SearchResult>
+ * Get all businesses (used as the base for nearby/map discovery)
+ * Uses: GET /api/search/businesses/all
+ */
+export const getAllBusinesses = async (): Promise<SearchResult> => {
+  try {
+    const response = await apiClient.get<Partial<Business>[]>(
+      "/api/search/businesses/all",
+      { timeout: API_REQUEST_TIMEOUT },
+    );
+    const rawBusinesses = Array.isArray(response.data) ? response.data : [];
+    const businesses = rawBusinesses.map(enrichBusiness);
+    return {
+      businesses,
+      totalCount: businesses.length,
+      page: 1,
+      pageSize: businesses.length,
+      hasMore: false,
+    };
+  } catch (error) {
+    console.error("Get all businesses error:", error);
+    return { businesses: [], totalCount: 0, page: 1, pageSize: 0, hasMore: false };
+  }
+};
+
+/**
+ * Get nearby businesses based on user location.
+ * Fetches all businesses, optionally filters by category, then sorts by distance.
  */
 export const getNearbyBusinesses = async (
-  _location: LocationCoords,
-  _radius: number = 5,
+  location: LocationCoords,
+  _radius: number = 50,
   categories: string[] = [],
 ): Promise<SearchResult> => {
   try {
-    // If categories are provided, search by first category
+    let result: SearchResult;
+
     if (categories.length > 0 && categories[0] !== "all") {
-      return await searchBusinessesByCategory(categories[0]);
+      result = await searchBusinessesByCategory(categories[0]);
+    } else {
+      result = await getAllBusinesses();
     }
 
-    // No categories and backend has no generic "nearby" endpoint
-    console.warn(
-      "getNearbyBusinesses: Backend does not support location-based search without category. Returning empty results.",
+    // Filter to only businesses that have real coordinates
+    let businesses = result.businesses.filter(
+      (b) => b.coordinates.latitude !== 0 || b.coordinates.longitude !== 0,
     );
+
+    // Sort by distance from user
+    businesses = sortByDistance(businesses, location);
+
     return {
-      businesses: [],
-      totalCount: 0,
+      businesses,
+      totalCount: businesses.length,
       page: 1,
-      pageSize: 0,
+      pageSize: businesses.length,
       hasMore: false,
     };
   } catch (error) {
     console.error("Get nearby businesses error:", error);
-    return {
-      businesses: [],
-      totalCount: 0,
-      page: 1,
-      pageSize: 0,
-      hasMore: false,
-    };
+    return { businesses: [], totalCount: 0, page: 1, pageSize: 0, hasMore: false };
   }
 };
 
