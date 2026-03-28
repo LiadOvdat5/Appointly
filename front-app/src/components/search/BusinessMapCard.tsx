@@ -80,12 +80,14 @@ export function BusinessMapCard({
         )}
 
         {/* Rating Badge */}
-        <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/80 backdrop-blur-sm rounded-md px-2 py-1 flex items-center gap-1 shadow-sm">
-          <MaterialIcon name="star" className="text-primary text-[12px]" />
-          <span className="text-xs font-bold text-gray-900 dark:text-white">
-            {business.rating.toFixed(1)}
-          </span>
-        </div>
+        {business.rating && (
+          <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/80 backdrop-blur-sm rounded-md px-2 py-1 flex items-center gap-1 shadow-sm">
+            <MaterialIcon name="star" className="text-primary text-[12px]" />
+            <span className="text-xs font-bold text-gray-900 dark:text-white">
+              {business.rating.toFixed(1)}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -95,9 +97,11 @@ export function BusinessMapCard({
           <h4 className="text-gray-900 dark:text-white text-sm font-bold truncate">
             {business.name}
           </h4>
-          <p className="text-gray-600 dark:text-gray-400 text-xs mt-0.5 truncate">
-            {business.reviewCount} reviews
-          </p>
+          {business.reviewCount && (
+            <p className="text-gray-600 dark:text-gray-400 text-xs mt-0.5 truncate">
+              {business.reviewCount} reviews
+            </p>
+          )}
         </div>
 
         {/* Services Preview */}

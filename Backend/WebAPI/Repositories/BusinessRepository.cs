@@ -179,6 +179,21 @@ namespace WebAPI.Repositories
             return BusinessMapper.ToBusinessDTO(business);
         }
 
+        public async Task<BusinessDTO> UpdateBusinessSearchImageAsync(Guid businessId, Guid userId, string searchImageUrl)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null)
+                throw new KeyNotFoundException($"Business with ID {businessId} not found.");
 
+            if (business.OwnerId != userId)
+                throw new UnauthorizedAccessException("You can only update your own business.");
+
+            business.SearchImageUrl = searchImageUrl;
+            business.UpdatedAt = DateTime.UtcNow;
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+
+            return BusinessMapper.ToBusinessDTO(business);
+        }
     }
 }

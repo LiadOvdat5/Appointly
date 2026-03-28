@@ -2,7 +2,7 @@
 
 **Feature:** [[F-05-E-Future-Enhancements|F-05-E: Future Enhancements]]
 **Epic:** [[EPIC-05-Search-and-Discovery|EPIC-05: Search & Discovery]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **customer**, I want to **see business ratings displayed in search results*
 - `[FE]` Businesses with no ratings are shown without stars (not a zero-star display)
 
 ## Acceptance Criteria
-- [ ] Average rating is displayed as a star rating on each business card
-- [ ] Businesses with no reviews are shown without a star rating (not as 0 stars)
-- [ ] Depends on a future Reviews epic being implemented first
+- [x] Average rating is displayed as a star rating on each business card
+- [x] Businesses with no reviews are shown without a star rating (not as 0 stars)
+- [x] Depends on a future Reviews epic being implemented first

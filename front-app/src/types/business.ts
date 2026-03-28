@@ -14,6 +14,7 @@ export interface BusinessProfile {
   themeColor?: string;
   logoUrl?: string;
   bannerUrl?: string;
+  searchImageUrl?: string;
 }
 
 export interface BusinessCategory {

@@ -32,6 +32,7 @@ namespace WebAPI.Mappers
                 ThemeColor = business.ThemeColor,
                 LogoUrl = business.LogoUrl,
                 BannerUrl = business.BannerUrl,
+                SearchImageUrl = business.SearchImageUrl,
                 Latitude = business.Latitude,
                 Longitude = business.Longitude,
                 Categories = categories?.ToList() ?? new List<CategoryDTO>()

@@ -16,6 +16,7 @@ import {
   deleteService,
   uploadBusinessLogo,
   uploadBusinessBanner,
+  uploadBusinessSearchImage,
 } from "../services/businessManagementService";
 import { fetchCategories } from "../services/categoryService";
 import {
@@ -110,6 +111,9 @@ type PageState =
       bannerFile: File | null;
       isUploadingLogo: boolean;
       isUploadingBanner: boolean;
+      searchImagePreview: string | null;
+      searchImageFile: File | null;
+      isUploadingSearchImage: boolean;
       // Service editing
       editingServiceId: string | "new" | null;
       serviceDraft: DraftService;
@@ -130,8 +134,10 @@ type PageAction =
   | { type: "SAVE_SUCCESS"; business: BusinessProfile }
   | { type: "SET_LOGO_PREVIEW"; preview: string | null; file: File | null }
   | { type: "SET_BANNER_PREVIEW"; preview: string | null; file: File | null }
+  | { type: "SET_SEARCH_IMAGE_PREVIEW"; preview: string | null; file: File | null }
   | { type: "SET_UPLOADING_LOGO"; value: boolean }
   | { type: "SET_UPLOADING_BANNER"; value: boolean }
+  | { type: "SET_UPLOADING_SEARCH_IMAGE"; value: boolean }
   | { type: "EDIT_SERVICE"; serviceId: string | "new"; draft?: DraftService }
   | { type: "CANCEL_SERVICE_EDIT" }
   | { type: "SET_SERVICE_DRAFT"; field: keyof DraftService; value: string }
@@ -171,6 +177,9 @@ function pageReducer(state: PageState, action: PageAction): PageState {
         bannerFile: null,
         isUploadingLogo: false,
         isUploadingBanner: false,
+        searchImagePreview: null,
+        searchImageFile: null,
+        isUploadingSearchImage: false,
         editingServiceId: null,
         serviceDraft: emptyServiceDraft(),
         isServiceSaving: false,
@@ -209,6 +218,9 @@ function pageReducer(state: PageState, action: PageAction): PageState {
         logoFile: null,
         bannerPreview: null,
         bannerFile: null,
+        searchImagePreview: null,
+        searchImageFile: null,
+        isUploadingSearchImage: false,
         editingServiceId: null,
         serviceDraft: emptyServiceDraft(),
         serviceError: null,
@@ -225,6 +237,9 @@ function pageReducer(state: PageState, action: PageAction): PageState {
         logoFile: null,
         bannerPreview: null,
         bannerFile: null,
+        searchImagePreview: null,
+        searchImageFile: null,
+        isUploadingSearchImage: false,
         editingServiceId: null,
         serviceDraft: emptyServiceDraft(),
         serviceError: null,
@@ -254,6 +269,9 @@ function pageReducer(state: PageState, action: PageAction): PageState {
         logoFile: null,
         bannerPreview: null,
         bannerFile: null,
+        searchImagePreview: null,
+        searchImageFile: null,
+        isUploadingSearchImage: false,
         editingServiceId: null,
         draft: makeDraftFromBusiness(action.business),
       };
@@ -273,6 +291,14 @@ function pageReducer(state: PageState, action: PageAction): PageState {
     case "SET_UPLOADING_BANNER":
       if (state.status !== "ready") return state;
       return { ...state, isUploadingBanner: action.value };
+
+    case "SET_SEARCH_IMAGE_PREVIEW":
+      if (state.status !== "ready") return state;
+      return { ...state, searchImagePreview: action.preview, searchImageFile: action.file };
+
+    case "SET_UPLOADING_SEARCH_IMAGE":
+      if (state.status !== "ready") return state;
+      return { ...state, isUploadingSearchImage: action.value };
 
     case "EDIT_SERVICE":
       if (state.status !== "ready") return state;
@@ -602,6 +628,7 @@ export default function PublicBusinessPage() {
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const searchImageInputRef = useRef<HTMLInputElement>(null);
 
   // Is the current user the owner?
   const isOwner =
@@ -724,6 +751,24 @@ export default function PublicBusinessPage() {
     dispatch({ type: "SET_BANNER_PREVIEW", preview, file });
   }
 
+  async function handleUploadSearchImage() {
+    if (page.status !== "ready" || !page.searchImageFile) return;
+    dispatch({ type: "SET_UPLOADING_SEARCH_IMAGE", value: true });
+    try {
+      const updated = await uploadBusinessSearchImage(page.business.id, page.searchImageFile);
+      dispatch({ type: "SAVE_SUCCESS", business: updated });
+    } catch {
+      dispatch({ type: "SET_UPLOADING_SEARCH_IMAGE", value: false });
+    }
+  }
+
+  function handleSearchImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const preview = URL.createObjectURL(file);
+    dispatch({ type: "SET_SEARCH_IMAGE_PREVIEW", preview, file });
+  }
+
   function handleEditService(svc: ServiceProfile) {
     dispatch({
       type: "EDIT_SERVICE",
@@ -828,6 +873,9 @@ export default function PublicBusinessPage() {
     bannerFile,
     isUploadingLogo,
     isUploadingBanner,
+    searchImagePreview,
+    searchImageFile,
+    isUploadingSearchImage,
     editingServiceId,
     serviceDraft,
     isServiceSaving,
@@ -840,9 +888,10 @@ export default function PublicBusinessPage() {
     ? ({ "--color-primary": activeThemeColor } as React.CSSProperties)
     : undefined;
 
-  // Displayed logo/banner (preview overrides persisted value in edit mode)
+  // Displayed logo/banner/search-image (preview overrides persisted value in edit mode)
   const displayLogo = isEditing && logoPreview ? logoPreview : resolveUploadUrl(business.logoUrl);
   const displayBanner = isEditing && bannerPreview ? bannerPreview : resolveUploadUrl(business.bannerUrl);
+  const displaySearchImage = isEditing && searchImagePreview ? searchImagePreview : resolveUploadUrl(business.searchImageUrl);
 
   return (
     <div style={themeStyle} className="min-h-screen bg-gray-50 dark:bg-background-dark">
@@ -1037,6 +1086,79 @@ export default function PublicBusinessPage() {
               >
                 <MaterialIcon name="close" className="text-base" />
               </button>
+            </div>
+          )}
+
+          {/* Search Card Image (edit mode only) */}
+          {isEditing && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
+                Search Card Image
+              </label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Shown on search &amp; discovery pages. If not set, your logo is used instead.
+              </p>
+              <div className="flex items-center gap-3">
+                {displaySearchImage ? (
+                  <img
+                    src={displaySearchImage}
+                    alt="Search card preview"
+                    className="h-20 w-32 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
+                  />
+                ) : (
+                  <div className="h-20 w-32 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-600">
+                    <MaterialIcon name="image_search" className="text-2xl text-gray-400" />
+                  </div>
+                )}
+                <div className="flex flex-col gap-2">
+                  <input
+                    ref={searchImageInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={handleSearchImageFileChange}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => searchImageInputRef.current?.click()}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    {displaySearchImage ? "Change image" : "Upload image"}
+                  </button>
+                  {displaySearchImage && !searchImageFile && (
+                    <button
+                      type="button"
+                      onClick={() => dispatch({ type: "SET_SEARCH_IMAGE_PREVIEW", preview: null, file: null })}
+                      className="text-xs text-gray-400 hover:text-red-500"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+              {searchImageFile && (
+                <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
+                  <MaterialIcon name="image" className="text-primary text-base" />
+                  <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
+                    {searchImageFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleUploadSearchImage}
+                    disabled={isUploadingSearchImage}
+                    className="text-sm font-semibold text-primary hover:underline disabled:opacity-50"
+                  >
+                    {isUploadingSearchImage ? "Uploading…" : "Upload"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: "SET_SEARCH_IMAGE_PREVIEW", preview: null, file: null })}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <MaterialIcon name="close" className="text-base" />
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

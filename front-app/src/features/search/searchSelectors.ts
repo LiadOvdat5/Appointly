@@ -208,7 +208,7 @@ export const selectResultsSortedByDistance = (state: RootState): Business[] => {
  * Select results sorted by rating
  */
 export const selectResultsSortedByRating = (state: RootState): Business[] => {
-  return [...state.search.results].sort((a, b) => b.rating - a.rating);
+  return [...state.search.results].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
 };
 
 /**
@@ -216,6 +216,6 @@ export const selectResultsSortedByRating = (state: RootState): Business[] => {
  */
 export const selectResultsSortedByReviews = (state: RootState): Business[] => {
   return [...state.search.results].sort(
-    (a, b) => b.reviewCount - a.reviewCount,
+    (a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0),
   );
 };

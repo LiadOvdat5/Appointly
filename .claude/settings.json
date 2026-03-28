@@ -31,7 +31,10 @@
       "Bash(findstr \":5173\")",
       "Bash(cmd /c \"del /F \"\"d:/Coding/.Net + React/BizSlot/Backend/WebAPI/bin/Debug/net9.0/WebAPI.exe\"\" 2>&1\")",
       "Bash(cmd /c \"netstat -ano | findstr :5142\")",
-      "Bash(sqlcmd -S \"MSI\\\\SQLEXPRESS\" -d BizSlot -E -Q \"SELECT Id, Name, Address FROM Businesses\")"
+      "Bash(sqlcmd -S \"MSI\\\\SQLEXPRESS\" -d BizSlot -E -Q \"SELECT Id, Name, Address FROM Businesses\")",
+      "Read(//d/Coding/.Net/**)",
+      "Bash(curl -s \"http://localhost:5142/api/search/businesses/by-name?text=a\")",
+      "Bash(python -m json.tool)"
     ]
   }
 }

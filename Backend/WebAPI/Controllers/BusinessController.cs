@@ -362,6 +362,53 @@ namespace WebAPI.Controllers
         }
 
         [Authorize]
+        [HttpPost("{id}/upload-search-image")]
+        [EndpointSummary("Upload Business Search Image")]
+        [EndpointDescription("Upload a search/discovery card image (jpg, png, webp) for the business. Shown in search results instead of the logo. Authorization: Only the business owner.")]
+        public async Task<IActionResult> UploadSearchImage(Guid id, IFormFile file)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                if (file == null || file.Length == 0)
+                    return BadRequest(new { error = "No file provided." });
+
+                var allowed = new[] { "image/jpeg", "image/png", "image/webp" };
+                if (!allowed.Contains(file.ContentType.ToLower()))
+                    return BadRequest(new { error = "Only jpg, png, and webp images are accepted." });
+
+                var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "search-images");
+                Directory.CreateDirectory(uploadsPath);
+
+                var ext = Path.GetExtension(file.FileName).ToLower();
+                var fileName = $"{id}-{Guid.NewGuid()}{ext}";
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                    await file.CopyToAsync(stream);
+
+                var searchImageUrl = $"/uploads/search-images/{fileName}";
+                var business = await _businessRepository.UpdateBusinessSearchImageAsync(id, userId, searchImageUrl);
+                return Ok(business);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
         [HttpDelete("{businessId}/services/{serviceId}")]
         [EndpointSummary("Delete Service")]
         [EndpointDescription("Delete a service from the business. Authorization: Only the business owner can delete services.")]

@@ -156,7 +156,8 @@ export function SearchMapView({
 
       marker.addListener("click", () => {
         onMarkerClick?.(m.businessId);
-        const content = `<div style="min-width:160px"><strong>${m.title}</strong><div style="font-size:12px;color:#666">${m.rating.toFixed(1)} ★</div></div>`;
+        const ratingStr = m.rating != null ? `<div style="font-size:12px;color:#666">${m.rating.toFixed(1)} ★</div>` : "";
+        const content = `<div style="min-width:160px"><strong>${m.title}</strong>${ratingStr}</div>`;
         infoWindowRef.current?.setContent(content);
         infoWindowRef.current?.open({ anchor: marker, map });
         marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -355,18 +356,22 @@ export function SearchMapView({
                     <h4 className="text-gray-900 dark:text-white text-sm font-bold truncate">
                       {business.name}
                     </h4>
-                    <div className="flex items-center gap-1 mt-1 mb-3">
-                      <MaterialIcon
-                        name="star"
-                        className="text-primary text-[14px]"
-                      />
-                      <span className="text-xs font-bold text-gray-900 dark:text-white">
-                        {business.rating.toFixed(1)}
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        • {business.reviewCount} reviews
-                      </span>
-                    </div>
+                    {business.rating && (
+                      <div className="flex items-center gap-1 mt-1 mb-3">
+                        <MaterialIcon
+                          name="star"
+                          className="text-primary text-[14px]"
+                        />
+                        <span className="text-xs font-bold text-gray-900 dark:text-white">
+                          {business.rating.toFixed(1)}
+                        </span>
+                        {business.reviewCount && (
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            • {business.reviewCount} reviews
+                          </span>
+                        )}
+                      </div>
+                    )}
                     <button
                       onClick={(e) => {
                         e.stopPropagation();

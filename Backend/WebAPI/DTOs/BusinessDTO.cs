@@ -11,11 +11,16 @@ namespace WebAPI.DTOs
         public string? ThemeColor { get; set; }
         public string? LogoUrl { get; set; }
         public string? BannerUrl { get; set; }
+        public string? SearchImageUrl { get; set; }
 
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
 
         // Derived categories aggregated from services
         public List<CategoryDTO> Categories { get; set; } = new();
+
+        // Rating fields — populated once Reviews epic is implemented
+        public double? AverageRating { get; set; }
+        public int ReviewCount { get; set; }
     }
 }

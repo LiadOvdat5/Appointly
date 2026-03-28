@@ -86,18 +86,24 @@ export function BusinessCard({
             {business.name}
           </h3>
 
-          {/* Rating */}
-          <div className="flex items-center gap-1 mt-1 mb-2">
-            <MaterialIcon name="star" className="text-primary text-[14px]" />
-            <span className="text-xs font-bold text-gray-900 dark:text-white">
-              {business.rating ? business.rating.toFixed(1) : "N/A"}
-            </span>
-            {business.distance && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                • {business.distance.toFixed(1)} mi
-              </span>
-            )}
-          </div>
+          {/* Rating + Distance */}
+          {(business.rating || business.distance) && (
+            <div className="flex items-center gap-1 mt-1 mb-2">
+              {business.rating && (
+                <>
+                  <MaterialIcon name="star" className="text-primary text-[14px]" />
+                  <span className="text-xs font-bold text-gray-900 dark:text-white">
+                    {business.rating.toFixed(1)}
+                  </span>
+                </>
+              )}
+              {business.distance && (
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {business.rating ? "• " : ""}{business.distance.toFixed(1)} mi
+                </span>
+              )}
+            </div>
+          )}
 
           {/* CTA Button */}
           <button
@@ -159,15 +165,19 @@ export function BusinessCard({
         )}
 
         {/* Rating Badge */}
-        <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2 py-1 rounded-md flex items-center gap-1 shadow-sm">
-          <MaterialIcon name="star" className="text-primary text-[14px]" />
-          <span className="text-xs font-bold text-gray-900 dark:text-white">
-            {business.rating ? business.rating.toFixed(1) : "N/A"}
-          </span>
-          <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
-            ({business.reviewCount ?? 0})
-          </span>
-        </div>
+        {business.rating && (
+          <div className="absolute top-3 right-3 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2 py-1 rounded-md flex items-center gap-1 shadow-sm">
+            <MaterialIcon name="star" className="text-primary text-[14px]" />
+            <span className="text-xs font-bold text-gray-900 dark:text-white">
+              {business.rating.toFixed(1)}
+            </span>
+            {business.reviewCount && (
+              <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
+                ({business.reviewCount})
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Content Section */}

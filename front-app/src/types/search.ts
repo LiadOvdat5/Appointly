@@ -5,8 +5,8 @@ export interface Business {
   id: string;
   name: string;
   description?: string;
-  rating: number;
-  reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
   category: string;
   location: {
     address: string;
@@ -91,12 +91,12 @@ export interface MapMarker {
     longitude: number;
   };
   title: string;
-  rating: number;
+  rating?: number;
   category: string;
   imageUrl?: string;
   infoWindowData?: {
     name: string;
-    rating: number;
+    rating?: number;
     distance?: number;
   };
 }

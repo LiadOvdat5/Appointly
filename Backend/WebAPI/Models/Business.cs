@@ -32,6 +32,7 @@ namespace WebAPI.Models
         public string? ThemeColor { get; set; }
         public string? LogoUrl { get; set; }
         public string? BannerUrl { get; set; }
+        public string? SearchImageUrl { get; set; }
 
         // Schedule settings
         [Required]

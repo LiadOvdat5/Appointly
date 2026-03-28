@@ -115,3 +115,17 @@ export const uploadBusinessBanner = async (
   );
   return response.data;
 };
+
+export const uploadBusinessSearchImage = async (
+  businessId: string,
+  file: File,
+): Promise<BusinessProfile> => {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await apiClient.post<BusinessProfile>(
+    `/businesses/${businessId}/upload-search-image`,
+    form,
+    { headers: { "Content-Type": "multipart/form-data" } },
+  );
+  return response.data;
+};

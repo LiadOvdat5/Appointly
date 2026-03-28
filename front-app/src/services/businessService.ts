@@ -17,6 +17,15 @@ import type {
 } from "../types/search";
 import { apiClient } from "./apiClient";
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? "";
+
+/** Resolve a backend-relative upload path to a full URL */
+function resolveUploadUrl(path: string | null | undefined): string | undefined {
+  if (!path) return undefined;
+  if (path.startsWith("http")) return path;
+  return `${API_BASE}${path}`;
+}
+
 /**
  * Enrich business object with default values for optional fields
  * The backend may not return all fields, so we provide sensible defaults
@@ -27,7 +36,10 @@ const enrichBusiness = (business: Partial<Business> & {
   latitude?: number | null;
   longitude?: number | null;
   logoUrl?: string;
+  searchImageUrl?: string;
   categories?: Array<{ id: string; name: string; iconName?: string }>;
+  averageRating?: number | null;
+  reviewCount?: number | null;
 }): Business => {
   // Derive category name from the first category in the categories array
   const categoryName =
@@ -36,8 +48,11 @@ const enrichBusiness = (business: Partial<Business> & {
       ? business.categories[0].name
       : "Other");
 
-  // Derive image URL from logoUrl if imageUrl not present
-  const imageUrl = business.imageUrl || business.logoUrl;
+  // Search image: prefer searchImageUrl, fall back to logoUrl, resolve to full URL
+  const imageUrl =
+    resolveUploadUrl(business.searchImageUrl) ??
+    resolveUploadUrl(business.logoUrl) ??
+    business.imageUrl;
 
   // Map flat address string to location object
   const location = business.location || {
@@ -55,8 +70,8 @@ const enrichBusiness = (business: Partial<Business> & {
     id: business.id || "",
     name: business.name || "Unknown Business",
     description: business.description,
-    rating: business.rating ?? 0,
-    reviewCount: business.reviewCount ?? 0,
+    rating: business.averageRating || business.rating || undefined,
+    reviewCount: business.reviewCount || undefined,
     category: categoryName,
     location,
     coordinates,
