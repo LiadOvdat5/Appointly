@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "../components/UI/Button";
 import { Card } from "../components/UI/Card";
@@ -16,18 +16,49 @@ import {
   getDateExceptions,
   createDateException,
   deleteDateException,
+  getRecurringRules,
+  createRecurringRule,
+  deleteRecurringRule,
   generateSlots,
   type WeeklyRuleDTO,
   type BreakRuleDTO,
   type DateExceptionDTO,
+  type RecurringRuleDTO,
   type GenerateSlotsResult,
 } from "../services/availabilityService";
 import { getPublicServicesForBusiness } from "../services/businessManagementService";
+import {
+  getAvailableSlotsForService,
+  deleteAvailableSlotsInWindow,
+  type SlotDTO,
+} from "../services/scheduleService";
+import {
+  getBusinessAppointments,
+  AppointmentStatus,
+  type AppointmentDTO,
+} from "../services/appointmentService";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const DAY_FULL  = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+// ─── Impact analysis types ────────────────────────────────────────────────────
+
+interface DeleteWindowParams {
+  fromDate: Date;
+  toDate: Date;
+  dayOfWeek?: number; // 0=Mon … 6=Sun
+  startTime?: string; // "HH:mm"
+  endTime?: string;   // "HH:mm"
+}
+
+interface ImpactInfo {
+  freeSlotCount: number;
+  bookedCount: number;
+  deletionPlans: DeleteWindowParams[];
+  infoMessages: string[];
+}
 
 // ─── State types ──────────────────────────────────────────────────────────────
 
@@ -150,12 +181,21 @@ export default function ScheduleEditorPage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
+  // ── Recurring rules state ─────────────────────────────────────────────────
+  const [recurringRules, setRecurringRules] = useState<RecurringRuleDTO[]>([]);
+
   // ── Date exceptions state ────────────────────────────────────────────────
   const [dateExceptions, setDateExceptions] = useState<DateExceptionDTO[]>([]);
-  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth()); // 0-indexed
-  const [togglingDate, setTogglingDate] = useState<string | null>(null); // "YYYY-MM-DD" being toggled
-  const [exceptionsError, setExceptionsError] = useState<string | null>(null);
+
+  // ── Impact analysis state ─────────────────────────────────────────────────
+  /** Snapshot of dayStates as they were when last loaded from the server */
+  const originalDayStatesRef = useRef<DayState[]>([]);
+  /** Upcoming AVAILABLE slots for this service (next 90 days) — for conflict counting */
+  const [upcomingSlots, setUpcomingSlots] = useState<SlotDTO[]>([]);
+  /** Upcoming non-canceled appointments for this service (next 90 days) */
+  const [upcomingAppts, setUpcomingAppts] = useState<AppointmentDTO[]>([]);
+  /** Populated when impact is detected; triggers the impact dialog */
+  const [pendingImpact, setPendingImpact] = useState<ImpactInfo | null>(null);
 
   // ── Generate slots state ─────────────────────────────────────────────────
   const [isGenerating, setIsGenerating] = useState(false);
@@ -173,16 +213,36 @@ export default function ScheduleEditorPage() {
   const loadData = useCallback(async () => {
     if (!businessId || !serviceId) return;
     try {
-      const [services, rules, breaks, exceptions] = await Promise.all([
+      const now = new Date();
+      const future90 = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+
+      const [services, rules, breaks, exceptions, recurring, slots, allAppts] = await Promise.all([
         getPublicServicesForBusiness(businessId),
         getWeeklyRules(serviceId),
         getBreakRules(serviceId),
         getDateExceptions(serviceId),
+        getRecurringRules(serviceId),
+        getAvailableSlotsForService(serviceId, now, future90),
+        getBusinessAppointments(businessId, 1, 500),
       ]);
+
       const svc = services.find((s) => s.id === serviceId);
       setServiceName(svc?.name ?? "Service");
-      setDayStates(buildInitialDayStates(rules, breaks));
+
+      const initialDayStates = buildInitialDayStates(rules, breaks);
+      originalDayStatesRef.current = initialDayStates;
+      setDayStates(initialDayStates);
       setDateExceptions(exceptions);
+      setRecurringRules(recurring);
+      setUpcomingSlots(slots);
+      setUpcomingAppts(
+        allAppts.filter(
+          (a) =>
+            a.serviceId === serviceId &&
+            a.status !== AppointmentStatus.Canceled &&
+            new Date(a.startDateTime) >= now,
+        ),
+      );
       setPageStatus("ready");
     } catch {
       setPageStatus("error");
@@ -256,6 +316,114 @@ export default function ScheduleEditorPage() {
     clearFeedback();
   }
 
+  // ── Impact analysis ───────────────────────────────────────────────────────
+
+  function analyzeImpact(): ImpactInfo {
+    const original = originalDayStatesRef.current;
+    const now = new Date();
+    const future90 = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+    const deletionPlans: DeleteWindowParams[] = [];
+    const infoMessages: string[] = [];
+
+    for (const day of dayStates) {
+      const orig = original.find((d) => d.dayOfWeek === day.dayOfWeek);
+      const wasOpen = !!(orig?.isOpen && orig.hasHours && orig.startTime && orig.endTime);
+      const shouldBeOpen = !!(day.isOpen && day.hasHours && day.startTime && day.endTime);
+
+      if (!wasOpen && shouldBeOpen) {
+        // Newly enabled — additive only
+        infoMessages.push(
+          `${DAY_FULL[day.dayOfWeek]} added as a working day. New slots will appear after running slot generation.`,
+        );
+      } else if (wasOpen && !shouldBeOpen) {
+        // Day disabled — remove all future slots on this DOW
+        deletionPlans.push({ fromDate: now, toDate: future90, dayOfWeek: day.dayOfWeek });
+      } else if (wasOpen && shouldBeOpen && orig) {
+        // Hours may have narrowed
+        if (day.startTime > orig.startTime) {
+          // Start moved later — slots before new start are now outside window
+          deletionPlans.push({
+            fromDate: now, toDate: future90,
+            dayOfWeek: day.dayOfWeek,
+            startTime: orig.startTime, endTime: day.startTime,
+          });
+        }
+        if (day.endTime < orig.endTime) {
+          // End moved earlier — slots at/after new end are now outside window
+          deletionPlans.push({
+            fromDate: now, toDate: future90,
+            dayOfWeek: day.dayOfWeek,
+            startTime: day.endTime, endTime: orig.endTime,
+          });
+        }
+        if (day.startTime < orig.startTime || day.endTime > orig.endTime) {
+          // Hours expanded — additive only
+          infoMessages.push(
+            `${DAY_FULL[day.dayOfWeek]} hours expanded. Run slot generation to fill the new window.`,
+          );
+        }
+      }
+
+      // New breaks being added
+      for (const brk of day.breaks) {
+        if (!brk.deleted && !brk.id && brk.startTime && brk.endTime) {
+          deletionPlans.push({
+            fromDate: now, toDate: future90,
+            dayOfWeek: day.dayOfWeek,
+            startTime: brk.startTime, endTime: brk.endTime,
+          });
+        }
+        // Breaks being removed — additive, info only
+        if (brk.deleted && brk.id) {
+          infoMessages.push(
+            `Break removed from ${DAY_FULL[day.dayOfWeek]}. Run slot generation to fill that window with new slots.`,
+          );
+        }
+      }
+    }
+
+    // Count affected free slots and booked appointments from cached data
+    let freeSlotCount = 0;
+    let bookedCount = 0;
+
+    // JS getDay → our DOW: (jsDay + 6) % 7  (0=Sun→6=Sun, 1=Mon→0=Mon, …)
+    for (const plan of deletionPlans) {
+      for (const slot of upcomingSlots) {
+        const d = new Date(slot.startDateTime);
+        if (d < plan.fromDate || d >= plan.toDate) continue;
+        if (plan.dayOfWeek !== undefined) {
+          const ourDay = (d.getDay() + 6) % 7;
+          if (ourDay !== plan.dayOfWeek) continue;
+        }
+        if (plan.startTime && plan.endTime) {
+          const t = d.getHours() * 60 + d.getMinutes();
+          const [sh, sm] = plan.startTime.split(":").map(Number);
+          const [eh, em] = plan.endTime.split(":").map(Number);
+          if (t < sh * 60 + sm || t >= eh * 60 + em) continue;
+        }
+        freeSlotCount++;
+      }
+
+      for (const appt of upcomingAppts) {
+        const d = new Date(appt.startDateTime);
+        if (d < plan.fromDate || d >= plan.toDate) continue;
+        if (plan.dayOfWeek !== undefined) {
+          const ourDay = (d.getDay() + 6) % 7;
+          if (ourDay !== plan.dayOfWeek) continue;
+        }
+        if (plan.startTime && plan.endTime) {
+          const t = d.getHours() * 60 + d.getMinutes();
+          const [sh, sm] = plan.startTime.split(":").map(Number);
+          const [eh, em] = plan.endTime.split(":").map(Number);
+          if (t < sh * 60 + sm || t >= eh * 60 + em) continue;
+        }
+        bookedCount++;
+      }
+    }
+
+    return { freeSlotCount, bookedCount, deletionPlans, infoMessages };
+  }
+
   // ── Save all ─────────────────────────────────────────────────────────────
 
   async function handleSaveAll() {
@@ -265,12 +433,43 @@ export default function ScheduleEditorPage() {
       return;
     }
 
+    const impact = analyzeImpact();
+
+    // If there is any destructive impact or info to show, pause and show the dialog
+    if (
+      impact.freeSlotCount > 0 ||
+      impact.bookedCount > 0 ||
+      impact.infoMessages.length > 0
+    ) {
+      setPendingImpact(impact);
+      return;
+    }
+
+    // No impact — save directly
+    await performSave([]);
+  }
+
+  async function performSave(deletionPlans: DeleteWindowParams[]) {
+    setPendingImpact(null);
     setIsSaving(true);
     setSaveError(null);
     setSaveSuccess(false);
     setValidationErrors([]);
 
     try {
+      // Delete free slots first if owner chose to
+      for (const plan of deletionPlans) {
+        await deleteAvailableSlotsInWindow(
+          serviceId!,
+          plan.fromDate,
+          plan.toDate,
+          plan.dayOfWeek,
+          plan.startTime,
+          plan.endTime,
+        );
+      }
+
+      // Save weekly rules and breaks
       for (const day of dayStates) {
         const shouldBeOpen = day.isOpen && day.hasHours && day.startTime && day.endTime;
 
@@ -336,40 +535,11 @@ export default function ScheduleEditorPage() {
     }
   }
 
-  // ── Date exception toggle ─────────────────────────────────────────────────
-
-  async function handleToggleDate(dateStr: string, reason?: string) {
-    if (!serviceId) return;
-    setTogglingDate(dateStr);
-    setExceptionsError(null);
-    try {
-      const existing = dateExceptions.find(
-        (e) => e.date.slice(0, 10) === dateStr && !e.isWorkingDay,
-      );
-      if (existing) {
-        await deleteDateException(existing.id);
-        setDateExceptions((prev) => prev.filter((e) => e.id !== existing.id));
-      } else {
-        const created = await createDateException({
-          serviceId,
-          date: `${dateStr}T00:00:00`,
-          isWorkingDay: false,
-          reason,
-        });
-        setDateExceptions((prev) => [...prev, created]);
-      }
-    } catch {
-      setExceptionsError("Failed to update blocked dates. Please try again.");
-    } finally {
-      setTogglingDate(null);
-    }
-  }
-
   // ── Render ────────────────────────────────────────────────────────────────
 
   if (pageStatus === "loading") {
     return (
-      <div className="flex items-center justify-center min-h-[300px]">
+      <div className="flex items-center justify-center min-h-75">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
@@ -388,6 +558,17 @@ export default function ScheduleEditorPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
+
+      {/* ── Impact dialog ── */}
+      {pendingImpact && (
+        <ImpactDialog
+          impact={pendingImpact}
+          onKeepSlots={() => performSave([])}
+          onDeleteFreeSlots={() => performSave(pendingImpact.deletionPlans)}
+          onCancel={() => setPendingImpact(null)}
+          scheduleUrl={`/business/${businessId}/schedule`}
+        />
+      )}
 
       {/* ── Header ── */}
       <div className="flex items-center gap-3">
@@ -629,24 +810,16 @@ export default function ScheduleEditorPage() {
       {/* ── Divider ── */}
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      {/* ── Blocked Dates ── */}
-      <BlockedDatesCalendar
-        year={calendarYear}
-        month={calendarMonth}
-        blockedDates={dateExceptions
-          .filter((e) => !e.isWorkingDay)
-          .map((e) => ({ dateStr: e.date.slice(0, 10), reason: e.reason }))}
-        togglingDate={togglingDate}
-        error={exceptionsError}
-        onPrevMonth={() => {
-          if (calendarMonth === 0) { setCalendarMonth(11); setCalendarYear((y) => y - 1); }
-          else setCalendarMonth((m) => m - 1);
-        }}
-        onNextMonth={() => {
-          if (calendarMonth === 11) { setCalendarMonth(0); setCalendarYear((y) => y + 1); }
-          else setCalendarMonth((m) => m + 1);
-        }}
-        onToggleDate={handleToggleDate}
+      {/* ── Schedule Overrides (Blocked Dates + Recurring Rules) ── */}
+      <ScheduleOverridesSection
+        serviceId={serviceId!}
+        businessId={businessId!}
+        dateExceptions={dateExceptions}
+        onExceptionsChange={setDateExceptions}
+        recurringRules={recurringRules}
+        onRulesChange={setRecurringRules}
+        upcomingSlots={upcomingSlots}
+        upcomingAppts={upcomingAppts}
       />
 
       {/* ── Divider ── */}
@@ -738,12 +911,13 @@ interface BlockedDatesCalendarProps {
   error: string | null;
   onPrevMonth: () => void;
   onNextMonth: () => void;
-  onToggleDate: (dateStr: string, reason?: string) => void;
+  onToggleDate: (dateStr: string, reason?: string) => void; // unblock
+  onPrepareBlock: (dateStr: string, reason?: string) => void; // block (with impact check)
 }
 
 function BlockedDatesCalendar({
   year, month, blockedDates, togglingDate, error,
-  onPrevMonth, onNextMonth, onToggleDate,
+  onPrevMonth, onNextMonth, onToggleDate, onPrepareBlock,
 }: BlockedDatesCalendarProps) {
   const [pendingDate, setPendingDate] = useState<string | null>(null);
   const [reasonInput, setReasonInput] = useState("");
@@ -784,16 +958,16 @@ function BlockedDatesCalendar({
 
   function confirmBlock() {
     if (!pendingDate) return;
-    onToggleDate(pendingDate, reasonInput.trim() || undefined);
+    const reason = reasonInput.trim() || undefined;
     setPendingDate(null);
     setReasonInput("");
+    onPrepareBlock(pendingDate, reason);
   }
 
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h2 className="text-base font-semibold text-[#111418] dark:text-white">Blocked Dates</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-gray-500">
           Click a future date to block it. Click a blocked date to unblock it.
         </p>
       </div>
@@ -926,6 +1100,1039 @@ function BlockedDatesCalendar({
               <Button variant="outline" onClick={() => setPendingDate(null)}>Cancel</Button>
               <Button variant="primary" onClick={confirmBlock}>Block Date</Button>
             </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── ImpactDialog ─────────────────────────────────────────────────────────────
+
+interface ImpactDialogProps {
+  impact: ImpactInfo;
+  onKeepSlots: () => void;
+  onDeleteFreeSlots: () => void;
+  onCancel: () => void;
+  scheduleUrl: string;
+}
+
+function ImpactDialog({
+  impact,
+  onKeepSlots,
+  onDeleteFreeSlots,
+  onCancel,
+  scheduleUrl,
+}: ImpactDialogProps) {
+  const hasDestructive = impact.freeSlotCount > 0 || impact.bookedCount > 0;
+  const hasInfoOnly = !hasDestructive && impact.infoMessages.length > 0;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-xl p-6 flex flex-col gap-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Title */}
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+            <MaterialIcon name="warning" className="text-xl text-amber-500" />
+          </div>
+          <div>
+            <h2 className="font-bold text-[#111418] dark:text-white text-base">
+              Schedule change detected
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Review the impact before saving.
+            </p>
+          </div>
+        </div>
+
+        {/* Impact rows */}
+        <div className="flex flex-col gap-2">
+
+          {/* Free slots to be removed */}
+          {impact.freeSlotCount > 0 && (
+            <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-3 py-2.5">
+              <MaterialIcon name="event_busy" className="text-red-500 text-base shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700 dark:text-red-300">
+                <span className="font-semibold">{impact.freeSlotCount} available slot{impact.freeSlotCount !== 1 ? "s" : ""}</span>{" "}
+                will be removed if you choose to delete free slots.
+              </p>
+            </div>
+          )}
+
+          {/* Booked appointments warning */}
+          {impact.bookedCount > 0 && (
+            <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
+              <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                <span className="font-semibold">{impact.bookedCount} appointment{impact.bookedCount !== 1 ? "s" : ""} are booked</span>{" "}
+                during the affected hours. They are <strong>not canceled automatically</strong> — cancel them individually from the{" "}
+                <a href={scheduleUrl} className="underline font-semibold">
+                  Schedule page
+                </a>
+                .
+              </p>
+            </div>
+          )}
+
+          {/* Info-only messages (additive changes, break removals) */}
+          {impact.infoMessages.map((msg, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 px-3 py-2.5"
+            >
+              <MaterialIcon name="info" className="text-blue-500 text-base shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-700 dark:text-blue-300">{msg}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col gap-2">
+          {hasDestructive ? (
+            <>
+              {impact.freeSlotCount > 0 && (
+                <button
+                  type="button"
+                  onClick={onDeleteFreeSlots}
+                  className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors"
+                >
+                  Delete {impact.freeSlotCount} free slot{impact.freeSlotCount !== 1 ? "s" : ""} &amp; Save
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onKeepSlots}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors"
+              >
+                {impact.freeSlotCount > 0 ? "Keep existing slots & Save" : "Understood, Save anyway"}
+              </button>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              >
+                Go back
+              </button>
+            </>
+          ) : (
+            // Info-only — just confirm
+            <>
+              <button
+                type="button"
+                onClick={onKeepSlots}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors"
+              >
+                Got it, Save
+              </button>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+              >
+                Go back
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── InfoTooltip ──────────────────────────────────────────────────────────────
+
+function InfoTooltip({ text }: { text: string }) {
+  return (
+    <span className="relative group inline-flex items-center">
+      <MaterialIcon
+        name="info"
+        className="text-sm text-gray-400 hover:text-primary cursor-help transition-colors"
+      />
+      <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block w-72 text-xs bg-gray-900 dark:bg-gray-700 text-white rounded-xl px-3 py-2 z-20 shadow-xl leading-relaxed">
+        {text}
+      </span>
+    </span>
+  );
+}
+
+// ─── BlockDateConfirmDialog ───────────────────────────────────────────────────
+
+function BlockDateConfirmDialog({
+  dateStr,
+  reason,
+  freeCount,
+  bookedCount,
+  scheduleUrl,
+  onConfirm,
+  onCancel,
+}: {
+  dateStr: string;
+  reason?: string;
+  freeCount: number;
+  bookedCount: number;
+  scheduleUrl: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      onClick={onCancel}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-xl p-6 flex flex-col gap-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Title */}
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+            <MaterialIcon name="event_busy" className="text-xl text-amber-500" />
+          </div>
+          <div>
+            <h2 className="font-bold text-[#111418] dark:text-white text-base">
+              Block {dateStr}?
+            </h2>
+            {reason && (
+              <p className="text-xs text-gray-500 mt-0.5">Reason: {reason}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Impact rows */}
+        <div className="flex flex-col gap-2">
+          {freeCount > 0 && (
+            <div className="flex items-start gap-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 px-3 py-2.5">
+              <MaterialIcon name="info" className="text-blue-500 text-base shrink-0 mt-0.5" />
+              <p className="text-sm text-blue-700 dark:text-blue-300">
+                <span className="font-semibold">{freeCount} available slot{freeCount !== 1 ? "s" : ""}</span>{" "}
+                will be hidden automatically and restored if you unblock this date.
+              </p>
+            </div>
+          )}
+          {bookedCount > 0 && (
+            <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
+              <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                <span className="font-semibold">{bookedCount} appointment{bookedCount !== 1 ? "s" : ""} are booked</span>{" "}
+                on this date and are <strong>not canceled automatically</strong>. Cancel them individually from the{" "}
+                <a href={scheduleUrl} className="underline font-semibold">Schedule page</a>.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-danger hover:bg-danger/90 text-white transition-colors"
+          >
+            Block date
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── ScheduleOverridesSection ────────────────────────────────────────────────
+
+// Helper: count items in a date+day+time window (partial time bounds OK)
+function countInWindow<T extends { startDateTime: string }>(
+  items: T[],
+  fromDate: Date,
+  toDate: Date,
+  days: Set<number>, // 0=Mon…6=Sun
+  startTime?: string,
+  endTime?: string,
+): number {
+  return items.filter((item) => {
+    const d = new Date(item.startDateTime);
+    if (d < fromDate || d > toDate) return false;
+    const ourDay = (d.getDay() + 6) % 7;
+    if (!days.has(ourDay)) return false;
+    const t = d.getHours() * 60 + d.getMinutes();
+    if (startTime) {
+      const [h, m] = startTime.split(":").map(Number);
+      if (t < h * 60 + m) return false;
+    }
+    if (endTime) {
+      const [h, m] = endTime.split(":").map(Number);
+      if (t >= h * 60 + m) return false;
+    }
+    return true;
+  }).length;
+}
+
+function ScheduleOverridesSection({
+  serviceId,
+  businessId,
+  dateExceptions,
+  onExceptionsChange,
+  recurringRules,
+  onRulesChange,
+  upcomingSlots,
+  upcomingAppts,
+}: {
+  serviceId: string;
+  businessId: string;
+  dateExceptions: DateExceptionDTO[];
+  onExceptionsChange: React.Dispatch<React.SetStateAction<DateExceptionDTO[]>>;
+  recurringRules: RecurringRuleDTO[];
+  onRulesChange: React.Dispatch<React.SetStateAction<RecurringRuleDTO[]>>;
+  upcomingSlots: SlotDTO[];
+  upcomingAppts: AppointmentDTO[];
+}) {
+  const today = new Date().toISOString().slice(0, 10);
+  const inputCls =
+    "flex-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40";
+
+  // ── Tab mode ─────────────────────────────────────────────────────────────
+  const [mode, setMode] = useState<"blocked" | "exception" | "recurring">("blocked");
+
+  // ── Blocked Dates state ───────────────────────────────────────────────────
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear());
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
+  const [togglingDate, setTogglingDate] = useState<string | null>(null);
+  const [exceptionsError, setExceptionsError] = useState<string | null>(null);
+  const [blockDateWarning, setBlockDateWarning] = useState<{ date: string; bookedCount: number } | null>(null);
+  const [blockDatePending, setBlockDatePending] = useState<{
+    dateStr: string; reason?: string; freeCount: number; bookedCount: number;
+  } | null>(null);
+
+  async function handleToggleDate(dateStr: string, reason?: string) {
+    setTogglingDate(dateStr);
+    setExceptionsError(null);
+    setBlockDateWarning(null);
+    try {
+      const existing = dateExceptions.find(
+        (e) => e.date.slice(0, 10) === dateStr && !e.isWorkingDay,
+      );
+      if (existing) {
+        await deleteDateException(existing.id);
+        onExceptionsChange((prev) => prev.filter((e) => e.id !== existing.id));
+      } else {
+        const bookedOnDate = upcomingAppts.filter(
+          (a) => a.startDateTime.slice(0, 10) === dateStr,
+        ).length;
+        const created = await createDateException({
+          serviceId,
+          date: `${dateStr}T00:00:00`,
+          isWorkingDay: false,
+          reason,
+        });
+        onExceptionsChange((prev) => [...prev, created]);
+        if (bookedOnDate > 0) {
+          setBlockDateWarning({ date: dateStr, bookedCount: bookedOnDate });
+        }
+      }
+    } catch {
+      setExceptionsError("Failed to update blocked dates. Please try again.");
+    } finally {
+      setTogglingDate(null);
+    }
+  }
+
+  function handlePrepareBlock(dateStr: string, reason?: string) {
+    const freeCount = upcomingSlots.filter(
+      (s) => s.startDateTime.slice(0, 10) === dateStr,
+    ).length;
+    const bookedCount = upcomingAppts.filter(
+      (a) => a.startDateTime.slice(0, 10) === dateStr,
+    ).length;
+    if (freeCount === 0 && bookedCount === 0) {
+      handleToggleDate(dateStr, reason);
+    } else {
+      setBlockDatePending({ dateStr, reason, freeCount, bookedCount });
+    }
+  }
+
+  // ── Recurring Rules state ─────────────────────────────────────────────────
+  const [newStart, setNewStart] = useState("");
+  const [newEnd, setNewEnd] = useState("");
+  const [newDays, setNewDays] = useState<Set<number>>(new Set());
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
+  const [addFormError, setAddFormError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  type RecurringImpact = {
+    type: "add" | "remove";
+    freeCount: number;
+    bookedCount: number;
+    deletionPlans: DeleteWindowParams[];
+    ruleId?: string;
+    pendingCreate?: Parameters<typeof createRecurringRule>[0];
+  };
+  const [recurringImpact, setRecurringImpact] = useState<RecurringImpact | null>(null);
+  const [recurringActionLoading, setRecurringActionLoading] = useState(false);
+
+  function parseDays(daysJson: string): number[] {
+    try { return JSON.parse(daysJson) as number[]; } catch { return []; }
+  }
+
+  function toggleDay(d: number) {
+    setNewDays((prev) => {
+      const next = new Set(prev);
+      if (next.has(d)) next.delete(d);
+      else next.add(d);
+      return next;
+    });
+  }
+
+  function prepareAdd() {
+    if (!newStart || !newEnd || newDays.size === 0 || !newStartTime || !newEndTime) {
+      setAddFormError("Please fill in all fields and select at least one day.");
+      return;
+    }
+    if (newStart > newEnd) { setAddFormError("Start date must be before end date."); return; }
+    if (newStartTime >= newEndTime) { setAddFormError("Start time must be before end time."); return; }
+    setAddFormError(null);
+
+    const from = new Date(`${newStart}T00:00:00`);
+    const to = new Date(`${newEnd}T23:59:59`);
+
+    // Free slots OUTSIDE the new rule's hours in this date range + days
+    let freeCount = 0;
+    for (const slot of upcomingSlots) {
+      const d = new Date(slot.startDateTime);
+      if (d < from || d > to) continue;
+      const ourDay = (d.getDay() + 6) % 7;
+      if (!newDays.has(ourDay)) continue;
+      const t = d.getHours() * 60 + d.getMinutes();
+      const [sh, sm] = newStartTime.split(":").map(Number);
+      const [eh, em] = newEndTime.split(":").map(Number);
+      if (t < sh * 60 + sm || t >= eh * 60 + em) freeCount++;
+    }
+    const bookedCount = countInWindow(upcomingAppts, from, to, newDays);
+
+    // Build deletion plans: one pair per selected day (before-start and after-end)
+    const deletionPlans: DeleteWindowParams[] = [];
+    for (const d of newDays) {
+      if (newStartTime > "00:00") {
+        deletionPlans.push({ fromDate: from, toDate: to, dayOfWeek: d, endTime: newStartTime });
+      }
+      deletionPlans.push({ fromDate: from, toDate: to, dayOfWeek: d, startTime: newEndTime });
+    }
+
+    const pendingCreate: Parameters<typeof createRecurringRule>[0] = {
+      serviceId,
+      startDate: `${newStart}T00:00:00`,
+      endDate: `${newEnd}T23:59:59`,
+      daysOfWeek: JSON.stringify(Array.from(newDays).sort()),
+      startTime: `${newStartTime}:00`,
+      endTime: `${newEndTime}:00`,
+    };
+
+    if (freeCount === 0 && bookedCount === 0) {
+      doAddRule(pendingCreate, []);
+    } else {
+      setRecurringImpact({ type: "add", freeCount, bookedCount, deletionPlans, pendingCreate });
+    }
+  }
+
+  async function doAddRule(dto: Parameters<typeof createRecurringRule>[0], plans: DeleteWindowParams[]) {
+    setRecurringActionLoading(true);
+    setRecurringImpact(null);
+    try {
+      for (const plan of plans) {
+        await deleteAvailableSlotsInWindow(serviceId, plan.fromDate, plan.toDate, plan.dayOfWeek, plan.startTime, plan.endTime);
+      }
+      const created = await createRecurringRule(dto);
+      onRulesChange((prev) => [...prev, created]);
+      setNewStart(""); setNewEnd(""); setNewDays(new Set()); setNewStartTime(""); setNewEndTime("");
+    } catch {
+      setAddFormError("Failed to create rule. Please try again.");
+    } finally {
+      setRecurringActionLoading(false);
+    }
+  }
+
+  function prepareDelete(rule: RecurringRuleDTO) {
+    const from = new Date(rule.startDate);
+    const to = new Date(rule.endDate);
+    const days = new Set(parseDays(rule.daysOfWeek));
+    const st = toHHMM(rule.startTime);
+    const et = toHHMM(rule.endTime);
+    const freeCount = countInWindow(upcomingSlots, from, to, days, st, et);
+    const bookedCount = countInWindow(upcomingAppts, from, to, days, st, et);
+    const deletionPlans: DeleteWindowParams[] = Array.from(days).map((d) => ({
+      fromDate: from, toDate: to, dayOfWeek: d, startTime: st, endTime: et,
+    }));
+    if (freeCount === 0 && bookedCount === 0) {
+      doDeleteRule(rule.id, []);
+    } else {
+      setRecurringImpact({ type: "remove", freeCount, bookedCount, deletionPlans, ruleId: rule.id });
+    }
+  }
+
+  async function doDeleteRule(ruleId: string, plans: DeleteWindowParams[]) {
+    setRecurringActionLoading(true);
+    setDeleting(ruleId);
+    setRecurringImpact(null);
+    try {
+      for (const plan of plans) {
+        await deleteAvailableSlotsInWindow(serviceId, plan.fromDate, plan.toDate, plan.dayOfWeek, plan.startTime, plan.endTime);
+      }
+      await deleteRecurringRule(ruleId);
+      onRulesChange((prev) => prev.filter((r) => r.id !== ruleId));
+    } catch {
+      setAddFormError("Failed to delete rule.");
+    } finally {
+      setRecurringActionLoading(false);
+      setDeleting(null);
+    }
+  }
+
+  // ── Date Exception state ─────────────────────────────────────────────────
+  const [excDate, setExcDate] = useState("");
+  const [excStartTime, setExcStartTime] = useState("");
+  const [excEndTime, setExcEndTime] = useState("");
+  const [excFormError, setExcFormError] = useState<string | null>(null);
+  const [excDeleting, setExcDeleting] = useState<string | null>(null);
+  const [excActionLoading, setExcActionLoading] = useState(false);
+
+  type ExcImpact = {
+    type: "add" | "remove";
+    freeCount: number;
+    bookedCount: number;
+    deletionPlans: DeleteWindowParams[];
+    excId?: string;
+    pendingCreate?: Parameters<typeof createDateException>[0];
+  };
+  const [excImpact, setExcImpact] = useState<ExcImpact | null>(null);
+
+  function prepareAddException() {
+    if (!excDate || !excStartTime || !excEndTime) {
+      setExcFormError("Please fill in the date, start time, and end time.");
+      return;
+    }
+    if (excStartTime >= excEndTime) {
+      setExcFormError("Start time must be before end time.");
+      return;
+    }
+    setExcFormError(null);
+
+    const from = new Date(`${excDate}T00:00:00`);
+    const to = new Date(`${excDate}T23:59:59`);
+    // Free slots on this date OUTSIDE the exception's hours
+    let freeCount = 0;
+    for (const slot of upcomingSlots) {
+      const d = new Date(slot.startDateTime);
+      if (d.toISOString().slice(0, 10) !== excDate) continue;
+      const t = d.getHours() * 60 + d.getMinutes();
+      const [sh, sm] = excStartTime.split(":").map(Number);
+      const [eh, em] = excEndTime.split(":").map(Number);
+      if (t < sh * 60 + sm || t >= eh * 60 + em) freeCount++;
+    }
+    const bookedCount = upcomingAppts.filter(
+      (a) => a.startDateTime.slice(0, 10) === excDate,
+    ).length;
+    const deletionPlans: DeleteWindowParams[] = [];
+    if (excStartTime > "00:00") deletionPlans.push({ fromDate: from, toDate: to, endTime: excStartTime });
+    deletionPlans.push({ fromDate: from, toDate: to, startTime: excEndTime });
+
+    const pendingCreate: Parameters<typeof createDateException>[0] = {
+      serviceId,
+      date: `${excDate}T00:00:00`,
+      isWorkingDay: true,
+      startTime: `${excStartTime}:00`,
+      endTime: `${excEndTime}:00`,
+    };
+    if (freeCount === 0 && bookedCount === 0) {
+      doAddException(pendingCreate, []);
+    } else {
+      setExcImpact({ type: "add", freeCount, bookedCount, deletionPlans, pendingCreate });
+    }
+  }
+
+  async function doAddException(dto: Parameters<typeof createDateException>[0], plans: DeleteWindowParams[]) {
+    setExcActionLoading(true);
+    setExcImpact(null);
+    try {
+      for (const plan of plans) {
+        await deleteAvailableSlotsInWindow(serviceId, plan.fromDate, plan.toDate, plan.dayOfWeek, plan.startTime, plan.endTime);
+      }
+      const created = await createDateException(dto);
+      onExceptionsChange((prev) => [...prev, created]);
+      setExcDate(""); setExcStartTime(""); setExcEndTime("");
+    } catch {
+      setExcFormError("Failed to create date exception. Please try again.");
+    } finally {
+      setExcActionLoading(false);
+    }
+  }
+
+  function prepareRemoveException(exc: DateExceptionDTO) {
+    const dateStr = exc.date.slice(0, 10);
+    const from = new Date(`${dateStr}T00:00:00`);
+    const to = new Date(`${dateStr}T23:59:59`);
+    const st = exc.startTime ? toHHMM(exc.startTime) : undefined;
+    const et = exc.endTime ? toHHMM(exc.endTime) : undefined;
+    const freeCount = upcomingSlots.filter((s) => {
+      const d = new Date(s.startDateTime);
+      if (d.toISOString().slice(0, 10) !== dateStr) return false;
+      if (st && et) {
+        const t = d.getHours() * 60 + d.getMinutes();
+        const [sh, sm] = st.split(":").map(Number);
+        const [eh, em] = et.split(":").map(Number);
+        if (t < sh * 60 + sm || t >= eh * 60 + em) return false;
+      }
+      return true;
+    }).length;
+    const bookedCount = upcomingAppts.filter((a) => a.startDateTime.slice(0, 10) === dateStr).length;
+    const deletionPlans: DeleteWindowParams[] = [{ fromDate: from, toDate: to, startTime: st, endTime: et }];
+    if (freeCount === 0 && bookedCount === 0) {
+      doRemoveException(exc.id, []);
+    } else {
+      setExcImpact({ type: "remove", freeCount, bookedCount, deletionPlans, excId: exc.id });
+    }
+  }
+
+  async function doRemoveException(excId: string, plans: DeleteWindowParams[]) {
+    setExcActionLoading(true);
+    setExcDeleting(excId);
+    setExcImpact(null);
+    try {
+      for (const plan of plans) {
+        await deleteAvailableSlotsInWindow(serviceId, plan.fromDate, plan.toDate, plan.dayOfWeek, plan.startTime, plan.endTime);
+      }
+      await deleteDateException(excId);
+      onExceptionsChange((prev) => prev.filter((e) => e.id !== excId));
+    } catch {
+      setExcFormError("Failed to delete date exception.");
+    } finally {
+      setExcActionLoading(false);
+      setExcDeleting(null);
+    }
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* ── Block date impact dialog ── */}
+      {blockDatePending && (
+        <BlockDateConfirmDialog
+          dateStr={blockDatePending.dateStr}
+          reason={blockDatePending.reason}
+          freeCount={blockDatePending.freeCount}
+          bookedCount={blockDatePending.bookedCount}
+          scheduleUrl={`/business/${businessId}/schedule`}
+          onConfirm={() => {
+            const { dateStr, reason } = blockDatePending;
+            setBlockDatePending(null);
+            handleToggleDate(dateStr, reason);
+          }}
+          onCancel={() => setBlockDatePending(null)}
+        />
+      )}
+
+      {/* ── Recurring rule impact dialog ── */}
+      {recurringImpact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          onClick={() => setRecurringImpact(null)}>
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-xl p-6 flex flex-col gap-5"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                <MaterialIcon name="warning" className="text-xl text-amber-500" />
+              </div>
+              <div>
+                <h2 className="font-bold text-[#111418] dark:text-white text-base">
+                  {recurringImpact.type === "add" ? "Add recurring rule?" : "Remove recurring rule?"}
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">Review the impact on existing slots.</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              {recurringImpact.freeCount > 0 && (
+                <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-3 py-2.5">
+                  <MaterialIcon name="event_busy" className="text-red-500 text-base shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    <span className="font-semibold">
+                      {recurringImpact.freeCount} free slot{recurringImpact.freeCount !== 1 ? "s" : ""}
+                    </span>{" "}
+                    {recurringImpact.type === "add"
+                      ? "fall outside the new rule's hours and can be removed."
+                      : "exist within this rule's period and can be removed."}
+                  </p>
+                </div>
+              )}
+              {recurringImpact.bookedCount > 0 && (
+                <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
+                  <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    <span className="font-semibold">
+                      {recurringImpact.bookedCount} appointment{recurringImpact.bookedCount !== 1 ? "s" : ""} are booked
+                    </span>{" "}
+                    in this period — they are <strong>not canceled automatically</strong>. Cancel individually from the{" "}
+                    <a href={`/business/${businessId}/schedule`} className="underline font-semibold">Schedule page</a>.
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              {recurringImpact.freeCount > 0 && (
+                <button type="button"
+                  disabled={recurringActionLoading}
+                  onClick={() => {
+                    if (recurringImpact.type === "add" && recurringImpact.pendingCreate) {
+                      doAddRule(recurringImpact.pendingCreate, recurringImpact.deletionPlans);
+                    } else if (recurringImpact.type === "remove" && recurringImpact.ruleId) {
+                      doDeleteRule(recurringImpact.ruleId, recurringImpact.deletionPlans);
+                    }
+                  }}
+                  className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-60">
+                  Delete {recurringImpact.freeCount} free slot{recurringImpact.freeCount !== 1 ? "s" : ""} &amp;{" "}
+                  {recurringImpact.type === "add" ? "Add Rule" : "Remove Rule"}
+                </button>
+              )}
+              <button type="button"
+                disabled={recurringActionLoading}
+                onClick={() => {
+                  if (recurringImpact.type === "add" && recurringImpact.pendingCreate) {
+                    doAddRule(recurringImpact.pendingCreate, []);
+                  } else if (recurringImpact.type === "remove" && recurringImpact.ruleId) {
+                    doDeleteRule(recurringImpact.ruleId, []);
+                  }
+                }}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors disabled:opacity-60">
+                {recurringImpact.freeCount > 0
+                  ? `Keep slots & ${recurringImpact.type === "add" ? "Add" : "Remove"} Rule`
+                  : `Understood, ${recurringImpact.type === "add" ? "Add" : "Remove"} Rule`}
+              </button>
+              <button type="button" onClick={() => setRecurringImpact(null)}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
+                Go back
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Block date booked-appointment warning banner ── */}
+      {blockDateWarning && (
+        <div className="flex items-start gap-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4">
+          <MaterialIcon name="warning" className="text-amber-500 shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+              {blockDateWarning.bookedCount} appointment{blockDateWarning.bookedCount !== 1 ? "s" : ""} booked on {blockDateWarning.date}
+            </p>
+            <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+              Available slots hidden automatically. Cancel booked appointments individually from the{" "}
+              <a href={`/business/${businessId}/schedule`} className="underline font-semibold">Schedule page</a>.
+            </p>
+          </div>
+          <button type="button" onClick={() => setBlockDateWarning(null)}
+            className="p-1 rounded-lg text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-800 transition shrink-0">
+            <MaterialIcon name="close" className="text-base" />
+          </button>
+        </div>
+      )}
+
+      {/* ── Date exception impact dialog ── */}
+      {excImpact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          onClick={() => setExcImpact(null)}>
+          <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-900 shadow-xl p-6 flex flex-col gap-5"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                <MaterialIcon name="warning" className="text-xl text-amber-500" />
+              </div>
+              <div>
+                <h2 className="font-bold text-[#111418] dark:text-white text-base">
+                  {excImpact.type === "add" ? "Add date exception?" : "Remove date exception?"}
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">Review the impact on existing slots.</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              {excImpact.freeCount > 0 && (
+                <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-3 py-2.5">
+                  <MaterialIcon name="event_busy" className="text-red-500 text-base shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 dark:text-red-300">
+                    <span className="font-semibold">{excImpact.freeCount} free slot{excImpact.freeCount !== 1 ? "s" : ""}</span>{" "}
+                    {excImpact.type === "add" ? "fall outside the exception's hours." : "exist within this exception's period."}
+                  </p>
+                </div>
+              )}
+              {excImpact.bookedCount > 0 && (
+                <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
+                  <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    <span className="font-semibold">{excImpact.bookedCount} appointment{excImpact.bookedCount !== 1 ? "s" : ""} booked</span>{" "}
+                    on this date — <strong>not canceled automatically</strong>. Cancel from the{" "}
+                    <a href={`/business/${businessId}/schedule`} className="underline font-semibold">Schedule page</a>.
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              {excImpact.freeCount > 0 && (
+                <button type="button" disabled={excActionLoading}
+                  onClick={() => {
+                    if (excImpact.type === "add" && excImpact.pendingCreate) doAddException(excImpact.pendingCreate, excImpact.deletionPlans);
+                    else if (excImpact.type === "remove" && excImpact.excId) doRemoveException(excImpact.excId, excImpact.deletionPlans);
+                  }}
+                  className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-60">
+                  Delete {excImpact.freeCount} free slot{excImpact.freeCount !== 1 ? "s" : ""} &amp;{" "}
+                  {excImpact.type === "add" ? "Add Exception" : "Remove Exception"}
+                </button>
+              )}
+              <button type="button" disabled={excActionLoading}
+                onClick={() => {
+                  if (excImpact.type === "add" && excImpact.pendingCreate) doAddException(excImpact.pendingCreate, []);
+                  else if (excImpact.type === "remove" && excImpact.excId) doRemoveException(excImpact.excId, []);
+                }}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors disabled:opacity-60">
+                {excImpact.freeCount > 0
+                  ? `Keep slots & ${excImpact.type === "add" ? "Add" : "Remove"} Exception`
+                  : `Understood, ${excImpact.type === "add" ? "Add" : "Remove"} Exception`}
+              </button>
+              <button type="button" onClick={() => setExcImpact(null)}
+                className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
+                Go back
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tab toggle (left-aligned, no outer header) ── */}
+      <div className="flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1 gap-1 self-start">
+        {([
+          ["blocked",   "event_busy",    "Blocked Dates"],
+          ["exception", "edit_calendar", "Date Exception"],
+          ["recurring", "loop",          "Recurring Rules"],
+        ] as const).map(([key, icon, label]) => (
+          <button key={key} type="button" onClick={() => setMode(key)}
+            className={[
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap",
+              mode === key
+                ? "bg-white dark:bg-gray-900 text-[#111418] dark:text-white shadow-sm"
+                : "text-gray-500 hover:text-[#111418] dark:hover:text-white",
+            ].join(" ")}>
+            <MaterialIcon name={icon} className="text-sm leading-none" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Blocked Dates content ── */}
+      {mode === "blocked" && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-[#111418] dark:text-white">Blocked Dates</h2>
+            <InfoTooltip text="Block specific dates when you are unavailable — e.g. holidays, vacations, or one-off closures. Blocked dates override ALL other rules: no slots will be generated and existing available slots are hidden. Booked appointments are NOT canceled automatically." />
+          </div>
+          <BlockedDatesCalendar
+            year={calYear}
+            month={calMonth}
+            blockedDates={dateExceptions
+              .filter((e) => !e.isWorkingDay)
+              .map((e) => ({ dateStr: e.date.slice(0, 10), reason: e.reason }))}
+            togglingDate={togglingDate}
+            error={exceptionsError}
+            onPrevMonth={() => {
+              if (calMonth === 0) { setCalMonth(11); setCalYear((y) => y - 1); }
+              else setCalMonth((m) => m - 1);
+            }}
+            onNextMonth={() => {
+              if (calMonth === 11) { setCalMonth(0); setCalYear((y) => y + 1); }
+              else setCalMonth((m) => m + 1);
+            }}
+            onToggleDate={handleToggleDate}
+            onPrepareBlock={handlePrepareBlock}
+          />
+        </div>
+      )}
+
+      {/* ── Date Exception content ── */}
+      {mode === "exception" && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-[#111418] dark:text-white">Date Exception</h2>
+            <InfoTooltip text="Set custom working hours for a single specific date — e.g. a shorter day before a holiday or a one-off late opening. This overrides both Weekly Hours and Recurring Rules for that date. The date must still have slots generated after adding the exception." />
+          </div>
+
+          {/* Existing working-day exceptions */}
+          {dateExceptions.filter((e) => e.isWorkingDay).length > 0 ? (
+            <div className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+                {[...dateExceptions.filter((e) => e.isWorkingDay)]
+                  .sort((a, b) => a.date.localeCompare(b.date))
+                  .map((exc) => (
+                    <li key={exc.id} className="flex items-start justify-between gap-3 px-4 py-3">
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <p className="text-sm font-semibold text-[#111418] dark:text-white">
+                          {exc.date.slice(0, 10)}
+                        </p>
+                        {exc.startTime && exc.endTime && (
+                          <p className="text-sm text-[#111418] dark:text-white">
+                            {toHHMM(exc.startTime)} – {toHHMM(exc.endTime)}
+                          </p>
+                        )}
+                        {exc.reason && <p className="text-xs text-gray-500">{exc.reason}</p>}
+                      </div>
+                      <button type="button"
+                        disabled={excDeleting === exc.id || excActionLoading}
+                        onClick={() => prepareRemoveException(exc)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-40 shrink-0">
+                        {excDeleting === exc.id ? (
+                          <span className="w-4 h-4 rounded-full border-2 border-danger border-t-transparent animate-spin inline-block" />
+                        ) : (
+                          <MaterialIcon name="delete_outline" className="text-base" />
+                        )}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">No date exceptions added.</p>
+          )}
+
+          {/* Add form */}
+          <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Add exception</p>
+            <div className="flex-1">
+              <label className="block text-xs text-gray-500 mb-1">Date</label>
+              <input type="date" value={excDate} min={today} onChange={(e) => setExcDate(e.target.value)} className={inputCls} />
+            </div>
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Start time</label>
+                <input type="time" value={excStartTime} onChange={(e) => setExcStartTime(e.target.value)} className={inputCls} />
+              </div>
+              <span className="text-gray-400 pb-2">—</span>
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">End time</label>
+                <input type="time" value={excEndTime} onChange={(e) => setExcEndTime(e.target.value)} className={inputCls} />
+              </div>
+            </div>
+            {excFormError && (
+              <p className="text-xs text-danger flex items-center gap-1">
+                <MaterialIcon name="error" className="text-sm" />{excFormError}
+              </p>
+            )}
+            <Button variant="secondary" onClick={prepareAddException} disabled={excActionLoading} isLoading={excActionLoading}>
+              Add Date Exception
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Recurring Rules content ── */}
+      {mode === "recurring" && (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-semibold text-[#111418] dark:text-white">Recurring Rules</h2>
+            <InfoTooltip text="Temporarily override your weekly hours for a date range. Useful for seasonal schedule changes (e.g. shorter summer hours) or temporary adjustments on specific days. Priority: Recurring rules override Weekly Hours but are overridden by Date Exceptions." />
+          </div>
+
+          {recurringRules.length > 0 ? (
+            <div className="rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+                {[...recurringRules]
+                  .sort((a, b) => a.startDate.localeCompare(b.startDate))
+                  .map((rule) => {
+                    const days = parseDays(rule.daysOfWeek);
+                    return (
+                      <li key={rule.id} className="flex items-start justify-between gap-3 px-4 py-3">
+                        <div className="flex flex-col gap-1 min-w-0">
+                          <div className="flex flex-wrap gap-1">
+                            {days.map((d) => (
+                              <span key={d} className="inline-block px-1.5 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary">
+                                {DAY_SHORT[d]}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-sm text-[#111418] dark:text-white">
+                            {toHHMM(rule.startTime)} – {toHHMM(rule.endTime)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {rule.startDate.slice(0, 10)} → {rule.endDate.slice(0, 10)}
+                          </p>
+                        </div>
+                        <button type="button"
+                          disabled={deleting === rule.id || recurringActionLoading}
+                          onClick={() => prepareDelete(rule)}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-40 shrink-0">
+                          {deleting === rule.id ? (
+                            <span className="w-4 h-4 rounded-full border-2 border-danger border-t-transparent animate-spin inline-block" />
+                          ) : (
+                            <MaterialIcon name="delete_outline" className="text-base" />
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">No recurring rules added.</p>
+          )}
+
+          <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Add rule</p>
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">From</label>
+                <input type="date" value={newStart} min={today} onChange={(e) => setNewStart(e.target.value)} className={inputCls} />
+              </div>
+              <span className="text-gray-400 pb-2">—</span>
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">To</label>
+                <input type="date" value={newEnd} min={newStart || today} onChange={(e) => setNewEnd(e.target.value)} className={inputCls} />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1.5">Days of week</label>
+              <div className="flex gap-1">
+                {DAY_SHORT.map((label, i) => (
+                  <button key={i} type="button" onClick={() => toggleDay(i)}
+                    className={["flex-1 py-1.5 rounded-lg text-xs font-semibold transition-all",
+                      newDays.has(i) ? "bg-primary text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500 hover:bg-primary/10 hover:text-primary"].join(" ")}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Start time</label>
+                <input type="time" value={newStartTime} onChange={(e) => setNewStartTime(e.target.value)} className={inputCls} />
+              </div>
+              <span className="text-gray-400 pb-2">—</span>
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">End time</label>
+                <input type="time" value={newEndTime} onChange={(e) => setNewEndTime(e.target.value)} className={inputCls} />
+              </div>
+            </div>
+            {addFormError && (
+              <p className="text-xs text-danger flex items-center gap-1">
+                <MaterialIcon name="error" className="text-sm" />{addFormError}
+              </p>
+            )}
+            <Button variant="secondary" onClick={prepareAdd} disabled={recurringActionLoading} isLoading={recurringActionLoading}>
+              Add Recurring Rule
+            </Button>
           </div>
         </div>
       )}

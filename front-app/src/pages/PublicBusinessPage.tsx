@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import {
@@ -615,6 +615,7 @@ function ServiceForm({
 export default function PublicBusinessPage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const authStatus = useSelector((state: RootState) => state.auth.status);
   const isAuthenticated = authStatus === "authenticated";
@@ -657,6 +658,13 @@ export default function PublicBusinessPage() {
 
     return () => { cancelled = true; };
   }, [businessId]);
+
+  // ── Auto-activate edit mode when ?edit=true ───────────────────────────────
+  useEffect(() => {
+    if (page.status === "ready" && searchParams.get("edit") === "true") {
+      dispatch({ type: "ENTER_EDIT" });
+    }
+  }, [page.status, searchParams]);
 
   // ── Load slots once services are known ────────────────────────────────────
   // If the user arrived from an availability search, use that date/time window.

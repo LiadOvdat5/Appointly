@@ -84,6 +84,34 @@ export async function getBusinessAppointmentsByRange(
   return response.data;
 }
 
+export interface BusinessReportDTO {
+  businessId: string;
+  startDate: string;
+  endDate: string;
+  totalAppointments: number;
+  revenue: number;
+  topServiceName: string | null;
+  topServiceCount: number;
+  cancellations: number;
+  uniqueCustomers: number;
+  busiestDayOfWeek: string | null;
+}
+
+export async function getBusinessReport(
+  businessId: string,
+  startDate?: Date,
+  endDate?: Date,
+): Promise<BusinessReportDTO> {
+  const params: Record<string, string> = {};
+  if (startDate) params.startDate = startDate.toISOString();
+  if (endDate) params.endDate = endDate.toISOString();
+  const response = await apiClient.get<BusinessReportDTO>(
+    `/api/reports/business/${businessId}`,
+    { params },
+  );
+  return response.data;
+}
+
 export async function cancelAppointment(
   id: string,
   cancellationReason?: string,

@@ -126,6 +126,50 @@ namespace WebAPI.Repositories
             return slots.Count;
         }
 
+        public async Task<int> DeleteAvailableSlotsInWindowAsync(
+            Guid serviceId,
+            DateTime fromDate,
+            DateTime toDate,
+            int? dayOfWeek = null,
+            string? startTime = null,
+            string? endTime = null)
+        {
+            // Load candidates: AVAILABLE slots in the outer date range
+            var candidates = await _context.ServiceSchedules
+                .Where(ss => ss.ServiceId == serviceId
+                    && ss.Status == ScheduleStatus.AVAILABLE
+                    && ss.StartDateTime >= fromDate
+                    && ss.StartDateTime < toDate)
+                .ToListAsync();
+
+            // Apply optional day-of-week filter (DayOfWeek enum: Sunday=0 … Saturday=6)
+            // Our rule convention: 0=Monday … 6=Sunday → convert
+            if (dayOfWeek.HasValue)
+            {
+                // Convert our 0=Mon convention to .NET DayOfWeek (0=Sun, 1=Mon … 6=Sat)
+                var dotNetDow = (DayOfWeek)(((dayOfWeek.Value + 1) % 7));
+                candidates = candidates.Where(ss => ss.StartDateTime.DayOfWeek == dotNetDow).ToList();
+            }
+
+            // Apply optional time window filter
+            if (startTime != null && endTime != null
+                && TimeSpan.TryParse(startTime, out var tsStart)
+                && TimeSpan.TryParse(endTime, out var tsEnd))
+            {
+                candidates = candidates
+                    .Where(ss =>
+                    {
+                        var slotTime = ss.StartDateTime.TimeOfDay;
+                        return slotTime >= tsStart && slotTime < tsEnd;
+                    })
+                    .ToList();
+            }
+
+            _context.ServiceSchedules.RemoveRange(candidates);
+            await _context.SaveChangesAsync();
+            return candidates.Count;
+        }
+
         public async Task<bool> InsertIfNotExistsAsync(Guid serviceId, DateTime startDateTime, DateTime endDateTime)
         {
             // Check if slot already exists

@@ -1,3 +1,604 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
+import {
+  getBusinessAppointments,
+  AppointmentStatus,
+  getBusinessReport,
+  type AppointmentDTO,
+  type BusinessReportDTO,
+} from "../services/appointmentService";
+import { getMyBusinesses, getBusinessById } from "../services/businessManagementService";
+import type { BusinessProfile } from "../types/business";
+import { Card } from "../components/UI/Card";
+import { Badge } from "../components/UI/Badge";
+import { Button } from "../components/UI/Button";
+import { MaterialIcon } from "../components/UI/MaterialIcon";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function startOfMonth(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth(), 1);
+}
+
+function endOfMonth(d: Date): Date {
+  return new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+}
+
+function toInputDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+// ─── Metric definitions ───────────────────────────────────────────────────────
+
+type MetricKey =
+  | "bookings"
+  | "revenue"
+  | "topService"
+  | "cancellations"
+  | "avgValue"
+  | "uniqueCustomers"
+  | "busiestDay";
+
+interface MetricDef {
+  key: MetricKey;
+  label: string;
+  icon: string;
+  iconColor: string;
+  iconBg: string;
+  getValue: (r: BusinessReportDTO) => string;
+  getSubtext: (r: BusinessReportDTO) => string;
+}
+
+const METRIC_DEFS: MetricDef[] = [
+  {
+    key: "bookings",
+    label: "Total Bookings",
+    icon: "event_available",
+    iconColor: "text-green-600",
+    iconBg: "bg-green-100 dark:bg-green-900/30",
+    getValue: (r) => String(r.totalAppointments),
+    getSubtext: (r) =>
+      r.totalAppointments === 1 ? "appointment" : "appointments",
+  },
+  {
+    key: "revenue",
+    label: "Revenue",
+    icon: "payments",
+    iconColor: "text-blue-600",
+    iconBg: "bg-blue-100 dark:bg-blue-900/30",
+    getValue: (r) => `$${r.revenue.toFixed(2)}`,
+    getSubtext: () => "Estimated from service prices",
+  },
+  {
+    key: "topService",
+    label: "Top Service",
+    icon: "star",
+    iconColor: "text-yellow-500",
+    iconBg: "bg-yellow-100 dark:bg-yellow-900/30",
+    getValue: (r) => r.topServiceName ?? "—",
+    getSubtext: (r) =>
+      r.topServiceCount > 0
+        ? `${r.topServiceCount} booking${r.topServiceCount !== 1 ? "s" : ""}`
+        : "No data yet",
+  },
+  {
+    key: "cancellations",
+    label: "Cancellations",
+    icon: "event_busy",
+    iconColor: "text-red-500",
+    iconBg: "bg-red-100 dark:bg-red-900/30",
+    getValue: (r) => String(r.cancellations),
+    getSubtext: (r) => {
+      const total = r.totalAppointments + r.cancellations;
+      if (total === 0) return "No appointments";
+      const rate = Math.round((r.cancellations / total) * 100);
+      return `${rate}% cancellation rate`;
+    },
+  },
+  {
+    key: "avgValue",
+    label: "Avg Booking Value",
+    icon: "trending_up",
+    iconColor: "text-purple-600",
+    iconBg: "bg-purple-100 dark:bg-purple-900/30",
+    getValue: (r) =>
+      r.totalAppointments > 0
+        ? `$${(r.revenue / r.totalAppointments).toFixed(2)}`
+        : "—",
+    getSubtext: () => "Revenue per appointment",
+  },
+  {
+    key: "uniqueCustomers",
+    label: "Unique Customers",
+    icon: "group",
+    iconColor: "text-indigo-600",
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30",
+    getValue: (r) => String(r.uniqueCustomers),
+    getSubtext: (r) =>
+      r.uniqueCustomers === 1 ? "individual client" : "individual clients",
+  },
+  {
+    key: "busiestDay",
+    label: "Busiest Day",
+    icon: "bar_chart",
+    iconColor: "text-orange-500",
+    iconBg: "bg-orange-100 dark:bg-orange-900/30",
+    getValue: (r) => r.busiestDayOfWeek ?? "—",
+    getSubtext: () => "Most bookings on this day",
+  },
+];
+
+const DEFAULT_METRICS: MetricKey[] = ["bookings", "revenue", "topService"];
+
+// ─── AnalyticCard ─────────────────────────────────────────────────────────────
+
+function AnalyticCard({
+  def,
+  report,
+}: {
+  def: MetricDef;
+  report: BusinessReportDTO;
+}) {
+  const value = def.getValue(report);
+  const subtext = def.getSubtext(report);
+
+  return (
+    <div className="bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 rounded-2xl shadow-sm px-6 py-5 flex items-center gap-5">
+      {/* Icon */}
+      <div
+        className={[
+          "h-14 w-14 shrink-0 rounded-2xl flex items-center justify-center",
+          def.iconBg,
+        ].join(" ")}
+      >
+        <MaterialIcon name={def.icon} className={["text-2xl", def.iconColor].join(" ")} />
+      </div>
+
+      {/* Label + subtext */}
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+          {def.label}
+        </p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+          {subtext}
+        </p>
+      </div>
+
+      {/* Value */}
+      <div className="shrink-0 text-right">
+        <p className="text-3xl font-black text-[#0e141b] dark:text-white leading-tight truncate max-w-45">
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function DashboardPage() {
-  return <div>Dashboard — coming soon</div>;
+  const navigate = useNavigate();
+  const { businessId: paramBusinessId } = useParams<{ businessId?: string }>();
+  const authUser = useSelector((s: RootState) => s.auth.user);
+
+  // Business
+  const [business, setBusiness] = useState<BusinessProfile | null>(null);
+  const [businessLoading, setBusinessLoading] = useState(true);
+  const [businessError, setBusinessError] = useState<string | null>(null);
+
+  // Upcoming appointments (next 10, non-canceled, future)
+  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  const [apptLoading, setApptLoading] = useState(false);
+
+  // Report / stats
+  const [report, setReport] = useState<BusinessReportDTO | null>(null);
+  const [reportLoading, setReportLoading] = useState(false);
+  const now = new Date();
+  const [startDate, setStartDate] = useState(toInputDate(startOfMonth(now)));
+  const [endDate, setEndDate] = useState(toInputDate(endOfMonth(now)));
+  const [activeMetrics, setActiveMetrics] = useState<MetricKey[]>(DEFAULT_METRICS);
+
+  function toggleMetric(key: MetricKey) {
+    setActiveMetrics((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+    );
+  }
+
+  // ── Load business ────────────────────────────────────────────────────────
+  useEffect(() => {
+    setBusinessLoading(true);
+    const load = paramBusinessId
+      ? getBusinessById(paramBusinessId)
+      : getMyBusinesses().then((list) => {
+          if (list.length === 0) throw new Error("no-business");
+          return list[0];
+        });
+
+    load
+      .then(setBusiness)
+      .catch((err) => {
+        if (err?.message === "no-business") {
+          setBusinessError("No business found. Please complete onboarding.");
+        } else {
+          setBusinessError("Failed to load business.");
+        }
+      })
+      .finally(() => setBusinessLoading(false));
+  }, [paramBusinessId]);
+
+  // ── Load upcoming appointments ───────────────────────────────────────────
+  useEffect(() => {
+    if (!business) return;
+    setApptLoading(true);
+    getBusinessAppointments(business.id, 1, 50)
+      .then((all) => {
+        const upcoming = all
+          .filter(
+            (a) =>
+              a.status !== AppointmentStatus.Canceled &&
+              new Date(a.startDateTime) >= new Date(),
+          )
+          .sort(
+            (a, b) =>
+              new Date(a.startDateTime).getTime() -
+              new Date(b.startDateTime).getTime(),
+          )
+          .slice(0, 10);
+        setAppointments(upcoming);
+      })
+      .catch(() => {/* silently ignore */})
+      .finally(() => setApptLoading(false));
+  }, [business]);
+
+  // ── Load report ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!business) return;
+    setReportLoading(true);
+    getBusinessReport(
+      business.id,
+      new Date(startDate),
+      new Date(endDate + "T23:59:59"),
+    )
+      .then(setReport)
+      .catch(() => {/* silently ignore */})
+      .finally(() => setReportLoading(false));
+  }, [business, startDate, endDate]);
+
+  // ── Loading / error states ────────────────────────────────────────────────
+  if (businessLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-background-dark">
+        <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+      </div>
+    );
+  }
+
+  if (businessError || !business) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50 dark:bg-background-dark p-6">
+        <MaterialIcon name="store_off" className="text-5xl text-gray-400" />
+        <p className="text-gray-600 dark:text-gray-400 text-center">
+          {businessError ?? "No business found."}
+        </p>
+        <Button variant="primary" onClick={() => navigate("/onboarding")}>
+          Set up your business
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+      {/* ── Header ── */}
+      <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              aria-label="Back"
+            >
+              <MaterialIcon name="arrow_back" className="text-xl" />
+            </button>
+            <div>
+              <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
+                {business.name}
+              </h1>
+              <p className="text-xs text-gray-500">
+                {authUser?.name ?? "Business Dashboard"}
+              </p>
+            </div>
+          </div>
+
+          {/* Edit business page button */}
+          <button
+            type="button"
+            onClick={() => navigate(`/business/${business.id}?edit=true`)}
+            className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline shrink-0"
+          >
+            <MaterialIcon name="edit" className="text-base" />
+            Edit Page
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
+
+        {/* ── Stats Section ── */}
+        <section>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide">
+              Performance
+            </h2>
+            {/* Date range picker */}
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+              <MaterialIcon name="date_range" className="text-base" />
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 bg-white dark:bg-surface-dark text-[#111418] dark:text-white text-xs"
+              />
+              <span>–</span>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border border-gray-200 dark:border-gray-700 rounded-lg px-2 py-1 bg-white dark:bg-surface-dark text-[#111418] dark:text-white text-xs"
+              />
+            </div>
+          </div>
+
+          {/* Metric toggles */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {METRIC_DEFS.map((def) => {
+              const active = activeMetrics.includes(def.key);
+              return (
+                <button
+                  key={def.key}
+                  type="button"
+                  onClick={() => toggleMetric(def.key)}
+                  className={[
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
+                    active
+                      ? "bg-primary text-white border-primary shadow-sm"
+                      : "bg-white dark:bg-surface-dark text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary",
+                  ].join(" ")}
+                >
+                  <MaterialIcon name={def.icon} className="text-sm leading-none" />
+                  {def.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Analytics cards */}
+          {reportLoading ? (
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : activeMetrics.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-10 text-center">
+              <MaterialIcon name="insights" className="text-4xl text-gray-300 dark:text-gray-700" />
+              <p className="text-sm text-gray-400">Select metrics above to display analytics</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {METRIC_DEFS.filter((d) => activeMetrics.includes(d.key)).map((def) =>
+                report ? (
+                  <AnalyticCard key={def.key} def={def} report={report} />
+                ) : (
+                  <div
+                    key={def.key}
+                    className="h-24 rounded-2xl bg-gray-100 dark:bg-gray-800/50 border border-dashed border-gray-200 dark:border-gray-700 flex items-center justify-center"
+                  >
+                    <span className="text-xs text-gray-400">No data for this period</span>
+                  </div>
+                ),
+              )}
+            </div>
+          )}
+        </section>
+
+        {/* ── Upcoming Appointments ── */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide">
+              Upcoming Appointments
+            </h2>
+            <button
+              type="button"
+              onClick={() => navigate(`/business/${business.id}/schedule`)}
+              className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+            >
+              View all
+              <MaterialIcon name="chevron_right" className="text-sm" />
+            </button>
+          </div>
+
+          {apptLoading ? (
+            <div className="space-y-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="h-20 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : appointments.length === 0 ? (
+            <Card className="p-6 flex flex-col items-center gap-3 text-center">
+              <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <MaterialIcon
+                  name="calendar_today"
+                  className="text-2xl text-gray-400"
+                />
+              </div>
+              <div>
+                <p className="font-semibold text-[#111418] dark:text-white text-sm">
+                  No upcoming appointments
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  New bookings will appear here.
+                </p>
+              </div>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {appointments.map((appt) => (
+                <Card key={appt.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                        {appt.clientName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {appt.serviceName}
+                      </p>
+                      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
+                        <span className="flex items-center gap-1">
+                          <MaterialIcon
+                            name="calendar_today"
+                            className="text-sm leading-none"
+                          />
+                          {formatDate(appt.startDateTime)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MaterialIcon
+                            name="schedule"
+                            className="text-sm leading-none"
+                          />
+                          {formatTime(appt.startDateTime)} –{" "}
+                          {formatTime(appt.endDateTime)}
+                        </span>
+                        {appt.servicePrice != null && (
+                          <span className="flex items-center gap-1 text-primary font-semibold">
+                            <MaterialIcon
+                              name="payments"
+                              className="text-sm leading-none"
+                            />
+                            ${appt.servicePrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Badge variant="confirmed">Confirmed</Badge>
+                  </div>
+                </Card>
+              ))}
+
+              {/* View full schedule CTA */}
+              <button
+                type="button"
+                onClick={() => navigate(`/business/${business.id}/schedule`)}
+                className="w-full text-center text-sm text-primary font-semibold py-2 hover:underline"
+              >
+                Manage all appointments →
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* ── Quick Links ── */}
+        <section>
+          <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+            Manage
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Services & Working Hours */}
+            <button
+              type="button"
+              onClick={() => navigate(`/dashboard/${business.id}/services`)}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
+            >
+              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
+                <MaterialIcon name="tune" className="text-2xl text-purple-600" />
+              </div>
+              <div>
+                <p className="font-bold text-[#111418] dark:text-white text-sm">
+                  Services & Hours
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Edit working hours, breaks &amp; availability
+                </p>
+              </div>
+              <MaterialIcon
+                name="chevron_right"
+                className="text-gray-400 ml-auto shrink-0"
+              />
+            </button>
+
+            {/* Public business page */}
+            <button
+              type="button"
+              onClick={() => navigate(`/business/${business.id}`)}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
+            >
+              <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <MaterialIcon name="storefront" className="text-2xl text-green-600" />
+              </div>
+              <div>
+                <p className="font-bold text-[#111418] dark:text-white text-sm">
+                  View Public Page
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  See your page as customers see it
+                </p>
+              </div>
+              <MaterialIcon
+                name="chevron_right"
+                className="text-gray-400 ml-auto shrink-0"
+              />
+            </button>
+
+            {/* Edit business page */}
+            <button
+              type="button"
+              onClick={() => navigate(`/business/${business.id}?edit=true`)}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
+            >
+              <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
+                <MaterialIcon name="edit_note" className="text-2xl text-orange-600" />
+              </div>
+              <div>
+                <p className="font-bold text-[#111418] dark:text-white text-sm">
+                  Edit Business Page
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Update info, photos, and description
+                </p>
+              </div>
+              <MaterialIcon
+                name="chevron_right"
+                className="text-gray-400 ml-auto shrink-0"
+              />
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  );
 }

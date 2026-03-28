@@ -30,6 +30,7 @@ export const getAvailableSlotsForService = async (
   return response.data.filter((s) => s.status === ScheduleStatus.AVAILABLE);
 };
 
+
 /**
  * Returns the set of date strings ("YYYY-MM-DD") that have at least one
  * available slot for the given service within the specified month.
@@ -49,6 +50,35 @@ export const getAvailableDatesForMonth = async (
     dates.add(key);
   }
   return dates;
+};
+
+/**
+ * Delete AVAILABLE (unbooked) slots for a service within a date/time window.
+ * dayOfWeek: 0=Mon … 6=Sun (our rule convention)
+ * startTime/endTime: "HH:mm" — only slots whose start falls in [start, end) are deleted
+ * Returns the count of deleted slots.
+ */
+export const deleteAvailableSlotsInWindow = async (
+  serviceId: string,
+  fromDate: Date,
+  toDate: Date,
+  dayOfWeek?: number,
+  startTime?: string,
+  endTime?: string,
+): Promise<number> => {
+  const params: Record<string, string> = {
+    fromDate: fromDate.toISOString(),
+    toDate: toDate.toISOString(),
+  };
+  if (dayOfWeek !== undefined) params.dayOfWeek = String(dayOfWeek);
+  if (startTime) params.startTime = startTime;
+  if (endTime) params.endTime = endTime;
+
+  const response = await apiClient.delete<{ deletedCount: number }>(
+    `/api/schedule/service/${serviceId}/slots/bulk-available`,
+    { params },
+  );
+  return response.data.deletedCount;
 };
 
 /**

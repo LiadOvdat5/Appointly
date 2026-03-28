@@ -67,6 +67,9 @@ builder.Services.AddScoped<SlotGenerationService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<AppointmentValidator>();
 
+// Register Report Services
+builder.Services.AddScoped<IReportService, ReportService>();
+
 // Add authorization services
 builder.Services.AddAuthorization();
 

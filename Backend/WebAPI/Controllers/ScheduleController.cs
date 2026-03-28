@@ -212,6 +212,46 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Delete available slots in a date/time window for a service
+        /// </summary>
+        [HttpDelete("service/{serviceId}/slots/bulk-available")]
+        [EndpointSummary("Delete Available Slots In Window")]
+        [EndpointDescription("Delete all AVAILABLE (unbooked) slots for a service within a date/time window. " +
+            "Optional filters: dayOfWeek (0=Mon–6=Sun), startTime and endTime ('HH:mm') to target a sub-window. " +
+            "BOOKED slots are never touched. Returns the count of deleted slots. " +
+            "Authorization: Only the business/service owner can delete slots.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<object>> DeleteAvailableSlotsInWindow(
+            Guid serviceId,
+            [FromQuery] DateTime fromDate,
+            [FromQuery] DateTime toDate,
+            [FromQuery] int? dayOfWeek = null,
+            [FromQuery] string? startTime = null,
+            [FromQuery] string? endTime = null)
+        {
+            try
+            {
+                var (_, error) = await AuthorizeServiceOwnerAsync(serviceId);
+                if (error != null)
+                    return error;
+
+                if (fromDate >= toDate)
+                    return BadRequest("fromDate must be before toDate.");
+
+                var deleted = await _serviceScheduleRepository.DeleteAvailableSlotsInWindowAsync(
+                    serviceId, fromDate, toDate, dayOfWeek, startTime, endTime);
+
+                return Ok(new { deletedCount = deleted });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Clear all slots for a service
         /// </summary>
         [HttpDelete("service/{serviceId}/clear-slots")]

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-A-Business-Dashboard|F-06-A: Business Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,9 @@ As a **business owner**, I want to **see an overview of my business stats includ
 - `[FE]` Default to current month; allow date range selection
 
 ## Acceptance Criteria
-- [ ] Stats reflect the current calendar month by default
-- [ ] Date range is selectable to adjust the reporting period
-- [ ] Revenue and booking counts update when the date range changes
-- [ ] Top service is calculated from the most-booked service in the period
+- [x] Stats reflect the current calendar month by default
+- [x] Date range is selectable to adjust the reporting period
+- [x] Revenue and booking counts update when the date range changes
+- [x] Top service is calculated from the most-booked service in the period
+
+> **Extended:** Analytics are full-width selectable cards with 7 metrics — Total Bookings, Revenue, Top Service, Cancellations (with rate %), Avg Booking Value, Unique Customers, Busiest Day of Week. Backend `ReportDTO` extended accordingly.

@@ -99,12 +99,45 @@ export const createDateException = (dto: {
   serviceId: string;
   date: string;        // "YYYY-MM-DDT00:00:00"
   isWorkingDay: boolean;
+  startTime?: string;  // "HH:mm:ss" — for working-day exceptions
+  endTime?: string;    // "HH:mm:ss"
   reason?: string;
 }): Promise<DateExceptionDTO> =>
   apiClient.post<DateExceptionDTO>("/api/availability/date-exception", dto).then((r) => r.data);
 
 export const deleteDateException = (exceptionId: string): Promise<void> =>
   apiClient.delete(`/api/availability/date-exception/${exceptionId}`).then(() => undefined);
+
+// ─── Recurring Rules ──────────────────────────────────────────────────────────
+
+export interface RecurringRuleDTO {
+  id: string;
+  serviceId: string;
+  startDate: string;  // ISO datetime
+  endDate: string;    // ISO datetime
+  daysOfWeek: string; // JSON array string e.g. "[0,1,2,3,4]"
+  startTime: string;  // "HH:MM:SS"
+  endTime: string;    // "HH:MM:SS"
+  createdAt: string;
+}
+
+export const getRecurringRules = (serviceId: string): Promise<RecurringRuleDTO[]> =>
+  apiClient
+    .get<RecurringRuleDTO[]>(`/api/availability/service/${serviceId}/recurring-rules`)
+    .then((r) => r.data);
+
+export const createRecurringRule = (dto: {
+  serviceId: string;
+  startDate: string;  // ISO datetime
+  endDate: string;    // ISO datetime
+  daysOfWeek: string; // JSON array string
+  startTime: string;  // "HH:mm:ss"
+  endTime: string;    // "HH:mm:ss"
+}): Promise<RecurringRuleDTO> =>
+  apiClient.post<RecurringRuleDTO>("/api/availability/recurring-rule", dto).then((r) => r.data);
+
+export const deleteRecurringRule = (ruleId: string): Promise<void> =>
+  apiClient.delete(`/api/availability/recurring-rule/${ruleId}`).then(() => undefined);
 
 // ─── Slot Generation ──────────────────────────────────────────────────────────
 

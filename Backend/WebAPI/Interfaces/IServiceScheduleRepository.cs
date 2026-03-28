@@ -19,5 +19,18 @@ namespace WebAPI.Interfaces
         Task<int> BlockAvailableSlotsForDateAsync(Guid serviceId, DateTime date);
         /// <summary>Restore all BLOCKED slots on a specific date back to AVAILABLE. Returns the count restored.</summary>
         Task<int> UnblockSlotsForDateAsync(Guid serviceId, DateTime date);
+        /// <summary>
+        /// Delete AVAILABLE slots in a date/time window. All filters are optional.
+        /// dayOfWeek (0=Mon–6=Sun): if provided, only slots on that weekday are deleted.
+        /// startTime/endTime ("HH:mm"): if provided, only slots whose start falls within [startTime, endTime) are deleted.
+        /// Returns the count of deleted slots.
+        /// </summary>
+        Task<int> DeleteAvailableSlotsInWindowAsync(
+            Guid serviceId,
+            DateTime fromDate,
+            DateTime toDate,
+            int? dayOfWeek = null,
+            string? startTime = null,
+            string? endTime = null);
     }
 }

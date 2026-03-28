@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-A-Business-Dashboard|F-06-A: Business Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -14,6 +14,6 @@ As a **business owner**, I want to **navigate to my business page editor directl
 - `[FE]` Navigation target: `/business/:id` with edit mode automatically activated
 
 ## Acceptance Criteria
-- [ ] A single click from the dashboard opens the business page in Edit Mode
-- [ ] The link is prominently placed in the dashboard header or sidebar
-- [ ] The edit mode is activated automatically upon navigation (no extra click needed)
+- [x] A single click from the dashboard opens the business page in Edit Mode
+- [x] The link is prominently placed in the dashboard header or sidebar
+- [x] The edit mode is activated automatically upon navigation (no extra click needed)

@@ -7,8 +7,11 @@ import {
   AppointmentStatus,
   type AppointmentDTO,
 } from "../services/appointmentService";
-import { getServicesForBusiness } from "../services/businessManagementService";
-import { getPublicBusinessById } from "../services/businessManagementService";
+import {
+  getAvailableSlotsForService,
+  type SlotDTO,
+} from "../services/scheduleService";
+import { getServicesForBusiness, getPublicBusinessById } from "../services/businessManagementService";
 import type { ServiceProfile, BusinessProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { Badge } from "../components/UI/Badge";
@@ -21,17 +24,19 @@ import { ConfirmDialog } from "../components/UI/ConfirmDialog";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+    weekday: "short", month: "short", day: "numeric", year: "numeric",
+  });
+}
+
+function formatDateHeading(d: Date): string {
+  return d.toLocaleDateString(undefined, {
+    weekday: "long", month: "short", day: "numeric",
   });
 }
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
+    hour: "2-digit", minute: "2-digit",
   });
 }
 
@@ -39,16 +44,31 @@ function toDateInputValue(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** "HH:mm" → minutes since midnight */
 function timeToMinutes(t: string): number {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
 }
 
-/** ISO datetime → minutes since midnight */
 function isoToMinutes(iso: string): number {
   const d = new Date(iso);
   return d.getHours() * 60 + d.getMinutes();
+}
+
+function dateKey(iso: string): string {
+  return iso.slice(0, 10);
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type ViewMode = "list" | "grid";
+type RangePreset = "week" | "next-week" | "month";
+
+interface MergedSlot {
+  key: string;           // unique key for rendering
+  startISO: string;
+  endISO: string;
+  isBooked: boolean;
+  appointment?: AppointmentDTO;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -61,12 +81,14 @@ export default function BusinessSchedulePage() {
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
   const [services, setServices] = useState<ServiceProfile[]>([]);
 
-  // All appointments from API
-  const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // View toggle
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
-  // Date range filter
+  // ── LIST VIEW state ───────────────────────────────────────────────────────
+  const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
+  const [listLoading, setListLoading] = useState(true);
+  const [listError, setListError] = useState<string | null>(null);
+
   const today = new Date();
   const thirtyDaysLater = new Date(today);
   thirtyDaysLater.setDate(today.getDate() + 30);
@@ -74,60 +96,116 @@ export default function BusinessSchedulePage() {
   const [startDate, setStartDate] = useState(toDateInputValue(today));
   const [endDate, setEndDate] = useState(toDateInputValue(thirtyDaysLater));
   const [isRangeApplied, setIsRangeApplied] = useState(false);
-
-  // Service filter (empty = all)
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
-
-  // Time filter
   const [timeFrom, setTimeFrom] = useState("");
   const [timeTo, setTimeTo] = useState("");
-
-  // Show canceled toggle
   const [showCanceled, setShowCanceled] = useState(false);
 
-  // Cancel flow
+  // Cancel flow (shared between views)
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
 
-  // ── Load meta + initial appointments ────────────────────────────────────────
+  // ── GRID VIEW state ───────────────────────────────────────────────────────
+  const [gridServiceId, setGridServiceId] = useState<string>("");
+  const [gridPreset, setGridPreset] = useState<RangePreset>("week");
+  const [gridSlots, setGridSlots] = useState<SlotDTO[]>([]);
+  const [gridAppts, setGridAppts] = useState<AppointmentDTO[]>([]);
+  const [gridLoading, setGridLoading] = useState(false);
+  const [gridError, setGridError] = useState<string | null>(null);
+  const [expandedSlotKey, setExpandedSlotKey] = useState<string | null>(null);
+
+  // Compute grid date range from preset
+  const gridRange = useMemo((): [Date, Date] => {
+    const t = new Date();
+    t.setHours(0, 0, 0, 0);
+    if (gridPreset === "week") {
+      const end = new Date(t);
+      end.setDate(t.getDate() + 7);
+      return [t, end];
+    }
+    if (gridPreset === "next-week") {
+      const start = new Date(t);
+      start.setDate(t.getDate() + 7);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 7);
+      return [start, end];
+    }
+    // month
+    const end = new Date(t);
+    end.setDate(t.getDate() + 30);
+    return [t, end];
+  }, [gridPreset]);
+
+  // ── Load meta ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!businessId) return;
-
     Promise.all([
       getPublicBusinessById(businessId),
       getServicesForBusiness(businessId),
     ]).then(([biz, svcs]) => {
       setBusiness(biz);
       setServices(svcs);
+      if (svcs.length > 0) setGridServiceId(svcs[0].id);
     });
 
-    fetchAppointments(businessId, false);
+    fetchListAppointments(businessId, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [businessId]);
 
-  function fetchAppointments(bizId: string, withRange: boolean) {
-    setLoading(true);
-    setError(null);
+  // ── Load grid data when service/preset/view changes ───────────────────────
+  useEffect(() => {
+    if (viewMode !== "grid" || !businessId || !gridServiceId) return;
+    loadGridData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, businessId, gridServiceId, gridPreset]);
 
+  async function loadGridData() {
+    if (!businessId || !gridServiceId) return;
+    setGridLoading(true);
+    setGridError(null);
+    setExpandedSlotKey(null);
+    try {
+      const [from, to] = gridRange;
+      const toEnd = new Date(to);
+      toEnd.setHours(23, 59, 59);
+
+      const [slots, appts] = await Promise.all([
+        getAvailableSlotsForService(gridServiceId, from, toEnd),
+        getBusinessAppointmentsByRange(businessId, from, toEnd),
+      ]);
+      setGridSlots(slots);
+      setGridAppts(
+        appts.filter(
+          (a) =>
+            a.serviceId === gridServiceId &&
+            a.status !== AppointmentStatus.Canceled,
+        ),
+      );
+    } catch {
+      setGridError("Failed to load slot data.");
+    } finally {
+      setGridLoading(false);
+    }
+  }
+
+  // ── LIST fetching ─────────────────────────────────────────────────────────
+  function fetchListAppointments(bizId: string, withRange: boolean) {
+    setListLoading(true);
+    setListError(null);
     const req = withRange
-      ? getBusinessAppointmentsByRange(
-          bizId,
-          new Date(startDate),
-          new Date(endDate + "T23:59:59"),
-        )
+      ? getBusinessAppointmentsByRange(bizId, new Date(startDate), new Date(endDate + "T23:59:59"))
       : getBusinessAppointments(bizId);
-
     req
       .then(setAllAppointments)
-      .catch(() => setError("Failed to load appointments."))
-      .finally(() => setLoading(false));
+      .catch(() => setListError("Failed to load appointments."))
+      .finally(() => setListLoading(false));
   }
 
   function handleApplyDateRange() {
     if (!businessId || !startDate || !endDate) return;
     if (new Date(startDate) > new Date(endDate)) return;
     setIsRangeApplied(true);
-    fetchAppointments(businessId, true);
+    fetchListAppointments(businessId, true);
   }
 
   function handleClearDateRange() {
@@ -138,24 +216,14 @@ export default function BusinessSchedulePage() {
     setStartDate(toDateInputValue(t));
     setEndDate(toDateInputValue(ahead));
     setIsRangeApplied(false);
-    fetchAppointments(businessId, false);
+    fetchListAppointments(businessId, false);
   }
 
-  // ── Client-side filtering ────────────────────────────────────────────────────
+  // ── List filtering ────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     let list = allAppointments;
-
-    // Exclude canceled unless toggled
-    if (!showCanceled) {
-      list = list.filter((a) => a.status !== AppointmentStatus.Canceled);
-    }
-
-    // Service filter
-    if (selectedServiceId) {
-      list = list.filter((a) => a.serviceId === selectedServiceId);
-    }
-
-    // Time filter
+    if (!showCanceled) list = list.filter((a) => a.status !== AppointmentStatus.Canceled);
+    if (selectedServiceId) list = list.filter((a) => a.serviceId === selectedServiceId);
     if (timeFrom) {
       const fromMin = timeToMinutes(timeFrom);
       list = list.filter((a) => isoToMinutes(a.startDateTime) >= fromMin);
@@ -164,15 +232,56 @@ export default function BusinessSchedulePage() {
       const toMin = timeToMinutes(timeTo);
       list = list.filter((a) => isoToMinutes(a.startDateTime) <= toMin);
     }
-
-    // Sort ascending
     return [...list].sort(
-      (a, b) =>
-        new Date(a.startDateTime).getTime() -
-        new Date(b.startDateTime).getTime(),
+      (a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime(),
     );
   }, [allAppointments, showCanceled, selectedServiceId, timeFrom, timeTo]);
 
+  // ── Grid merge: available slots + booked appointments, grouped by day ─────
+  const gridDays = useMemo(() => {
+    // Build a map from date string → merged slots
+    const byDay = new Map<string, MergedSlot[]>();
+
+    // Available slots
+    for (const slot of gridSlots) {
+      const key = dateKey(slot.startDateTime);
+      if (!byDay.has(key)) byDay.set(key, []);
+      byDay.get(key)!.push({
+        key: `avail-${slot.id}`,
+        startISO: slot.startDateTime,
+        endISO: slot.endDateTime,
+        isBooked: false,
+      });
+    }
+
+    // Booked appointments — create pseudo-slots
+    for (const appt of gridAppts) {
+      const key = dateKey(appt.startDateTime);
+      if (!byDay.has(key)) byDay.set(key, []);
+      byDay.get(key)!.push({
+        key: `booked-${appt.id}`,
+        startISO: appt.startDateTime,
+        endISO: appt.endDateTime,
+        isBooked: true,
+        appointment: appt,
+      });
+    }
+
+    // Sort each day's slots by time, then sort days
+    const days = Array.from(byDay.entries())
+      .map(([dateStr, slots]) => ({
+        dateStr,
+        date: new Date(dateStr),
+        slots: slots.sort(
+          (a, b) => new Date(a.startISO).getTime() - new Date(b.startISO).getTime(),
+        ),
+      }))
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    return days;
+  }, [gridSlots, gridAppts]);
+
+  // ── Cancel (shared) ───────────────────────────────────────────────────────
   async function handleConfirmCancel() {
     if (!confirmCancelId) return;
     const id = confirmCancelId;
@@ -180,11 +289,13 @@ export default function BusinessSchedulePage() {
     setCancelingId(id);
     try {
       await cancelAppointment(id);
+      // Update list view
       setAllAppointments((prev) =>
-        prev.map((a) =>
-          a.id === id ? { ...a, status: AppointmentStatus.Canceled } : a,
-        ),
+        prev.map((a) => a.id === id ? { ...a, status: AppointmentStatus.Canceled } : a),
       );
+      // Update grid view
+      setGridAppts((prev) => prev.filter((a) => a.id !== id));
+      setExpandedSlotKey(null);
     } catch {
       // silently ignore
     } finally {
@@ -192,246 +303,605 @@ export default function BusinessSchedulePage() {
     }
   }
 
-  // ── Render ───────────────────────────────────────────────────────────────────
+  // ─── Render ────────────────────────────────────────────────────────────────
   return (
     <>
-    <ConfirmDialog
-      open={confirmCancelId !== null}
-      title="Cancel appointment?"
-      message="Are you sure you want to cancel this appointment? This action cannot be undone."
-      confirmLabel="Yes, cancel it"
-      cancelLabel="Keep it"
-      destructive
-      onConfirm={handleConfirmCancel}
-      onCancel={() => setConfirmCancelId(null)}
-    />
-    <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
-      {/* Header */}
-      <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          aria-label="Back"
-        >
-          <MaterialIcon name="arrow_back" className="text-xl" />
-        </button>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-bold text-[#111418] dark:text-white text-base truncate">
-            {business?.name ?? "Business"} — Schedule
-          </h1>
-          <p className="text-xs text-gray-500">All appointments</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate(`/business/${businessId}`)}
-          className="text-xs text-primary hover:underline flex items-center gap-1 shrink-0"
-        >
-          View page
-          <MaterialIcon name="open_in_new" className="text-xs" />
-        </button>
-      </div>
+      <ConfirmDialog
+        open={confirmCancelId !== null}
+        title="Cancel appointment?"
+        message="Are you sure you want to cancel this appointment? This action cannot be undone."
+        confirmLabel="Yes, cancel it"
+        cancelLabel="Keep it"
+        destructive
+        onConfirm={handleConfirmCancel}
+        onCancel={() => setConfirmCancelId(null)}
+      />
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
-        {/* ── Filter panel ─────────────────────────────────────────────── */}
-        <Card className="p-4 space-y-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-            Filters
-          </p>
+      <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+        {/* ── Header ── */}
+        <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
+          <div className="max-w-4xl mx-auto flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              aria-label="Back"
+            >
+              <MaterialIcon name="arrow_back" className="text-xl" />
+            </button>
 
-          {/* Date range */}
-          <div className="space-y-1.5">
-            <p className="text-xs text-gray-500 font-medium">Date range</p>
-            <div className="flex flex-wrap gap-3 items-end">
-              <div className="flex-1 min-w-32">
-                <label className="block text-[11px] text-gray-400 mb-1">From</label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
-              <div className="flex-1 min-w-32">
-                <label className="block text-[11px] text-gray-400 mb-1">To</label>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <Button variant="primary" onClick={handleApplyDateRange}>
-                  Apply
-                </Button>
-                {isRangeApplied && (
-                  <Button variant="ghost" onClick={handleClearDateRange}>
-                    Clear
-                  </Button>
-                )}
-              </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-bold text-[#111418] dark:text-white text-base truncate">
+                {business?.name ?? "Business"} — Schedule
+              </h1>
+              <p className="text-xs text-gray-500">Appointments &amp; slots</p>
             </div>
-          </div>
 
-          {/* Service + Time row */}
-          <div className="flex flex-wrap gap-3">
-            {/* Service filter */}
-            <div className="flex-1 min-w-40">
-              <label className="block text-[11px] text-gray-400 mb-1">Service</label>
-              <select
-                value={selectedServiceId}
-                onChange={(e) => setSelectedServiceId(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm px-3 py-2 text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+            {/* View toggle */}
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-1 gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className={[
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+                  viewMode === "list"
+                    ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300",
+                ].join(" ")}
               >
-                <option value="">All services</option>
-                {services.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
+                <MaterialIcon name="view_list" className="text-sm" />
+                List
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={[
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+                  viewMode === "grid"
+                    ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
+                    : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300",
+                ].join(" ")}
+              >
+                <MaterialIcon name="grid_view" className="text-sm" />
+                Slots
+              </button>
             </div>
 
-            {/* Time from */}
-            <div className="flex-1 min-w-28">
-              <label className="block text-[11px] text-gray-400 mb-1">
-                Time from
-              </label>
-              <Input
-                type="time"
-                value={timeFrom}
-                onChange={(e) => setTimeFrom(e.target.value)}
-              />
-            </div>
-
-            {/* Time to */}
-            <div className="flex-1 min-w-28">
-              <label className="block text-[11px] text-gray-400 mb-1">
-                Time to
-              </label>
-              <Input
-                type="time"
-                value={timeTo}
-                onChange={(e) => setTimeTo(e.target.value)}
-              />
-            </div>
+            <button
+              type="button"
+              onClick={() => navigate(`/business/${businessId}`)}
+              className="text-xs text-primary hover:underline flex items-center gap-1 shrink-0"
+            >
+              View page
+              <MaterialIcon name="open_in_new" className="text-xs" />
+            </button>
           </div>
+        </div>
 
-          {/* Show canceled toggle */}
-          <label className="flex items-center gap-2 cursor-pointer w-fit">
-            <input
-              type="checkbox"
-              checked={showCanceled}
-              onChange={(e) => setShowCanceled(e.target.checked)}
-              className="rounded accent-primary"
+        {/* ── Content ── */}
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          {viewMode === "list" ? (
+            <ListView
+              services={services}
+              filtered={filtered}
+              loading={listLoading}
+              error={listError}
+              startDate={startDate}
+              endDate={endDate}
+              isRangeApplied={isRangeApplied}
+              selectedServiceId={selectedServiceId}
+              timeFrom={timeFrom}
+              timeTo={timeTo}
+              showCanceled={showCanceled}
+              cancelingId={cancelingId}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+              onApplyRange={handleApplyDateRange}
+              onClearRange={handleClearDateRange}
+              onServiceChange={setSelectedServiceId}
+              onTimeFromChange={setTimeFrom}
+              onTimeToChange={setTimeTo}
+              onShowCanceledChange={setShowCanceled}
+              onRequestCancel={setConfirmCancelId}
             />
-            <span className="text-xs text-gray-600 dark:text-gray-400">
-              Include canceled appointments
-            </span>
-          </label>
-        </Card>
-
-        {/* ── Result count ──────────────────────────────────────────────── */}
-        {!loading && !error && (
-          <p className="text-xs text-gray-500 px-1">
-            {filtered.length === 0
-              ? "No appointments found"
-              : `${filtered.length} appointment${filtered.length === 1 ? "" : "s"}`}
-          </p>
-        )}
-
-        {/* ── Loading ───────────────────────────────────────────────────── */}
-        {loading && (
-          <div className="flex justify-center py-12">
-            <span className="h-7 w-7 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
-          </div>
-        )}
-
-        {/* ── Error ─────────────────────────────────────────────────────── */}
-        {error && (
-          <div className="flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
-            <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        {/* ── Empty state ───────────────────────────────────────────────── */}
-        {!loading && !error && filtered.length === 0 && (
-          <div className="flex flex-col items-center gap-3 py-16 text-center">
-            <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <MaterialIcon name="event_busy" className="text-2xl text-gray-400" />
-            </div>
-            <p className="font-semibold text-[#111418] dark:text-white text-sm">
-              No appointments
-            </p>
-            <p className="text-xs text-gray-500">
-              Try adjusting your filters or expanding the date range.
-            </p>
-          </div>
-        )}
-
-        {/* ── Appointment list ──────────────────────────────────────────── */}
-        {!loading &&
-          filtered.map((appt) => (
-            <Card key={appt.id} className="p-4 space-y-3">
-              {/* Top row: customer + status badge */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                    {appt.clientName}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">{appt.serviceName}</p>
-                </div>
-                <StatusBadge status={appt.status} />
-              </div>
-
-              {/* Date / time / price */}
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <MaterialIcon name="calendar_today" className="text-sm leading-none" />
-                  {formatDate(appt.startDateTime)}
-                </span>
-                <span className="flex items-center gap-1">
-                  <MaterialIcon name="schedule" className="text-sm leading-none" />
-                  {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
-                </span>
-                {appt.servicePrice != null && (
-                  <span className="flex items-center gap-1 font-semibold text-primary">
-                    <MaterialIcon name="payments" className="text-sm leading-none" />
-                    ${appt.servicePrice.toFixed(2)}
-                  </span>
-                )}
-              </div>
-
-              {/* Confirmation code + cancel */}
-              <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
-                <span className="text-[10px] font-mono text-gray-400">
-                  #{appt.confirmationCode}
-                </span>
-                {appt.status === AppointmentStatus.Scheduled && (
-                  <button
-                    type="button"
-                    onClick={() => setConfirmCancelId(appt.id)}
-                    disabled={cancelingId === appt.id}
-                    className="text-xs text-red-500 hover:underline disabled:opacity-50"
-                  >
-                    {cancelingId === appt.id ? "Canceling…" : "Cancel"}
-                  </button>
-                )}
-              </div>
-            </Card>
-          ))}
+          ) : (
+            <GridView
+              services={services}
+              gridServiceId={gridServiceId}
+              gridPreset={gridPreset}
+              gridDays={gridDays}
+              loading={gridLoading}
+              error={gridError}
+              expandedSlotKey={expandedSlotKey}
+              cancelingId={cancelingId}
+              onServiceChange={(id) => { setGridServiceId(id); }}
+              onPresetChange={(p) => { setGridPreset(p); }}
+              onRefresh={loadGridData}
+              onToggleExpand={(key) => setExpandedSlotKey((prev) => prev === key ? null : key)}
+              onRequestCancel={setConfirmCancelId}
+            />
+          )}
+        </div>
       </div>
-    </div>
     </>
   );
 }
 
-// ── Status badge helper ────────────────────────────────────────────────────────
+// ─── ListView ─────────────────────────────────────────────────────────────────
+
+function ListView({
+  services,
+  filtered,
+  loading,
+  error,
+  startDate,
+  endDate,
+  isRangeApplied,
+  selectedServiceId,
+  timeFrom,
+  timeTo,
+  showCanceled,
+  cancelingId,
+  onStartDateChange,
+  onEndDateChange,
+  onApplyRange,
+  onClearRange,
+  onServiceChange,
+  onTimeFromChange,
+  onTimeToChange,
+  onShowCanceledChange,
+  onRequestCancel,
+}: {
+  services: ServiceProfile[];
+  filtered: AppointmentDTO[];
+  loading: boolean;
+  error: string | null;
+  startDate: string;
+  endDate: string;
+  isRangeApplied: boolean;
+  selectedServiceId: string;
+  timeFrom: string;
+  timeTo: string;
+  showCanceled: boolean;
+  cancelingId: string | null;
+  onStartDateChange: (v: string) => void;
+  onEndDateChange: (v: string) => void;
+  onApplyRange: () => void;
+  onClearRange: () => void;
+  onServiceChange: (v: string) => void;
+  onTimeFromChange: (v: string) => void;
+  onTimeToChange: (v: string) => void;
+  onShowCanceledChange: (v: boolean) => void;
+  onRequestCancel: (id: string) => void;
+}) {
+  return (
+    <div className="space-y-5">
+      {/* Filter panel */}
+      <Card className="p-4 space-y-4">
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Filters</p>
+
+        <div className="space-y-1.5">
+          <p className="text-xs text-gray-500 font-medium">Date range</p>
+          <div className="flex flex-wrap gap-3 items-end">
+            <div className="flex-1 min-w-32">
+              <label className="block text-[11px] text-gray-400 mb-1">From</label>
+              <Input type="date" value={startDate} onChange={(e) => onStartDateChange(e.target.value)} />
+            </div>
+            <div className="flex-1 min-w-32">
+              <label className="block text-[11px] text-gray-400 mb-1">To</label>
+              <Input type="date" value={endDate} onChange={(e) => onEndDateChange(e.target.value)} />
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button variant="primary" onClick={onApplyRange}>Apply</Button>
+              {isRangeApplied && <Button variant="ghost" onClick={onClearRange}>Clear</Button>}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <div className="flex-1 min-w-40">
+            <label className="block text-[11px] text-gray-400 mb-1">Service</label>
+            <select
+              value={selectedServiceId}
+              onChange={(e) => onServiceChange(e.target.value)}
+              className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm px-3 py-2 text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+            >
+              <option value="">All services</option>
+              {services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+          <div className="flex-1 min-w-28">
+            <label className="block text-[11px] text-gray-400 mb-1">Time from</label>
+            <Input type="time" value={timeFrom} onChange={(e) => onTimeFromChange(e.target.value)} />
+          </div>
+          <div className="flex-1 min-w-28">
+            <label className="block text-[11px] text-gray-400 mb-1">Time to</label>
+            <Input type="time" value={timeTo} onChange={(e) => onTimeToChange(e.target.value)} />
+          </div>
+        </div>
+
+        <label className="flex items-center gap-2 cursor-pointer w-fit">
+          <input
+            type="checkbox"
+            checked={showCanceled}
+            onChange={(e) => onShowCanceledChange(e.target.checked)}
+            className="rounded accent-primary"
+          />
+          <span className="text-xs text-gray-600 dark:text-gray-400">Include canceled appointments</span>
+        </label>
+      </Card>
+
+      {!loading && !error && (
+        <p className="text-xs text-gray-500 px-1">
+          {filtered.length === 0 ? "No appointments found" : `${filtered.length} appointment${filtered.length === 1 ? "" : "s"}`}
+        </p>
+      )}
+
+      {loading && (
+        <div className="flex justify-center py-12">
+          <span className="h-7 w-7 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+          <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && filtered.length === 0 && (
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <MaterialIcon name="event_busy" className="text-2xl text-gray-400" />
+          </div>
+          <p className="font-semibold text-[#111418] dark:text-white text-sm">No appointments</p>
+          <p className="text-xs text-gray-500">Try adjusting your filters or expanding the date range.</p>
+        </div>
+      )}
+
+      {!loading && filtered.map((appt) => (
+        <Card key={appt.id} className="p-4 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-semibold text-[#111418] dark:text-white text-sm">{appt.clientName}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{appt.serviceName}</p>
+            </div>
+            <StatusBadge status={appt.status} />
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+            <span className="flex items-center gap-1">
+              <MaterialIcon name="calendar_today" className="text-sm leading-none" />
+              {formatDate(appt.startDateTime)}
+            </span>
+            <span className="flex items-center gap-1">
+              <MaterialIcon name="schedule" className="text-sm leading-none" />
+              {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+            </span>
+            {appt.servicePrice != null && (
+              <span className="flex items-center gap-1 font-semibold text-primary">
+                <MaterialIcon name="payments" className="text-sm leading-none" />
+                ${appt.servicePrice.toFixed(2)}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
+            <span className="text-[10px] font-mono text-gray-400">#{appt.confirmationCode}</span>
+            {appt.status === AppointmentStatus.Scheduled && (
+              <button
+                type="button"
+                onClick={() => onRequestCancel(appt.id)}
+                disabled={cancelingId === appt.id}
+                className="text-xs text-red-500 hover:underline disabled:opacity-50"
+              >
+                {cancelingId === appt.id ? "Canceling…" : "Cancel"}
+              </button>
+            )}
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+// ─── GridView ─────────────────────────────────────────────────────────────────
+
+function GridView({
+  services,
+  gridServiceId,
+  gridPreset,
+  gridDays,
+  loading,
+  error,
+  expandedSlotKey,
+  cancelingId,
+  onServiceChange,
+  onPresetChange,
+  onRefresh,
+  onToggleExpand,
+  onRequestCancel,
+}: {
+  services: ServiceProfile[];
+  gridServiceId: string;
+  gridPreset: RangePreset;
+  gridDays: { dateStr: string; date: Date; slots: MergedSlot[] }[];
+  loading: boolean;
+  error: string | null;
+  expandedSlotKey: string | null;
+  cancelingId: string | null;
+  onServiceChange: (id: string) => void;
+  onPresetChange: (p: RangePreset) => void;
+  onRefresh: () => void;
+  onToggleExpand: (key: string) => void;
+  onRequestCancel: (id: string) => void;
+}) {
+  const totalBooked = gridDays.reduce((s, d) => s + d.slots.filter((sl) => sl.isBooked).length, 0);
+  const totalFree = gridDays.reduce((s, d) => s + d.slots.filter((sl) => !sl.isBooked).length, 0);
+
+  const presets: { value: RangePreset; label: string }[] = [
+    { value: "week", label: "This week" },
+    { value: "next-week", label: "Next week" },
+    { value: "month", label: "Next 30 days" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Controls bar */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Service selector */}
+        <div className="flex-1 min-w-48">
+          <select
+            value={gridServiceId}
+            onChange={(e) => onServiceChange(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm px-3 py-2 text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40"
+          >
+            {services.length === 0 && <option value="">No services</option>}
+            {services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </div>
+
+        {/* Range preset pills */}
+        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-1 gap-1">
+          {presets.map((p) => (
+            <button
+              key={p.value}
+              type="button"
+              onClick={() => onPresetChange(p.value)}
+              className={[
+                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+                gridPreset === p.value
+                  ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
+                  : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300",
+              ].join(" ")}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Refresh */}
+        <button
+          type="button"
+          onClick={onRefresh}
+          className="p-2 rounded-xl bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary hover:border-primary transition-colors"
+          title="Refresh"
+        >
+          <MaterialIcon name="refresh" className="text-base" />
+        </button>
+      </div>
+
+      {/* Summary row */}
+      {!loading && !error && (
+        <div className="flex items-center gap-4 px-1">
+          <span className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span className="inline-block w-3 h-3 rounded-sm bg-primary/20 border border-primary/40" />
+            {totalBooked} booked
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span className="inline-block w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600" />
+            {totalFree} free
+          </span>
+        </div>
+      )}
+
+      {/* Loading */}
+      {loading && (
+        <div className="flex justify-center py-16">
+          <span className="h-7 w-7 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+          <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      )}
+
+      {/* No service */}
+      {!loading && !error && services.length === 0 && (
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <MaterialIcon name="content_cut" className="text-3xl text-gray-400" />
+          <p className="text-sm text-gray-500">No services configured yet.</p>
+        </div>
+      )}
+
+      {/* Empty days */}
+      {!loading && !error && services.length > 0 && gridDays.length === 0 && (
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <MaterialIcon name="calendar_today" className="text-2xl text-gray-400" />
+          </div>
+          <p className="font-semibold text-[#111418] dark:text-white text-sm">No slots in this range</p>
+          <p className="text-xs text-gray-500">Generate slots for this service from Services &amp; Hours.</p>
+        </div>
+      )}
+
+      {/* Day sections */}
+      {!loading && !error && gridDays.map((day) => {
+        const bookedCount = day.slots.filter((s) => s.isBooked).length;
+        const freeCount = day.slots.filter((s) => !s.isBooked).length;
+
+        return (
+          <div key={day.dateStr} className="space-y-2">
+            {/* Day header */}
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-bold text-[#111418] dark:text-white">
+                {formatDateHeading(day.date)}
+              </p>
+              <div className="flex items-center gap-2 text-[11px] text-gray-400">
+                {bookedCount > 0 && (
+                  <span className="flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 rounded-full bg-primary" />
+                    {bookedCount} booked
+                  </span>
+                )}
+                {freeCount > 0 && (
+                  <span className="text-gray-300 dark:text-gray-600">·</span>
+                )}
+                {freeCount > 0 && (
+                  <span>{freeCount} free</span>
+                )}
+              </div>
+              <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+            </div>
+
+            {/* Slot chips grid */}
+            <div className="flex flex-wrap gap-2">
+              {day.slots.map((slot) => (
+                <SlotChip
+                  key={slot.key}
+                  slot={slot}
+                  isExpanded={expandedSlotKey === slot.key}
+                  cancelingId={cancelingId}
+                  onToggle={() => slot.isBooked && onToggleExpand(slot.key)}
+                  onRequestCancel={onRequestCancel}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── SlotChip ─────────────────────────────────────────────────────────────────
+
+function SlotChip({
+  slot,
+  isExpanded,
+  cancelingId,
+  onToggle,
+  onRequestCancel,
+}: {
+  slot: MergedSlot;
+  isExpanded: boolean;
+  cancelingId: string | null;
+  onToggle: () => void;
+  onRequestCancel: (id: string) => void;
+}) {
+  const time = formatTime(slot.startISO);
+  const appt = slot.appointment;
+
+  if (!slot.isBooked) {
+    // Available slot — non-interactive chip
+    return (
+      <div className="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500 font-medium select-none">
+        {time}
+      </div>
+    );
+  }
+
+  // Booked slot chip + optional expanded detail
+  return (
+    <div className="flex flex-col">
+      <button
+        type="button"
+        onClick={onToggle}
+        className={[
+          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all",
+          isExpanded
+            ? "bg-primary text-white border-primary shadow-md"
+            : "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
+        ].join(" ")}
+      >
+        <MaterialIcon name="person" className="text-xs leading-none" />
+        {time}
+        {appt && (
+          <span className="max-w-20 truncate opacity-80">
+            {appt.clientName.split(" ")[0]}
+          </span>
+        )}
+        <MaterialIcon
+          name={isExpanded ? "expand_less" : "expand_more"}
+          className="text-xs leading-none opacity-70"
+        />
+      </button>
+
+      {/* Expanded appointment detail */}
+      {isExpanded && appt && (
+        <div className="mt-2 w-72 rounded-xl border border-primary/20 bg-white dark:bg-gray-900 shadow-lg p-4 space-y-3 z-10">
+          {/* Top row */}
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                {appt.clientName}
+              </p>
+              <p className="text-xs text-gray-500 mt-0.5 truncate">{appt.serviceName}</p>
+            </div>
+            <Badge variant="active">Scheduled</Badge>
+          </div>
+
+          {/* Details */}
+          <div className="flex flex-col gap-1 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <MaterialIcon name="schedule" className="text-sm leading-none" />
+              {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+            </span>
+            {appt.clientEmail && (
+              <span className="flex items-center gap-1.5">
+                <MaterialIcon name="mail" className="text-sm leading-none" />
+                {appt.clientEmail}
+              </span>
+            )}
+            {appt.servicePrice != null && (
+              <span className="flex items-center gap-1.5 text-primary font-semibold">
+                <MaterialIcon name="payments" className="text-sm leading-none" />
+                ${appt.servicePrice.toFixed(2)}
+              </span>
+            )}
+            {appt.notes && (
+              <span className="flex items-start gap-1.5">
+                <MaterialIcon name="notes" className="text-sm leading-none mt-0.5" />
+                <span className="italic">{appt.notes}</span>
+              </span>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
+            <span className="text-[10px] font-mono text-gray-400">#{appt.confirmationCode}</span>
+            <button
+              type="button"
+              onClick={() => onRequestCancel(appt.id)}
+              disabled={cancelingId === appt.id}
+              className="text-xs text-red-500 hover:underline disabled:opacity-50 font-semibold"
+            >
+              {cancelingId === appt.id ? "Canceling…" : "Cancel appointment"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── StatusBadge ──────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: number }) {
-  if (status === AppointmentStatus.Canceled)
-    return <Badge variant="cancelled">Canceled</Badge>;
-  if (status === AppointmentStatus.Completed)
-    return <Badge variant="confirmed">Completed</Badge>;
+  if (status === AppointmentStatus.Canceled) return <Badge variant="cancelled">Canceled</Badge>;
+  if (status === AppointmentStatus.Completed) return <Badge variant="confirmed">Completed</Badge>;
   return <Badge variant="active">Scheduled</Badge>;
 }

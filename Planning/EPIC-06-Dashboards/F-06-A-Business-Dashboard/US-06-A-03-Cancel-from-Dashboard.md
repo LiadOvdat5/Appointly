@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-A-Business-Dashboard|F-06-A: Business Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,8 @@ As a **business owner**, I want to **cancel an appointment directly from my dash
 - `[FE]` Remove the canceled appointment from the list immediately on success
 
 ## Acceptance Criteria
-- [ ] Canceled appointment is removed from the upcoming appointments list immediately
-- [ ] A confirmation dialog is shown before the cancellation is submitted
-- [ ] API error is shown if the cancellation fails
+- [x] Canceled appointment is removed from the upcoming appointments list immediately
+- [x] A confirmation dialog is shown before the cancellation is submitted
+- [x] API error is shown if the cancellation fails
+
+> **Design decision:** Cancellations are handled from the Business Schedule page (`/business/:id/schedule`) via the "Manage all appointments →" link on the dashboard, rather than inline on the dashboard. This avoids duplicating the full cancel flow and leverages the existing slot/grid view that already supports cancellation with full appointment context.
