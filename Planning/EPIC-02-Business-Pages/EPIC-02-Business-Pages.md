@@ -15,3 +15,4 @@
 | B   | [[F-02-B-Public-Business-Page\|Feature B: Public Business Page]]     | ✅ Done |
 | C   | [[F-02-C-Owner-Edit-Mode\|Feature C: Owner Edit Mode]]               | ✅ Done |
 | D   | [[F-02-D-Business-Authorization\|Feature D: Business Authorization]] | ✅ Done |
+| E   | [[F-02-E-Staff-Management\|Feature E: Staff Management]]             | 🔲 Not Started |
