@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
@@ -18,6 +18,11 @@ import {
   uploadBusinessBanner,
   uploadBusinessSearchImage,
 } from "../services/businessManagementService";
+import {
+  followBusiness,
+  unfollowBusiness,
+  getFollowStatus,
+} from "../services/followService";
 import { fetchCategories } from "../services/categoryService";
 import {
   getAvailableSlotsForService,
@@ -637,6 +642,10 @@ export default function PublicBusinessPage() {
     authUser != null &&
     authUser.id === page.business.ownerId;
 
+  // ── Follow state ──────────────────────────────────────────────────────────
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
+
   // ── Load business + services + categories ──────────────────────────────────
   useEffect(() => {
     if (!businessId) return;
@@ -658,6 +667,16 @@ export default function PublicBusinessPage() {
 
     return () => { cancelled = true; };
   }, [businessId]);
+
+  // ── Load follow status once business is ready ────────────────────────────
+  useEffect(() => {
+    if (page.status !== "ready" || !isAuthenticated || isOwner || !businessId) return;
+    let cancelled = false;
+    getFollowStatus(businessId)
+      .then((s) => { if (!cancelled) setIsFollowing(s.isFollowing); })
+      .catch(() => { /* silently ignore — user may not be authenticated */ });
+    return () => { cancelled = true; };
+  }, [page.status, isAuthenticated, isOwner, businessId]);
 
   // ── Auto-activate edit mode when ?edit=true ───────────────────────────────
   useEffect(() => {
@@ -835,6 +854,24 @@ export default function PublicBusinessPage() {
       }
     } catch {
       dispatch({ type: "SET_SERVICE_ERROR", message: "Failed to save service." });
+    }
+  }
+
+  async function handleFollowToggle() {
+    if (!businessId || isFollowLoading) return;
+    setIsFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await unfollowBusiness(businessId);
+        setIsFollowing(false);
+      } else {
+        await followBusiness(businessId);
+        setIsFollowing(true);
+      }
+    } catch {
+      // Silently ignore — could add a toast later
+    } finally {
+      setIsFollowLoading(false);
     }
   }
 
@@ -1232,6 +1269,31 @@ export default function PublicBusinessPage() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Follow button (customers only, view mode) */}
+          {!isEditing && isAuthenticated && !isOwner && (
+            <button
+              type="button"
+              onClick={handleFollowToggle}
+              disabled={isFollowLoading}
+              className={[
+                "flex items-center gap-2 self-start rounded-full px-5 py-2 text-sm font-semibold transition-all disabled:opacity-50",
+                isFollowing
+                  ? "bg-primary/10 text-primary border border-primary/30 hover:bg-red-50 hover:text-red-500 hover:border-red-200 dark:hover:bg-red-900/20"
+                  : "bg-primary text-white hover:brightness-95 shadow-sm",
+              ].join(" ")}
+            >
+              {isFollowLoading ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                <MaterialIcon
+                  name="favorite"
+                  className={["text-base leading-none", isFollowing ? "icon-filled" : ""].filter(Boolean).join(" ")}
+                />
+              )}
+              {isFollowing ? "Following" : "Follow"}
+            </button>
           )}
 
           {/* Theme color picker (edit mode only) */}

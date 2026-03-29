@@ -1,7 +1,7 @@
-import React, { useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "../redux/store";
+import type { AppDispatch, RootState } from "../redux/store";
 import type { Business } from "../types/search";
 import {
   setSearchQuery,
@@ -10,7 +10,6 @@ import {
   setError,
   setResults,
   selectBusiness,
-  toggleFavorite,
   setCategories,
   setAvailabilityDate,
   setAvailabilityTime,
@@ -23,7 +22,6 @@ import {
   selectError,
   selectViewMode,
   selectSelectedCategories,
-  selectFavorites,
   selectTotalCount,
   selectHasMore,
   selectCurrentPage,
@@ -41,6 +39,11 @@ import {
   searchByAvailability,
 } from "../services/businessService";
 import { fetchCategories } from "../services/categoryService";
+import {
+  followBusiness,
+  unfollowBusiness,
+  getFollowedBusinesses,
+} from "../services/followService";
 import { useLocationTracking } from "../hooks/useLocationTracking";
 import { SearchHeader } from "../components/search/SearchHeader";
 import { SearchListView } from "../components/search/SearchListView";
@@ -61,6 +64,14 @@ export function SearchPage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  // Auth
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const authStatus = useSelector((s: RootState) => s.auth.status);
+  const isAuthenticated = authStatus === "authenticated";
+
+  // Local follow state (backed by API when authenticated)
+  const [followedIds, setFollowedIds] = useState<string[]>([]);
+
   // Redux selectors
   const searchQuery = useSelector(selectSearchQuery);
   const results = useSelector(selectResults);
@@ -68,7 +79,6 @@ export function SearchPage() {
   const error = useSelector(selectError);
   const viewMode = useSelector(selectViewMode);
   const selectedCategories = useSelector(selectSelectedCategories);
-  const favorites = useSelector(selectFavorites);
   const totalCount = useSelector(selectTotalCount);
   const hasMore = useSelector(selectHasMore);
   const currentPage = useSelector(selectCurrentPage);
@@ -97,6 +107,14 @@ export function SearchPage() {
 
     loadCategories();
   }, [dispatch]);
+
+  // Load real follow state from API (authenticated customers only)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    getFollowedBusinesses()
+      .then((businesses) => setFollowedIds(businesses.map((b) => b.id)))
+      .catch(() => {/* silently ignore */});
+  }, [isAuthenticated]);
 
   // Load featured businesses on mount
   useEffect(() => {
@@ -235,13 +253,29 @@ export function SearchPage() {
     console.warn("Pagination not supported by current backend API");
   }, [loading, hasMore]);
 
-  // Handle favorite toggle
+  // Handle follow toggle — backed by real API when authenticated
   const handleFavoriteClick = useCallback(
-    (businessId: string) => {
-      dispatch(toggleFavorite(businessId));
-      // TODO: Persist to backend in Phase 6
+    async (businessId: string) => {
+      if (!isAuthenticated) return;
+      const isFollowing = followedIds.includes(businessId);
+      // Optimistic update
+      setFollowedIds((prev) =>
+        isFollowing ? prev.filter((id) => id !== businessId) : [...prev, businessId],
+      );
+      try {
+        if (isFollowing) {
+          await unfollowBusiness(businessId);
+        } else {
+          await followBusiness(businessId);
+        }
+      } catch {
+        // Revert optimistic update on failure
+        setFollowedIds((prev) =>
+          isFollowing ? [...prev, businessId] : prev.filter((id) => id !== businessId),
+        );
+      }
     },
-    [dispatch],
+    [isAuthenticated, followedIds],
   );
 
   // Handle business card click
@@ -357,7 +391,8 @@ export function SearchPage() {
             onFavoriteClick={handleFavoriteClick}
             onBusinessClick={handleBusinessClick}
             onViewServicesClick={handleViewServicesClick}
-            favorites={favorites}
+            favorites={followedIds}
+            currentUserId={authUser?.id}
             hasActiveSearch={!!searchQuery || selectedCategories.length > 0 || !!availabilityDate}
             featuredResults={
               searchQuery

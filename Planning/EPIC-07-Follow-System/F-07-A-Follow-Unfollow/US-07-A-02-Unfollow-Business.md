@@ -2,7 +2,7 @@
 
 **Feature:** [[F-07-A-Follow-Unfollow|F-07-A: Follow / Unfollow]]
 **Epic:** [[EPIC-07-Follow-System|EPIC-07: Follow System]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **customer**, I want to **unfollow a business** so that **I can remove it f
 - `[FE]` Unfollow is also available from the followed businesses section of the Customer Dashboard
 
 ## Acceptance Criteria
-- [ ] Unfollowing removes the business from the customer's followed list immediately
-- [ ] The "Following" button reverts to "Follow" after unfollowing
-- [ ] Unfollow action is confirmed by the button state change (no separate confirmation dialog required)
+- [x] Unfollowing removes the business from the customer's followed list immediately
+- [x] The "Following" button reverts to "Follow" after unfollowing
+- [x] Unfollow action is confirmed by the button state change (no separate confirmation dialog required)

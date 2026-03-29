@@ -8,6 +8,7 @@ import { logout } from "../../api/auth";
 import { clearSession } from "../../redux/authSlice";
 import { Role } from "../../constants/roles";
 import { getMyBusinesses } from "../../services/businessManagementService";
+import { getFollowedBusinesses } from "../../services/followService";
 import { setOwnedBusinesses } from "../../features/business/businessSlice";
 import type { BusinessProfile } from "../../types/business";
 
@@ -50,6 +51,7 @@ export function RoleSidebar({
 
   const ownedBusinesses = useAppSelector((s) => s.business.ownedBusinesses);
   const [businessesExpanded, setBusinessesExpanded] = useState(true);
+  const [favoritesExpanded, setFavoritesExpanded] = useState(false);
 
   // Load owned businesses when the user is an Owner
   useEffect(() => {
@@ -96,13 +98,6 @@ export function RoleSidebar({
               to: "/dashboard/customer",
               minRole: Role.Client,
               icon: <Icon name="event_upcoming" />,
-            },
-            {
-              key: "favorites",
-              label: "Favorites",
-              to: "/favorites",
-              minRole: Role.Client,
-              icon: <Icon name="favorite" />,
             },
           ],
         },
@@ -210,6 +205,15 @@ export function RoleSidebar({
             </div>
           </div>
         ))}
+
+        {/* Favorites — inline collapsible list for Client+ */}
+        {role >= Role.Client && (
+          <FavoritesSection
+            expanded={favoritesExpanded}
+            onToggle={() => setFavoritesExpanded((v) => !v)}
+            onClose={onClose}
+          />
+        )}
 
         {/* Business section — Client: "Create your business" / Owner: collapsible list */}
         <BusinessSection
@@ -433,6 +437,92 @@ function BusinessNavItem({
               <span>{link.label}</span>
             </NavLink>
           ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Favorites section ─────────────────────────────────────────────────────────
+
+function FavoritesSection({
+  expanded,
+  onToggle,
+  onClose,
+}: {
+  expanded: boolean;
+  onToggle: () => void;
+  onClose?: () => void;
+}) {
+  const navigate = useNavigate();
+  const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Reload every time the section is opened so it stays fresh
+  useEffect(() => {
+    if (!expanded) return;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const result = await getFollowedBusinesses();
+        setBusinesses(result);
+      } catch {
+        // silently ignore
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [expanded]);
+
+  return (
+    <div className="mb-1">
+      <button
+        onClick={onToggle}
+        className={[
+          "group flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-colors",
+          expanded
+            ? "bg-primary/10 text-primary"
+            : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
+        ].join(" ")}
+      >
+        <Icon
+          name="favorite"
+          className={expanded ? "icon-filled" : ""}
+        />
+        <span className="flex-1 truncate font-medium text-left">Favorites</span>
+        <Icon
+          name={expanded ? "expand_less" : "expand_more"}
+          className="text-[16px]! text-gray-400 shrink-0"
+        />
+      </button>
+
+      {expanded && (
+        <div className="ml-4 border-l border-gray-200 dark:border-gray-700 pl-3 space-y-0.5 py-1">
+          {loading ? (
+            <div className="flex justify-center py-3">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            </div>
+          ) : businesses.length === 0 ? (
+            <p className="px-2 py-2 text-xs text-gray-400 dark:text-gray-500">
+              No followed businesses yet.
+            </p>
+          ) : (
+            businesses.map((b) => (
+              <button
+                key={b.id}
+                type="button"
+                onClick={() => {
+                  navigate(`/business/${b.id}`);
+                  onClose?.();
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+              >
+                <Icon name="storefront" className="text-[18px]! shrink-0" />
+                <span className="truncate">{b.name}</span>
+              </button>
+            ))
+          )}
         </div>
       )}
     </div>

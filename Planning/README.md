@@ -25,4 +25,4 @@
 | 04 | [[EPIC-04-Booking-Flow\|Booking Flow]] | ✅ Done |
 | 05 | [[EPIC-05-Search-and-Discovery\|Search & Discovery]] | ✅ Done |
 | 06 | [[EPIC-06-Dashboards\|Dashboards]] | ✅ Done |
-| 07 | [[EPIC-07-Follow-System\|Follow System]] | 🔲 Not Started |
+| 07 | [[EPIC-07-Follow-System\|Follow System]] | 🔄 In Progress (F-07-A ✅ Done, F-07-B pending) |

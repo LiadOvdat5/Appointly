@@ -70,6 +70,9 @@ builder.Services.AddScoped<AppointmentValidator>();
 // Register Report Services
 builder.Services.AddScoped<IReportService, ReportService>();
 
+// Register Follow Repository
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+
 // Add authorization services
 builder.Services.AddAuthorization();
 

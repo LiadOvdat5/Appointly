@@ -2,7 +2,7 @@
 
 **Feature:** [[F-07-A-Follow-Unfollow|F-07-A: Follow / Unfollow]]
 **Epic:** [[EPIC-07-Follow-System|EPIC-07: Follow System]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **customer**, I want to **follow a business from their public page** so tha
 - `[FE]` Button toggles to "Following" state after a successful follow action
 
 ## Acceptance Criteria
-- [ ] Follow state persists after the page is refreshed
-- [ ] Revisiting a followed business page shows "Following" state on the button
-- [ ] A customer cannot follow the same business twice (duplicate follow is rejected)
-- [ ] Only authenticated customers can follow businesses
+- [x] Follow state persists after the page is refreshed
+- [x] Revisiting a followed business page shows "Following" state on the button
+- [x] A customer cannot follow the same business twice (duplicate follow is rejected)
+- [x] Only authenticated customers can follow businesses

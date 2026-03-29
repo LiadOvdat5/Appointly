@@ -9,6 +9,7 @@ interface BusinessCardProps {
   onViewServicesClick?: (businessId: string) => void;
   onCardClick?: (businessId: string) => void;
   isFavorite?: boolean;
+  currentUserId?: string;
   className?: string;
 }
 
@@ -25,8 +26,11 @@ export function BusinessCard({
   onViewServicesClick,
   onCardClick,
   isFavorite = false,
+  currentUserId,
   className,
 }: BusinessCardProps) {
+  // Hide the follow heart if this business belongs to the current user
+  const showFollow = !currentUserId || business.ownerId !== currentUserId;
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
 
@@ -197,25 +201,28 @@ export function BusinessCard({
             </p>
           </div>
 
-          {/* Favorite Button */}
-          <button
-            onClick={handleFavoriteClick}
-            className={[
-              "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              isFavorite
-                ? "bg-red-100 text-red-500"
-                : "bg-gray-100 dark:bg-gray-700 text-gray-400 hover:text-red-500",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-            aria-label={
-              isFavorite ? "Remove from favorites" : "Add to favorites"
-            }
-          >
-            <MaterialIcon name="favorite" className="text-[20px]" />
-          </button>
+          {/* Follow Button — hidden for user's own businesses */}
+          {showFollow && (
+            <button
+              onClick={handleFavoriteClick}
+              className={[
+                "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                isFavorite
+                  ? "bg-red-100 text-red-500"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-400 hover:text-red-500",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              title={isFavorite ? "Unfollow" : "Follow"}
+              aria-label={isFavorite ? "Unfollow" : "Follow"}
+            >
+              <MaterialIcon
+                name="favorite"
+                className={["text-[20px]", isFavorite ? "icon-filled" : ""].filter(Boolean).join(" ")}
+              />
+            </button>
+          )}
         </div>
 
         {/* Services Tags */}

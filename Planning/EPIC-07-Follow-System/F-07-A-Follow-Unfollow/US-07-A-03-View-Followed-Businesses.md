@@ -2,7 +2,7 @@
 
 **Feature:** [[F-07-A-Follow-Unfollow|F-07-A: Follow / Unfollow]]
 **Epic:** [[EPIC-07-Follow-System|EPIC-07: Follow System]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **customer**, I want to **see all businesses I follow in my dashboard** so 
 - `[FE]` List updates immediately after a follow or unfollow action anywhere in the app
 
 ## Acceptance Criteria
-- [ ] All followed businesses are shown in the dashboard section
-- [ ] The list updates immediately when a business is followed or unfollowed
-- [ ] Empty state is shown if the customer follows no businesses
+- [x] All followed businesses are shown in the dashboard section
+- [x] The list updates immediately when a business is followed or unfollowed
+- [x] Empty state is shown if the customer follows no businesses

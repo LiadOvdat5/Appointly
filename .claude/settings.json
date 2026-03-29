@@ -34,7 +34,8 @@
       "Bash(sqlcmd -S \"MSI\\\\SQLEXPRESS\" -d BizSlot -E -Q \"SELECT Id, Name, Address FROM Businesses\")",
       "Read(//d/Coding/.Net/**)",
       "Bash(curl -s \"http://localhost:5142/api/search/businesses/by-name?text=a\")",
-      "Bash(python -m json.tool)"
+      "Bash(python -m json.tool)",
+      "Bash(npm run:*)"
     ]
   }
 }

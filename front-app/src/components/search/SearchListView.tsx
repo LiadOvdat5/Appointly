@@ -15,6 +15,7 @@ interface SearchListViewProps {
   onBusinessClick?: (businessId: string) => void;
   onViewServicesClick?: (businessId: string) => void;
   favorites: string[];
+  currentUserId?: string;
   featuredResults?: Business[];
   hasActiveSearch?: boolean;
   className?: string;
@@ -37,6 +38,7 @@ export function SearchListView({
   onBusinessClick,
   onViewServicesClick,
   favorites,
+  currentUserId,
   featuredResults,
   hasActiveSearch = false,
   className,
@@ -174,6 +176,7 @@ export function SearchListView({
                 business={business}
                 variant="vertical"
                 isFavorite={favorites.includes(business.id)}
+                currentUserId={currentUserId}
                 onFavoriteClick={handleFavorite}
                 onViewServicesClick={handleViewServices}
                 onCardClick={handleCardClick}
@@ -203,6 +206,7 @@ export function SearchListView({
               business={business}
               variant="vertical"
               isFavorite={favorites.includes(business.id)}
+              currentUserId={currentUserId}
               onFavoriteClick={handleFavorite}
               onViewServicesClick={handleViewServices}
               onCardClick={handleCardClick}

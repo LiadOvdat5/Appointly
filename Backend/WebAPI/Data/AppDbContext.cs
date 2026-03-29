@@ -25,6 +25,7 @@ namespace WebAPI.Data
         public DbSet<DateException> DateExceptions => Set<DateException>();
         public DbSet<ServiceSchedule> ServiceSchedules => Set<ServiceSchedule>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Follow> Follows => Set<Follow>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -38,6 +39,27 @@ namespace WebAPI.Data
             // Configure BusinessPartner composite key
             modelBuilder.Entity<BusinessPartner>()
                 .HasKey(bp => new { bp.UserId, bp.BusinessId });
+
+            // =====================================================
+            // Follow Relationships
+            // =====================================================
+
+            modelBuilder.Entity<Follow>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Follow>()
+                .HasOne(f => f.Business)
+                .WithMany()
+                .HasForeignKey(f => f.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Prevent a user from following the same business twice
+            modelBuilder.Entity<Follow>()
+                .HasIndex(f => new { f.UserId, f.BusinessId })
+                .IsUnique();
 
             // =====================================================
             // Schedule & Availability Relationships

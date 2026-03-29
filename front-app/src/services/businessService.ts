@@ -32,6 +32,7 @@ function resolveUploadUrl(path: string | null | undefined): string | undefined {
  */
 const enrichBusiness = (business: Partial<Business> & {
   // Backend DTO flat fields (camelCase from ASP.NET Core)
+  ownerId?: string;
   address?: string;
   latitude?: number | null;
   longitude?: number | null;
@@ -68,6 +69,7 @@ const enrichBusiness = (business: Partial<Business> & {
 
   return {
     id: business.id || "",
+    ownerId: business.ownerId,
     name: business.name || "Unknown Business",
     description: business.description,
     rating: business.averageRating || business.rating || undefined,

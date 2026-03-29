@@ -16,3 +16,8 @@
 html, body, #root {
   min-height: max(884px, 100dvh);
 }
+
+/* Material Symbols filled variant (FILL axis = 1) */
+.icon-filled {
+  font-variation-settings: 'FILL' 1;
+}
