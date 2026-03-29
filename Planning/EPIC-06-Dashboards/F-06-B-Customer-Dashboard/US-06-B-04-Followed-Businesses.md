@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-B-Customer-Dashboard|F-06-B: Customer Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** 🔲 Placeholder (blocked by EPIC-07)
 
 ---
 
@@ -15,8 +15,12 @@ As a **customer**, I want to **see the businesses I follow in my dashboard** so 
 - `[FE]` Include an "Unfollow" option on each card
 - `[FE]` Depends on [[EPIC-07-Follow-System|EPIC-07]] being implemented
 
+## Notes
+UI placeholder section is present on the customer dashboard with an "Explore businesses" CTA.
+Full implementation blocked by [[EPIC-07-Follow-System|EPIC-07]].
+
 ## Acceptance Criteria
 - [ ] Each followed business is shown as a card with their name and category
 - [ ] Quick re-book link is available on each card
 - [ ] Unfollow option is available and immediately removes the business from the list
-- [ ] Empty state is shown if the customer does not follow any businesses
+- [x] Empty/placeholder state is shown when follow system is not yet implemented

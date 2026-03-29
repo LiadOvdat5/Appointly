@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-B-Customer-Dashboard|F-06-B: Customer Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -14,8 +14,12 @@ As a **customer**, I want to **see my upcoming appointments on my dashboard** so
 - `[FE]` Build upcoming appointments list in `DashboardPage.tsx` (customer view)
 - `[FE]` Show for each appointment: business name, service name, date, and time
 
+## Notes
+Preview of 3 upcoming appointments shown on the customer dashboard (`/customer-dashboard`).
+"View all" links to the full appointments page (`/dashboard/customer`).
+
 ## Acceptance Criteria
-- [ ] Only future, non-canceled appointments are shown
-- [ ] Appointments are sorted by date ascending (soonest first)
-- [ ] Empty state message is shown if no upcoming appointments exist
-- [ ] Each row shows business name, service, date, and time clearly
+- [x] Only future, non-canceled appointments are shown
+- [x] Appointments are sorted by date ascending (soonest first)
+- [x] Empty state message is shown if no upcoming appointments exist
+- [x] Each row shows business name, service, date, and time clearly

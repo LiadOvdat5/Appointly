@@ -112,6 +112,31 @@ export async function getBusinessReport(
   return response.data;
 }
 
+export interface CustomerReportDTO {
+  customerId: string;
+  startDate: string;
+  endDate: string;
+  totalBookings: number;
+  completedBookings: number;
+  canceledBookings: number;
+  totalSpent: number;
+  favoriteBusinessName: string | null;
+  favoriteBusinessCount: number;
+  favoriteServiceName: string | null;
+  favoriteServiceCount: number;
+}
+
+export async function getCustomerReport(
+  startDate?: Date,
+  endDate?: Date,
+): Promise<CustomerReportDTO> {
+  const params: Record<string, string> = {};
+  if (startDate) params.startDate = startDate.toISOString();
+  if (endDate) params.endDate = endDate.toISOString();
+  const response = await apiClient.get<CustomerReportDTO>("/api/reports/customer", { params });
+  return response.data;
+}
+
 export async function cancelAppointment(
   id: string,
   cancellationReason?: string,

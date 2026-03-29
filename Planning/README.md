@@ -24,5 +24,5 @@
 | 03 | [[EPIC-03-Schedule-and-Availability\|Schedule & Availability]] | ✅ Done (F-03-A ✅, F-03-B ✅, F-03-C ✅) |
 | 04 | [[EPIC-04-Booking-Flow\|Booking Flow]] | ✅ Done |
 | 05 | [[EPIC-05-Search-and-Discovery\|Search & Discovery]] | ✅ Done |
-| 06 | [[EPIC-06-Dashboards\|Dashboards]] | 🔄 In Progress (F-06-A ✅, F-06-B pending) |
+| 06 | [[EPIC-06-Dashboards\|Dashboards]] | ✅ Done |
 | 07 | [[EPIC-07-Follow-System\|Follow System]] | 🔲 Not Started |

@@ -56,7 +56,9 @@ export function RoleSidebar({
     if (role >= Role.Owner) {
       getMyBusinesses()
         .then((businesses) => dispatch(setOwnedBusinesses(businesses)))
-        .catch(() => {/* silently ignore — sidebar is non-critical */});
+        .catch(() => {
+          /* silently ignore — sidebar is non-critical */
+        });
     }
   }, [role, dispatch]);
 
@@ -80,6 +82,13 @@ export function RoleSidebar({
               to: "/search",
               minRole: Role.Guest,
               icon: <Icon name="search" />,
+            },
+            {
+              key: "customer-dashboard",
+              label: "Dashboard",
+              to: "/customer-dashboard",
+              minRole: Role.Client,
+              icon: <Icon name="dashboard" />,
             },
             {
               key: "appointments",
@@ -192,7 +201,9 @@ export function RoleSidebar({
                   }
                   title={item.label}
                 >
-                  <span className="shrink-0">{item.icon ?? <Icon name="circle" />}</span>
+                  <span className="shrink-0">
+                    {item.icon ?? <Icon name="circle" />}
+                  </span>
                   <span className="truncate font-medium">{item.label}</span>
                 </NavLink>
               ))}
@@ -214,11 +225,16 @@ export function RoleSidebar({
       <div className="p-3 border-t border-gray-200 dark:border-gray-800 space-y-2">
         <div className="flex items-center gap-3 rounded-xl px-3 py-2 bg-gray-50 dark:bg-gray-900/40">
           <div className="size-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center shrink-0">
-            <Icon name="account_circle" className="text-gray-600 dark:text-gray-300" />
+            <Icon
+              name="account_circle"
+              className="text-gray-600 dark:text-gray-300"
+            />
           </div>
           <div className="flex items-center justify-between w-full">
             <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">{user?.name ?? "Guest"}</div>
+              <div className="text-sm font-semibold truncate">
+                {user?.name ?? "Guest"}
+              </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 {user ? "Signed in" : "Not signed in"}
               </div>
@@ -374,11 +390,31 @@ function BusinessNavItem({
       {subExpanded && (
         <div className="ml-4 space-y-0.5 border-l border-gray-200 dark:border-gray-700 pl-3">
           {[
-            { label: "Business Page", icon: "storefront", to: `/business/${business.id}` },
-            { label: "Dashboard", icon: "dashboard", to: `/dashboard/${business.id}` },
-            { label: "Services", icon: "content_cut", to: `/business/${business.id}/services` },
-            { label: "Schedule", icon: "calendar_month", to: `/business/${business.id}/schedule` },
-            { label: "Staff", icon: "group", to: `/business/${business.id}/staff` },
+            {
+              label: "Business Page",
+              icon: "storefront",
+              to: `/business/${business.id}`,
+            },
+            {
+              label: "Dashboard",
+              icon: "dashboard",
+              to: `/dashboard/${business.id}`,
+            },
+            {
+              label: "Services",
+              icon: "content_cut",
+              to: `/business/${business.id}/services`,
+            },
+            {
+              label: "Schedule",
+              icon: "calendar_month",
+              to: `/business/${business.id}/schedule`,
+            },
+            {
+              label: "Staff",
+              icon: "group",
+              to: `/business/${business.id}/staff`,
+            },
           ].map((link) => (
             <NavLink
               key={link.label}

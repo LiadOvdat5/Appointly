@@ -229,5 +229,20 @@ namespace WebAPI.Repositories
                 .Where(a => a.ServiceId == serviceId)
                 .CountAsync();
         }
+
+        /// <summary>
+        /// Get all appointments for a client within a date range
+        /// </summary>
+        public async Task<List<Appointment>> GetByClientIdAndDateRangeAsync(Guid clientId, DateTime startDate, DateTime endDate)
+        {
+            return await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Business)
+                .Where(a => a.ClientId == clientId
+                    && a.StartDateTime >= startDate
+                    && a.StartDateTime <= endDate)
+                .OrderBy(a => a.StartDateTime)
+                .ToListAsync();
+        }
     }
 }

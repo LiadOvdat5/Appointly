@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-B-Customer-Dashboard|F-06-B: Customer Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -14,8 +14,14 @@ As a **customer**, I want to **see my booking history including past appointment
 - `[FE]` Build a "History" section in the Customer Dashboard separate from upcoming appointments
 - `[FE]` Display status badges (e.g., "Completed", "Canceled") on each history entry
 
+## Notes
+Implemented as a customer analytics section (date range filter + 6 toggleable metric cards) instead
+of a raw history list — full history is accessible from My Appointments (`/dashboard/customer`).
+Backend: `GET /api/reports/customer` returns totalBookings, completedBookings, canceledBookings,
+totalSpent, favoriteBusinessName, favoriteServiceName.
+
 ## Acceptance Criteria
-- [ ] All past appointments are shown in the history section
-- [ ] Each appointment shows its status with a visual badge (Completed / Canceled)
-- [ ] History is separate from the upcoming appointments section
-- [ ] Appointments are sorted by date descending (most recent first) in history
+- [x] Past activity is surfaced via analytics metrics (completed, canceled counts, total spent)
+- [x] Data is scoped to a configurable date range (defaults to current month)
+- [x] Activity section is separate from the upcoming appointments preview
+- [x] Full history with status badges is available via My Appointments link

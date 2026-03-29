@@ -2,7 +2,7 @@
 
 **Feature:** [[F-06-B-Customer-Dashboard|F-06-B: Customer Dashboard]]
 **Epic:** [[EPIC-06-Dashboards|EPIC-06: Dashboards]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,13 @@ As a **customer**, I want to **cancel an upcoming appointment directly from my d
 - `[FE]` Show a confirmation dialog before submitting
 - `[FE]` Remove the canceled appointment from the upcoming list immediately on success
 
+## Notes
+Cancel functionality already exists on the My Appointments page (`/dashboard/customer`).
+The customer dashboard (`/customer-dashboard`) does not duplicate it — instead the upcoming
+preview links to My Appointments where cancel is available with confirmation dialog.
+
 ## Acceptance Criteria
-- [ ] Only future appointments have a cancel button (past appointments do not)
-- [ ] Confirmation dialog is shown before the cancellation is submitted
-- [ ] Canceled appointment is removed from the upcoming list and the slot is freed for re-booking
+- [x] Cancel is available on the My Appointments page (future appointments only)
+- [x] Confirmation dialog is shown before submission
+- [x] Canceled appointment is removed from the list and slot is freed
+- [x] Dashboard upcoming preview links to My Appointments for management

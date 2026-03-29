@@ -81,5 +81,10 @@ namespace WebAPI.Interfaces
         /// Get total count of appointments for a service
         /// </summary>
         Task<int> GetServiceAppointmentCountAsync(Guid serviceId);
+
+        /// <summary>
+        /// Get all appointments for a client within a date range
+        /// </summary>
+        Task<List<Appointment>> GetByClientIdAndDateRangeAsync(Guid clientId, DateTime startDate, DateTime endDate);
     }
 }
