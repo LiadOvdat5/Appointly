@@ -13,6 +13,10 @@ import {
   getFollowedBusinesses,
   unfollowBusiness,
 } from "../services/followService";
+import {
+  getMyInvitations,
+  InvitationStatus,
+} from "../services/invitationService";
 import type { BusinessProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { Badge } from "../components/UI/Badge";
@@ -197,6 +201,9 @@ export default function CustomerDashboardOverviewPage() {
   const [endDate, setEndDate] = useState(toInputDate(endOfMonth(now)));
   const [activeMetrics, setActiveMetrics] = useState<MetricKey[]>(DEFAULT_METRICS);
 
+  // Pending invitations count (for quick action card)
+  const [pendingInvitationCount, setPendingInvitationCount] = useState(0);
+
   // Followed businesses
   const [followedBusinesses, setFollowedBusinesses] = useState<BusinessProfile[]>([]);
   const [followedLoading, setFollowedLoading] = useState(true);
@@ -238,6 +245,16 @@ export default function CustomerDashboardOverviewPage() {
       .catch(() => {/* silently ignore */})
       .finally(() => setReportLoading(false));
   }, [startDate, endDate]);
+
+  // Load pending invitations count
+  useEffect(() => {
+    getMyInvitations()
+      .then((inv) => {
+        const pending = inv.filter((i) => i.status === InvitationStatus.Pending).length;
+        setPendingInvitationCount(pending);
+      })
+      .catch(() => {/* silently ignore */});
+  }, []);
 
   // Load followed businesses
   useEffect(() => {
@@ -504,6 +521,30 @@ export default function CustomerDashboardOverviewPage() {
               </div>
               <MaterialIcon name="chevron_right" className="text-gray-400 ml-auto shrink-0" />
             </button>
+
+            {pendingInvitationCount > 0 && (
+              <button
+                type="button"
+                onClick={() => navigate("/invitations")}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-indigo-200 dark:border-indigo-800 shadow-sm hover:shadow-md transition text-left relative"
+              >
+                <div className="h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0 relative">
+                  <MaterialIcon name="mail" className="text-2xl text-indigo-600" />
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                    {pendingInvitationCount}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-bold text-[#111418] dark:text-white text-sm">
+                    Business Invitations
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {pendingInvitationCount} pending invite{pendingInvitationCount !== 1 ? "s" : ""} waiting for you
+                  </p>
+                </div>
+                <MaterialIcon name="chevron_right" className="text-gray-400 ml-auto shrink-0" />
+              </button>
+            )}
 
           </div>
         </section>

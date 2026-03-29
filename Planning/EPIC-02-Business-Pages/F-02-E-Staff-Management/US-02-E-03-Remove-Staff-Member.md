@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-E-Staff-Management|F-02-E: Staff Management]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,8 +18,8 @@ As a **business owner**, I want to **remove a staff member from my business** so
 - `[FE]` Removed member disappears from the staff list immediately
 
 ## Acceptance Criteria
-- [ ] Owner can remove any staff member except themselves (owner cannot remove themselves)
-- [ ] Removal is a soft delete — `BusinessPartner.Status` is set to `Removed`, not deleted
-- [ ] Removed member is automatically unlinked from all assigned services
-- [ ] Confirmation dialog is shown before removal to prevent accidental deletes
-- [ ] Removed member immediately loses access to any staff-scoped dashboard views
+- [x]Owner can remove any staff member except themselves (owner cannot remove themselves)
+- [x]Removal is a soft delete — `BusinessPartner.Status` is set to `Removed`, not deleted
+- [x]Removed member is automatically unlinked from all assigned services
+- [x]Confirmation dialog is shown before removal to prevent accidental deletes
+- [x]Removed member immediately loses access to any staff-scoped dashboard views

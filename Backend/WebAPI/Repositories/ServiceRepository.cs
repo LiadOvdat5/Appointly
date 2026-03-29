@@ -127,6 +127,7 @@ namespace WebAPI.Repositories
         {
             return await _context.Services
                 .Include(s => s.Business)
+                    .ThenInclude(b => b!.Partners)
                 .Include(s => s.User)
                 .FirstOrDefaultAsync(s => s.Id == serviceId);
         }

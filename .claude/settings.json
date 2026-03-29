@@ -37,7 +37,10 @@
       "Bash(python -m json.tool)",
       "Bash(npm run:*)",
       "Bash(xargs grep:*)",
-      "Bash(grep -r \"staff\\\\|partner\\\\|notification\\\\|translation\\\\|i18n\" 'd:\\\\Coding\\\\.Net + React\\\\BizSlot/Planning' --include=*.md)"
+      "Bash(grep -r \"staff\\\\|partner\\\\|notification\\\\|translation\\\\|i18n\" 'd:\\\\Coding\\\\.Net + React\\\\BizSlot/Planning' --include=*.md)",
+      "Bash(for f:*)",
+      "Bash(do sed:*)",
+      "Bash(done)"
     ]
   }
 }

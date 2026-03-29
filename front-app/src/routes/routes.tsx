@@ -21,6 +21,9 @@ import BusinessSchedulePage from "../pages/BusinessSchedulePage.tsx";
 import PublicBusinessPage from "../pages/PublicBusinessPage.tsx";
 import ScheduleEditorPage from "../pages/ScheduleEditorPage.tsx";
 import BookingPage from "../pages/BookingPage.tsx";
+import StaffPage from "../pages/StaffPage.tsx";
+import StaffDashboardPage from "../pages/StaffDashboardPage.tsx";
+import InvitationsPage from "../pages/InvitationsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -80,6 +83,46 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <ServiceSelectionPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/:businessId/staff",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <StaffPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "staff-dashboard/:businessId",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <StaffDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "staff-dashboard/:businessId/services",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <StaffDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "staff-dashboard/:businessId/appointments",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <StaffDashboardPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "invitations",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <InvitationsPage />
           </ProtectedRoute>
         ),
       },

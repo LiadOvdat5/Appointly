@@ -6,6 +6,7 @@ namespace WebAPI.Models
         Accepted,
         Declined,
         Expired,
-        Cancelled
+        Cancelled,
+        Removed
     }
 }

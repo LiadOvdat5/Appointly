@@ -10,7 +10,7 @@ namespace WebAPI.Services
 {
     public interface IJwtService
     {
-        JwtTokenResult GenerateToken(User user);
+        JwtTokenResult GenerateToken(User user, Guid? businessId = null);
     }
 
     public class JwtService : IJwtService
@@ -22,15 +22,20 @@ namespace WebAPI.Services
             _configuration = configuration;
         }
 
-        public JwtTokenResult GenerateToken(User user)
+        public JwtTokenResult GenerateToken(User user, Guid? businessId = null)
         {
-            var claims = new[]
+            var claimsList = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
+
+            if (businessId.HasValue)
+                claimsList.Add(new Claim("businessId", businessId.Value.ToString()));
+
+            var claims = claimsList.ToArray();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

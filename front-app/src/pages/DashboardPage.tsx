@@ -595,6 +595,29 @@ export default function DashboardPage() {
                 className="text-gray-400 ml-auto shrink-0"
               />
             </button>
+
+            {/* Staff management */}
+            <button
+              type="button"
+              onClick={() => navigate(`/dashboard/${business.id}/staff`)}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
+            >
+              <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                <MaterialIcon name="group" className="text-2xl text-indigo-600" />
+              </div>
+              <div>
+                <p className="font-bold text-[#111418] dark:text-white text-sm">
+                  Staff Management
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Invite, assign services &amp; view performance
+                </p>
+              </div>
+              <MaterialIcon
+                name="chevron_right"
+                className="text-gray-400 ml-auto shrink-0"
+              />
+            </button>
           </div>
         </section>
 

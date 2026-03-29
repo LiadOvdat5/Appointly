@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   getBusinessAppointments,
   getBusinessAppointmentsByRange,
@@ -76,6 +76,8 @@ interface MergedSlot {
 export default function BusinessSchedulePage() {
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const preselectedServiceId = searchParams.get("serviceId") ?? "";
 
   // Meta
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
@@ -96,7 +98,7 @@ export default function BusinessSchedulePage() {
   const [startDate, setStartDate] = useState(toDateInputValue(today));
   const [endDate, setEndDate] = useState(toDateInputValue(thirtyDaysLater));
   const [isRangeApplied, setIsRangeApplied] = useState(false);
-  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
+  const [selectedServiceId, setSelectedServiceId] = useState<string>(preselectedServiceId);
   const [timeFrom, setTimeFrom] = useState("");
   const [timeTo, setTimeTo] = useState("");
   const [showCanceled, setShowCanceled] = useState(false);
@@ -106,7 +108,7 @@ export default function BusinessSchedulePage() {
   const [cancelingId, setCancelingId] = useState<string | null>(null);
 
   // ── GRID VIEW state ───────────────────────────────────────────────────────
-  const [gridServiceId, setGridServiceId] = useState<string>("");
+  const [gridServiceId, setGridServiceId] = useState<string>(preselectedServiceId);
   const [gridPreset, setGridPreset] = useState<RangePreset>("week");
   const [gridSlots, setGridSlots] = useState<SlotDTO[]>([]);
   const [gridAppts, setGridAppts] = useState<AppointmentDTO[]>([]);
@@ -145,7 +147,7 @@ export default function BusinessSchedulePage() {
     ]).then(([biz, svcs]) => {
       setBusiness(biz);
       setServices(svcs);
-      if (svcs.length > 0) setGridServiceId(svcs[0].id);
+      if (svcs.length > 0 && !preselectedServiceId) setGridServiceId(svcs[0].id);
     });
 
     fetchListAppointments(businessId, false);

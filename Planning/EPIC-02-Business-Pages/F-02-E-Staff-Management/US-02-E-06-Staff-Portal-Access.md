@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-E-Staff-Management|F-02-E: Staff Management]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,8 +18,8 @@ As a **staff member (BusinessPartner)**, I want to **log in and access a restric
 - `[FE]` Role-aware `RoleSidebar` — staff members see a minimal sidebar with only accessible items
 
 ## Acceptance Criteria
-- [ ] A staff member who logs in sees only their assigned services and schedules
-- [ ] Staff cannot access business settings, other staff members' data, or owner analytics
-- [ ] Staff can edit the schedule of services they are assigned to
-- [ ] Staff can view their own upcoming appointments
-- [ ] Owner logging in to the same business sees the full dashboard (no restrictions)
+- [x]A staff member who logs in sees only their assigned services and schedules
+- [x]Staff cannot access business settings, other staff members' data, or owner analytics
+- [x]Staff can edit the schedule of services they are assigned to
+- [x]Staff can view their own upcoming appointments
+- [x]Owner logging in to the same business sees the full dashboard (no restrictions)

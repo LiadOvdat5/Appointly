@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
@@ -8,6 +9,7 @@ import { login } from "../api/auth";
 import { Alert } from "../components/UI/Alert";
 import { useAppDispatch } from "../redux/hooks";
 import { setSession } from "../redux/authSlice";
+import { Role } from "../constants/roles";
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -17,6 +19,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   function toEpochMs(expiresAt: string) {
     const ms = new Date(expiresAt).getTime();
@@ -40,8 +43,14 @@ export default function LoginPage() {
 
       setError("");
 
-      // TODO: redirect to dashboard
-      // navigate("/dashboard");
+      // Redirect based on role
+      if (session.user.role === Role.Partner && session.user.businessId) {
+        navigate(`/staff-dashboard/${session.user.businessId}`);
+      } else if (session.user.role === Role.Owner) {
+        navigate("/dashboard");
+      } else {
+        navigate("/customer-dashboard");
+      }
     } catch (err: unknown) {
       // Axios error handling
       const error = err as AxiosError<{ error?: string; message?: string }>;

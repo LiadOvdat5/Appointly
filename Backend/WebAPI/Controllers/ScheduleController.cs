@@ -34,7 +34,12 @@ namespace WebAPI.Controllers
 
         private static bool IsOwner(Service service, Guid userId)
         {
-            return service.UserId == userId || (service.Business?.OwnerId == userId);
+            if (service.Business?.OwnerId == userId) return true;
+            if (service.UserId == userId) return true;
+            // Allow accepted partners who have this service in their assignment list
+            var partner = service.Business?.Partners
+                .FirstOrDefault(p => p.UserId == userId && p.Status == Models.InvitationStatus.Accepted);
+            return partner != null && partner.Services.Contains(service.Id);
         }
 
         private async Task<Service?> GetServiceWithBusinessAsync(Guid serviceId)

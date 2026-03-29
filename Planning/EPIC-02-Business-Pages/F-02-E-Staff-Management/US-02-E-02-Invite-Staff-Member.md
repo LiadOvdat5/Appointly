@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-E-Staff-Management|F-02-E: Staff Management]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,8 +19,8 @@ As a **business owner**, I want to **invite a new staff member by email** so tha
 - `[FE]` Allow owner to cancel a pending invitation
 
 ## Acceptance Criteria
-- [ ] Owner can open an invite modal and enter an email address
-- [ ] Submitting creates a `BusinessInvitation` with `Pending` status
-- [ ] Pending invitations are visible on the staff page, separate from accepted members
-- [ ] Owner can cancel a pending invitation before it is accepted
-- [ ] Inviting an already-active staff member shows a clear error message
+- [x]Owner can open an invite modal and enter an email address
+- [x]Submitting creates a `BusinessInvitation` with `Pending` status
+- [x]Pending invitations are visible on the staff page, separate from accepted members
+- [x]Owner can cancel a pending invitation before it is accepted
+- [x]Inviting an already-active staff member shows a clear error message

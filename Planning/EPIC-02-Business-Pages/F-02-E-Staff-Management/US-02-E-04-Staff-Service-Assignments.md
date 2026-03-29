@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-E-Staff-Management|F-02-E: Staff Management]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **business owner**, I want to **click on a staff member and manage which se
 - `[FE]` Owner can toggle service assignments and save
 
 ## Acceptance Criteria
-- [ ] Owner can view all services assigned to a specific staff member
-- [ ] Owner can add or remove service assignments with a single save action
-- [ ] Changes are reflected immediately after saving
-- [ ] A staff member can be assigned to zero or more services
+- [x]Owner can view all services assigned to a specific staff member
+- [x]Owner can add or remove service assignments with a single save action
+- [x]Changes are reflected immediately after saving
+- [x]A staff member can be assigned to zero or more services

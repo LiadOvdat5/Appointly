@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.EntityFrameworkCore;
+using WebAPI.Data;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
+using WebAPI.Models;
 using WebAPI.Services;
 
 
@@ -14,11 +17,13 @@ namespace WebAPI.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IJwtService _jwtService;
+        private readonly AppDbContext _context;
 
-        public AuthController(IAuthRepository authRepository, IJwtService jwtService)
+        public AuthController(IAuthRepository authRepository, IJwtService jwtService, AppDbContext context)
         {
             _authRepository = authRepository;
             _jwtService = jwtService;
+            _context = context;
         }
 
 
@@ -111,9 +116,21 @@ namespace WebAPI.Controllers
                     ? DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime
                     : DateTime.UtcNow.AddDays(7);
 
+                // Read businessId: first try JWT claim, then fall back to DB for partners
+                // (the JWT may be stale if the user's role was upgraded after their last login)
+                var businessIdClaim = User.FindFirst("businessId")?.Value;
+                Guid? businessId = businessIdClaim != null && Guid.TryParse(businessIdClaim, out var bid) ? bid : null;
+
+                if (businessId == null && user.Role == UserRole.partner)
+                {
+                    var partnerRecord = await _context.BusinessPartners
+                        .FirstOrDefaultAsync(p => p.UserId == user.Id && p.Status == InvitationStatus.Accepted);
+                    businessId = partnerRecord?.BusinessId;
+                }
+
                 return Ok(new
                 {
-                    user = new { id = user.Id, name = user.Name, role = user.Role },
+                    user = new { id = user.Id, name = user.Name, role = user.Role, businessId },
                     expiresAt
                 });
             }

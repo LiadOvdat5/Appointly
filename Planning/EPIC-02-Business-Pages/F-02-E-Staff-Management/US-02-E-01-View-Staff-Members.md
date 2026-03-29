@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-E-Staff-Management|F-02-E: Staff Management]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **business owner**, I want to **see a list of all my current staff members*
 - `[FE]` Add "Staff" link in the owner's business dashboard sidebar
 
 ## Acceptance Criteria
-- [ ] Owner sees all accepted staff members for their business
-- [ ] Each member shows their name, email, join date, and how many services they're assigned to
-- [ ] Only the business owner can access this page (403 for others)
-- [ ] Empty state is shown when there are no staff members besides the owner
+- [x]Owner sees all accepted staff members for their business
+- [x]Each member shows their name, email, join date, and how many services they're assigned to
+- [x]Only the business owner can access this page (403 for others)
+- [x]Empty state is shown when there are no staff members besides the owner

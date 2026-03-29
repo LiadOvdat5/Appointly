@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using WebAPI.Data;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Mappers;
@@ -17,19 +19,31 @@ namespace WebAPI.Services
         private readonly IServiceRepository _serviceRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly AppointmentValidator _validator;
+        private readonly AppDbContext _context;
 
         public AppointmentService(
             IAppointmentRepository appointmentRepository,
             IServiceScheduleRepository scheduleRepository,
             IServiceRepository serviceRepository,
             IBusinessRepository businessRepository,
-            AppointmentValidator validator)
+            AppointmentValidator validator,
+            AppDbContext context)
         {
             _appointmentRepository = appointmentRepository;
             _scheduleRepository = scheduleRepository;
             _serviceRepository = serviceRepository;
             _businessRepository = businessRepository;
             _validator = validator;
+            _context = context;
+        }
+
+        private async Task<bool> IsOwnerOrPartnerAsync(Guid businessId, Guid userId)
+        {
+            bool isOwner = await _validator.ValidateBusinessOwnerAccessAsync(businessId, userId);
+            if (isOwner) return true;
+
+            return await _context.BusinessPartners
+                .AnyAsync(p => p.BusinessId == businessId && p.UserId == userId && p.Status == InvitationStatus.Accepted);
         }
 
         /// <summary>
@@ -104,9 +118,7 @@ namespace WebAPI.Services
         /// </summary>
         public async Task<List<AppointmentDTO>> GetBusinessAppointmentsAsync(Guid businessId, Guid userId, int page = 1, int pageSize = 20)
         {
-            bool isOwner = await _validator.ValidateBusinessOwnerAccessAsync(businessId, userId);
-
-            if (!isOwner)
+            if (!await IsOwnerOrPartnerAsync(businessId, userId))
             {
                 throw new UnauthorizedAppointmentAccessException("You do not have permission to view appointments for this business.");
             }
@@ -120,9 +132,7 @@ namespace WebAPI.Services
         /// </summary>
         public async Task<List<AppointmentDTO>> GetAppointmentsByDateRangeAsync(Guid businessId, Guid userId, DateTime startDate, DateTime endDate)
         {
-            bool isOwner = await _validator.ValidateBusinessOwnerAccessAsync(businessId, userId);
-
-            if (!isOwner)
+            if (!await IsOwnerOrPartnerAsync(businessId, userId))
             {
                 throw new UnauthorizedAppointmentAccessException("You do not have permission to view appointments for this business.");
             }

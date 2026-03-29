@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-E-Staff-Management|F-02-E: Staff Management]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,7 +18,7 @@ As a **business owner**, I want to **see performance analytics for each staff me
 - `[FE]` Placeholder for "Average Rating" linked to [[EPIC-08-Reviews-and-Ratings|EPIC-08]]
 
 ## Acceptance Criteria
-- [ ] Owner sees total appointments and revenue attributed to each staff member
-- [ ] Stats default to the current month
-- [ ] Completion rate (completed / total booked) is shown as a percentage
-- [ ] Average rating stat card is displayed as a placeholder until Reviews epic is implemented
+- [x]Owner sees total appointments and revenue attributed to each staff member
+- [x]Stats default to the current month
+- [x]Completion rate (completed / total booked) is shown as a percentage
+- [x]Average rating stat card is displayed as a placeholder until Reviews epic is implemented

@@ -13,15 +13,18 @@ namespace WebAPI.Controllers
         private readonly IBusinessRepository _businessRepository;
         private readonly IBusinessInvitationRepository _businessInvitationRepository;
         private readonly IServiceRepository _serviceRepository;
+        private readonly IStaffRepository _staffRepository;
 
         public BusinessController(
             IBusinessRepository businessRepository,
             IBusinessInvitationRepository businessInvitationRepository,
-            IServiceRepository serviceRepository)
+            IServiceRepository serviceRepository,
+            IStaffRepository staffRepository)
         {
             _businessRepository = businessRepository;
             _businessInvitationRepository = businessInvitationRepository;
             _serviceRepository = serviceRepository;
+            _staffRepository = staffRepository;
         }
 
         // Define endpoints for business operations here
@@ -422,6 +425,219 @@ namespace WebAPI.Controllers
 
                 await _serviceRepository.DeleteServiceAsync(businessId, serviceId, userId);
                 return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // ── Staff Management ─────────────────────────────────────────────────
+
+        [Authorize]
+        [HttpGet("{businessId}/staff")]
+        [EndpointSummary("List Staff Members")]
+        [EndpointDescription("Returns all accepted staff members for the business with their assigned service names. Authorization: Only the business owner.")]
+        public async Task<IActionResult> GetStaff(Guid businessId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var staff = await _staffRepository.GetStaffAsync(businessId, userId);
+                return Ok(staff);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("{businessId}/invitations")]
+        [EndpointSummary("List Pending Invitations")]
+        [EndpointDescription("Returns all pending invitations sent by this business. Authorization: Only the business owner.")]
+        public async Task<IActionResult> GetPendingInvitations(Guid businessId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var invitations = await _staffRepository.GetPendingInvitationsAsync(businessId, userId);
+                return Ok(invitations);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("{businessId}/invitations/{invitationId}")]
+        [EndpointSummary("Cancel Invitation")]
+        [EndpointDescription("Cancels a pending invitation. Authorization: Only the business owner.")]
+        public async Task<IActionResult> CancelInvitation(Guid businessId, Guid invitationId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                await _staffRepository.CancelInvitationAsync(businessId, invitationId, userId);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("{businessId}/staff/{userId}")]
+        [EndpointSummary("Remove Staff Member")]
+        [EndpointDescription("Soft-deletes a staff member (status = Removed) and unlinks them from all services. Authorization: Only the business owner.")]
+        public async Task<IActionResult> RemoveStaff(Guid businessId, Guid userId)
+        {
+            try
+            {
+                var callerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (callerIdString == null) return Unauthorized();
+                Guid callerId = Guid.Parse(callerIdString);
+
+                await _staffRepository.RemoveStaffAsync(businessId, userId, callerId);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("{businessId}/staff/{userId}/services")]
+        [EndpointSummary("Get Staff Member Services")]
+        [EndpointDescription("Returns the list of service IDs assigned to a staff member. Authorization: Only the business owner.")]
+        public async Task<IActionResult> GetStaffServices(Guid businessId, Guid userId)
+        {
+            try
+            {
+                var callerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (callerIdString == null) return Unauthorized();
+                Guid callerId = Guid.Parse(callerIdString);
+
+                var serviceIds = await _staffRepository.GetStaffServicesAsync(businessId, userId, callerId);
+                return Ok(serviceIds);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("{businessId}/staff/{userId}/services")]
+        [EndpointSummary("Update Staff Member Services")]
+        [EndpointDescription("Replaces the full list of service assignments for a staff member. Body: array of service GUIDs. Authorization: Only the business owner.")]
+        public async Task<IActionResult> UpdateStaffServices(Guid businessId, Guid userId, [FromBody] List<Guid> serviceIds)
+        {
+            try
+            {
+                var callerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (callerIdString == null) return Unauthorized();
+                Guid callerId = Guid.Parse(callerIdString);
+
+                await _staffRepository.UpdateStaffServicesAsync(businessId, userId, callerId, serviceIds);
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("{businessId}/staff/{userId}/report")]
+        [EndpointSummary("Get Staff Member Report")]
+        [EndpointDescription("Returns performance analytics for a staff member. Optional query params: startDate, endDate (ISO 8601). Defaults to current month. Authorization: Only the business owner.")]
+        public async Task<IActionResult> GetStaffReport(Guid businessId, Guid userId, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+        {
+            try
+            {
+                var callerIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (callerIdString == null) return Unauthorized();
+                Guid callerId = Guid.Parse(callerIdString);
+
+                var report = await _staffRepository.GetStaffReportAsync(businessId, userId, callerId, startDate, endDate);
+                return Ok(report);
             }
             catch (UnauthorizedAccessException ex)
             {

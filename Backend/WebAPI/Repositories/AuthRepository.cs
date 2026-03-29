@@ -53,8 +53,16 @@ namespace WebAPI.Repositories
             if (result != PasswordVerificationResult.Success)
                 throw new Exception("Invalid credentials.");
 
-            //Generate JWT token
-            var tokenResult = _jwtService.GenerateToken(user);
+            // For partner users, include their associated businessId in the JWT
+            Guid? partnerBusinessId = null;
+            if (user.Role == UserRole.partner)
+            {
+                var partnerRecord = await _context.BusinessPartners
+                    .FirstOrDefaultAsync(p => p.UserId == user.Id && p.Status == InvitationStatus.Accepted);
+                partnerBusinessId = partnerRecord?.BusinessId;
+            }
+
+            var tokenResult = _jwtService.GenerateToken(user, partnerBusinessId);
 
             return new LoginResponseDTO
             {

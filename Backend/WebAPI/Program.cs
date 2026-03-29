@@ -51,6 +51,7 @@ builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISearchRepository, SearchRepository>();
+builder.Services.AddScoped<IStaffRepository, StaffRepository>();
 
 // Register Schedule & Availability Repositories
 builder.Services.AddScoped<IWeeklyWorkingRuleRepository, WeeklyWorkingRuleRepository>();

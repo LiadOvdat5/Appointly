@@ -5,6 +5,7 @@ export type AuthUser = {
   id: string;
   name: string;
   role: number;
+  businessId?: string; // only set for partner role
 };
 
 type AuthStatus = "unknown" | "authenticated" | "guest";
