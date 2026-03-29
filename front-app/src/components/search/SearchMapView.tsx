@@ -262,23 +262,6 @@ export function SearchMapView({
         <div ref={googleMaps.mapRef} className="w-full h-full" />
       </div>
 
-      {/* Search Bar Overlay */}
-      <div className="absolute top-4 left-4 right-4 z-20">
-        <div className="flex gap-2">
-          <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden flex items-center">
-            <div className="pl-4 pr-2 text-gray-400 dark:text-gray-500">
-              <MaterialIcon name="search" className="text-[20px]" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search businesses..."
-              className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none border-none px-0 text-sm font-normal"
-              readOnly
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Map Controls */}
       <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-20">
         <button

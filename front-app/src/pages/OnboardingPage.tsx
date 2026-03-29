@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
@@ -12,6 +12,8 @@ import { Button } from "../components/UI/Button";
 import { Select } from "../components/UI/Select";
 import { Alert } from "../components/UI/Alert";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
+import type { AddressResult } from "../components/UI/AddressAutocomplete";
 import type { Category } from "../types/search";
 import type { CreateServiceInput } from "../types/business";
 
@@ -22,6 +24,8 @@ type Step = 1 | 2 | 3;
 interface BusinessFields {
   name: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   phone: string;
   description: string;
 }
@@ -41,6 +45,46 @@ const EMPTY_SERVICE: ServiceDraft = {
   price: "",
   categoryId: "",
 };
+
+// ── Address map preview ──────────────────────────────────────────────────────
+
+function AddressMapPreview({ latitude, longitude }: { latitude: number; longitude: number }) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<google.maps.Map | null>(null);
+  const markerRef = useRef<google.maps.Marker | null>(null);
+
+  useEffect(() => {
+    if (!mapRef.current || !window.google?.maps) return;
+
+    const position = { lat: latitude, lng: longitude };
+
+    if (!mapInstanceRef.current) {
+      mapInstanceRef.current = new window.google.maps.Map(mapRef.current, {
+        center: position,
+        zoom: 15,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: true,
+        gestureHandling: "cooperative",
+      });
+      markerRef.current = new window.google.maps.Marker({
+        position,
+        map: mapInstanceRef.current,
+      });
+    } else {
+      mapInstanceRef.current.panTo(position);
+      markerRef.current?.setPosition(position);
+    }
+  }, [latitude, longitude]);
+
+  return (
+    <div
+      ref={mapRef}
+      className="w-full h-44 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+    />
+  );
+}
 
 // ── Stepper indicator ────────────────────────────────────────────────────────
 
@@ -119,7 +163,11 @@ function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1
 
   const errors: Partial<Record<keyof BusinessFields, string>> = {
     name: !fields.name.trim() ? "Business name is required." : undefined,
-    address: !fields.address.trim() ? "Address is required." : undefined,
+    address: !fields.address.trim()
+      ? "Address is required."
+      : fields.latitude == null
+        ? "Please select an address from the suggestions."
+        : undefined,
     phone: !fields.phone.trim() ? "Phone number is required." : undefined,
   };
 
@@ -133,6 +181,17 @@ function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1
   const set = (key: keyof BusinessFields) => (val: string) => {
     onChange({ ...fields, [key]: val });
     setTouched((t) => ({ ...t, [key]: true }));
+  };
+
+  const handleAddressSelect = (result: AddressResult) => {
+    onChange({ ...fields, address: result.address, latitude: result.latitude, longitude: result.longitude });
+    setTouched((t) => ({ ...t, address: true }));
+  };
+
+  const handleAddressTyping = (val: string) => {
+    // Clear coordinates when user edits text manually
+    onChange({ ...fields, address: val, latitude: null, longitude: null });
+    setTouched((t) => ({ ...t, address: true }));
   };
 
   return (
@@ -156,13 +215,18 @@ function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1
         error={touched.name ? errors.name : undefined}
       />
 
-      <Input
+      <AddressAutocomplete
         label="Address *"
         placeholder="e.g. 123 Main St, Tel Aviv"
         value={fields.address}
-        onValueChange={set("address")}
+        onAddressSelect={handleAddressSelect}
+        onValueChange={handleAddressTyping}
         error={touched.address ? errors.address : undefined}
       />
+
+      {fields.latitude != null && fields.longitude != null && (
+        <AddressMapPreview latitude={fields.latitude} longitude={fields.longitude} />
+      )}
 
       <Input
         label="Phone *"
@@ -407,6 +471,8 @@ export default function OnboardingPage() {
   const [businessFields, setBusinessFields] = useState<BusinessFields>({
     name: "",
     address: "",
+    latitude: null,
+    longitude: null,
     phone: "",
     description: "",
   });
@@ -424,6 +490,8 @@ export default function OnboardingPage() {
         address: businessFields.address.trim(),
         phone: businessFields.phone.trim(),
         description: businessFields.description.trim() || undefined,
+        latitude: businessFields.latitude ?? undefined,
+        longitude: businessFields.longitude ?? undefined,
       });
       dispatch(setOwnedBusiness(business));
       setCreatedBusinessId(business.id);

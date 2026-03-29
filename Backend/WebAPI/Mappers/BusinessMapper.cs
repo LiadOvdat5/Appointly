@@ -14,6 +14,8 @@ namespace WebAPI.Mappers
                 Name = createBusinessDto.Name,
                 Address = createBusinessDto.Address,
                 Phone = createBusinessDto.Phone,
+                Latitude = createBusinessDto.Latitude,
+                Longitude = createBusinessDto.Longitude,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -55,6 +57,12 @@ namespace WebAPI.Mappers
 
             if (updateDto.ThemeColor != null)
                 business.ThemeColor = updateDto.ThemeColor;
+
+            if (updateDto.Latitude.HasValue)
+                business.Latitude = updateDto.Latitude;
+
+            if (updateDto.Longitude.HasValue)
+                business.Longitude = updateDto.Longitude;
 
             business.UpdatedAt = DateTime.UtcNow;
         }

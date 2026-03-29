@@ -15,6 +15,8 @@ export interface BusinessProfile {
   logoUrl?: string;
   bannerUrl?: string;
   searchImageUrl?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface BusinessCategory {
@@ -29,6 +31,8 @@ export interface CreateBusinessInput {
   address: string;
   phone: string;
   description?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface UpdateBusinessInput {
@@ -37,6 +41,8 @@ export interface UpdateBusinessInput {
   phone?: string;
   description?: string;
   themeColor?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface ServiceProfile {

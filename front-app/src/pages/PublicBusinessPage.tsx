@@ -35,6 +35,8 @@ import { Card } from "../components/UI/Card";
 import { Input } from "../components/UI/Input";
 import { Select } from "../components/UI/Select";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
+import type { AddressResult } from "../components/UI/AddressAutocomplete";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -74,6 +76,8 @@ type DraftBusiness = {
   name: string;
   description: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   phone: string;
   themeColor: string;
 };
@@ -134,6 +138,7 @@ type PageAction =
   | { type: "ENTER_EDIT" }
   | { type: "EXIT_EDIT" }
   | { type: "SET_DRAFT"; field: keyof DraftBusiness; value: string }
+  | { type: "SET_DRAFT_ADDRESS"; address: string; latitude: number | null; longitude: number | null }
   | { type: "SET_SAVING"; value: boolean }
   | { type: "SET_SAVE_ERROR"; message: string | null }
   | { type: "SAVE_SUCCESS"; business: BusinessProfile }
@@ -157,6 +162,8 @@ function makeDraftFromBusiness(b: BusinessProfile): DraftBusiness {
     name: b.name,
     description: b.description ?? "",
     address: b.address ?? "",
+    latitude: b.latitude ?? null,
+    longitude: b.longitude ?? null,
     phone: b.phone ?? "",
     themeColor: b.themeColor ?? "#197fe6",
   };
@@ -253,6 +260,18 @@ function pageReducer(state: PageState, action: PageAction): PageState {
     case "SET_DRAFT":
       if (state.status !== "ready") return state;
       return { ...state, draft: { ...state.draft, [action.field]: action.value } };
+
+    case "SET_DRAFT_ADDRESS":
+      if (state.status !== "ready") return state;
+      return {
+        ...state,
+        draft: {
+          ...state.draft,
+          address: action.address,
+          latitude: action.latitude,
+          longitude: action.longitude,
+        },
+      };
 
     case "SET_SAVING":
       if (state.status !== "ready") return state;
@@ -735,6 +754,8 @@ export default function PublicBusinessPage() {
         address: page.draft.address,
         phone: page.draft.phone,
         themeColor: page.draft.themeColor,
+        latitude: page.draft.latitude ?? undefined,
+        longitude: page.draft.longitude ?? undefined,
       });
       dispatch({ type: "SAVE_SUCCESS", business: updated });
     } catch {
@@ -1236,12 +1257,26 @@ export default function PublicBusinessPage() {
           {/* Address + phone */}
           {isEditing ? (
             <div className="grid grid-cols-1 gap-3">
-              <Input
+              <AddressAutocomplete
                 label="Address"
                 value={draft.address}
-                onValueChange={(v) => dispatch({ type: "SET_DRAFT", field: "address", value: v })}
-                placeholder="123 Main St, City"
-                startIcon={<MaterialIcon name="location_on" className="text-sm" />}
+                placeholder="Search for an address..."
+                onAddressSelect={(result: AddressResult) =>
+                  dispatch({
+                    type: "SET_DRAFT_ADDRESS",
+                    address: result.address,
+                    latitude: result.latitude,
+                    longitude: result.longitude,
+                  })
+                }
+                onValueChange={(v) =>
+                  dispatch({
+                    type: "SET_DRAFT_ADDRESS",
+                    address: v,
+                    latitude: null,
+                    longitude: null,
+                  })
+                }
               />
               <Input
                 label="Phone"
