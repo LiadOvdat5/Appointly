@@ -2,7 +2,7 @@
 
 **Feature:** [[F-08-A-Submit-Review|F-08-A: Submit Review]]
 **Epic:** [[EPIC-08-Reviews-and-Ratings|EPIC-08: Reviews & Ratings]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **business owner**, I want to **ensure each appointment can only be reviewe
 - `[FE]` After a review is submitted, hide the "Leave a Review" button and show "Reviewed" badge on that appointment
 
 ## Acceptance Criteria
-- [ ] Database enforces uniqueness at the constraint level (unique index on `AppointmentId`)
-- [ ] Backend returns 409 Conflict when a duplicate review is attempted
-- [ ] Frontend prevents re-submission by updating the UI state after a successful review
+- [x] Database enforces uniqueness at the constraint level (unique index on `AppointmentId`)
+- [x] Backend returns 409 Conflict when a duplicate review is attempted
+- [x] Frontend prevents re-submission by updating the UI state after a successful review

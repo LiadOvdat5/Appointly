@@ -2,7 +2,7 @@
 
 **Feature:** [[F-08-A-Submit-Review|F-08-A: Submit Review]]
 **Epic:** [[EPIC-08-Reviews-and-Ratings|EPIC-08: Reviews & Ratings]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -22,8 +22,8 @@ As a **customer**, I want to **leave a star rating and optional text comment on 
 - `[FE]` Show success state after submission; button changes to "Review Submitted"
 
 ## Acceptance Criteria
-- [ ] Only customers can submit reviews (owners cannot review their own business)
-- [ ] Review can only be submitted for a `Completed` appointment
-- [ ] Star rating is required (1–5); comment is optional
-- [ ] `AverageRating` and `ReviewCount` on the business are updated immediately after submission
-- [ ] Submitting the same appointment review twice returns a 409 Conflict
+- [x] Only customers can submit reviews (owners cannot review their own business)
+- [x] Review can only be submitted for a `Completed` appointment
+- [x] Star rating is required (1–5); comment is optional
+- [x] `AverageRating` and `ReviewCount` on the business are updated immediately after submission
+- [x] Submitting the same appointment review twice returns a 409 Conflict

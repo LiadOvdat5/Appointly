@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import {
   getBusinessAppointments,
+  cancelAppointment,
   AppointmentStatus,
   type AppointmentDTO,
 } from "../services/appointmentService";
@@ -13,6 +14,9 @@ import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { Button } from "../components/UI/Button";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { ConfirmDialog } from "../components/UI/ConfirmDialog";
+import { ReviewViewModal } from "../components/UI/ReviewViewModal";
+import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -35,8 +39,17 @@ export default function StaffDashboardPage() {
   const authUser = useSelector((s: RootState) => s.auth.user);
 
   const [assignedServices, setAssignedServices] = useState<ServiceProfile[]>([]);
-  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Cancel flow
+  const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  // Reviews
+  const [reviewMap, setReviewMap] = useState<Record<string, ReviewDTO>>({});
+  const [viewingReview, setViewingReview] = useState<ReviewDTO | null>(null);
 
   const bid = businessId ?? authUser?.businessId ?? "";
 
@@ -47,30 +60,70 @@ export default function StaffDashboardPage() {
     Promise.all([
       getServicesForBusiness(bid),
       getStaffServices(bid, authUser.id).catch(() => [] as string[]),
-      getBusinessAppointments(bid, 1, 50).catch(() => [] as AppointmentDTO[]),
+      getBusinessAppointments(bid, 1, 100).catch(() => [] as AppointmentDTO[]),
     ])
       .then(([allServices, assignedIds, allAppts]) => {
-        // Filter services to only the ones assigned to this staff member
         const myServices = allServices.filter((s) => assignedIds.includes(s.id));
         setAssignedServices(myServices);
-
-        // Filter appointments: only this partner's upcoming non-cancelled ones
-        const upcoming = allAppts
-          .filter(
-            (a) =>
-              a.status !== AppointmentStatus.Canceled &&
-              new Date(a.startDateTime) >= new Date(),
-          )
-          .sort(
-            (a, b) =>
-              new Date(a.startDateTime).getTime() -
-              new Date(b.startDateTime).getTime(),
-          )
-          .slice(0, 10);
-        setAppointments(upcoming);
+        setAllAppointments(allAppts);
       })
       .finally(() => setLoading(false));
   }, [bid, authUser]);
+
+  useEffect(() => {
+    if (!bid) return;
+    getBusinessReviews(bid, 1, 200)
+      .then((reviews) => {
+        const map: Record<string, ReviewDTO> = {};
+        for (const r of reviews) map[r.appointmentId] = r;
+        setReviewMap(map);
+      })
+      .catch(() => {/* silently ignore */});
+  }, [bid]);
+
+  const now = new Date();
+
+  const upcoming = allAppointments
+    .filter(
+      (a) =>
+        a.status !== AppointmentStatus.Canceled &&
+        a.status !== AppointmentStatus.Completed &&
+        new Date(a.startDateTime) >= now,
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime(),
+    )
+    .slice(0, 10);
+
+  const completed = allAppointments
+    .filter(
+      (a) =>
+        a.status === AppointmentStatus.Completed ||
+        (a.status === AppointmentStatus.Canceled &&
+          a.notes?.includes("Service did not take place")),
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime(),
+    )
+    .slice(0, 20);
+
+  async function handleConfirmCancel() {
+    if (!confirmCancelId) return;
+    const id = confirmCancelId;
+    setConfirmCancelId(null);
+    setCancelingId(id);
+    setCancelError(null);
+    try {
+      const updated = await cancelAppointment(id, "Service did not take place");
+      setAllAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    } catch {
+      setCancelError("Failed to void appointment. Please try again.");
+    } finally {
+      setCancelingId(null);
+    }
+  }
 
   if (loading) {
     return (
@@ -81,128 +134,250 @@ export default function StaffDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
-      {/* ── Header ── */}
-      <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-            Staff Dashboard
-          </h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {authUser?.name} · Staff member
-          </p>
+    <>
+      <ConfirmDialog
+        open={confirmCancelId !== null}
+        title="Cancel completed appointment?"
+        message="This will mark the appointment as canceled. Use this only if the service did not take place."
+        confirmLabel="Yes, cancel it"
+        cancelLabel="Keep it"
+        destructive
+        onConfirm={handleConfirmCancel}
+        onCancel={() => setConfirmCancelId(null)}
+      />
+      {viewingReview && (
+        <ReviewViewModal
+          open
+          review={viewingReview}
+          onClose={() => setViewingReview(null)}
+        />
+      )}
+      {cancelError && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3 shadow-lg">
+          <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
+          <p className="text-sm text-red-600 dark:text-red-400">{cancelError}</p>
+          <button type="button" onClick={() => setCancelError(null)} className="ml-2 text-red-400 hover:text-red-600">
+            <MaterialIcon name="close" className="text-base" />
+          </button>
+        </div>
+      )}
+
+      <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+        {/* ── Header ── */}
+        <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
+              Staff Dashboard
+            </h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {authUser?.name} · Staff member
+            </p>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+
+          {/* ── Assigned Services ── */}
+          <section>
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+              My Services
+            </h2>
+
+            {assignedServices.length === 0 ? (
+              <Card className="p-6 flex flex-col items-center gap-3 text-center">
+                <MaterialIcon name="design_services" className="text-3xl text-gray-400" />
+                <div>
+                  <p className="font-semibold text-[#111418] dark:text-white text-sm">
+                    No services assigned yet
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Your business owner will assign services to you.
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {assignedServices.map((svc) => (
+                  <Card key={svc.id} className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <MaterialIcon name="design_services" className="text-base text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                          {svc.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {svc.duration} min
+                          {svc.price != null ? ` · $${svc.price.toFixed(2)}` : ""}
+                        </p>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-auto! px-3"
+                          onClick={() => navigate(`/business/${bid}/schedule?serviceId=${svc.id}`)}
+                        >
+                          View Schedule
+                        </Button>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          className="w-auto! px-3"
+                          onClick={() => navigate(`/schedule/${bid}/${svc.id}`)}
+                        >
+                          Edit Availability
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* ── Upcoming Appointments ── */}
+          <section>
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+              Upcoming Appointments
+            </h2>
+
+            {upcoming.length === 0 ? (
+              <Card className="p-6 flex flex-col items-center gap-3 text-center">
+                <MaterialIcon name="calendar_today" className="text-3xl text-gray-400" />
+                <div>
+                  <p className="font-semibold text-[#111418] dark:text-white text-sm">
+                    No upcoming appointments
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    New bookings will appear here.
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {upcoming.map((appt) => (
+                  <Card key={appt.id} className="p-4">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                        {appt.clientName}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                        {appt.serviceName}
+                      </p>
+                      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
+                        <span className="flex items-center gap-1">
+                          <MaterialIcon name="calendar_today" className="text-xs" />
+                          {formatDate(appt.startDateTime)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MaterialIcon name="schedule" className="text-xs" />
+                          {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                        </span>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* ── Completed Appointments ── */}
+          <section>
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+              Completed Appointments
+            </h2>
+
+            {completed.length === 0 ? (
+              <Card className="p-6 flex flex-col items-center gap-3 text-center">
+                <MaterialIcon name="check_circle" className="text-3xl text-gray-400" />
+                <p className="font-semibold text-[#111418] dark:text-white text-sm">
+                  No completed appointments yet
+                </p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {completed.map((appt) => {
+                  const review = reviewMap[appt.id];
+                  return (
+                    <Card key={appt.id} className="p-4 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                            {appt.clientName}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate mt-0.5">
+                            {appt.serviceName}
+                          </p>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
+                            <span className="flex items-center gap-1">
+                              <MaterialIcon name="calendar_today" className="text-xs" />
+                              {formatDate(appt.startDateTime)}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MaterialIcon name="schedule" className="text-xs" />
+                              {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                            </span>
+                          </div>
+                        </div>
+                        {appt.status === AppointmentStatus.Completed && (
+                          <button
+                            type="button"
+                            onClick={() => setConfirmCancelId(appt.id)}
+                            disabled={cancelingId === appt.id}
+                            className="shrink-0 text-xs text-red-500 hover:underline disabled:opacity-50"
+                          >
+                            {cancelingId === appt.id ? "Canceling…" : "Didn't happen"}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Review indicator / voided indicator */}
+                      <div className="pt-1.5 border-t border-gray-100 dark:border-gray-800">
+                        {appt.status === AppointmentStatus.Canceled ? (
+                          <p className="text-xs text-orange-500 font-medium flex items-center gap-1">
+                            <MaterialIcon name="block" className="text-sm" />
+                            Marked as not completed
+                          </p>
+                        ) : review ? (
+                          <button
+                            type="button"
+                            onClick={() => setViewingReview(review)}
+                            className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                          >
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <MaterialIcon
+                                  key={s}
+                                  name={review.rating >= s ? "star" : "star_border"}
+                                  className={`text-sm ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
+                                />
+                              ))}
+                            </div>
+                            <span className="font-medium">
+                              {review.comment
+                                ? `"${review.comment.slice(0, 40)}${review.comment.length > 40 ? "…" : ""}"`
+                                : "View review"}
+                            </span>
+                            <MaterialIcon name="open_in_new" className="text-xs ml-auto" />
+                          </button>
+                        ) : (
+                          <p className="text-xs text-gray-400 flex items-center gap-1">
+                            <MaterialIcon name="rate_review" className="text-sm" />
+                            No review yet
+                          </p>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
         </div>
       </div>
-
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
-
-        {/* ── Assigned Services ── */}
-        <section>
-          <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-            My Services
-          </h2>
-
-          {assignedServices.length === 0 ? (
-            <Card className="p-6 flex flex-col items-center gap-3 text-center">
-              <MaterialIcon name="design_services" className="text-3xl text-gray-400" />
-              <div>
-                <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                  No services assigned yet
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  Your business owner will assign services to you.
-                </p>
-              </div>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {assignedServices.map((svc) => (
-                <Card key={svc.id} className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <MaterialIcon name="design_services" className="text-base text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
-                        {svc.name}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {svc.duration} min
-                        {svc.price != null ? ` · $${svc.price.toFixed(2)}` : ""}
-                      </p>
-                    </div>
-                    <div className="flex gap-2 shrink-0">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-auto! px-3"
-                        onClick={() => navigate(`/business/${bid}/schedule?serviceId=${svc.id}`)}
-                      >
-                        View Schedule
-                      </Button>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="w-auto! px-3"
-                        onClick={() => navigate(`/schedule/${bid}/${svc.id}`)}
-                      >
-                        Edit Availability
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* ── Upcoming Appointments ── */}
-        <section>
-          <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-            Upcoming Appointments
-          </h2>
-
-          {appointments.length === 0 ? (
-            <Card className="p-6 flex flex-col items-center gap-3 text-center">
-              <MaterialIcon name="calendar_today" className="text-3xl text-gray-400" />
-              <div>
-                <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                  No upcoming appointments
-                </p>
-                <p className="text-xs text-gray-500 mt-0.5">
-                  New bookings will appear here.
-                </p>
-              </div>
-            </Card>
-          ) : (
-            <div className="space-y-3">
-              {appointments.map((appt) => (
-                <Card key={appt.id} className="p-4">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
-                      {appt.clientName}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate mt-0.5">
-                      {appt.serviceName}
-                    </p>
-                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
-                      <span className="flex items-center gap-1">
-                        <MaterialIcon name="calendar_today" className="text-xs" />
-                        {formatDate(appt.startDateTime)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MaterialIcon name="schedule" className="text-xs" />
-                        {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
-                      </span>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </section>
-
-      </div>
-    </div>
+    </>
   );
 }

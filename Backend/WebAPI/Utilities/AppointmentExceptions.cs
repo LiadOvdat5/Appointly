@@ -105,6 +105,19 @@ namespace WebAPI.Utilities
         }
     }
 
+    public class DuplicateReviewException : Exception
+    {
+        public DuplicateReviewException()
+            : base("A review for this appointment has already been submitted.")
+        {
+        }
+
+        public DuplicateReviewException(Guid appointmentId)
+            : base($"A review for appointment '{appointmentId}' has already been submitted.")
+        {
+        }
+    }
+
     public class InvalidAppointmentOperationException : Exception
     {
         public InvalidAppointmentOperationException()

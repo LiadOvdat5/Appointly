@@ -43,6 +43,10 @@ namespace WebAPI.Models
         [Range(1, 365, ErrorMessage = "AdvanceBookingDays must be between 1 and 365.")]
         public int AdvanceBookingDays { get; set; } = 90;
 
+        // Review aggregates — updated after each review submission
+        public double AverageRating { get; set; } = 0;
+        public int ReviewCount { get; set; } = 0;
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]

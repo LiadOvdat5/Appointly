@@ -371,6 +371,10 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(ex.Message);
             }
+            catch (InvalidAppointmentOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,

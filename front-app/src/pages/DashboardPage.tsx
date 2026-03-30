@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import {
   getBusinessAppointments,
+  cancelAppointment,
   AppointmentStatus,
   getBusinessReport,
   type AppointmentDTO,
@@ -15,6 +16,9 @@ import { Card } from "../components/UI/Card";
 import { Badge } from "../components/UI/Badge";
 import { Button } from "../components/UI/Button";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { ConfirmDialog } from "../components/UI/ConfirmDialog";
+import { ReviewViewModal } from "../components/UI/ReviewViewModal";
+import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -203,9 +207,18 @@ export default function DashboardPage() {
   const [businessLoading, setBusinessLoading] = useState(true);
   const [businessError, setBusinessError] = useState<string | null>(null);
 
-  // Upcoming appointments (next 10, non-canceled, future)
-  const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
+  // All appointments — split into upcoming/completed in render
+  const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
   const [apptLoading, setApptLoading] = useState(false);
+
+  // Cancel flow (for completed appointments owner can revert to canceled)
+  const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  // Reviews
+  const [reviewMap, setReviewMap] = useState<Record<string, ReviewDTO>>({});
+  const [viewingReview, setViewingReview] = useState<ReviewDTO | null>(null);
 
   // Report / stats
   const [report, setReport] = useState<BusinessReportDTO | null>(null);
@@ -243,28 +256,69 @@ export default function DashboardPage() {
       .finally(() => setBusinessLoading(false));
   }, [paramBusinessId]);
 
-  // ── Load upcoming appointments ───────────────────────────────────────────
+  // ── Load appointments ────────────────────────────────────────────────────
   useEffect(() => {
     if (!business) return;
     setApptLoading(true);
-    getBusinessAppointments(business.id, 1, 50)
-      .then((all) => {
-        const upcoming = all
-          .filter(
-            (a) =>
-              a.status !== AppointmentStatus.Canceled &&
-              new Date(a.startDateTime) >= new Date(),
-          )
-          .sort(
-            (a, b) =>
-              new Date(a.startDateTime).getTime() -
-              new Date(b.startDateTime).getTime(),
-          )
-          .slice(0, 10);
-        setAppointments(upcoming);
-      })
+    getBusinessAppointments(business.id, 1, 100)
+      .then(setAllAppointments)
       .catch(() => {/* silently ignore */})
       .finally(() => setApptLoading(false));
+  }, [business]);
+
+  const now2 = new Date();
+  const appointments = allAppointments
+    .filter(
+      (a) =>
+        a.status !== AppointmentStatus.Canceled &&
+        a.status !== AppointmentStatus.Completed &&
+        new Date(a.startDateTime) >= now2,
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime(),
+    )
+    .slice(0, 10);
+
+  const completedAppointments = allAppointments
+    .filter(
+      (a) =>
+        a.status === AppointmentStatus.Completed ||
+        (a.status === AppointmentStatus.Canceled &&
+          a.notes?.includes("Service did not take place")),
+    )
+    .sort(
+      (a, b) =>
+        new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime(),
+    )
+    .slice(0, 20);
+
+  async function handleConfirmCancel() {
+    if (!confirmCancelId) return;
+    const id = confirmCancelId;
+    setConfirmCancelId(null);
+    setCancelingId(id);
+    setCancelError(null);
+    try {
+      const updated = await cancelAppointment(id, "Service did not take place");
+      setAllAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
+    } catch {
+      setCancelError("Failed to void appointment. Please try again.");
+    } finally {
+      setCancelingId(null);
+    }
+  }
+
+  // ── Load reviews ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!business) return;
+    getBusinessReviews(business.id, 1, 200)
+      .then((reviews) => {
+        const map: Record<string, ReviewDTO> = {};
+        for (const r of reviews) map[r.appointmentId] = r;
+        setReviewMap(map);
+      })
+      .catch(() => {/* silently ignore */});
   }, [business]);
 
   // ── Load report ──────────────────────────────────────────────────────────
@@ -305,6 +359,33 @@ export default function DashboardPage() {
   }
 
   return (
+    <>
+    <ConfirmDialog
+      open={confirmCancelId !== null}
+      title="Cancel completed appointment?"
+      message="This will mark the appointment as canceled. Use this only if the service did not take place."
+      confirmLabel="Yes, cancel it"
+      cancelLabel="Keep it"
+      destructive
+      onConfirm={handleConfirmCancel}
+      onCancel={() => setConfirmCancelId(null)}
+    />
+    {viewingReview && (
+      <ReviewViewModal
+        open
+        review={viewingReview}
+        onClose={() => setViewingReview(null)}
+      />
+    )}
+    {cancelError && (
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3 shadow-lg">
+        <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
+        <p className="text-sm text-red-600 dark:text-red-400">{cancelError}</p>
+        <button type="button" onClick={() => setCancelError(null)} className="ml-2 text-red-400 hover:text-red-600">
+          <MaterialIcon name="close" className="text-base" />
+        </button>
+      </div>
+    )}
     <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
       {/* ── Header ── */}
       <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
@@ -423,6 +504,73 @@ export default function DashboardPage() {
           )}
         </section>
 
+        {/* ── Reviews Summary ── */}
+        {(business.reviewCount ?? 0) > 0 && (
+          <section>
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+              Reviews
+            </h2>
+            <div className="bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 rounded-2xl shadow-sm px-6 py-5 flex items-center gap-6">
+              {/* Average rating */}
+              <div className="flex flex-col items-center gap-1 shrink-0">
+                <span className="text-4xl font-black text-[#0e141b] dark:text-white leading-tight">
+                  {business.averageRating?.toFixed(1)}
+                </span>
+                <div className="flex gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => {
+                    const filled = (business.averageRating ?? 0) >= s;
+                    const half =
+                      !filled && (business.averageRating ?? 0) >= s - 0.5;
+                    return (
+                      <MaterialIcon
+                        key={s}
+                        name={filled ? "star" : half ? "star_half" : "star_border"}
+                        className={`text-lg ${filled || half ? "text-yellow-400" : "text-gray-300"}`}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="text-xs text-gray-500">
+                  {business.reviewCount}{" "}
+                  {business.reviewCount === 1 ? "review" : "reviews"}
+                </span>
+              </div>
+
+              {/* Divider */}
+              <div className="w-px self-stretch bg-gray-100 dark:bg-gray-800" />
+
+              {/* Rating breakdown from loaded reviews */}
+              <div className="flex-1 space-y-1">
+                {[5, 4, 3, 2, 1].map((star) => {
+                  const count = Object.values(reviewMap).filter(
+                    (r) => r.rating === star,
+                  ).length;
+                  const total = Object.values(reviewMap).length;
+                  const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                  return (
+                    <div key={star} className="flex items-center gap-2 text-xs">
+                      <span className="w-4 text-gray-500 text-right shrink-0">
+                        {star}
+                      </span>
+                      <MaterialIcon
+                        name="star"
+                        className="text-yellow-400 text-xs shrink-0"
+                      />
+                      <div className="flex-1 h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-yellow-400 transition-all"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="w-7 text-gray-400 shrink-0">{count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ── Upcoming Appointments ── */}
         <section>
           <div className="flex items-center justify-between mb-4">
@@ -518,6 +666,112 @@ export default function DashboardPage() {
                 Manage all appointments →
               </button>
             </div>
+          )}
+        </section>
+
+        {/* ── Completed Appointments ── */}
+        <section>
+          <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+            Completed Appointments
+          </h2>
+
+          {apptLoading ? (
+            <div className="space-y-3">
+              {[0, 1].map((i) => (
+                <div key={i} className="h-20 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+              ))}
+            </div>
+          ) : completedAppointments.length === 0 ? (
+            <Card className="p-6 flex flex-col items-center gap-3 text-center">
+              <MaterialIcon name="check_circle" className="text-3xl text-gray-400" />
+              <p className="font-semibold text-[#111418] dark:text-white text-sm">
+                No completed appointments yet
+              </p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {completedAppointments.map((appt) => {
+                const review = reviewMap[appt.id];
+                return (
+                  <Card key={appt.id} className="p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                          {appt.clientName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                          {appt.serviceName} · {appt.partnerName}
+                        </p>
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
+                          <span className="flex items-center gap-1">
+                            <MaterialIcon name="calendar_today" className="text-sm leading-none" />
+                            {formatDate(appt.startDateTime)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MaterialIcon name="schedule" className="text-sm leading-none" />
+                            {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                          </span>
+                          {appt.servicePrice != null && (
+                            <span className="flex items-center gap-1 text-primary font-semibold">
+                              <MaterialIcon name="payments" className="text-sm leading-none" />
+                              ${appt.servicePrice.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {appt.status === AppointmentStatus.Completed && (
+                        <button
+                          type="button"
+                          onClick={() => setConfirmCancelId(appt.id)}
+                          disabled={cancelingId === appt.id}
+                          className="shrink-0 text-xs text-red-500 hover:underline disabled:opacity-50"
+                        >
+                          {cancelingId === appt.id ? "Canceling…" : "Didn't happen"}
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Review indicator / voided indicator */}
+                    <div className="pt-1.5 border-t border-gray-100 dark:border-gray-800">
+                      {appt.status === AppointmentStatus.Canceled ? (
+                        <p className="text-xs text-orange-500 font-medium flex items-center gap-1">
+                          <MaterialIcon name="block" className="text-sm" />
+                          Marked as not completed
+                        </p>
+                      ) : review ? (
+                        <button
+                          type="button"
+                          onClick={() => setViewingReview(review)}
+                          className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 hover:text-primary transition-colors"
+                        >
+                          <div className="flex gap-0.5">
+                            {[1, 2, 3, 4, 5].map((s) => (
+                              <MaterialIcon
+                                key={s}
+                                name={review.rating >= s ? "star" : "star_border"}
+                                className={`text-sm ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="font-medium">
+                            {review.comment
+                              ? `"${review.comment.slice(0, 40)}${review.comment.length > 40 ? "…" : ""}"`
+                              : "View review"}
+                          </span>
+                          <MaterialIcon name="open_in_new" className="text-xs ml-auto" />
+                        </button>
+                      ) : (
+                        <p className="text-xs text-gray-400 flex items-center gap-1">
+                          <MaterialIcon name="rate_review" className="text-sm" />
+                          No review yet
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+
           )}
         </section>
 
@@ -623,5 +877,6 @@ export default function DashboardPage() {
 
       </div>
     </div>
+    </>
   );
 }

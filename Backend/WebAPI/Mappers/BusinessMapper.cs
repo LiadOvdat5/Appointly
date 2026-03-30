@@ -37,7 +37,9 @@ namespace WebAPI.Mappers
                 SearchImageUrl = business.SearchImageUrl,
                 Latitude = business.Latitude,
                 Longitude = business.Longitude,
-                Categories = categories?.ToList() ?? new List<CategoryDTO>()
+                Categories = categories?.ToList() ?? new List<CategoryDTO>(),
+                AverageRating = business.AverageRating > 0 ? business.AverageRating : null,
+                ReviewCount = business.ReviewCount
             };
         }
 

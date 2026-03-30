@@ -74,6 +74,10 @@ builder.Services.AddScoped<IReportService, ReportService>();
 // Register Follow Repository
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 
+// Register Review Repository and Service
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+
 // Add authorization services
 builder.Services.AddAuthorization();
 

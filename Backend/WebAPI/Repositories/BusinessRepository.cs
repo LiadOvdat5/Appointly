@@ -195,5 +195,17 @@ namespace WebAPI.Repositories
 
             return BusinessMapper.ToBusinessDTO(business);
         }
+
+        public async Task UpdateRatingAsync(Guid businessId, double averageRating, int reviewCount)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null) return;
+
+            business.AverageRating = averageRating;
+            business.ReviewCount = reviewCount;
+            business.UpdatedAt = DateTime.UtcNow;
+            _context.Businesses.Update(business);
+            await _context.SaveChangesAsync();
+        }
     }
 }

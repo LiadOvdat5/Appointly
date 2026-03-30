@@ -37,6 +37,28 @@ namespace WebAPI.Services
             _context = context;
         }
 
+        /// <summary>
+        /// Auto-completes any scheduled appointments whose EndDateTime has passed.
+        /// Called lazily on fetch to keep statuses current without a background job.
+        /// </summary>
+        private async Task AutoCompleteExpiredAsync(List<Appointment> appointments)
+        {
+            var now = DateTime.UtcNow;
+            var expired = appointments
+                .Where(a => a.Status == AppointmentStatus.scheduled && a.EndDateTime < now)
+                .ToList();
+
+            if (expired.Count == 0) return;
+
+            foreach (var appt in expired)
+            {
+                appt.Status = AppointmentStatus.completed;
+                appt.UpdatedAt = now;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         private async Task<bool> IsOwnerOrPartnerAsync(Guid businessId, Guid userId)
         {
             bool isOwner = await _validator.ValidateBusinessOwnerAccessAsync(businessId, userId);
@@ -77,6 +99,7 @@ namespace WebAPI.Services
         public async Task<List<AppointmentDTO>> GetClientAppointmentsAsync(Guid clientId, int page = 1, int pageSize = 20)
         {
             var appointments = await _appointmentRepository.GetByClientIdAsync(clientId, page, pageSize);
+            await AutoCompleteExpiredAsync(appointments);
             return appointments.Select(AppointmentMapper.ToDTO).ToList();
         }
 
@@ -86,6 +109,7 @@ namespace WebAPI.Services
         public async Task<List<AppointmentDTO>> GetPartnerAppointmentsAsync(Guid partnerId, int page = 1, int pageSize = 20)
         {
             var appointments = await _appointmentRepository.GetByPartnerIdAsync(partnerId, page, pageSize);
+            await AutoCompleteExpiredAsync(appointments);
             return appointments.Select(AppointmentMapper.ToDTO).ToList();
         }
 
@@ -124,6 +148,7 @@ namespace WebAPI.Services
             }
 
             var appointments = await _appointmentRepository.GetByBusinessIdAsync(businessId, page, pageSize);
+            await AutoCompleteExpiredAsync(appointments);
             return appointments.Select(AppointmentMapper.ToDTO).ToList();
         }
 
@@ -138,6 +163,7 @@ namespace WebAPI.Services
             }
 
             var appointments = await _appointmentRepository.GetByDateRangeAsync(businessId, startDate, endDate);
+            await AutoCompleteExpiredAsync(appointments);
             return appointments.Select(AppointmentMapper.ToDTO).ToList();
         }
 
@@ -204,18 +230,26 @@ namespace WebAPI.Services
                 throw new AppointmentNotFoundException(appointmentId);
             }
 
-            // Validate user has access (client, partner, or business owner)
+            // Validate user has access: client (their own appointment) or any business member
             bool isClient = appointment.ClientId == userId;
-            bool isPartner = appointment.PartnerId == userId;
-            bool isOwner = await _validator.ValidateBusinessOwnerAccessAsync(appointment.BusinessId, userId);
+            bool isBusinessMember = await IsOwnerOrPartnerAsync(appointment.BusinessId, userId);
 
-            if (!isClient && !isPartner && !isOwner)
+            if (!isClient && !isBusinessMember)
             {
                 throw new UnauthorizedAppointmentAccessException();
             }
 
-            // Validate can cancel
-            _validator.ValidateCanCancel(appointment);
+            // Customers cannot cancel a completed appointment; business members can (e.g. no-show)
+            if (appointment.Status == AppointmentStatus.canceled)
+            {
+                throw new AppointmentAlreadyCanceledException(appointmentId);
+            }
+
+            // Business members can void completed appointments even if they're also the client
+            if (appointment.Status == AppointmentStatus.completed && isClient && !isBusinessMember)
+            {
+                throw new InvalidAppointmentOperationException("Customers cannot cancel a completed appointment.");
+            }
 
             // Update appointment status
             appointment.Status = AppointmentStatus.canceled;

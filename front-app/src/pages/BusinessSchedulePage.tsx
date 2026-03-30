@@ -19,6 +19,8 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { Button } from "../components/UI/Button";
 import { Input } from "../components/UI/Input";
 import { ConfirmDialog } from "../components/UI/ConfirmDialog";
+import { ReviewViewModal } from "../components/UI/ReviewViewModal";
+import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -104,8 +106,15 @@ export default function BusinessSchedulePage() {
   const [showCanceled, setShowCanceled] = useState(false);
 
   // Cancel flow (shared between views)
+  // cancelMode: 'cancel' = standard cancel, 'didnt-happen' = business voids a completed appt
   const [confirmCancelId, setConfirmCancelId] = useState<string | null>(null);
+  const [cancelMode, setCancelMode] = useState<"cancel" | "didnt-happen">("cancel");
   const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  // Reviews
+  const [reviewMap, setReviewMap] = useState<Record<string, ReviewDTO>>({});
+  const [viewingReview, setViewingReview] = useState<ReviewDTO | null>(null);
 
   // ── GRID VIEW state ───────────────────────────────────────────────────────
   const [gridServiceId, setGridServiceId] = useState<string>(preselectedServiceId);
@@ -152,6 +161,18 @@ export default function BusinessSchedulePage() {
 
     fetchListAppointments(businessId, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [businessId]);
+
+  // ── Load reviews ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!businessId) return;
+    getBusinessReviews(businessId, 1, 500)
+      .then((reviews) => {
+        const map: Record<string, ReviewDTO> = {};
+        for (const r of reviews) map[r.appointmentId] = r;
+        setReviewMap(map);
+      })
+      .catch(() => {/* silently ignore */});
   }, [businessId]);
 
   // ── Load grid data when service/preset/view changes ───────────────────────
@@ -224,7 +245,9 @@ export default function BusinessSchedulePage() {
   // ── List filtering ────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     let list = allAppointments;
-    if (!showCanceled) list = list.filter((a) => a.status !== AppointmentStatus.Canceled);
+    if (!showCanceled) list = list.filter(
+      (a) => a.status !== AppointmentStatus.Canceled || a.notes?.includes("Service did not take place"),
+    );
     if (selectedServiceId) list = list.filter((a) => a.serviceId === selectedServiceId);
     if (timeFrom) {
       const fromMin = timeToMinutes(timeFrom);
@@ -283,23 +306,33 @@ export default function BusinessSchedulePage() {
     return days;
   }, [gridSlots, gridAppts]);
 
-  // ── Cancel (shared) ───────────────────────────────────────────────────────
+  // ── Cancel helpers ────────────────────────────────────────────────────────
+  function requestCancel(id: string) {
+    setCancelMode("cancel");
+    setConfirmCancelId(id);
+  }
+
+  function requestDidntHappen(id: string) {
+    setCancelMode("didnt-happen");
+    setConfirmCancelId(id);
+  }
+
   async function handleConfirmCancel() {
     if (!confirmCancelId) return;
     const id = confirmCancelId;
+    const reason = cancelMode === "didnt-happen" ? "Service did not take place" : undefined;
     setConfirmCancelId(null);
     setCancelingId(id);
+    setCancelError(null);
     try {
-      await cancelAppointment(id);
-      // Update list view
+      await cancelAppointment(id, reason);
       setAllAppointments((prev) =>
         prev.map((a) => a.id === id ? { ...a, status: AppointmentStatus.Canceled } : a),
       );
-      // Update grid view
       setGridAppts((prev) => prev.filter((a) => a.id !== id));
       setExpandedSlotKey(null);
     } catch {
-      // silently ignore
+      setCancelError("Failed to void appointment. Please try again.");
     } finally {
       setCancelingId(null);
     }
@@ -310,14 +343,34 @@ export default function BusinessSchedulePage() {
     <>
       <ConfirmDialog
         open={confirmCancelId !== null}
-        title="Cancel appointment?"
-        message="Are you sure you want to cancel this appointment? This action cannot be undone."
-        confirmLabel="Yes, cancel it"
+        title={cancelMode === "didnt-happen" ? "Mark as didn't happen?" : "Cancel appointment?"}
+        message={
+          cancelMode === "didnt-happen"
+            ? "This will void the completed appointment and notify the record. Use only if the service did not take place."
+            : "Are you sure you want to cancel this appointment? This action cannot be undone."
+        }
+        confirmLabel={cancelMode === "didnt-happen" ? "Yes, void it" : "Yes, cancel it"}
         cancelLabel="Keep it"
         destructive
         onConfirm={handleConfirmCancel}
         onCancel={() => setConfirmCancelId(null)}
       />
+      {viewingReview && (
+        <ReviewViewModal
+          open
+          review={viewingReview}
+          onClose={() => setViewingReview(null)}
+        />
+      )}
+      {cancelError && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3 shadow-lg">
+          <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
+          <p className="text-sm text-red-600 dark:text-red-400">{cancelError}</p>
+          <button type="button" onClick={() => setCancelError(null)} className="ml-2 text-red-400 hover:text-red-600">
+            <MaterialIcon name="close" className="text-base" />
+          </button>
+        </div>
+      )}
 
       <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
         {/* ── Header ── */}
@@ -396,6 +449,7 @@ export default function BusinessSchedulePage() {
               timeTo={timeTo}
               showCanceled={showCanceled}
               cancelingId={cancelingId}
+              reviewMap={reviewMap}
               onStartDateChange={setStartDate}
               onEndDateChange={setEndDate}
               onApplyRange={handleApplyDateRange}
@@ -404,7 +458,9 @@ export default function BusinessSchedulePage() {
               onTimeFromChange={setTimeFrom}
               onTimeToChange={setTimeTo}
               onShowCanceledChange={setShowCanceled}
-              onRequestCancel={setConfirmCancelId}
+              onRequestCancel={requestCancel}
+              onRequestDidntHappen={requestDidntHappen}
+              onViewReview={setViewingReview}
             />
           ) : (
             <GridView
@@ -416,11 +472,14 @@ export default function BusinessSchedulePage() {
               error={gridError}
               expandedSlotKey={expandedSlotKey}
               cancelingId={cancelingId}
+              reviewMap={reviewMap}
               onServiceChange={(id) => { setGridServiceId(id); }}
               onPresetChange={(p) => { setGridPreset(p); }}
               onRefresh={loadGridData}
               onToggleExpand={(key) => setExpandedSlotKey((prev) => prev === key ? null : key)}
-              onRequestCancel={setConfirmCancelId}
+              onRequestCancel={requestCancel}
+              onRequestDidntHappen={requestDidntHappen}
+              onViewReview={setViewingReview}
             />
           )}
         </div>
@@ -444,6 +503,7 @@ function ListView({
   timeTo,
   showCanceled,
   cancelingId,
+  reviewMap,
   onStartDateChange,
   onEndDateChange,
   onApplyRange,
@@ -453,6 +513,8 @@ function ListView({
   onTimeToChange,
   onShowCanceledChange,
   onRequestCancel,
+  onRequestDidntHappen,
+  onViewReview,
 }: {
   services: ServiceProfile[];
   filtered: AppointmentDTO[];
@@ -466,6 +528,7 @@ function ListView({
   timeTo: string;
   showCanceled: boolean;
   cancelingId: string | null;
+  reviewMap: Record<string, ReviewDTO>;
   onStartDateChange: (v: string) => void;
   onEndDateChange: (v: string) => void;
   onApplyRange: () => void;
@@ -475,6 +538,8 @@ function ListView({
   onTimeToChange: (v: string) => void;
   onShowCanceledChange: (v: boolean) => void;
   onRequestCancel: (id: string) => void;
+  onRequestDidntHappen: (id: string) => void;
+  onViewReview: (r: ReviewDTO) => void;
 }) {
   return (
     <div className="space-y-5">
@@ -562,46 +627,110 @@ function ListView({
         </div>
       )}
 
-      {!loading && filtered.map((appt) => (
-        <Card key={appt.id} className="p-4 space-y-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="font-semibold text-[#111418] dark:text-white text-sm">{appt.clientName}</p>
-              <p className="text-xs text-gray-500 mt-0.5">{appt.serviceName}</p>
+      {!loading && filtered.map((appt) => {
+        const review = reviewMap[appt.id];
+        const isCompleted = appt.status === AppointmentStatus.Completed;
+        const isVoided = appt.status === AppointmentStatus.Canceled && appt.notes?.includes("Service did not take place");
+        return (
+          <Card key={appt.id} className="p-4 space-y-3">
+            {/* Top row */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="font-semibold text-[#111418] dark:text-white text-sm">{appt.clientName}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{appt.serviceName} · {appt.partnerName}</p>
+              </div>
+              <StatusBadge status={appt.status} />
             </div>
-            <StatusBadge status={appt.status} />
-          </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-            <span className="flex items-center gap-1">
-              <MaterialIcon name="calendar_today" className="text-sm leading-none" />
-              {formatDate(appt.startDateTime)}
-            </span>
-            <span className="flex items-center gap-1">
-              <MaterialIcon name="schedule" className="text-sm leading-none" />
-              {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
-            </span>
-            {appt.servicePrice != null && (
-              <span className="flex items-center gap-1 font-semibold text-primary">
-                <MaterialIcon name="payments" className="text-sm leading-none" />
-                ${appt.servicePrice.toFixed(2)}
+
+            {/* Details */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <MaterialIcon name="calendar_today" className="text-sm leading-none" />
+                {formatDate(appt.startDateTime)}
               </span>
+              <span className="flex items-center gap-1">
+                <MaterialIcon name="schedule" className="text-sm leading-none" />
+                {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+              </span>
+              {appt.servicePrice != null && (
+                <span className="flex items-center gap-1 font-semibold text-primary">
+                  <MaterialIcon name="payments" className="text-sm leading-none" />
+                  ${appt.servicePrice.toFixed(2)}
+                </span>
+              )}
+            </div>
+
+            {/* Review row — completed only */}
+            {isCompleted && (
+              <div className="border-t border-gray-100 dark:border-gray-800 pt-2">
+                {review ? (
+                  <button
+                    type="button"
+                    onClick={() => onViewReview(review)}
+                    className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 hover:text-primary transition-colors w-full"
+                  >
+                    <div className="flex gap-0.5 shrink-0">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <MaterialIcon
+                          key={s}
+                          name={review.rating >= s ? "star" : "star_border"}
+                          className={`text-sm ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
+                        />
+                      ))}
+                    </div>
+                    <span className="font-medium truncate">
+                      {review.comment
+                        ? `"${review.comment.slice(0, 50)}${review.comment.length > 50 ? "…" : ""}"`
+                        : "View review"}
+                    </span>
+                    <MaterialIcon name="open_in_new" className="text-xs ml-auto shrink-0" />
+                  </button>
+                ) : (
+                  <p className="text-xs text-gray-400 flex items-center gap-1">
+                    <MaterialIcon name="rate_review" className="text-sm" />
+                    No review left
+                  </p>
+                )}
+              </div>
             )}
-          </div>
-          <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
-            <span className="text-[10px] font-mono text-gray-400">#{appt.confirmationCode}</span>
-            {appt.status === AppointmentStatus.Scheduled && (
-              <button
-                type="button"
-                onClick={() => onRequestCancel(appt.id)}
-                disabled={cancelingId === appt.id}
-                className="text-xs text-red-500 hover:underline disabled:opacity-50"
-              >
-                {cancelingId === appt.id ? "Canceling…" : "Cancel"}
-              </button>
+
+            {/* Voided indicator */}
+            {isVoided && (
+              <div className="border-t border-gray-100 dark:border-gray-800 pt-2">
+                <p className="text-xs text-orange-500 font-medium flex items-center gap-1">
+                  <MaterialIcon name="block" className="text-sm" />
+                  Marked as not completed
+                </p>
+              </div>
             )}
-          </div>
-        </Card>
-      ))}
+
+            {/* Footer: code + action */}
+            <div className="flex items-center justify-between pt-1 border-t border-gray-100 dark:border-gray-800">
+              <span className="text-[10px] font-mono text-gray-400">#{appt.confirmationCode}</span>
+              {appt.status === AppointmentStatus.Scheduled && (
+                <button
+                  type="button"
+                  onClick={() => onRequestCancel(appt.id)}
+                  disabled={cancelingId === appt.id}
+                  className="text-xs text-red-500 hover:underline disabled:opacity-50"
+                >
+                  {cancelingId === appt.id ? "Canceling…" : "Cancel"}
+                </button>
+              )}
+              {isCompleted && (
+                <button
+                  type="button"
+                  onClick={() => onRequestDidntHappen(appt.id)}
+                  disabled={cancelingId === appt.id}
+                  className="text-xs text-red-500 hover:underline disabled:opacity-50"
+                >
+                  {cancelingId === appt.id ? "Voiding…" : "Didn't happen"}
+                </button>
+              )}
+            </div>
+          </Card>
+        );
+      })}
     </div>
   );
 }
@@ -617,11 +746,14 @@ function GridView({
   error,
   expandedSlotKey,
   cancelingId,
+  reviewMap,
   onServiceChange,
   onPresetChange,
   onRefresh,
   onToggleExpand,
   onRequestCancel,
+  onRequestDidntHappen,
+  onViewReview,
 }: {
   services: ServiceProfile[];
   gridServiceId: string;
@@ -631,11 +763,14 @@ function GridView({
   error: string | null;
   expandedSlotKey: string | null;
   cancelingId: string | null;
+  reviewMap: Record<string, ReviewDTO>;
   onServiceChange: (id: string) => void;
   onPresetChange: (p: RangePreset) => void;
   onRefresh: () => void;
   onToggleExpand: (key: string) => void;
   onRequestCancel: (id: string) => void;
+  onRequestDidntHappen: (id: string) => void;
+  onViewReview: (r: ReviewDTO) => void;
 }) {
   const totalBooked = gridDays.reduce((s, d) => s + d.slots.filter((sl) => sl.isBooked).length, 0);
   const totalFree = gridDays.reduce((s, d) => s + d.slots.filter((sl) => !sl.isBooked).length, 0);
@@ -777,8 +912,11 @@ function GridView({
                   slot={slot}
                   isExpanded={expandedSlotKey === slot.key}
                   cancelingId={cancelingId}
+                  review={slot.appointment ? reviewMap[slot.appointment.id] : undefined}
                   onToggle={() => slot.isBooked && onToggleExpand(slot.key)}
                   onRequestCancel={onRequestCancel}
+                  onRequestDidntHappen={onRequestDidntHappen}
+                  onViewReview={onViewReview}
                 />
               ))}
             </div>
@@ -795,14 +933,20 @@ function SlotChip({
   slot,
   isExpanded,
   cancelingId,
+  review,
   onToggle,
   onRequestCancel,
+  onRequestDidntHappen,
+  onViewReview,
 }: {
   slot: MergedSlot;
   isExpanded: boolean;
   cancelingId: string | null;
+  review?: ReviewDTO;
   onToggle: () => void;
   onRequestCancel: (id: string) => void;
+  onRequestDidntHappen: (id: string) => void;
+  onViewReview: (r: ReviewDTO) => void;
 }) {
   const time = formatTime(slot.startISO);
   const appt = slot.appointment;
@@ -853,7 +997,7 @@ function SlotChip({
               </p>
               <p className="text-xs text-gray-500 mt-0.5 truncate">{appt.serviceName}</p>
             </div>
-            <Badge variant="active">Scheduled</Badge>
+            <StatusBadge status={appt.status} />
           </div>
 
           {/* Details */}
@@ -882,17 +1026,73 @@ function SlotChip({
             )}
           </div>
 
+          {/* Voided indicator */}
+          {appt.status === AppointmentStatus.Canceled && appt.notes?.includes("Service did not take place") && (
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-2">
+              <p className="text-xs text-orange-500 font-medium flex items-center gap-1">
+                <MaterialIcon name="block" className="text-sm" />
+                Marked as not completed
+              </p>
+            </div>
+          )}
+
+          {/* Review row — completed only */}
+          {appt.status === AppointmentStatus.Completed && (
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-2">
+              {review ? (
+                <button
+                  type="button"
+                  onClick={() => onViewReview(review)}
+                  className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 hover:text-primary transition-colors w-full"
+                >
+                  <div className="flex gap-0.5 shrink-0">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <MaterialIcon
+                        key={s}
+                        name={review.rating >= s ? "star" : "star_border"}
+                        className={`text-sm ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="font-medium truncate">
+                    {review.comment
+                      ? `"${review.comment.slice(0, 35)}${review.comment.length > 35 ? "…" : ""}"`
+                      : "View review"}
+                  </span>
+                  <MaterialIcon name="open_in_new" className="text-xs ml-auto shrink-0" />
+                </button>
+              ) : (
+                <p className="text-xs text-gray-400 flex items-center gap-1">
+                  <MaterialIcon name="rate_review" className="text-sm" />
+                  No review left
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Footer */}
           <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
             <span className="text-[10px] font-mono text-gray-400">#{appt.confirmationCode}</span>
-            <button
-              type="button"
-              onClick={() => onRequestCancel(appt.id)}
-              disabled={cancelingId === appt.id}
-              className="text-xs text-red-500 hover:underline disabled:opacity-50 font-semibold"
-            >
-              {cancelingId === appt.id ? "Canceling…" : "Cancel appointment"}
-            </button>
+            {appt.status === AppointmentStatus.Scheduled && (
+              <button
+                type="button"
+                onClick={() => onRequestCancel(appt.id)}
+                disabled={cancelingId === appt.id}
+                className="text-xs text-red-500 hover:underline disabled:opacity-50 font-semibold"
+              >
+                {cancelingId === appt.id ? "Canceling…" : "Cancel appointment"}
+              </button>
+            )}
+            {appt.status === AppointmentStatus.Completed && (
+              <button
+                type="button"
+                onClick={() => onRequestDidntHappen(appt.id)}
+                disabled={cancelingId === appt.id}
+                className="text-xs text-red-500 hover:underline disabled:opacity-50 font-semibold"
+              >
+                {cancelingId === appt.id ? "Voiding…" : "Didn't happen"}
+              </button>
+            )}
           </div>
         </div>
       )}

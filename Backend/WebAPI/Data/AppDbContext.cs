@@ -26,6 +26,7 @@ namespace WebAPI.Data
         public DbSet<ServiceSchedule> ServiceSchedules => Set<ServiceSchedule>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Follow> Follows => Set<Follow>();
+        public DbSet<Review> Reviews => Set<Review>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -106,6 +107,33 @@ namespace WebAPI.Data
                 .IsUnique();
 
 
+
+            // =====================================================
+            // Review Relationships
+            // =====================================================
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Business)
+                .WithMany()
+                .HasForeignKey(r => r.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Customer)
+                .WithMany()
+                .HasForeignKey(r => r.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Appointment)
+                .WithMany()
+                .HasForeignKey(r => r.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // One review per appointment
+            modelBuilder.Entity<Review>()
+                .HasIndex(r => r.AppointmentId)
+                .IsUnique();
 
             // =====================================================
             // Appointment Relationships

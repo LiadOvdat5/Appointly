@@ -2,7 +2,7 @@
 
 **Feature:** [[F-08-C-Owner-Review-Management|F-08-C: Owner Review Management]]
 **Epic:** [[EPIC-08-Reviews-and-Ratings|EPIC-08: Reviews & Ratings]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **business owner**, I want to **see all reviews for my business in my dashb
 - `[FE]` Highlight any reviews that are flagged (pending admin review)
 
 ## Acceptance Criteria
-- [ ] Owner can see all reviews for their business in the dashboard
-- [ ] Rating summary (average, count, distribution) is shown at the top
-- [ ] Flagged reviews are visually distinguished from regular ones
-- [ ] Reviews are sorted newest first by default
+- [x] Owner can see all reviews for their business in the dashboard
+- [x] Rating summary (average, count, distribution) is shown at the top
+- [ ] Flagged reviews are visually distinguished from regular ones (pending US-08-C-02)
+- [x] Reviews are sorted newest first by default

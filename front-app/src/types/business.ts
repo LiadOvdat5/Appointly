@@ -17,6 +17,8 @@ export interface BusinessProfile {
   searchImageUrl?: string;
   latitude?: number;
   longitude?: number;
+  averageRating?: number;
+  reviewCount?: number;
 }
 
 export interface BusinessCategory {
