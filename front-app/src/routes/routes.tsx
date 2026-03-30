@@ -24,6 +24,7 @@ import BookingPage from "../pages/BookingPage.tsx";
 import StaffPage from "../pages/StaffPage.tsx";
 import StaffDashboardPage from "../pages/StaffDashboardPage.tsx";
 import InvitationsPage from "../pages/InvitationsPage.tsx";
+import BusinessReviewsPage from "../pages/BusinessReviewsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -91,6 +92,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <StaffPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/:businessId/reviews",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <BusinessReviewsPage />
           </ProtectedRoute>
         ),
       },

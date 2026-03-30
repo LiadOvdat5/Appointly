@@ -377,6 +377,7 @@ export default function DashboardPage() {
         onClose={() => setViewingReview(null)}
       />
     )}
+
     {cancelError && (
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3 shadow-lg">
         <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
@@ -865,6 +866,31 @@ export default function DashboardPage() {
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
                   Invite, assign services &amp; view performance
+                </p>
+              </div>
+              <MaterialIcon
+                name="chevron_right"
+                className="text-gray-400 ml-auto shrink-0"
+              />
+            </button>
+
+            {/* Reviews */}
+            <button
+              type="button"
+              onClick={() => navigate(`/dashboard/${business.id}/reviews`)}
+              className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
+            >
+              <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">
+                <MaterialIcon name="star" className="text-2xl text-yellow-500" />
+              </div>
+              <div>
+                <p className="font-bold text-[#111418] dark:text-white text-sm">
+                  Reviews
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {(business.reviewCount ?? 0) > 0
+                    ? `${business.reviewCount} review${business.reviewCount === 1 ? "" : "s"} · ${business.averageRating?.toFixed(1)} avg`
+                    : "No reviews yet"}
                 </p>
               </div>
               <MaterialIcon

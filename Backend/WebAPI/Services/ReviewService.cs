@@ -75,16 +75,50 @@ namespace WebAPI.Services
             return reviews.Select(r => ToDTO(r, r.Customer?.Name)).ToList();
         }
 
+        public async Task<ReviewDTO> FlagReviewAsync(Guid businessId, Guid reviewId, Guid requestingUserId, string reason)
+        {
+            // Verify the business exists and the requesting user is the owner
+            var business = await _businessRepository.GetBusinessEntityByIdAsync(businessId);
+            if (business == null)
+                throw new InvalidAppointmentOperationException("Business not found.");
+
+            if (business.OwnerId != requestingUserId)
+                throw new UnauthorizedAppointmentAccessException("Only the business owner can flag reviews.");
+
+            // Load the review and verify it belongs to this business
+            var review = await _reviewRepository.GetByIdAsync(reviewId);
+            if (review == null || review.BusinessId != businessId)
+                throw new InvalidAppointmentOperationException("Review not found for this business.");
+
+            if (review.IsFlagged)
+                throw new InvalidAppointmentOperationException("This review has already been flagged.");
+
+            var flagged = await _reviewRepository.FlagAsync(reviewId, reason);
+            return ToDTO(flagged!, flagged!.Customer?.Name);
+        }
+
+        private static string AnonymizeName(string? fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return "Anonymous";
+            var parts = fullName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1) return parts[0];
+            return $"{parts[0]} {parts[^1][0]}.";
+        }
+
         private static ReviewDTO ToDTO(Review r, string? customerName) => new()
         {
             Id = r.Id,
             BusinessId = r.BusinessId,
             CustomerId = r.CustomerId,
-            CustomerName = customerName ?? string.Empty,
+            CustomerName = AnonymizeName(customerName),
             AppointmentId = r.AppointmentId,
+            ServiceId = r.Appointment?.ServiceId,
+            ServiceName = r.Appointment?.Service?.Name,
             Rating = r.Rating,
             Comment = r.Comment,
-            CreatedAt = r.CreatedAt
+            CreatedAt = r.CreatedAt,
+            IsFlagged = r.IsFlagged,
+            FlagReason = r.FlagReason
         };
     }
 }

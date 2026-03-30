@@ -19,5 +19,5 @@ As a **business owner**, I want to **see all reviews for my business in my dashb
 ## Acceptance Criteria
 - [x] Owner can see all reviews for their business in the dashboard
 - [x] Rating summary (average, count, distribution) is shown at the top
-- [ ] Flagged reviews are visually distinguished from regular ones (pending US-08-C-02)
+- [x] Flagged reviews are visually distinguished from regular ones
 - [x] Reviews are sorted newest first by default

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-08-C-Owner-Review-Management|F-08-C: Owner Review Management]]
 **Epic:** [[EPIC-08-Reviews-and-Ratings|EPIC-08: Reviews & Ratings]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,7 +18,7 @@ As a **business owner**, I want to **flag a review as inappropriate** so that **
 - `[FE]` After flagging, show "Flagged — pending review" badge on the review
 
 ## Acceptance Criteria
-- [ ] Owner can flag any review on their business with a reason
-- [ ] Flagging does not immediately remove the review — it marks it for admin review
-- [ ] A review can only be flagged once (flag button is disabled after flagging)
-- [ ] Flagged reviews remain visible on the public page until an admin acts on them
+- [x] Owner can flag any review on their business with a reason
+- [x] Flagging does not immediately remove the review — it marks it for admin review
+- [x] A review can only be flagged once (flag button is disabled after flagging)
+- [x] Flagged reviews remain visible on the public page until an admin acts on them

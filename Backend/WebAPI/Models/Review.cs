@@ -27,6 +27,11 @@ namespace WebAPI.Models
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public bool IsFlagged { get; set; } = false;
+
+        [MaxLength(500)]
+        public string? FlagReason { get; set; }
+
         // Navigation properties
         public Business? Business { get; set; }
         public User? Customer { get; set; }

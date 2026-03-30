@@ -2,7 +2,7 @@
 
 **Feature:** [[F-08-B-Reviews-On-Business-Page|F-08-B: Reviews on Business Page]]
 **Epic:** [[EPIC-08-Reviews-and-Ratings|EPIC-08: Reviews & Ratings]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **customer**, I want to **see a business's overall star rating and review c
 - `[FE]` Businesses with zero reviews show no stars (not zero stars) — match existing search stub behavior
 
 ## Acceptance Criteria
-- [ ] `AverageRating` is accurate to one decimal place
-- [ ] `ReviewCount` reflects the real number of reviews
-- [ ] Businesses with no reviews show no rating indicator (not "0.0 ★")
-- [ ] Star display on search results and business page are visually consistent
+- [x] `AverageRating` is accurate to one decimal place
+- [x] `ReviewCount` reflects the real number of reviews
+- [x] Businesses with no reviews show no rating indicator (not "0.0 ★")
+- [x] Star display on search results and business page are visually consistent

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-08-B-Reviews-On-Business-Page|F-08-B: Reviews on Business Page]]
 **Epic:** [[EPIC-08-Reviews-and-Ratings|EPIC-08: Reviews & Ratings]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,8 +19,8 @@ As a **customer browsing a business**, I want to **see a list of customer review
 - `[FE]` Show empty state message when business has no reviews yet
 
 ## Acceptance Criteria
-- [ ] Reviews are shown newest first
-- [ ] Customer identity is anonymized (first name + last initial only)
-- [ ] Pagination works correctly — loading more appends to the list
-- [ ] Empty state is shown when there are no reviews
-- [ ] Reviews section is visible to all visitors (no login required)
+- [x] Reviews are shown newest first
+- [x] Customer identity is anonymized (first name + last initial only)
+- [x] Pagination works correctly — loading more appends to the list
+- [x] Empty state is shown when there are no reviews
+- [x] Reviews section is visible to all visitors (no login required)

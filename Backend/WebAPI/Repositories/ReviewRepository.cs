@@ -18,6 +18,7 @@ namespace WebAPI.Repositories
         {
             return await _context.Reviews
                 .Include(r => r.Customer)
+                .Include(r => r.Appointment).ThenInclude(a => a!.Service)
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
@@ -31,6 +32,7 @@ namespace WebAPI.Repositories
         {
             return await _context.Reviews
                 .Include(r => r.Customer)
+                .Include(r => r.Appointment).ThenInclude(a => a!.Service)
                 .Where(r => r.BusinessId == businessId)
                 .OrderByDescending(r => r.CreatedAt)
                 .Skip((page - 1) * pageSize)
@@ -56,6 +58,21 @@ namespace WebAPI.Repositories
 
             var avg = reviews.Average(r => r.Rating);
             return (Math.Round(avg, 1), reviews.Count);
+        }
+
+        public async Task<Review?> FlagAsync(Guid reviewId, string reason)
+        {
+            var review = await _context.Reviews
+                .Include(r => r.Customer)
+                .Include(r => r.Appointment).ThenInclude(a => a!.Service)
+                .FirstOrDefaultAsync(r => r.Id == reviewId);
+
+            if (review == null) return null;
+
+            review.IsFlagged = true;
+            review.FlagReason = reason;
+            await _context.SaveChangesAsync();
+            return review;
         }
     }
 }

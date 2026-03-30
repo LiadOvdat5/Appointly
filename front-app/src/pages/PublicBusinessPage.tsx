@@ -23,6 +23,7 @@ import {
   unfollowBusiness,
   getFollowStatus,
 } from "../services/followService";
+import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 import { fetchCategories } from "../services/categoryService";
 import {
   getAvailableSlotsForService,
@@ -665,6 +666,13 @@ export default function PublicBusinessPage() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
+  // ── Reviews state ─────────────────────────────────────────────────────────
+  const [reviews, setReviews] = useState<ReviewDTO[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsPage, setReviewsPage] = useState(1);
+  const [reviewsHasMore, setReviewsHasMore] = useState(false);
+  const REVIEWS_PAGE_SIZE = 10;
+
   // ── Load business + services + categories ──────────────────────────────────
   useEffect(() => {
     if (!businessId) return;
@@ -696,6 +704,36 @@ export default function PublicBusinessPage() {
       .catch(() => { /* silently ignore — user may not be authenticated */ });
     return () => { cancelled = true; };
   }, [page.status, isAuthenticated, isOwner, businessId]);
+
+  // ── Load reviews (page 1) when business is ready ─────────────────────────
+  useEffect(() => {
+    if (!businessId) return;
+    setReviewsLoading(true);
+    setReviewsPage(1);
+    getBusinessReviews(businessId, 1, REVIEWS_PAGE_SIZE)
+      .then((data) => {
+        setReviews(data);
+        setReviewsHasMore(data.length === REVIEWS_PAGE_SIZE);
+      })
+      .catch(() => { /* silently ignore */ })
+      .finally(() => setReviewsLoading(false));
+  }, [businessId]);
+
+  async function handleLoadMoreReviews() {
+    if (!businessId || reviewsLoading) return;
+    const nextPage = reviewsPage + 1;
+    setReviewsLoading(true);
+    try {
+      const data = await getBusinessReviews(businessId, nextPage, REVIEWS_PAGE_SIZE);
+      setReviews((prev) => [...prev, ...data]);
+      setReviewsPage(nextPage);
+      setReviewsHasMore(data.length === REVIEWS_PAGE_SIZE);
+    } catch {
+      /* silently ignore */
+    } finally {
+      setReviewsLoading(false);
+    }
+  }
 
   // ── Auto-activate edit mode when ?edit=true ───────────────────────────────
   useEffect(() => {
@@ -1126,6 +1164,30 @@ export default function PublicBusinessPage() {
                     ))}
                   </div>
                 )}
+                {(business.reviewCount ?? 0) > 0 && (
+                  <div className="mt-2 flex items-center gap-1.5">
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => {
+                        const avg = business.averageRating ?? 0;
+                        const filled = avg >= s;
+                        const half = !filled && avg >= s - 0.5;
+                        return (
+                          <MaterialIcon
+                            key={s}
+                            name={filled ? "star" : half ? "star_half" : "star_border"}
+                            className={`text-base leading-none ${filled || half ? "text-yellow-400" : "text-gray-300"}`}
+                          />
+                        );
+                      })}
+                    </div>
+                    <span className="text-sm font-semibold text-[#111418] dark:text-white">
+                      {business.averageRating?.toFixed(1)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      ({business.reviewCount} {business.reviewCount === 1 ? "review" : "reviews"})
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1462,6 +1524,76 @@ export default function PublicBusinessPage() {
             </div>
           )}
         </section>
+
+        {/* ── Reviews section ── */}
+        {!isEditing && (
+          <section>
+            <h2 className="text-lg font-bold text-[#111418] dark:text-white mb-4">Reviews</h2>
+
+            {reviewsLoading && reviews.length === 0 ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                ))}
+              </div>
+            ) : reviews.length === 0 ? (
+              <Card className="p-8 flex flex-col items-center gap-2 text-center">
+                <MaterialIcon name="rate_review" className="text-4xl text-gray-300 dark:text-gray-700" />
+                <p className="text-sm text-gray-500">No reviews yet. Be the first to leave one!</p>
+              </Card>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {reviews.map((review) => (
+                  <Card key={review.id} className="p-5 flex flex-col gap-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-sm text-[#111418] dark:text-white">
+                          {review.customerName}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(review.createdAt).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex gap-0.5 shrink-0">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <MaterialIcon
+                            key={s}
+                            name={review.rating >= s ? "star" : "star_border"}
+                            className={`text-base leading-none ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        "{review.comment}"
+                      </p>
+                    )}
+                  </Card>
+                ))}
+
+                {reviewsHasMore && (
+                  <button
+                    type="button"
+                    onClick={handleLoadMoreReviews}
+                    disabled={reviewsLoading}
+                    className="w-full py-3 text-sm font-semibold text-primary hover:underline disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {reviewsLoading ? (
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+                    ) : (
+                      "Load more reviews"
+                    )}
+                  </button>
+                )}
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </div>
   );

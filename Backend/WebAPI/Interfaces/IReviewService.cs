@@ -9,5 +9,6 @@ namespace WebAPI.Interfaces
     {
         Task<ReviewDTO> CreateReviewAsync(Guid businessId, CreateReviewDTO dto, Guid customerId);
         Task<List<ReviewDTO>> GetReviewsForBusinessAsync(Guid businessId, int page = 1, int pageSize = 20);
+        Task<ReviewDTO> FlagReviewAsync(Guid businessId, Guid reviewId, Guid requestingUserId, string reason);
     }
 }

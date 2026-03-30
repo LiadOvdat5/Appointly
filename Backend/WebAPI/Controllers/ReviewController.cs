@@ -67,6 +67,50 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Flag a review as inappropriate (business owner only)
+        /// </summary>
+        [HttpPost("{reviewId:guid}/flag")]
+        [EndpointSummary("Flag Review")]
+        [EndpointDescription("Flags a review as inappropriate. Only the business owner can flag reviews on their business. " +
+            "A review can only be flagged once.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ReviewDTO>> FlagReview(
+            Guid businessId,
+            Guid reviewId,
+            [FromBody] FlagReviewDTO dto)
+        {
+            var userId = GetCurrentUserId();
+            if (!userId.HasValue)
+                return Unauthorized("User is not authenticated.");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var review = await _reviewService.FlagReviewAsync(businessId, reviewId, userId.Value, dto.Reason);
+                return Ok(review);
+            }
+            catch (UnauthorizedAppointmentAccessException ex)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, ex.Message);
+            }
+            catch (InvalidAppointmentOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"An error occurred while flagging the review: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Get reviews for a business (public)
         /// </summary>
         [HttpGet]
