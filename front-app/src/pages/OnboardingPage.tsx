@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import type { RootState } from "../redux/store";
 import { setOwnedBusiness, setBusinessError } from "../features/business/businessSlice";
 import { setSession } from "../redux/authSlice";
@@ -89,10 +90,11 @@ function AddressMapPreview({ latitude, longitude }: { latitude: number; longitud
 // ── Stepper indicator ────────────────────────────────────────────────────────
 
 function StepIndicator({ current }: { current: Step }) {
-  const steps: { label: string; icon: string }[] = [
-    { label: "Business Info", icon: "store" },
-    { label: "Services", icon: "design_services" },
-    { label: "Done", icon: "check_circle" },
+  const { t } = useTranslation();
+  const steps: { labelKey: string; icon: string }[] = [
+    { labelKey: "onboarding.steps.businessInfo", icon: "store" },
+    { labelKey: "onboarding.steps.services", icon: "design_services" },
+    { labelKey: "onboarding.steps.done", icon: "check_circle" },
   ];
 
   return (
@@ -130,7 +132,7 @@ function StepIndicator({ current }: { current: Step }) {
                       : "text-gray-400",
                 ].join(" ")}
               >
-                {s.label}
+                {t(s.labelKey)}
               </span>
             </div>
             {i < steps.length - 1 && (
@@ -159,16 +161,17 @@ interface Step1Props {
 }
 
 function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1Props) {
+  const { t } = useTranslation();
   const [touched, setTouched] = useState<Partial<Record<keyof BusinessFields, boolean>>>({});
 
   const errors: Partial<Record<keyof BusinessFields, string>> = {
-    name: !fields.name.trim() ? "Business name is required." : undefined,
+    name: !fields.name.trim() ? t("onboarding.error.businessNameRequired") : undefined,
     address: !fields.address.trim()
-      ? "Address is required."
+      ? t("onboarding.error.addressRequired")
       : fields.latitude == null
-        ? "Please select an address from the suggestions."
+        ? t("onboarding.error.addressFromSuggestions")
         : undefined,
-    phone: !fields.phone.trim() ? "Phone number is required." : undefined,
+    phone: !fields.phone.trim() ? t("onboarding.error.phoneRequired") : undefined,
   };
 
   const isValid = !errors.name && !errors.address && !errors.phone;
@@ -189,7 +192,6 @@ function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1
   };
 
   const handleAddressTyping = (val: string) => {
-    // Clear coordinates when user edits text manually
     onChange({ ...fields, address: val, latitude: null, longitude: null });
     setTouched((t) => ({ ...t, address: true }));
   };
@@ -198,26 +200,26 @@ function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1
     <div className="flex flex-col gap-5">
       <div>
         <h2 className="text-xl font-bold text-[#111418] dark:text-white">
-          Tell us about your business
+          {t("onboarding.step1.title")}
         </h2>
         <p className="text-sm text-gray-500 mt-1">
-          This information will appear on your public business page.
+          {t("onboarding.step1.subtitle")}
         </p>
       </div>
 
       {error && <Alert variant="error">{error}</Alert>}
 
       <Input
-        label="Business name *"
-        placeholder="e.g. John's Barbershop"
+        label={t("onboarding.step1.businessNameLabel")}
+        placeholder={t("onboarding.step1.businessNamePlaceholder")}
         value={fields.name}
         onValueChange={set("name")}
         error={touched.name ? errors.name : undefined}
       />
 
       <AddressAutocomplete
-        label="Address *"
-        placeholder="e.g. 123 Main St, Tel Aviv"
+        label={t("onboarding.step1.addressLabel")}
+        placeholder={t("onboarding.step1.addressPlaceholder")}
         value={fields.address}
         onAddressSelect={handleAddressSelect}
         onValueChange={handleAddressTyping}
@@ -229,23 +231,23 @@ function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }: Step1
       )}
 
       <Input
-        label="Phone *"
+        label={t("onboarding.step1.phoneLabel")}
         type="tel"
-        placeholder="e.g. +972-50-0000000"
+        placeholder={t("onboarding.step1.phonePlaceholder")}
         value={fields.phone}
         onValueChange={set("phone")}
         error={touched.phone ? errors.phone : undefined}
       />
 
       <Input
-        label="Description"
-        placeholder="A short description of your business (optional)"
+        label={t("onboarding.step1.descriptionLabel")}
+        placeholder={t("onboarding.step1.descriptionPlaceholder")}
         value={fields.description}
         onValueChange={set("description")}
       />
 
       <Button onClick={handleSubmit} isLoading={isLoading}>
-        Continue
+        {t("buttons.next")}
       </Button>
     </div>
   );
@@ -261,6 +263,7 @@ interface Step2Props {
 }
 
 function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
+  const { t } = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
   const [draft, setDraft] = useState<ServiceDraft>(EMPTY_SERVICE);
   const [services, setServices] = useState<CreateServiceInput[]>([]);
@@ -273,12 +276,12 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
   }, []);
 
   const errors: Partial<Record<keyof ServiceDraft, string>> = {
-    name: !draft.name.trim() ? "Service name is required." : undefined,
+    name: !draft.name.trim() ? t("onboarding.error.serviceNameRequired") : undefined,
     duration:
       !draft.duration || isNaN(Number(draft.duration)) || Number(draft.duration) <= 0
-        ? "Duration must be a positive number (minutes)."
+        ? t("onboarding.error.durationInvalid")
         : undefined,
-    categoryId: !draft.categoryId ? "Category is required." : undefined,
+    categoryId: !draft.categoryId ? t("onboarding.error.categoryRequired") : undefined,
   };
 
   const draftValid = !errors.name && !errors.duration && !errors.categoryId;
@@ -308,7 +311,7 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
       setDraft(EMPTY_SERVICE);
       setTouched({});
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to add service.";
+      const msg = e instanceof Error ? e.message : t("onboarding.error.serviceNameRequired");
       setAddError(msg);
     } finally {
       setIsAdding(false);
@@ -316,7 +319,7 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
   };
 
   const categoryOptions = [
-    { value: "", label: "Select a category..." },
+    { value: "", label: t("onboarding.step2.categoryPlaceholder") },
     ...categories.map((c) => ({ value: c.id, label: c.name })),
   ];
 
@@ -324,10 +327,10 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
     <div className="flex flex-col gap-5">
       <div>
         <h2 className="text-xl font-bold text-[#111418] dark:text-white">
-          Add your services
+          {t("onboarding.step2.title")}
         </h2>
         <p className="text-sm text-gray-500 mt-1">
-          Add at least one service. You can add more later from your dashboard.
+          {t("onboarding.step2.subtitle")}
         </p>
       </div>
 
@@ -356,46 +359,46 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
       {/* Service draft form */}
       <div className="flex flex-col gap-4 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
         <p className="text-sm font-semibold text-[#111418] dark:text-white">
-          {services.length === 0 ? "New service" : "Add another service"}
+          {services.length === 0 ? t("onboarding.step2.newService") : t("onboarding.step2.addAnother")}
         </p>
 
         {addError && <Alert variant="error">{addError}</Alert>}
 
         <Input
-          label="Service name *"
-          placeholder="e.g. Haircut"
+          label={t("onboarding.step2.serviceNameLabel")}
+          placeholder={t("onboarding.step2.serviceNamePlaceholder")}
           value={draft.name}
           onValueChange={set("name")}
           error={touched.name ? errors.name : undefined}
         />
 
         <Input
-          label="Description"
-          placeholder="e.g. Classic haircut with wash and dry"
+          label={t("onboarding.step2.descriptionLabel")}
+          placeholder={t("onboarding.step2.serviceDescPlaceholder")}
           value={draft.description}
           onValueChange={set("description")}
         />
 
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="Duration (min) *"
+            label={t("onboarding.step2.durationLabel")}
             type="number"
-            placeholder="e.g. 30"
+            placeholder={t("onboarding.step2.durationPlaceholder")}
             value={draft.duration}
             onValueChange={set("duration")}
             error={touched.duration ? errors.duration : undefined}
           />
           <Input
-            label="Price (₪)"
+            label={t("onboarding.step2.priceLabel")}
             type="number"
-            placeholder="e.g. 80"
+            placeholder={t("onboarding.step2.pricePlaceholder")}
             value={draft.price}
             onValueChange={set("price")}
           />
         </div>
 
         <Select
-          label="Category *"
+          label={t("onboarding.step2.categoryLabel")}
           value={draft.categoryId}
           onChange={set("categoryId")}
           options={categoryOptions}
@@ -406,20 +409,20 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
 
         <Button variant="secondary" onClick={handleAddService} isLoading={isAdding}>
           <MaterialIcon name="add" className="text-[18px]!" />
-          Add service
+          {t("onboarding.step2.addServiceButton")}
         </Button>
       </div>
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={onBack} className="flex-1">
-          Back
+          {t("buttons.previous")}
         </Button>
         <Button
           onClick={onNext}
           disabled={services.length === 0}
           className="flex-1"
         >
-          Continue
+          {t("buttons.next")}
         </Button>
       </div>
     </div>
@@ -434,6 +437,7 @@ interface Step3Props {
 }
 
 function Step3Complete({ businessName, onFinish }: Step3Props) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center gap-6 text-center py-4">
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-success/10">
@@ -442,20 +446,18 @@ function Step3Complete({ businessName, onFinish }: Step3Props) {
 
       <div>
         <h2 className="text-2xl font-bold text-[#111418] dark:text-white">
-          You're all set!
+          {t("onboarding.step3.title")}
         </h2>
         <p className="text-gray-500 mt-2 text-sm leading-relaxed">
-          <strong>{businessName}</strong> has been created successfully.
-          Your services are live and customers can start booking.
+          {t("onboarding.step3.subtitle", { businessName })}
         </p>
       </div>
 
       <Alert variant="info" className="text-left">
-        Want to set up your working hours? Head to your dashboard to configure
-        your schedule and availability.
+        {t("onboarding.step3.scheduleAlert")}
       </Alert>
 
-      <Button onClick={onFinish}>Go to Dashboard</Button>
+      <Button onClick={onFinish}>{t("onboarding.step3.goToDashboard")}</Button>
     </div>
   );
 }
@@ -463,6 +465,7 @@ function Step3Complete({ businessName, onFinish }: Step3Props) {
 // ── Main OnboardingPage ──────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((s: RootState) => s.auth.user);
@@ -511,7 +514,7 @@ export default function OnboardingPage() {
 
       setStep(2);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to create business.";
+      const msg = e instanceof Error ? e.message : t("onboarding.error.businessNameRequired");
       setCreateError(msg);
       dispatch(setBusinessError(msg));
     } finally {
@@ -526,7 +529,7 @@ export default function OnboardingPage() {
         <div className="flex items-center gap-3 mb-6">
           <MaterialIcon name="store" className="text-primary text-[28px]!" />
           <h1 className="text-2xl font-black text-[#111418] dark:text-white">
-            Set up your business
+            {t("onboarding.pageTitle")}
           </h1>
         </div>
 

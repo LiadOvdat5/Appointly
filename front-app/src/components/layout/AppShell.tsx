@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Header } from "./Header";
 import { RoleSidebar } from "./RoleSidebar";
 
@@ -33,6 +34,7 @@ function SidebarOverlay({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
   if (!open) return null;
 
   return (
@@ -51,11 +53,11 @@ function SidebarOverlay({
           <div className="h-full bg-white dark:bg-background-dark border-l border-gray-200 dark:border-gray-800">
             {/* Optional top row inside drawer */}
             <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-800">
-              <span className="font-semibold">Menu</span>
+              <span className="font-semibold">{t("buttons.menu")}</span>
               <button
                 onClick={onClose}
                 className="flex size-9 items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800"
-                aria-label="Close"
+                aria-label={t("buttons.close")}
               >
                 <span className="material-symbols-outlined">close</span>
               </button>

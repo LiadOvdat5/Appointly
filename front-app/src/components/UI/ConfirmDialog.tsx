@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 
 type Props = {
@@ -15,12 +16,16 @@ export function ConfirmDialog({
   open,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   destructive = false,
   onConfirm,
   onCancel,
 }: Props) {
+  const { t } = useTranslation();
+  const resolvedConfirm = confirmLabel ?? t("buttons.confirm");
+  const resolvedCancel = cancelLabel ?? t("buttons.cancel");
+
   if (!open) return null;
 
   return (
@@ -42,8 +47,8 @@ export function ConfirmDialog({
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" onClick={onCancel} className="flex-1">
-            {cancelLabel}
+          <Button variant="outline" onClick={onCancel} className="flex-1">
+            {resolvedCancel}
           </Button>
           <button
             type="button"
@@ -55,7 +60,7 @@ export function ConfirmDialog({
                 : "bg-primary hover:bg-primary/90 text-white",
             ].join(" ")}
           >
-            {confirmLabel}
+            {resolvedConfirm}
           </button>
         </div>
       </div>

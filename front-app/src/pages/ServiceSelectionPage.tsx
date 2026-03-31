@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { getServicesForBusiness } from "../services/businessManagementService";
 import { getBusinessAppointments, AppointmentStatus, type AppointmentDTO } from "../services/appointmentService";
@@ -9,6 +10,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ServiceSelectionPage() {
+  const { t } = useTranslation();
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
 
@@ -37,7 +39,7 @@ export default function ServiceSelectionPage() {
           ),
         );
       })
-      .catch(() => setError("Failed to load services."))
+      .catch(() => setError(t("serviceSelection.error.loadFailed")))
       .finally(() => setLoading(false));
   }, [businessId]);
 
@@ -54,15 +56,15 @@ export default function ServiceSelectionPage() {
             type="button"
             onClick={() => navigate(-1)}
             className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            aria-label="Back"
+            aria-label={t("common.back")}
           >
             <MaterialIcon name="arrow_back" className="text-xl" />
           </button>
           <div>
             <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-              Services &amp; Hours
+              {t("serviceSelection.title")}
             </h1>
-            <p className="text-xs text-gray-500">Select a service to manage its schedule</p>
+            <p className="text-xs text-gray-500">{t("serviceSelection.subtitle")}</p>
           </div>
         </div>
       </div>
@@ -90,9 +92,9 @@ export default function ServiceSelectionPage() {
               <MaterialIcon name="content_cut" className="text-3xl text-gray-400" />
             </div>
             <div>
-              <p className="font-semibold text-[#111418] dark:text-white">No services yet</p>
+              <p className="font-semibold text-[#111418] dark:text-white">{t("serviceSelection.empty.title")}</p>
               <p className="text-sm text-gray-500 mt-1">
-                Add services from your business page first.
+                {t("serviceSelection.empty.text")}
               </p>
             </div>
             <button
@@ -100,7 +102,7 @@ export default function ServiceSelectionPage() {
               onClick={() => navigate(`/business/${businessId}?edit=true`)}
               className="text-sm font-semibold text-primary hover:underline"
             >
-              Go to business page →
+              {t("serviceSelection.empty.goToBusinessPage")}
             </button>
           </div>
         )}
@@ -145,7 +147,7 @@ export default function ServiceSelectionPage() {
                         {upcoming > 0 && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
                             <MaterialIcon name="event" className="text-xs leading-none" />
-                            {upcoming} upcoming
+                            {t("serviceSelection.upcoming", { count: upcoming })}
                           </span>
                         )}
                       </div>
@@ -161,7 +163,7 @@ export default function ServiceSelectionPage() {
         {/* Hint */}
         {!loading && services.length > 0 && (
           <p className="text-center text-xs text-gray-400 pt-2">
-            Tap a service to manage working hours, breaks, date exceptions, and slot generation.
+            {t("serviceSelection.hint")}
           </p>
         )}
       </div>

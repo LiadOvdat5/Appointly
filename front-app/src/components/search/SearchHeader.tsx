@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MaterialIcon } from "../UI/MaterialIcon";
 import { CategoryFilter } from "./CategoryFilter";
 import type { CategoryFilterOption } from "./CategoryFilter";
@@ -43,6 +44,7 @@ export function SearchHeader({
   onViewChange,
   className,
 }: SearchHeaderProps) {
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const [isFilterOpen, setFilterOpen] = useState(false);
 
@@ -87,7 +89,7 @@ export function SearchHeader({
             onChange={(e) => onSearchChange(e.target.value)}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder="Search for salons, doctors..."
+            placeholder={t("search.placeholder")}
             className={[
               "flex-1 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400",
               "focus:outline-none border-none px-0 text-base font-normal leading-normal",
@@ -106,7 +108,7 @@ export function SearchHeader({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              aria-label="Clear search"
+              aria-label={t("search.clearAriaLabel")}
             >
               <MaterialIcon name="close" className="text-[20px]" />
             </button>
@@ -119,10 +121,10 @@ export function SearchHeader({
         <button
           onClick={() => setFilterOpen((o) => !o)}
           className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-          aria-label="Filter categories"
+          aria-label={t("search.filterAriaLabel")}
         >
           <MaterialIcon name="filter_list" className="text-[20px]" />
-          <span className="text-sm font-medium">Filters</span>
+          <span className="text-sm font-medium">{t("search.filters.title")}</span>
           {availabilityDate && (
             <span className="ml-1 px-2 py-0.5 rounded-full bg-primary text-white text-xs font-medium">
               {availabilityDate}
@@ -140,11 +142,11 @@ export function SearchHeader({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-between items-center mb-3">
-                <h4 className="text-lg font-bold">Filters</h4>
+                <h4 className="text-lg font-bold">{t("search.filters.title")}</h4>
                 <button
                   onClick={() => setFilterOpen(false)}
                   className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                  aria-label="Close filter panel"
+                  aria-label={t("search.filters.closePanelAriaLabel")}
                 >
                   <MaterialIcon name="close" className="text-[20px]" />
                 </button>
@@ -152,7 +154,7 @@ export function SearchHeader({
 
               {/* Category filter */}
               <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Categories
+                {t("search.filters.categories")}
               </p>
               <CategoryFilter
                 options={categoryOptions}
@@ -165,7 +167,7 @@ export function SearchHeader({
               <div className="mt-4 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    Available on
+                    {t("search.filters.availableOn")}
                   </p>
                   {availabilityDate && (
                     <button
@@ -175,7 +177,7 @@ export function SearchHeader({
                       }}
                       className="text-xs text-primary hover:underline"
                     >
-                      Clear
+                      {t("search.filters.clear")}
                     </button>
                   )}
                 </div>
@@ -191,7 +193,7 @@ export function SearchHeader({
                 {availabilityDate && (
                   <div className="mt-3">
                     <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                      Time range (optional)
+                      {t("search.filters.timeRange")}
                     </p>
                     <div className="flex items-center gap-2">
                       <input
@@ -205,7 +207,7 @@ export function SearchHeader({
                         }
                         className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       />
-                      <span className="text-gray-500 text-sm">to</span>
+                      <span className="text-gray-500 text-sm">{t("search.filters.timeTo")}</span>
                       <input
                         type="time"
                         value={availabilityTimeTo ?? ""}

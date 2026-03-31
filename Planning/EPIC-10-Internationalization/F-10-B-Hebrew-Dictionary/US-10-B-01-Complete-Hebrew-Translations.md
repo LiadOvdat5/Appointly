@@ -2,7 +2,7 @@
 
 **Feature:** [[F-10-B-Hebrew-Dictionary|F-10-B: Hebrew Dictionary Completion]]
 **Epic:** [[EPIC-10-Internationalization|EPIC-10: Internationalization (i18n) Hardening]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ As a **Hebrew-speaking user**, I want to **see the entire app in Hebrew with no 
 - `[FE]` After completing translations, switch the app to Hebrew and manually verify all pages render correctly without fallbacks
 
 ## Acceptance Criteria
-- [ ] Every key in `en` has a corresponding, non-empty key in `he`
-- [ ] Switching the app to Hebrew shows no English text fallbacks on any page
-- [ ] Translated text fits within UI components without overflow (spot-check key components)
+- [x] Every key in `en` has a corresponding, non-empty key in `he`
+- [x] Switching the app to Hebrew shows no English text fallbacks on any page
+- [x] Translated text fits within UI components without overflow (spot-check key components)

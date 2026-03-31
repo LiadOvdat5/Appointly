@@ -1,6 +1,7 @@
 // src/components/layout/RoleSidebar.tsx
 import React, { useMemo, useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { selectIsAuthenticated, selectUser } from "../../redux/authSelectors";
 import { Button } from "../UI/Button";
@@ -43,6 +44,7 @@ export function RoleSidebar({
   sections,
   onClose,
 }: Props) {
+  const { t } = useTranslation();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
   const role = (user?.role ?? Role.Guest) as Role;
@@ -69,32 +71,32 @@ export function RoleSidebar({
       sections ?? [
         {
           key: "main",
-          title: "Main",
+          title: t("sidebar.mainSection"),
           items: [
             {
               key: "home",
-              label: "Home",
+              label: t("common.home"),
               to: "/",
               minRole: Role.Guest,
               icon: <Icon name="home" />,
             },
             {
               key: "search",
-              label: "Search",
+              label: t("sidebar.search"),
               to: "/search",
               minRole: Role.Guest,
               icon: <Icon name="search" />,
             },
             {
               key: "customer-dashboard",
-              label: "Dashboard",
+              label: t("sidebar.dashboard"),
               to: "/customer-dashboard",
               minRole: Role.Client,
               icon: <Icon name="dashboard" />,
             },
             {
               key: "appointments",
-              label: "My Appointments",
+              label: t("customerAppointments.title"),
               to: "/dashboard/customer",
               minRole: Role.Client,
               icon: <Icon name="event_upcoming" />,
@@ -103,18 +105,18 @@ export function RoleSidebar({
         },
         {
           key: "account",
-          title: "Account",
+          title: t("sidebar.accountSection"),
           items: [
             {
               key: "profile",
-              label: "Profile",
+              label: t("profile.title"),
               to: "/profile",
               minRole: Role.Client,
               icon: <Icon name="person" />,
             },
             {
               key: "settings",
-              label: "Settings",
+              label: t("settings.title"),
               to: "/settings",
               minRole: Role.Client,
               icon: <Icon name="settings" />,
@@ -122,7 +124,7 @@ export function RoleSidebar({
           ],
         },
       ],
-    [sections],
+    [sections, t],
   );
 
   const visibleSections = useMemo(() => {
@@ -164,7 +166,7 @@ export function RoleSidebar({
           <div className="min-w-0">
             <div className="truncate">{brand}</div>
             <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-              {user ? `Role: ${role}` : "Guest"}
+              {user ? t("sidebar.signedIn") : t("sidebar.notSignedIn")}
             </div>
           </div>
         </div>
@@ -242,10 +244,10 @@ export function RoleSidebar({
           <div className="flex items-center justify-between w-full">
             <div className="min-w-0">
               <div className="text-sm font-semibold truncate">
-                {user?.name ?? "Guest"}
+                {user?.name ?? t("sidebar.notSignedIn")}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {user ? "Signed in" : "Not signed in"}
+                {user ? t("sidebar.signedIn") : t("sidebar.notSignedIn")}
               </div>
             </div>
             <div>
@@ -258,7 +260,7 @@ export function RoleSidebar({
                     onClose?.();
                   }}
                 >
-                  Logout
+                  {t("sidebar.logout")}
                 </Button>
               ) : (
                 <Button
@@ -269,7 +271,7 @@ export function RoleSidebar({
                     onClose?.();
                   }}
                 >
-                  Login
+                  {t("sidebar.login")}
                 </Button>
               )}
             </div>
@@ -295,11 +297,13 @@ function BusinessSection({
   onToggle: () => void;
   onClose?: () => void;
 }) {
+  const { t } = useTranslation();
+
   if (role === Role.Client) {
     return (
       <div className="mb-3">
         <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Business
+          {t("sidebar.businessSection")}
         </div>
         <NavLink
           to="/onboarding"
@@ -314,7 +318,9 @@ function BusinessSection({
           }
         >
           <Icon name="add_business" />
-          <span className="truncate font-medium">Create your business</span>
+          <span className="truncate font-medium">
+            {t("sidebar.createBusiness")}
+          </span>
         </NavLink>
       </div>
     );
@@ -329,7 +335,7 @@ function BusinessSection({
         onClick={onToggle}
         className="flex w-full items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
       >
-        <span>My Businesses</span>
+        <span>{t("sidebar.myBusinesses")}</span>
         <Icon
           name={expanded ? "expand_less" : "expand_more"}
           className="text-[16px]! text-gray-400"
@@ -340,7 +346,7 @@ function BusinessSection({
         <div className="space-y-1">
           {ownedBusinesses.length === 0 ? (
             <p className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
-              No businesses found.
+              {t("sidebar.noBusinesses")}
             </p>
           ) : (
             ownedBusinesses.map((b) => (
@@ -362,7 +368,9 @@ function BusinessSection({
             }
           >
             <Icon name="add" className="text-[18px]!" />
-            <span className="font-medium">Add another business</span>
+            <span className="font-medium">
+              {t("sidebar.addAnotherBusiness")}
+            </span>
           </NavLink>
         </div>
       )}
@@ -377,6 +385,7 @@ function BusinessNavItem({
   business: BusinessProfile;
   onClose?: () => void;
 }) {
+  const { t } = useTranslation();
   const [subExpanded, setSubExpanded] = useState(false);
 
   return (
@@ -400,27 +409,27 @@ function BusinessNavItem({
         <div className="ml-4 space-y-0.5 border-l border-gray-200 dark:border-gray-700 pl-3">
           {[
             {
-              label: "Business Page",
+              label: t("sidebar.businessPage"),
               icon: "storefront",
               to: `/business/${business.id}`,
             },
             {
-              label: "Dashboard",
+              label: t("sidebar.dashboard"),
               icon: "dashboard",
               to: `/dashboard/${business.id}`,
             },
             {
-              label: "Services",
+              label: t("sidebar.services"),
               icon: "content_cut",
               to: `/business/${business.id}/services`,
             },
             {
-              label: "Schedule",
+              label: t("sidebar.schedule"),
               icon: "calendar_month",
               to: `/business/${business.id}/schedule`,
             },
             {
-              label: "Staff",
+              label: t("sidebar.staffPartners"),
               icon: "group",
               to: `/dashboard/${business.id}/staff`,
             },
@@ -457,6 +466,7 @@ function PartnerSection({
   businessId: string;
   onClose?: () => void;
 }) {
+  const { t } = useTranslation();
   const [businessName, setBusinessName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -469,7 +479,7 @@ function PartnerSection({
   return (
     <div className="mb-3">
       <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-        My Workplace
+        {t("sidebar.myWorkplace")}
       </div>
       <div className="space-y-1">
         <NavLink
@@ -486,7 +496,7 @@ function PartnerSection({
         >
           <Icon name="store" />
           <span className="truncate font-medium text-sm">
-            {businessName ?? "Loading…"}
+            {businessName ?? t("sidebar.loading")}
           </span>
         </NavLink>
       </div>
@@ -505,6 +515,7 @@ function FavoritesSection({
   onToggle: () => void;
   onClose?: () => void;
 }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -537,11 +548,10 @@ function FavoritesSection({
             : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
         ].join(" ")}
       >
-        <Icon
-          name="favorite"
-          className={expanded ? "icon-filled" : ""}
-        />
-        <span className="flex-1 truncate font-medium text-left">Favorites</span>
+        <Icon name="favorite" className={expanded ? "icon-filled" : ""} />
+        <span className="flex-1 truncate font-medium text-left">
+          {t("sidebar.favorites")}
+        </span>
         <Icon
           name={expanded ? "expand_less" : "expand_more"}
           className="text-[16px]! text-gray-400 shrink-0"
@@ -556,7 +566,7 @@ function FavoritesSection({
             </div>
           ) : businesses.length === 0 ? (
             <p className="px-2 py-2 text-xs text-gray-400 dark:text-gray-500">
-              No followed businesses yet.
+              {t("sidebar.noFollowed")}
             </p>
           ) : (
             businesses.map((b) => (

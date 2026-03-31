@@ -96,7 +96,7 @@ export const MOCK_BUSINESS_CARD = {
 
 // UI Showcase - Appointment Example
 export const MOCK_APPOINTMENT = {
-  time: "Tomorrow, 10:30 AM",
+  time: "Tomorrow, 10:30",
   serviceName: "Men's Classic Haircut",
   status: "Confirmed",
 };

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { MaterialIcon } from "./MaterialIcon";
 import { Button } from "./Button";
 import type { ReviewDTO } from "../../services/reviewService";
@@ -23,6 +24,8 @@ function StarDisplay({ rating }: { rating: number }) {
 }
 
 export function ReviewViewModal({ open, review, onClose }: Props) {
+  const { t } = useTranslation();
+
   if (!open) return null;
 
   return (
@@ -38,7 +41,7 @@ export function ReviewViewModal({ open, review, onClose }: Props) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <h2 className="font-bold text-[#111418] dark:text-white text-base">
-              Customer Review
+              {t("reviews.viewModal.title")}
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {review.customerName}
@@ -48,7 +51,7 @@ export function ReviewViewModal({ open, review, onClose }: Props) {
             type="button"
             onClick={onClose}
             className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            aria-label="Close"
+            aria-label={t("reviews.viewModal.closeAriaLabel")}
           >
             <MaterialIcon name="close" className="text-xl text-gray-500" />
           </button>
@@ -63,7 +66,7 @@ export function ReviewViewModal({ open, review, onClose }: Props) {
             "{review.comment}"
           </p>
         ) : (
-          <p className="text-sm text-gray-400 italic">No written comment left.</p>
+          <p className="text-sm text-gray-400 italic">{t("reviews.viewModal.noComment")}</p>
         )}
 
         {/* Date */}
@@ -77,7 +80,7 @@ export function ReviewViewModal({ open, review, onClose }: Props) {
         </p>
 
         <Button variant="ghost" onClick={onClose} className="w-full">
-          Close
+          {t("reviews.viewModal.close")}
         </Button>
       </div>
     </div>

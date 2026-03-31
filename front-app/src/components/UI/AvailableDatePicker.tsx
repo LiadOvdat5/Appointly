@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useReducer } from "react";
+import { useTranslation } from "react-i18next";
 import { MaterialIcon } from "./MaterialIcon";
 import { getAvailableDatesForMonth } from "../../services/scheduleService";
 
@@ -41,13 +42,6 @@ function calendarReducer(state: CalendarState, action: CalendarAction): Calendar
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
 function toDateKey(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
@@ -89,6 +83,10 @@ function buildCalendarGrid(year: number, month: number) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: Props) {
+  const { t } = useTranslation();
+  const MONTHS = t("calendar.months", { returnObjects: true }) as string[];
+  const DAYS = t("calendar.days", { returnObjects: true }) as string[];
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -107,10 +105,10 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
         const dates = await getAvailableDatesForMonth(serviceId, year, month);
         dispatch({ type: "LOADED", dates });
       } catch {
-        dispatch({ type: "ERROR", message: "Failed to load availability" });
+        dispatch({ type: "ERROR", message: t("calendar.error") });
       }
     },
-    [serviceId],
+    [serviceId, t],
   );
 
   useEffect(() => {
@@ -148,7 +146,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
           type="button"
           onClick={prevMonth}
           disabled={isCurrentMonth || state.loading}
-          aria-label="Previous month"
+          aria-label={t("calendar.prevMonth")}
           className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
         >
           <MaterialIcon name="chevron_left" className="text-xl" />
@@ -162,7 +160,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
           type="button"
           onClick={nextMonth}
           disabled={state.loading}
-          aria-label="Next month"
+          aria-label={t("calendar.nextMonth")}
           className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
         >
           <MaterialIcon name="chevron_right" className="text-xl" />
@@ -216,7 +214,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
               ]
                 .filter(Boolean)
                 .join(" ")}
-              aria-label={`${cell.day} ${MONTHS[cell.month]} ${cell.year}${isSelected ? " (selected)" : ""}${isDisabled && isCurrentMonthCell ? " (unavailable)" : ""}`}
+              aria-label={`${cell.day} ${MONTHS[cell.month]} ${cell.year}${isSelected ? ` ${t("calendar.selected")}` : ""}${isDisabled && isCurrentMonthCell ? ` ${t("calendar.unavailable")}` : ""}`}
               aria-pressed={isSelected}
             >
               {cell.day}
@@ -231,7 +229,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
 
       {/* Loading / error feedback */}
       {state.loading && (
-        <p className="text-center text-xs text-gray-400 mt-3">Loading availability…</p>
+        <p className="text-center text-xs text-gray-400 mt-3">{t("calendar.loading")}</p>
       )}
       {state.error && !state.loading && (
         <p className="text-center text-xs text-red-500 mt-3">{state.error}</p>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { formatTime } from "../utils/formatTime";
 import {
   getPublicBusinessById,
   getPublicServicesForBusiness,
@@ -28,13 +30,6 @@ function formatDuration(minutes: number): string {
   return m ? `${h}h ${m}m` : `${h}h`;
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 function formatDateLong(date: Date): string {
   return date.toLocaleDateString(undefined, {
     weekday: "long",
@@ -47,6 +42,7 @@ function formatDateLong(date: Date): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function BookingPage() {
+  const { t } = useTranslation();
   const { businessId, serviceId } = useParams<{
     businessId: string;
     serviceId: string;
@@ -61,7 +57,6 @@ export default function BookingPage() {
   const [metaError, setMetaError] = useState<string | null>(null);
 
   // ─ Date selection
-  // If the user clicked a specific slot chip on the business page, pre-select that date.
   const slotDateParam = searchParams.get("slotDate");
   const [selectedDate, setSelectedDate] = useState<Date | null>(() => {
     if (slotDateParam) {
@@ -81,7 +76,8 @@ export default function BookingPage() {
   // ─ Booking submission
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
-  const [confirmedAppointment, setConfirmedAppointment] = useState<AppointmentDTO | null>(null);
+  const [confirmedAppointment, setConfirmedAppointment] =
+    useState<AppointmentDTO | null>(null);
 
   // Load business + service metadata
   useEffect(() => {
@@ -95,11 +91,11 @@ export default function BookingPage() {
         setBusiness(biz);
         const svc = services.find((s) => s.id === serviceId) ?? null;
         setService(svc);
-        if (!svc) setMetaError("Service not found.");
+        if (!svc) setMetaError(t("booking.errorServiceNotFound"));
       })
-      .catch(() => setMetaError("Failed to load booking details."))
+      .catch(() => setMetaError(t("booking.errorLoadFailed")))
       .finally(() => setMetaLoading(false));
-  }, [businessId, serviceId]);
+  }, [businessId, serviceId, t]);
 
   // Load time slots when a date is selected
   useEffect(() => {
@@ -125,13 +121,15 @@ export default function BookingPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 text-center p-6">
         <MaterialIcon name="error_outline" className="text-5xl text-gray-300" />
-        <p className="text-gray-500">{metaError ?? "Something went wrong."}</p>
+        <p className="text-gray-500">
+          {metaError ?? t("booking.errorSomethingWrong")}
+        </p>
         <button
           type="button"
           onClick={() => navigate(-1)}
           className="text-primary text-sm underline"
         >
-          Go back
+          {t("booking.goBack")}
         </button>
       </div>
     );
@@ -147,13 +145,14 @@ export default function BookingPage() {
       const appointment = await bookAppointment(serviceId, selectedSlot.id);
       setConfirmedAppointment(appointment);
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response?.status;
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
       if (status === 409) {
-        setBookingError("That slot was just taken. Please pick another time.");
+        setBookingError(t("booking.slotTaken"));
         setSelectedSlotId(null);
         setSlots([]);
       } else {
-        setBookingError("Something went wrong. Please try again.");
+        setBookingError(t("booking.errorTryAgain"));
       }
     } finally {
       setIsSubmitting(false);
@@ -166,36 +165,51 @@ export default function BookingPage() {
       <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
         <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-[#111418] dark:text-white">Booking Confirmed</p>
+            <p className="font-semibold text-sm text-[#111418] dark:text-white">
+              {t("booking.confirmed.header")}
+            </p>
           </div>
         </div>
         <div className="max-w-lg mx-auto px-4 py-10 flex flex-col items-center gap-6 text-center">
           <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <MaterialIcon name="check_circle" className="text-4xl text-green-500" />
+            <MaterialIcon
+              name="check_circle"
+              className="text-4xl text-green-500"
+            />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[#111418] dark:text-white">You're booked!</h1>
-            <p className="text-sm text-gray-500 mt-1">Your appointment has been confirmed.</p>
+            <h1 className="text-xl font-bold text-[#111418] dark:text-white">
+              {t("booking.confirmed.title")}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {t("booking.confirmed.subtitle")}
+            </p>
           </div>
           <Card className="p-5 w-full text-left space-y-3">
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Confirmation #</span>
+              <span>{t("booking.confirmed.confirmationCode")}</span>
               <span className="font-mono font-medium text-[#111418] dark:text-white text-xs">
                 {confirmedAppointment.confirmationCode}
               </span>
             </div>
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Business</span>
-              <span className="font-medium text-[#111418] dark:text-white">{confirmedAppointment.businessName}</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Service</span>
-              <span className="font-medium text-[#111418] dark:text-white">{confirmedAppointment.serviceName}</span>
-            </div>
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Date</span>
+              <span>{t("booking.confirmed.business")}</span>
               <span className="font-medium text-[#111418] dark:text-white">
-                {new Date(confirmedAppointment.startDateTime).toLocaleDateString(undefined, {
+                {confirmedAppointment.businessName}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>{t("booking.confirmed.service")}</span>
+              <span className="font-medium text-[#111418] dark:text-white">
+                {confirmedAppointment.serviceName}
+              </span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <span>{t("booking.confirmed.date")}</span>
+              <span className="font-medium text-[#111418] dark:text-white">
+                {new Date(
+                  confirmedAppointment.startDateTime,
+                ).toLocaleDateString(undefined, {
                   weekday: "short",
                   month: "short",
                   day: "numeric",
@@ -204,24 +218,37 @@ export default function BookingPage() {
               </span>
             </div>
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-              <span>Time</span>
+              <span>{t("booking.confirmed.time")}</span>
               <span className="font-medium text-[#111418] dark:text-white">
-                {formatTime(confirmedAppointment.startDateTime)} – {formatTime(confirmedAppointment.endDateTime)}
+                {formatTime(confirmedAppointment.startDateTime)} –{" "}
+                {formatTime(confirmedAppointment.endDateTime)}
               </span>
             </div>
             {confirmedAppointment.servicePrice != null && (
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
-                <span className="font-semibold">Total</span>
-                <span className="font-bold text-primary">${confirmedAppointment.servicePrice.toFixed(2)}</span>
+                <span className="font-semibold">
+                  {t("booking.confirmed.total")}
+                </span>
+                <span className="font-bold text-primary">
+                  ${confirmedAppointment.servicePrice.toFixed(2)}
+                </span>
               </div>
             )}
           </Card>
           <div className="flex flex-col gap-3 w-full">
-            <Button variant="primary" onClick={() => navigate("/dashboard/customer")}>
-              View in your appointments
+            <Button
+              variant="primary"
+              onClick={() => navigate("/dashboard/customer")}
+            >
+              {t("booking.confirmed.viewAppointments")}
             </Button>
-            <Button variant="ghost" onClick={() => navigate(`/business/${confirmedAppointment.businessId}`)}>
-              Back to Business Page
+            <Button
+              variant="outline"
+              onClick={() =>
+                navigate(`/business/${confirmedAppointment.businessId}`)
+              }
+            >
+              {t("booking.confirmed.backToBusiness")}
             </Button>
           </div>
         </div>
@@ -237,7 +264,7 @@ export default function BookingPage() {
           type="button"
           onClick={() => navigate(`/business/${businessId}`)}
           className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          aria-label="Back"
+          aria-label={t("common.back")}
         >
           <MaterialIcon name="arrow_back" className="text-xl" />
         </button>
@@ -261,11 +288,16 @@ export default function BookingPage() {
             </p>
             <p className="text-xs text-gray-500 flex items-center gap-2 mt-0.5">
               <span className="flex items-center gap-1">
-                <MaterialIcon name="schedule" className="text-sm leading-none" />
+                <MaterialIcon
+                  name="schedule"
+                  className="text-sm leading-none"
+                />
                 {formatDuration(service.duration)}
               </span>
               {service.price != null && (
-                <span className="font-semibold text-primary">${service.price.toFixed(2)}</span>
+                <span className="font-semibold text-primary">
+                  ${service.price.toFixed(2)}
+                </span>
               )}
             </p>
           </div>
@@ -274,7 +306,7 @@ export default function BookingPage() {
         {/* Date picker */}
         <Card className="p-5">
           <h2 className="font-semibold text-[#111418] dark:text-white text-sm mb-4">
-            Pick a date
+            {t("booking.pickDate")}
           </h2>
           <AvailableDatePicker
             serviceId={serviceId!}
@@ -290,9 +322,11 @@ export default function BookingPage() {
         {selectedDate && (
           <Card className="p-5">
             <h2 className="font-semibold text-[#111418] dark:text-white text-sm mb-1">
-              Available times
+              {t("booking.availableTimes")}
             </h2>
-            <p className="text-xs text-gray-400 mb-4">{formatDateLong(selectedDate)}</p>
+            <p className="text-xs text-gray-400 mb-4">
+              {formatDateLong(selectedDate)}
+            </p>
 
             {slotsLoading ? (
               <div className="flex justify-center py-4">
@@ -300,7 +334,7 @@ export default function BookingPage() {
               </div>
             ) : slots.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-4">
-                No available slots for this date.
+                {t("booking.noSlots")}
               </p>
             ) : (
               <div className="grid grid-cols-3 gap-2">
@@ -309,7 +343,9 @@ export default function BookingPage() {
                     key={slot.id}
                     selected={slot.id === selectedSlotId}
                     onClick={() =>
-                      setSelectedSlotId(slot.id === selectedSlotId ? null : slot.id)
+                      setSelectedSlotId(
+                        slot.id === selectedSlotId ? null : slot.id,
+                      )
                     }
                   >
                     {formatTime(slot.startDateTime)}
@@ -324,17 +360,17 @@ export default function BookingPage() {
         {selectedSlot && (
           <Card className="p-5 space-y-4">
             <h2 className="font-semibold text-[#111418] dark:text-white text-sm">
-              Booking summary
+              {t("booking.summary")}
             </h2>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                <span>Service</span>
+                <span>{t("booking.summaryService")}</span>
                 <span className="font-medium text-[#111418] dark:text-white">
                   {service.name}
                 </span>
               </div>
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                <span>Date</span>
+                <span>{t("booking.summaryDate")}</span>
                 <span className="font-medium text-[#111418] dark:text-white">
                   {selectedDate
                     ? selectedDate.toLocaleDateString(undefined, {
@@ -346,7 +382,7 @@ export default function BookingPage() {
                 </span>
               </div>
               <div className="flex justify-between text-gray-600 dark:text-gray-400">
-                <span>Time</span>
+                <span>{t("booking.summaryTime")}</span>
                 <span className="font-medium text-[#111418] dark:text-white">
                   {formatTime(selectedSlot.startDateTime)} –{" "}
                   {formatTime(selectedSlot.endDateTime)}
@@ -354,7 +390,9 @@ export default function BookingPage() {
               </div>
               {service.price != null && (
                 <div className="flex justify-between text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
-                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">
+                    {t("booking.summaryTotal")}
+                  </span>
                   <span className="font-bold text-primary">
                     ${service.price.toFixed(2)}
                   </span>
@@ -364,8 +402,13 @@ export default function BookingPage() {
 
             {bookingError && (
               <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3">
-                <MaterialIcon name="error_outline" className="text-red-500 text-base mt-0.5 shrink-0" />
-                <p className="text-sm text-red-600 dark:text-red-400">{bookingError}</p>
+                <MaterialIcon
+                  name="error_outline"
+                  className="text-red-500 text-base mt-0.5 shrink-0"
+                />
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {bookingError}
+                </p>
               </div>
             )}
             <Button
@@ -373,7 +416,9 @@ export default function BookingPage() {
               disabled={isSubmitting}
               onClick={handleConfirmBooking}
             >
-              {isSubmitting ? "Confirming…" : "Confirm Booking"}
+              {isSubmitting
+                ? t("booking.confirming")
+                : t("booking.confirmButton")}
             </Button>
           </Card>
         )}

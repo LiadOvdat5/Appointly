@@ -1,6 +1,8 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { formatTime } from "../utils/formatTime";
 import type { RootState } from "../redux/store";
 import {
   selectAvailabilityDate,
@@ -41,7 +43,7 @@ import type { AddressResult } from "../components/UI/AddressAutocomplete";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL as string ?? "";
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) ?? "";
 
 /** Resolve an API-relative upload path (e.g. /uploads/logos/foo.jpg) to a full URL */
 function resolveUploadUrl(path: string | null | undefined): string | null {
@@ -67,8 +69,7 @@ function formatSlotDate(iso: string): string {
 }
 
 function formatSlotTime(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  return formatTime(iso);
 }
 
 // ─── State types ─────────────────────────────────────────────────────────────
@@ -132,20 +133,34 @@ type PageState =
     };
 
 type PageAction =
-  | { type: "LOADED"; business: BusinessProfile; services: ServiceProfile[]; categories: Category[] }
+  | {
+      type: "LOADED";
+      business: BusinessProfile;
+      services: ServiceProfile[];
+      categories: Category[];
+    }
   | { type: "NOT_FOUND" }
   | { type: "SLOTS_LOADING"; serviceId: string }
   | { type: "SLOTS_READY"; serviceId: string; slots: SlotDTO[] }
   | { type: "ENTER_EDIT" }
   | { type: "EXIT_EDIT" }
   | { type: "SET_DRAFT"; field: keyof DraftBusiness; value: string }
-  | { type: "SET_DRAFT_ADDRESS"; address: string; latitude: number | null; longitude: number | null }
+  | {
+      type: "SET_DRAFT_ADDRESS";
+      address: string;
+      latitude: number | null;
+      longitude: number | null;
+    }
   | { type: "SET_SAVING"; value: boolean }
   | { type: "SET_SAVE_ERROR"; message: string | null }
   | { type: "SAVE_SUCCESS"; business: BusinessProfile }
   | { type: "SET_LOGO_PREVIEW"; preview: string | null; file: File | null }
   | { type: "SET_BANNER_PREVIEW"; preview: string | null; file: File | null }
-  | { type: "SET_SEARCH_IMAGE_PREVIEW"; preview: string | null; file: File | null }
+  | {
+      type: "SET_SEARCH_IMAGE_PREVIEW";
+      preview: string | null;
+      file: File | null;
+    }
   | { type: "SET_UPLOADING_LOGO"; value: boolean }
   | { type: "SET_UPLOADING_BANNER"; value: boolean }
   | { type: "SET_UPLOADING_SEARCH_IMAGE"; value: boolean }
@@ -215,7 +230,10 @@ function pageReducer(state: PageState, action: PageAction): PageState {
       next.delete(action.serviceId);
       return {
         ...state,
-        slotsByService: { ...state.slotsByService, [action.serviceId]: action.slots },
+        slotsByService: {
+          ...state.slotsByService,
+          [action.serviceId]: action.slots,
+        },
         slotsLoadingFor: next,
       };
     }
@@ -260,7 +278,10 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
     case "SET_DRAFT":
       if (state.status !== "ready") return state;
-      return { ...state, draft: { ...state.draft, [action.field]: action.value } };
+      return {
+        ...state,
+        draft: { ...state.draft, [action.field]: action.value },
+      };
 
     case "SET_DRAFT_ADDRESS":
       if (state.status !== "ready") return state;
@@ -307,7 +328,11 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
     case "SET_BANNER_PREVIEW":
       if (state.status !== "ready") return state;
-      return { ...state, bannerPreview: action.preview, bannerFile: action.file };
+      return {
+        ...state,
+        bannerPreview: action.preview,
+        bannerFile: action.file,
+      };
 
     case "SET_UPLOADING_LOGO":
       if (state.status !== "ready") return state;
@@ -319,7 +344,11 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
     case "SET_SEARCH_IMAGE_PREVIEW":
       if (state.status !== "ready") return state;
-      return { ...state, searchImagePreview: action.preview, searchImageFile: action.file };
+      return {
+        ...state,
+        searchImagePreview: action.preview,
+        searchImageFile: action.file,
+      };
 
     case "SET_UPLOADING_SEARCH_IMAGE":
       if (state.status !== "ready") return state;
@@ -336,11 +365,19 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
     case "CANCEL_SERVICE_EDIT":
       if (state.status !== "ready") return state;
-      return { ...state, editingServiceId: null, serviceDraft: emptyServiceDraft(), serviceError: null };
+      return {
+        ...state,
+        editingServiceId: null,
+        serviceDraft: emptyServiceDraft(),
+        serviceError: null,
+      };
 
     case "SET_SERVICE_DRAFT":
       if (state.status !== "ready") return state;
-      return { ...state, serviceDraft: { ...state.serviceDraft, [action.field]: action.value } };
+      return {
+        ...state,
+        serviceDraft: { ...state.serviceDraft, [action.field]: action.value },
+      };
 
     case "SET_SERVICE_SAVING":
       if (state.status !== "ready") return state;
@@ -413,6 +450,7 @@ function ServiceCardItem({
   onManageSchedule: () => void;
 }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const bookingPath = `/book/${businessId}/${service.id}`;
   const loginRedirect = `/login?from=/business/${businessId}`;
 
@@ -427,14 +465,18 @@ function ServiceCardItem({
   const previewSlots = slots.slice(0, 3);
 
   return (
-    <Card className={`p-5 flex flex-col gap-4 transition-opacity ${isBeingEdited ? "opacity-40 pointer-events-none" : ""}`}>
+    <Card
+      className={`p-5 flex flex-col gap-4 transition-opacity ${isBeingEdited ? "opacity-40 pointer-events-none" : ""}`}
+    >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <p className="font-bold text-[#111418] dark:text-white text-base">
             {service.name}
           </p>
           {service.description && (
-            <p className="text-sm text-gray-500 mt-0.5">{service.description}</p>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {service.description}
+            </p>
           )}
         </div>
         <div className="flex items-start gap-2">
@@ -455,7 +497,7 @@ function ServiceCardItem({
                 type="button"
                 onClick={onManageSchedule}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
-                aria-label="Manage schedule"
+                aria-label={t("publicBusiness.manageSchedule")}
               >
                 <MaterialIcon name="calendar_month" className="text-base" />
               </button>
@@ -463,7 +505,7 @@ function ServiceCardItem({
                 type="button"
                 onClick={onEdit}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
-                aria-label="Edit service"
+                aria-label={t("publicBusiness.editServiceAriaLabel")}
               >
                 <MaterialIcon name="edit" className="text-base" />
               </button>
@@ -471,7 +513,7 @@ function ServiceCardItem({
                 type="button"
                 onClick={onDelete}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors"
-                aria-label="Delete service"
+                aria-label={t("publicBusiness.deleteServiceAriaLabel")}
               >
                 <MaterialIcon name="delete" className="text-base" />
               </button>
@@ -484,7 +526,9 @@ function ServiceCardItem({
         <>
           <div>
             {slotsLoading ? (
-              <p className="text-xs text-gray-400">Checking availability…</p>
+              <p className="text-xs text-gray-400">
+                {t("publicBusiness.checkingAvailability")}
+              </p>
             ) : previewSlots.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {previewSlots.map((slot) => (
@@ -500,16 +544,20 @@ function ServiceCardItem({
                       hover:bg-primary/10 active:scale-95 transition-all"
                   >
                     {formatSlotDate(slot.startDateTime)}{" "}
-                    <span className="font-bold">{formatSlotTime(slot.startDateTime)}</span>
+                    <span className="font-bold">
+                      {formatSlotTime(slot.startDateTime)}
+                    </span>
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-gray-400">No upcoming slots available</p>
+              <p className="text-xs text-gray-400">
+                {t("publicBusiness.noUpcomingSlots")}
+              </p>
             )}
           </div>
           <Button variant="primary" size="sm" onClick={() => handleBook()}>
-            Book
+            {t("publicBusiness.book")}
           </Button>
         </>
       )}
@@ -538,8 +586,9 @@ function ServiceForm({
   onSave: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const categoryOptions = [
-    { value: "", label: "— Select category —" },
+    { value: "", label: t("publicBusiness.selectCategory") },
     ...categories.map((c) => ({ value: c.id, label: c.name })),
   ];
 
@@ -547,11 +596,11 @@ function ServiceForm({
   const priceNum = Number(draft.price);
   const durationError =
     draft.duration !== "" && (isNaN(durationNum) || durationNum <= 0)
-      ? "Must be a positive number"
+      ? t("publicBusiness.durationPositive")
       : undefined;
   const priceError =
     draft.price !== "" && (isNaN(priceNum) || priceNum < 0)
-      ? "Cannot be negative"
+      ? t("publicBusiness.priceNotNegative")
       : undefined;
 
   const canSave =
@@ -564,25 +613,27 @@ function ServiceForm({
   return (
     <Card className="p-5 flex flex-col gap-4 border-2 border-primary/30 bg-primary/5 dark:bg-primary/10">
       <p className="text-sm font-bold text-primary">
-        {isNew ? "Add Service" : "Edit Service"}
+        {isNew
+          ? t("publicBusiness.addService")
+          : t("publicBusiness.editServiceTitle")}
       </p>
 
       <div className="grid grid-cols-1 gap-3">
         <Input
-          label="Name"
+          label={t("publicBusiness.nameLabel")}
           value={draft.name}
           onValueChange={(v) => onField("name", v)}
-          placeholder="e.g. Haircut"
+          placeholder={t("publicBusiness.namePlaceholder")}
         />
         <Input
-          label="Description (optional)"
+          label={t("publicBusiness.descriptionOptionalLabel")}
           value={draft.description}
           onValueChange={(v) => onField("description", v)}
-          placeholder="Short description"
+          placeholder={t("publicBusiness.descriptionShortPlaceholder")}
         />
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="Duration (min)"
+            label={t("publicBusiness.durationLabel")}
             type="number"
             value={draft.duration}
             onValueChange={(v) => onField("duration", v)}
@@ -590,7 +641,7 @@ function ServiceForm({
             error={durationError}
           />
           <Input
-            label="Price ($)"
+            label={t("publicBusiness.priceLabel")}
             type="number"
             value={draft.price}
             onValueChange={(v) => onField("price", v)}
@@ -600,7 +651,7 @@ function ServiceForm({
         </div>
         {isNew && (
           <Select
-            label="Category"
+            label={t("publicBusiness.categoryLabel")}
             value={draft.categoryId}
             onChange={(v) => onField("categoryId", v)}
             options={categoryOptions}
@@ -619,7 +670,7 @@ function ServiceForm({
           disabled={!canSave}
           isLoading={isSaving}
         >
-          {isNew ? "Add Service" : "Save"}
+          {isNew ? t("publicBusiness.addService") : t("buttons.save")}
         </Button>
         <Button
           variant="outline"
@@ -628,7 +679,7 @@ function ServiceForm({
           onClick={onCancel}
           disabled={isSaving}
         >
-          Cancel
+          {t("buttons.cancel")}
         </Button>
       </div>
     </Card>
@@ -638,6 +689,7 @@ function ServiceForm({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function PublicBusinessPage() {
+  const { t } = useTranslation();
   const { businessId } = useParams<{ businessId: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -685,24 +737,38 @@ export default function PublicBusinessPage() {
     ])
       .then(([biz, svcs, cats]) => {
         if (!cancelled)
-          dispatch({ type: "LOADED", business: biz, services: svcs, categories: cats });
+          dispatch({
+            type: "LOADED",
+            business: biz,
+            services: svcs,
+            categories: cats,
+          });
       })
       .catch((err) => {
         if (!cancelled && err?.response?.status === 404)
           dispatch({ type: "NOT_FOUND" });
       });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [businessId]);
 
   // ── Load follow status once business is ready ────────────────────────────
   useEffect(() => {
-    if (page.status !== "ready" || !isAuthenticated || isOwner || !businessId) return;
+    if (page.status !== "ready" || !isAuthenticated || isOwner || !businessId)
+      return;
     let cancelled = false;
     getFollowStatus(businessId)
-      .then((s) => { if (!cancelled) setIsFollowing(s.isFollowing); })
-      .catch(() => { /* silently ignore — user may not be authenticated */ });
-    return () => { cancelled = true; };
+      .then((s) => {
+        if (!cancelled) setIsFollowing(s.isFollowing);
+      })
+      .catch(() => {
+        /* silently ignore — user may not be authenticated */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [page.status, isAuthenticated, isOwner, businessId]);
 
   // ── Load reviews (page 1) when business is ready ─────────────────────────
@@ -715,7 +781,9 @@ export default function PublicBusinessPage() {
         setReviews(data);
         setReviewsHasMore(data.length === REVIEWS_PAGE_SIZE);
       })
-      .catch(() => { /* silently ignore */ })
+      .catch(() => {
+        /* silently ignore */
+      })
       .finally(() => setReviewsLoading(false));
   }, [businessId]);
 
@@ -724,7 +792,11 @@ export default function PublicBusinessPage() {
     const nextPage = reviewsPage + 1;
     setReviewsLoading(true);
     try {
-      const data = await getBusinessReviews(businessId, nextPage, REVIEWS_PAGE_SIZE);
+      const data = await getBusinessReviews(
+        businessId,
+        nextPage,
+        REVIEWS_PAGE_SIZE,
+      );
       setReviews((prev) => [...prev, ...data]);
       setReviewsPage(nextPage);
       setReviewsHasMore(data.length === REVIEWS_PAGE_SIZE);
@@ -769,14 +841,18 @@ export default function PublicBusinessPage() {
     page.services.forEach((svc) => {
       getAvailableSlotsForService(svc.id, fromDate, toDate)
         .then((slots) => {
-          if (!cancelled) dispatch({ type: "SLOTS_READY", serviceId: svc.id, slots });
+          if (!cancelled)
+            dispatch({ type: "SLOTS_READY", serviceId: svc.id, slots });
         })
         .catch(() => {
-          if (!cancelled) dispatch({ type: "SLOTS_READY", serviceId: svc.id, slots: [] });
+          if (!cancelled)
+            dispatch({ type: "SLOTS_READY", serviceId: svc.id, slots: [] });
         });
     });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.status === "ready" ? page.services : null]);
 
@@ -797,7 +873,10 @@ export default function PublicBusinessPage() {
       });
       dispatch({ type: "SAVE_SUCCESS", business: updated });
     } catch {
-      dispatch({ type: "SET_SAVE_ERROR", message: "Failed to save. Please try again." });
+      dispatch({
+        type: "SET_SAVE_ERROR",
+        message: t("publicBusiness.saveFailed"),
+      });
     }
   }
 
@@ -816,7 +895,10 @@ export default function PublicBusinessPage() {
     if (page.status !== "ready" || !page.bannerFile) return;
     dispatch({ type: "SET_UPLOADING_BANNER", value: true });
     try {
-      const updated = await uploadBusinessBanner(page.business.id, page.bannerFile);
+      const updated = await uploadBusinessBanner(
+        page.business.id,
+        page.bannerFile,
+      );
       dispatch({ type: "SAVE_SUCCESS", business: updated });
     } catch {
       dispatch({ type: "SET_UPLOADING_BANNER", value: false });
@@ -841,7 +923,10 @@ export default function PublicBusinessPage() {
     if (page.status !== "ready" || !page.searchImageFile) return;
     dispatch({ type: "SET_UPLOADING_SEARCH_IMAGE", value: true });
     try {
-      const updated = await uploadBusinessSearchImage(page.business.id, page.searchImageFile);
+      const updated = await uploadBusinessSearchImage(
+        page.business.id,
+        page.searchImageFile,
+      );
       dispatch({ type: "SAVE_SUCCESS", business: updated });
     } catch {
       dispatch({ type: "SET_UPLOADING_SEARCH_IMAGE", value: false });
@@ -889,7 +974,9 @@ export default function PublicBusinessPage() {
           name: page.serviceDraft.name,
           description: page.serviceDraft.description || undefined,
           duration: parseInt(page.serviceDraft.duration, 10),
-          price: page.serviceDraft.price ? parseFloat(page.serviceDraft.price) : undefined,
+          price: page.serviceDraft.price
+            ? parseFloat(page.serviceDraft.price)
+            : undefined,
           categoryId: page.serviceDraft.categoryId,
           userId: authUser!.id,
         });
@@ -912,7 +999,10 @@ export default function PublicBusinessPage() {
         dispatch({ type: "SERVICE_SAVED", service: updated });
       }
     } catch {
-      dispatch({ type: "SET_SERVICE_ERROR", message: "Failed to save service." });
+      dispatch({
+        type: "SET_SERVICE_ERROR",
+        message: t("publicBusiness.serviceFormSaveFailed"),
+      });
     }
   }
 
@@ -947,15 +1037,21 @@ export default function PublicBusinessPage() {
   if (page.status === "not_found") {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-        <MaterialIcon name="storefront" className="text-5xl text-gray-300 dark:text-gray-700" />
+        <MaterialIcon
+          name="storefront"
+          className="text-5xl text-gray-300 dark:text-gray-700"
+        />
         <h1 className="text-2xl font-bold text-[#111418] dark:text-white">
-          Business not found
+          {t("publicBusiness.notFound")}
         </h1>
-        <p className="text-gray-500">
-          This business page doesn't exist or has been removed.
-        </p>
-        <Button variant="outline" size="sm" className="w-auto px-6" onClick={() => navigate(-1)}>
-          Go back
+        <p className="text-gray-500">{t("publicBusiness.notFoundDesc")}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-auto px-6"
+          onClick={() => navigate(-1)}
+        >
+          {t("publicBusiness.goBack")}
         </Button>
       </div>
     );
@@ -987,25 +1083,41 @@ export default function PublicBusinessPage() {
   } = page;
 
   // Apply live theme color via CSS custom property override on this page
-  const activeThemeColor = isEditing ? draft.themeColor : (business.themeColor ?? undefined);
+  const activeThemeColor = isEditing
+    ? draft.themeColor
+    : (business.themeColor ?? undefined);
   const themeStyle: React.CSSProperties | undefined = activeThemeColor
     ? ({ "--color-primary": activeThemeColor } as React.CSSProperties)
     : undefined;
 
   // Displayed logo/banner/search-image (preview overrides persisted value in edit mode)
-  const displayLogo = isEditing && logoPreview ? logoPreview : resolveUploadUrl(business.logoUrl);
-  const displayBanner = isEditing && bannerPreview ? bannerPreview : resolveUploadUrl(business.bannerUrl);
-  const displaySearchImage = isEditing && searchImagePreview ? searchImagePreview : resolveUploadUrl(business.searchImageUrl);
+  const displayLogo =
+    isEditing && logoPreview ? logoPreview : resolveUploadUrl(business.logoUrl);
+  const displayBanner =
+    isEditing && bannerPreview
+      ? bannerPreview
+      : resolveUploadUrl(business.bannerUrl);
+  const displaySearchImage =
+    isEditing && searchImagePreview
+      ? searchImagePreview
+      : resolveUploadUrl(business.searchImageUrl);
 
   return (
-    <div style={themeStyle} className="min-h-screen bg-gray-50 dark:bg-background-dark">
+    <div
+      style={themeStyle}
+      className="min-h-screen bg-gray-50 dark:bg-background-dark"
+    >
       {/* ── Sticky top bar ── */}
       <div className="sticky top-0 z-50 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-background-dark">
         <button
           type="button"
-          onClick={() => (isEditing ? dispatch({ type: "EXIT_EDIT" }) : navigate(-1))}
+          onClick={() =>
+            isEditing ? dispatch({ type: "EXIT_EDIT" }) : navigate(-1)
+          }
           className="inline-flex items-center justify-center rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label={isEditing ? "Cancel edit" : "Back"}
+          aria-label={
+            isEditing ? t("publicBusiness.cancelEdit") : t("common.back")
+          }
         >
           <MaterialIcon
             name={isEditing ? "close" : "arrow_back"}
@@ -1013,7 +1125,9 @@ export default function PublicBusinessPage() {
           />
         </button>
         <span className="flex-1 text-base font-bold text-[#111418] truncate dark:text-white">
-          {isEditing ? "Editing: " + business.name : business.name}
+          {isEditing
+            ? t("publicBusiness.editingTitle", { name: business.name })
+            : business.name}
         </span>
         {isOwner && !isEditing && (
           <button
@@ -1023,7 +1137,7 @@ export default function PublicBusinessPage() {
               text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
           >
             <MaterialIcon name="edit" className="text-base" />
-            Edit
+            {t("buttons.edit")}
           </button>
         )}
         {isEditing && (
@@ -1034,7 +1148,7 @@ export default function PublicBusinessPage() {
             onClick={handleSaveBusiness}
             isLoading={isSaving}
           >
-            Save
+            {t("buttons.save")}
           </Button>
         )}
       </div>
@@ -1045,7 +1159,7 @@ export default function PublicBusinessPage() {
           {displayBanner ? (
             <img
               src={displayBanner}
-              alt="Business banner"
+              alt={t("publicBusiness.bannerAlt")}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -1074,14 +1188,22 @@ export default function PublicBusinessPage() {
                     ) : (
                       <MaterialIcon name="cloud_upload" className="text-base" />
                     )}
-                    {isUploadingBanner ? "Uploading…" : "Upload banner"}
+                    {isUploadingBanner
+                      ? t("publicBusiness.uploading")
+                      : t("publicBusiness.uploadBanner")}
                   </button>
                   <button
                     type="button"
-                    onClick={() => dispatch({ type: "SET_BANNER_PREVIEW", preview: null, file: null })}
+                    onClick={() =>
+                      dispatch({
+                        type: "SET_BANNER_PREVIEW",
+                        preview: null,
+                        file: null,
+                      })
+                    }
                     className="rounded-lg bg-white/80 px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-white transition-colors shadow"
                   >
-                    Cancel
+                    {t("buttons.cancel")}
                   </button>
                 </div>
               ) : (
@@ -1091,8 +1213,13 @@ export default function PublicBusinessPage() {
                   className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#111418]
                     hover:bg-gray-100 transition-colors shadow"
                 >
-                  <MaterialIcon name="add_photo_alternate" className="text-base" />
-                  {displayBanner ? "Change banner" : "Add banner"}
+                  <MaterialIcon
+                    name="add_photo_alternate"
+                    className="text-base"
+                  />
+                  {displayBanner
+                    ? t("publicBusiness.changeBanner")
+                    : t("publicBusiness.addBanner")}
                 </button>
               )}
             </div>
@@ -1109,12 +1236,15 @@ export default function PublicBusinessPage() {
               {displayLogo ? (
                 <img
                   src={displayLogo}
-                  alt="Business logo"
+                  alt={t("publicBusiness.logoAlt")}
                   className="h-16 w-16 rounded-xl object-cover border border-gray-200 dark:border-gray-700"
                 />
               ) : (
                 <div className="h-16 w-16 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <MaterialIcon name="storefront" className="text-2xl text-primary" />
+                  <MaterialIcon
+                    name="storefront"
+                    className="text-2xl text-primary"
+                  />
                 </div>
               )}
               {isEditing && (
@@ -1131,9 +1261,12 @@ export default function PublicBusinessPage() {
                     onClick={() => logoInputRef.current?.click()}
                     className="absolute -bottom-1 -right-1 rounded-full bg-primary p-1 shadow-md
                       hover:brightness-95 transition-all"
-                    aria-label="Change logo"
+                    aria-label={t("publicBusiness.changeLogoAriaLabel")}
                   >
-                    <MaterialIcon name="photo_camera" className="text-white text-xs" />
+                    <MaterialIcon
+                      name="photo_camera"
+                      className="text-white text-xs"
+                    />
                   </button>
                 </>
               )}
@@ -1143,8 +1276,10 @@ export default function PublicBusinessPage() {
               <div className="flex-1">
                 <Input
                   value={draft.name}
-                  onValueChange={(v) => dispatch({ type: "SET_DRAFT", field: "name", value: v })}
-                  placeholder="Business name"
+                  onValueChange={(v) =>
+                    dispatch({ type: "SET_DRAFT", field: "name", value: v })
+                  }
+                  placeholder={t("publicBusiness.businessNamePlaceholder")}
                 />
               </div>
             ) : (
@@ -1174,7 +1309,13 @@ export default function PublicBusinessPage() {
                         return (
                           <MaterialIcon
                             key={s}
-                            name={filled ? "star" : half ? "star_half" : "star_border"}
+                            name={
+                              filled
+                                ? "star"
+                                : half
+                                  ? "star_half"
+                                  : "star_border"
+                            }
                             className={`text-base leading-none ${filled || half ? "text-yellow-400" : "text-gray-300"}`}
                           />
                         );
@@ -1184,7 +1325,9 @@ export default function PublicBusinessPage() {
                       {business.averageRating?.toFixed(1)}
                     </span>
                     <span className="text-xs text-gray-500">
-                      ({business.reviewCount} {business.reviewCount === 1 ? "review" : "reviews"})
+                      {t("publicBusiness.reviewCount", {
+                        count: business.reviewCount,
+                      })}
                     </span>
                   </div>
                 )}
@@ -1205,11 +1348,19 @@ export default function PublicBusinessPage() {
                 disabled={isUploadingLogo}
                 className="text-sm font-semibold text-primary hover:underline disabled:opacity-50"
               >
-                {isUploadingLogo ? "Uploading…" : "Upload"}
+                {isUploadingLogo
+                  ? t("publicBusiness.uploading")
+                  : t("publicBusiness.upload")}
               </button>
               <button
                 type="button"
-                onClick={() => dispatch({ type: "SET_LOGO_PREVIEW", preview: null, file: null })}
+                onClick={() =>
+                  dispatch({
+                    type: "SET_LOGO_PREVIEW",
+                    preview: null,
+                    file: null,
+                  })
+                }
                 className="text-gray-400 hover:text-gray-600"
               >
                 <MaterialIcon name="close" className="text-base" />
@@ -1221,21 +1372,24 @@ export default function PublicBusinessPage() {
           {isEditing && (
             <div className="flex flex-col gap-2">
               <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
-                Search Card Image
+                {t("publicBusiness.searchCardImageLabel")}
               </label>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Shown on search &amp; discovery pages. If not set, your logo is used instead.
+                {t("publicBusiness.searchCardImageDesc")}
               </p>
               <div className="flex items-center gap-3">
                 {displaySearchImage ? (
                   <img
                     src={displaySearchImage}
-                    alt="Search card preview"
+                    alt={t("publicBusiness.searchCardPreviewAlt")}
                     className="h-20 w-32 rounded-lg object-cover border border-gray-200 dark:border-gray-700"
                   />
                 ) : (
                   <div className="h-20 w-32 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-600">
-                    <MaterialIcon name="image_search" className="text-2xl text-gray-400" />
+                    <MaterialIcon
+                      name="image_search"
+                      className="text-2xl text-gray-400"
+                    />
                   </div>
                 )}
                 <div className="flex flex-col gap-2">
@@ -1251,22 +1405,33 @@ export default function PublicBusinessPage() {
                     onClick={() => searchImageInputRef.current?.click()}
                     className="text-sm font-medium text-primary hover:underline"
                   >
-                    {displaySearchImage ? "Change image" : "Upload image"}
+                    {displaySearchImage
+                      ? t("publicBusiness.changeImage")
+                      : t("publicBusiness.uploadImage")}
                   </button>
                   {displaySearchImage && !searchImageFile && (
                     <button
                       type="button"
-                      onClick={() => dispatch({ type: "SET_SEARCH_IMAGE_PREVIEW", preview: null, file: null })}
+                      onClick={() =>
+                        dispatch({
+                          type: "SET_SEARCH_IMAGE_PREVIEW",
+                          preview: null,
+                          file: null,
+                        })
+                      }
                       className="text-xs text-gray-400 hover:text-red-500"
                     >
-                      Remove
+                      {t("publicBusiness.remove")}
                     </button>
                   )}
                 </div>
               </div>
               {searchImageFile && (
                 <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
-                  <MaterialIcon name="image" className="text-primary text-base" />
+                  <MaterialIcon
+                    name="image"
+                    className="text-primary text-base"
+                  />
                   <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
                     {searchImageFile.name}
                   </span>
@@ -1276,11 +1441,19 @@ export default function PublicBusinessPage() {
                     disabled={isUploadingSearchImage}
                     className="text-sm font-semibold text-primary hover:underline disabled:opacity-50"
                   >
-                    {isUploadingSearchImage ? "Uploading…" : "Upload"}
+                    {isUploadingSearchImage
+                      ? t("publicBusiness.uploading")
+                      : t("publicBusiness.upload")}
                   </button>
                   <button
                     type="button"
-                    onClick={() => dispatch({ type: "SET_SEARCH_IMAGE_PREVIEW", preview: null, file: null })}
+                    onClick={() =>
+                      dispatch({
+                        type: "SET_SEARCH_IMAGE_PREVIEW",
+                        preview: null,
+                        file: null,
+                      })
+                    }
                     className="text-gray-400 hover:text-gray-600"
                   >
                     <MaterialIcon name="close" className="text-base" />
@@ -1294,14 +1467,18 @@ export default function PublicBusinessPage() {
           {isEditing ? (
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
-                Description
+                {t("publicBusiness.descriptionLabel")}
               </label>
               <textarea
                 value={draft.description}
                 onChange={(e) =>
-                  dispatch({ type: "SET_DRAFT", field: "description", value: e.target.value })
+                  dispatch({
+                    type: "SET_DRAFT",
+                    field: "description",
+                    value: e.target.value,
+                  })
                 }
-                placeholder="Tell customers about your business…"
+                placeholder={t("publicBusiness.descriptionEditPlaceholder")}
                 rows={3}
                 className="w-full rounded-lg border border-gray-300 bg-white p-3 text-[#111418] outline-none
                   resize-none text-sm focus:ring-2 focus:ring-primary
@@ -1320,9 +1497,9 @@ export default function PublicBusinessPage() {
           {isEditing ? (
             <div className="grid grid-cols-1 gap-3">
               <AddressAutocomplete
-                label="Address"
+                label={t("publicBusiness.addressLabel")}
                 value={draft.address}
-                placeholder="Search for an address..."
+                placeholder={t("publicBusiness.addressPlaceholder")}
                 onAddressSelect={(result: AddressResult) =>
                   dispatch({
                     type: "SET_DRAFT_ADDRESS",
@@ -1341,10 +1518,12 @@ export default function PublicBusinessPage() {
                 }
               />
               <Input
-                label="Phone"
+                label={t("publicBusiness.phoneLabel")}
                 type="tel"
                 value={draft.phone}
-                onValueChange={(v) => dispatch({ type: "SET_DRAFT", field: "phone", value: v })}
+                onValueChange={(v) =>
+                  dispatch({ type: "SET_DRAFT", field: "phone", value: v })
+                }
                 placeholder="+1-555-0123"
                 startIcon={<MaterialIcon name="call" className="text-sm" />}
               />
@@ -1353,14 +1532,23 @@ export default function PublicBusinessPage() {
             <div className="flex flex-col gap-2">
               {business.address && (
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <MaterialIcon name="location_on" className="text-base text-gray-400" />
+                  <MaterialIcon
+                    name="location_on"
+                    className="text-base text-gray-400"
+                  />
                   <span>{business.address}</span>
                 </div>
               )}
               {business.phone && (
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <MaterialIcon name="call" className="text-base text-gray-400" />
-                  <a href={`tel:${business.phone}`} className="hover:text-primary transition-colors">
+                  <MaterialIcon
+                    name="call"
+                    className="text-base text-gray-400"
+                  />
+                  <a
+                    href={`tel:${business.phone}`}
+                    className="hover:text-primary transition-colors"
+                  >
                     {business.phone}
                   </a>
                 </div>
@@ -1386,10 +1574,17 @@ export default function PublicBusinessPage() {
               ) : (
                 <MaterialIcon
                   name="favorite"
-                  className={["text-base leading-none", isFollowing ? "icon-filled" : ""].filter(Boolean).join(" ")}
+                  className={[
+                    "text-base leading-none",
+                    isFollowing ? "icon-filled" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                 />
               )}
-              {isFollowing ? "Following" : "Follow"}
+              {isFollowing
+                ? t("publicBusiness.following")
+                : t("publicBusiness.follow")}
             </button>
           )}
 
@@ -1397,29 +1592,33 @@ export default function PublicBusinessPage() {
           {isEditing && (
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
-                Theme Color
+                {t("publicBusiness.themeColorLabel")}
               </label>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
                   value={draft.themeColor}
                   onChange={(e) =>
-                    dispatch({ type: "SET_DRAFT", field: "themeColor", value: e.target.value })
+                    dispatch({
+                      type: "SET_DRAFT",
+                      field: "themeColor",
+                      value: e.target.value,
+                    })
                   }
                   className="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
                 />
-                <span className="text-sm text-gray-500 font-mono">{draft.themeColor}</span>
+                <span className="text-sm text-gray-500 font-mono">
+                  {draft.themeColor}
+                </span>
                 <span className="text-xs text-gray-400">
-                  Live preview updates the page colors
+                  {t("publicBusiness.themeColorHint")}
                 </span>
               </div>
             </div>
           )}
 
           {/* Save error */}
-          {saveError && (
-            <p className="text-sm text-danger">{saveError}</p>
-          )}
+          {saveError && <p className="text-sm text-danger">{saveError}</p>}
 
           {/* Edit mode action bar (inside card) */}
           {isEditing && (
@@ -1431,7 +1630,7 @@ export default function PublicBusinessPage() {
                 onClick={handleSaveBusiness}
                 isLoading={isSaving}
               >
-                Save changes
+                {t("publicBusiness.saveChanges")}
               </Button>
               <Button
                 variant="outline"
@@ -1440,7 +1639,7 @@ export default function PublicBusinessPage() {
                 onClick={() => dispatch({ type: "EXIT_EDIT" })}
                 disabled={isSaving}
               >
-                Cancel
+                {t("buttons.cancel")}
               </Button>
             </div>
           )}
@@ -1449,24 +1648,31 @@ export default function PublicBusinessPage() {
         {/* ── Services section ── */}
         <section>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-[#111418] dark:text-white">Services</h2>
+            <h2 className="text-lg font-bold text-[#111418] dark:text-white">
+              {t("publicBusiness.servicesTitle")}
+            </h2>
             {isEditing && editingServiceId !== "new" && (
               <button
                 type="button"
-                onClick={() => dispatch({ type: "EDIT_SERVICE", serviceId: "new" })}
+                onClick={() =>
+                  dispatch({ type: "EDIT_SERVICE", serviceId: "new" })
+                }
                 className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
               >
                 <MaterialIcon name="add" className="text-base" />
-                Add service
+                {t("publicBusiness.addServiceLink")}
               </button>
             )}
           </div>
 
           {services.length === 0 && !isEditing ? (
             <Card className="p-8 flex flex-col items-center gap-2 text-center">
-              <MaterialIcon name="content_cut" className="text-4xl text-gray-300 dark:text-gray-700" />
+              <MaterialIcon
+                name="content_cut"
+                className="text-4xl text-gray-300 dark:text-gray-700"
+              />
               <p className="text-sm text-gray-500">
-                This business hasn't listed any services yet.
+                {t("publicBusiness.noServicesListed")}
               </p>
             </Card>
           ) : (
@@ -1480,7 +1686,13 @@ export default function PublicBusinessPage() {
                     isNew={false}
                     isSaving={isServiceSaving}
                     error={serviceError}
-                    onField={(f, v) => dispatch({ type: "SET_SERVICE_DRAFT", field: f, value: v })}
+                    onField={(f, v) =>
+                      dispatch({
+                        type: "SET_SERVICE_DRAFT",
+                        field: f,
+                        value: v,
+                      })
+                    }
                     onSave={handleSaveService}
                     onCancel={() => dispatch({ type: "CANCEL_SERVICE_EDIT" })}
                   />
@@ -1493,10 +1705,16 @@ export default function PublicBusinessPage() {
                     slotsLoading={slotsLoadingFor.has(svc.id)}
                     isAuthenticated={isAuthenticated}
                     isEditing={isEditing}
-                    isBeingEdited={isEditing && editingServiceId !== null && editingServiceId !== svc.id}
+                    isBeingEdited={
+                      isEditing &&
+                      editingServiceId !== null &&
+                      editingServiceId !== svc.id
+                    }
                     onEdit={() => handleEditService(svc)}
                     onDelete={() => handleDeleteService(svc.id)}
-                    onManageSchedule={() => navigate(`/schedule/${businessId}/${svc.id}`)}
+                    onManageSchedule={() =>
+                      navigate(`/schedule/${businessId}/${svc.id}`)
+                    }
                   />
                 ),
               )}
@@ -1509,18 +1727,27 @@ export default function PublicBusinessPage() {
                   isNew
                   isSaving={isServiceSaving}
                   error={serviceError}
-                  onField={(f, v) => dispatch({ type: "SET_SERVICE_DRAFT", field: f, value: v })}
+                  onField={(f, v) =>
+                    dispatch({ type: "SET_SERVICE_DRAFT", field: f, value: v })
+                  }
                   onSave={handleSaveService}
                   onCancel={() => dispatch({ type: "CANCEL_SERVICE_EDIT" })}
                 />
               )}
 
-              {services.length === 0 && isEditing && editingServiceId !== "new" && (
-                <Card className="p-6 flex flex-col items-center gap-2 text-center border-dashed">
-                  <MaterialIcon name="content_cut" className="text-3xl text-gray-300 dark:text-gray-700" />
-                  <p className="text-sm text-gray-500">No services yet. Add your first one above.</p>
-                </Card>
-              )}
+              {services.length === 0 &&
+                isEditing &&
+                editingServiceId !== "new" && (
+                  <Card className="p-6 flex flex-col items-center gap-2 text-center border-dashed">
+                    <MaterialIcon
+                      name="content_cut"
+                      className="text-3xl text-gray-300 dark:text-gray-700"
+                    />
+                    <p className="text-sm text-gray-500">
+                      {t("publicBusiness.noServicesYet")}
+                    </p>
+                  </Card>
+                )}
             </div>
           )}
         </section>
@@ -1528,18 +1755,28 @@ export default function PublicBusinessPage() {
         {/* ── Reviews section ── */}
         {!isEditing && (
           <section>
-            <h2 className="text-lg font-bold text-[#111418] dark:text-white mb-4">Reviews</h2>
+            <h2 className="text-lg font-bold text-[#111418] dark:text-white mb-4">
+              {t("publicBusiness.reviewsTitle")}
+            </h2>
 
             {reviewsLoading && reviews.length === 0 ? (
               <div className="space-y-3">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse" />
+                  <div
+                    key={i}
+                    className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse"
+                  />
                 ))}
               </div>
             ) : reviews.length === 0 ? (
               <Card className="p-8 flex flex-col items-center gap-2 text-center">
-                <MaterialIcon name="rate_review" className="text-4xl text-gray-300 dark:text-gray-700" />
-                <p className="text-sm text-gray-500">No reviews yet. Be the first to leave one!</p>
+                <MaterialIcon
+                  name="rate_review"
+                  className="text-4xl text-gray-300 dark:text-gray-700"
+                />
+                <p className="text-sm text-gray-500">
+                  {t("publicBusiness.noReviewsYet")}
+                </p>
               </Card>
             ) : (
               <div className="flex flex-col gap-3">
@@ -1551,11 +1788,14 @@ export default function PublicBusinessPage() {
                           {review.customerName}
                         </span>
                         <span className="text-xs text-gray-400">
-                          {new Date(review.createdAt).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
+                          {new Date(review.createdAt).toLocaleDateString(
+                            undefined,
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )}
                         </span>
                       </div>
                       <div className="flex gap-0.5 shrink-0">
@@ -1586,7 +1826,7 @@ export default function PublicBusinessPage() {
                     {reviewsLoading ? (
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
                     ) : (
-                      "Load more reviews"
+                      t("publicBusiness.loadMoreReviews")
                     )}
                   </button>
                 )}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   getStaff,
   getPendingInvitations,
@@ -50,6 +51,7 @@ function InviteModal({
   onClose: () => void;
   onInvite: (email: string, message: string) => Promise<void>;
 }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,7 +70,7 @@ function InviteModal({
         err instanceof Error
           ? err.message
           : (err as { response?: { data?: { error?: string } } })?.response?.data
-              ?.error ?? "Failed to send invitation.";
+              ?.error ?? t("staff.error.inviteFailed");
       setError(msg);
     } finally {
       setLoading(false);
@@ -86,7 +88,7 @@ function InviteModal({
       >
         <div className="flex items-center justify-between">
           <h2 className="font-bold text-[#111418] dark:text-white text-base">
-            Invite Staff Member
+            {t("staff.inviteModal.title")}
           </h2>
           <button
             type="button"
@@ -99,21 +101,21 @@ function InviteModal({
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input
-            label="Email address"
+            label={t("staff.inviteModal.emailLabel")}
             type="email"
             value={email}
             onValueChange={setEmail}
-            placeholder="worker@example.com"
+            placeholder={t("staff.inviteModal.emailPlaceholder")}
             required
           />
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
-              Message (optional)
+              {t("staff.inviteModal.messageLabel")}
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Add a personal note..."
+              placeholder={t("staff.inviteModal.messagePlaceholder")}
               rows={3}
               maxLength={500}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 text-[#111418] dark:text-white text-sm outline-none focus:ring-2 focus:ring-primary resize-none"
@@ -125,7 +127,7 @@ function InviteModal({
           )}
 
           <Button type="submit" variant="primary" isLoading={loading}>
-            Send Invitation
+            {t("staff.inviteModal.submitButton")}
           </Button>
         </form>
       </div>
@@ -148,6 +150,7 @@ function StaffDetailModal({
   onClose: () => void;
   onRemove: () => void;
 }) {
+  const { t } = useTranslation();
   const [assignedIds, setAssignedIds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -180,7 +183,7 @@ function StaffDetailModal({
     try {
       await updateStaffServices(businessId, member.userId, assignedIds);
     } catch {
-      setSaveError("Failed to save assignments.");
+      setSaveError(t("staff.error.saveFailed"));
     } finally {
       setSaving(false);
     }
@@ -222,7 +225,7 @@ function StaffDetailModal({
             {/* ── Analytics (US-02-E-05) ── */}
             <section>
               <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-                Performance (This Month)
+                {t("staff.detail.performance")}
               </h3>
               {reportLoading ? (
                 <div className="grid grid-cols-2 gap-3">
@@ -236,9 +239,9 @@ function StaffDetailModal({
               ) : report ? (
                 <div className="grid grid-cols-2 gap-3">
                   <StatCard
-                    label="Appointments"
+                    label={t("staff.detail.appointments")}
                     value={String(report.totalAppointments)}
-                    description="this period"
+                    description={t("staff.detail.thisPeriod")}
                     iconBgColor="bg-green-100 dark:bg-green-900/30"
                     icon={
                       <MaterialIcon
@@ -248,9 +251,9 @@ function StaffDetailModal({
                     }
                   />
                   <StatCard
-                    label="Revenue"
+                    label={t("staff.detail.revenue")}
                     value={`$${report.revenue.toFixed(2)}`}
-                    description="from completed"
+                    description={t("staff.detail.fromCompleted")}
                     iconBgColor="bg-blue-100 dark:bg-blue-900/30"
                     icon={
                       <MaterialIcon
@@ -260,9 +263,9 @@ function StaffDetailModal({
                     }
                   />
                   <StatCard
-                    label="Completion"
+                    label={t("staff.detail.completion")}
                     value={`${report.completionRate}%`}
-                    description="completion rate"
+                    description={t("staff.detail.completionRate")}
                     iconBgColor="bg-purple-100 dark:bg-purple-900/30"
                     icon={
                       <MaterialIcon
@@ -272,9 +275,9 @@ function StaffDetailModal({
                     }
                   />
                   <StatCard
-                    label="Avg Rating"
+                    label={t("staff.detail.avgRating")}
                     value="—"
-                    description="Coming soon"
+                    description={t("staff.detail.comingSoon")}
                     iconBgColor="bg-yellow-100 dark:bg-yellow-900/30"
                     icon={
                       <MaterialIcon
@@ -285,14 +288,14 @@ function StaffDetailModal({
                   />
                 </div>
               ) : (
-                <p className="text-sm text-gray-400">No data available.</p>
+                <p className="text-sm text-gray-400">{t("staff.detail.noData")}</p>
               )}
             </section>
 
             {/* ── Service Assignments (US-02-E-04) ── */}
             <section>
               <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
-                Service Assignments
+                {t("staff.detail.serviceAssignments")}
               </h3>
               {servicesLoading ? (
                 <div className="space-y-2">
@@ -305,7 +308,7 @@ function StaffDetailModal({
                 </div>
               ) : allServices.length === 0 ? (
                 <p className="text-sm text-gray-400">
-                  No services available for this business.
+                  {t("staff.detail.noServices")}
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -350,7 +353,7 @@ function StaffDetailModal({
                   onClick={handleSaveServices}
                   disabled={servicesLoading}
                 >
-                  Save Assignments
+                  {t("staff.detail.saveAssignments")}
                 </Button>
               </div>
             </section>
@@ -363,7 +366,7 @@ function StaffDetailModal({
                 className="flex items-center gap-2 text-sm font-semibold text-red-500 hover:text-red-600 transition"
               >
                 <MaterialIcon name="person_remove" className="text-base" />
-                Remove from business
+                {t("staff.detail.removeFromBusiness")}
               </button>
             </section>
           </div>
@@ -373,9 +376,9 @@ function StaffDetailModal({
       {/* Confirm remove dialog */}
       <ConfirmDialog
         open={confirmRemove}
-        title="Remove Staff Member"
-        message={`Remove ${member.name} from your business? They will lose access immediately.`}
-        confirmLabel="Remove"
+        title={t("staff.remove.title")}
+        message={t("staff.remove.message", { name: member.name })}
+        confirmLabel={t("staff.remove.confirmLabel")}
         destructive
         onConfirm={() => {
           setConfirmRemove(false);
@@ -390,6 +393,7 @@ function StaffDetailModal({
 // ─── StaffPage ────────────────────────────────────────────────────────────────
 
 export default function StaffPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { businessId } = useParams<{ businessId: string }>();
 
@@ -422,9 +426,9 @@ export default function StaffPage() {
         setInvitations(inv);
         setAllServices(svc);
       })
-      .catch(() => setError("Failed to load staff data."))
+      .catch(() => setError(t("staff.error.loadFailed")))
       .finally(() => setLoading(false));
-  }, [bid]);
+  }, [bid, t]);
 
   // ── Actions ────────────────────────────────────────────────────────────────
   async function handleInvite(email: string, message: string) {
@@ -468,7 +472,7 @@ export default function StaffPage() {
         <MaterialIcon name="error_outline" className="text-5xl text-gray-400" />
         <p className="text-gray-600 dark:text-gray-400">{error}</p>
         <Button variant="outline" onClick={() => navigate(-1)}>
-          Go back
+          {t("buttons.goBack")}
         </Button>
       </div>
     );
@@ -484,27 +488,27 @@ export default function StaffPage() {
               type="button"
               onClick={() => navigate(-1)}
               className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-              aria-label="Back"
+              aria-label={t("common.back")}
             >
               <MaterialIcon name="arrow_back" className="text-xl" />
             </button>
             <div>
               <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-                Staff Management
+                {t("staff.title")}
               </h1>
               <p className="text-xs text-gray-500">
-                {staff.length} member{staff.length !== 1 ? "s" : ""}
+                {staff.length} {staff.length !== 1 ? t("nav.staff").toLowerCase() : t("nav.staff").toLowerCase()}
               </p>
             </div>
           </div>
           <Button
             variant="primary"
             size="sm"
-            className="!w-auto px-4"
+            className="w-auto! px-4"
             onClick={() => setShowInviteModal(true)}
           >
             <MaterialIcon name="person_add" className="text-base" />
-            Invite Staff
+            {t("staff.inviteButton")}
           </Button>
         </div>
       </div>
@@ -513,7 +517,7 @@ export default function StaffPage() {
         {/* ── Active Staff (US-02-E-01) ── */}
         <section>
           <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-            Team Members
+            {t("staff.teamMembers")}
           </h2>
 
           {staff.length === 0 ? (
@@ -526,19 +530,19 @@ export default function StaffPage() {
               </div>
               <div>
                 <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                  No staff members yet
+                  {t("staff.empty.title")}
                 </p>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  Invite someone by email to get started.
+                  {t("staff.empty.text")}
                 </p>
               </div>
               <Button
                 variant="secondary"
                 size="sm"
-                className="!w-auto px-5 mt-1"
+                className="w-auto! px-5 mt-1"
                 onClick={() => setShowInviteModal(true)}
               >
-                Invite Staff
+                {t("staff.inviteButton")}
               </Button>
             </Card>
           ) : (
@@ -573,12 +577,11 @@ export default function StaffPage() {
                             name="calendar_today"
                             className="text-xs"
                           />
-                          Joined {formatDate(member.joinedAt)}
+                          {t("staff.joined", { date: formatDate(member.joinedAt) })}
                         </span>
                         <span className="text-xs text-gray-400 flex items-center gap-1">
                           <MaterialIcon name="design_services" className="text-xs" />
-                          {member.assignedServicesCount} service
-                          {member.assignedServicesCount !== 1 ? "s" : ""}
+                          {member.assignedServicesCount} {member.assignedServicesCount !== 1 ? t("business.myServices").toLowerCase() : t("business.myServices").toLowerCase()}
                         </span>
                       </div>
                     </div>
@@ -598,7 +601,7 @@ export default function StaffPage() {
         {invitations.length > 0 && (
           <section>
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-              Pending Invitations
+              {t("staff.pendingInvitations")}
             </h2>
             <div className="space-y-3">
               {invitations.map((inv) => (
@@ -615,7 +618,7 @@ export default function StaffPage() {
                         {inv.workerEmail}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Expires {formatDate(inv.expirationDate)}
+                        {t("staff.expires", { date: formatDate(inv.expirationDate) })}
                       </p>
                     </div>
                     <button
@@ -624,7 +627,7 @@ export default function StaffPage() {
                       onClick={() => handleCancelInvitation(inv.id)}
                       className="text-xs font-semibold text-red-500 hover:text-red-600 disabled:opacity-50 shrink-0"
                     >
-                      {cancellingId === inv.id ? "Cancelling…" : "Cancel"}
+                      {cancellingId === inv.id ? t("staff.cancelling") : t("staff.cancel")}
                     </button>
                   </div>
                 </Card>

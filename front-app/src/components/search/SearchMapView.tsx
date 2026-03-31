@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Business } from "../../types/search";
 import { MaterialIcon } from "../UI/MaterialIcon";
 import { useGoogleMaps } from "../../hooks/useGoogleMaps";
@@ -43,6 +44,7 @@ export function SearchMapView({
   onCenterLocation,
   className,
 }: SearchMapViewProps) {
+  const { t } = useTranslation();
   const googleMaps = useGoogleMaps();
   const { markers } = useMapMarkers(results, {
     userLocation: userLocation ?? null,
@@ -73,7 +75,7 @@ export function SearchMapView({
             />
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Map failed to load
+            {t("search.map.loadFailed")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
             {String(mapError)}
@@ -267,16 +269,16 @@ export function SearchMapView({
         <button
           onClick={handleZoomInClick}
           className="flex items-center justify-center w-10 h-10 rounded-lg bg-white dark:bg-gray-800 shadow-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          title="Zoom in"
-          aria-label="Zoom in"
+          title={t("search.map.zoomIn")}
+          aria-label={t("search.map.zoomIn")}
         >
           <MaterialIcon name="add" className="text-[20px]" />
         </button>
         <button
           onClick={handleZoomOutClick}
           className="flex items-center justify-center w-10 h-10 rounded-lg bg-white dark:bg-gray-800 shadow-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          title="Zoom out"
-          aria-label="Zoom out"
+          title={t("search.map.zoomOut")}
+          aria-label={t("search.map.zoomOut")}
         >
           <MaterialIcon name="remove" className="text-[20px]" />
         </button>
@@ -284,8 +286,8 @@ export function SearchMapView({
           <button
             onClick={handleCenterLocationClick}
             className="flex items-center justify-center w-10 h-10 rounded-lg bg-white dark:bg-gray-800 shadow-lg text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            title="Center on your location"
-            aria-label="Center on your location"
+            title={t("search.map.centerLocation")}
+            aria-label={t("search.map.centerLocation")}
           >
             <MaterialIcon name="my_location" className="text-[20px]" />
           </button>
@@ -296,7 +298,7 @@ export function SearchMapView({
       <div className="absolute top-20 left-4 z-20 bg-white dark:bg-gray-800 rounded-lg shadow-lg px-4 py-2">
         <p className="text-sm font-medium text-gray-900 dark:text-white">
           {results.length}
-          <span className="text-gray-600 dark:text-gray-400"> results</span>
+          <span className="text-gray-600 dark:text-gray-400"> {t("search.map.results")}</span>
         </p>
       </div>
 
@@ -362,7 +364,7 @@ export function SearchMapView({
                       }}
                       className="w-full bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white rounded-lg py-2 text-xs font-bold transition-colors hover:bg-gray-200 dark:hover:bg-gray-500"
                     >
-                      Book Now
+                      {t("search.map.bookNow")}
                     </button>
                   </div>
                 </div>
@@ -374,7 +376,7 @@ export function SearchMapView({
               <div className="flex flex-col items-center gap-2">
                 <div className="w-6 h-6 border-3 border-primary border-t-transparent rounded-full animate-spin" />
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Loading results...
+                  {t("search.map.loading")}
                 </p>
               </div>
             </div>
@@ -391,10 +393,10 @@ export function SearchMapView({
               className="text-[40px] text-gray-400 mb-3 flex justify-center"
             />
             <h3 className="text-gray-900 dark:text-white font-bold mb-1">
-              No results found
+              {t("search.map.noResults")}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Try adjusting your search
+              {t("search.map.noResultsHint")}
             </p>
           </div>
         </div>

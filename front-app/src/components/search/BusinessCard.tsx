@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Business } from "../../types/search";
 import { MaterialIcon } from "../UI/MaterialIcon";
 
@@ -29,6 +30,7 @@ export function BusinessCard({
   currentUserId,
   className,
 }: BusinessCardProps) {
+  const { t } = useTranslation();
   // Hide the follow heart if this business belongs to the current user
   const showFollow = !currentUserId || business.ownerId !== currentUserId;
   const [isImageLoading, setIsImageLoading] = useState(true);
@@ -214,8 +216,8 @@ export function BusinessCard({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              title={isFavorite ? "Unfollow" : "Follow"}
-              aria-label={isFavorite ? "Unfollow" : "Follow"}
+              title={isFavorite ? t("buttons.unfollow") : t("buttons.follow")}
+              aria-label={isFavorite ? t("buttons.unfollow") : t("buttons.follow")}
             >
               <MaterialIcon
                 name="favorite"

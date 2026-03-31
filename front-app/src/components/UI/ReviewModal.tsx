@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "./Button";
 import { MaterialIcon } from "./MaterialIcon";
 import { submitReview } from "../../services/reviewService";
@@ -20,6 +21,7 @@ export function ReviewModal({
   onSuccess,
   onCancel,
 }: Props) {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(0);
   const [hovered, setHovered] = useState(0);
   const [comment, setComment] = useState("");
@@ -30,7 +32,7 @@ export function ReviewModal({
 
   async function handleSubmit() {
     if (rating === 0) {
-      setError("Please select a star rating.");
+      setError(t("reviews.modal.errorNoRating"));
       return;
     }
     setSubmitting(true);
@@ -43,7 +45,7 @@ export function ReviewModal({
       });
       onSuccess();
     } catch {
-      setError("Failed to submit review. Please try again.");
+      setError(t("reviews.modal.errorSubmit"));
     } finally {
       setSubmitting(false);
     }
@@ -63,7 +65,7 @@ export function ReviewModal({
         {/* Header */}
         <div className="space-y-1">
           <h2 className="font-bold text-[#111418] dark:text-white text-base">
-            Leave a Review
+            {t("reviews.modal.title")}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {businessName}
@@ -80,7 +82,7 @@ export function ReviewModal({
               onMouseLeave={() => setHovered(0)}
               onClick={() => setRating(star)}
               className="text-3xl transition-transform hover:scale-110 focus:outline-none"
-              aria-label={`Rate ${star} star${star > 1 ? "s" : ""}`}
+              aria-label={t(star > 1 ? "reviews.modal.starAriaLabel_other" : "reviews.modal.starAriaLabel_one", { count: star })}
             >
               <MaterialIcon
                 name={displayRating >= star ? "star" : "star_border"}
@@ -98,7 +100,7 @@ export function ReviewModal({
           onChange={(e) => setComment(e.target.value)}
           maxLength={500}
           rows={3}
-          placeholder="Share your experience (optional)"
+          placeholder={t("reviews.modal.placeholder")}
           className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-background-dark px-3 py-2 text-sm text-[#111418] dark:text-white placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
         <p className="text-right text-[10px] text-gray-400 -mt-3">
@@ -116,7 +118,7 @@ export function ReviewModal({
         {/* Actions */}
         <div className="flex gap-3">
           <Button variant="ghost" onClick={onCancel} className="flex-1" disabled={submitting}>
-            Cancel
+            {t("reviews.modal.cancel")}
           </Button>
           <Button
             variant="primary"
@@ -124,7 +126,7 @@ export function ReviewModal({
             className="flex-1"
             disabled={submitting || rating === 0}
           >
-            {submitting ? "Submitting…" : "Submit Review"}
+            {submitting ? t("reviews.modal.submitting") : t("reviews.modal.submitButton")}
           </Button>
         </div>
       </div>

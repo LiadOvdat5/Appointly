@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
@@ -10,6 +11,7 @@ import { setSession } from "../redux/authSlice";
 import { getUser, updateUser } from "../api/user";
 
 export default function ProfilePage() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const authUser = useAppSelector(selectUser);
 
@@ -44,23 +46,23 @@ export default function ProfilePage() {
         setName(profile.name);
         setEmail(profile.email);
       })
-      .catch(() => setLoadError("Failed to load profile. Please try again."));
-  }, [authUser?.id]);
+      .catch(() => setLoadError(t("profile.error.loadFailed")));
+  }, [authUser?.id, t]);
 
   const validate = () => {
     const errors: typeof fieldErrors = {};
 
-    if (!name.trim()) errors.name = "Name is required.";
-    if (!email.trim()) errors.email = "Email is required.";
+    if (!name.trim()) errors.name = t("profile.error.nameRequired");
+    if (!email.trim()) errors.email = t("profile.error.emailRequired");
 
     const changingPassword = newPassword || currentPassword || confirmPassword;
     if (changingPassword) {
-      if (!currentPassword) errors.currentPassword = "Current password is required.";
-      if (!newPassword) errors.newPassword = "New password is required.";
+      if (!currentPassword) errors.currentPassword = t("profile.error.currentPasswordRequired");
+      if (!newPassword) errors.newPassword = t("profile.error.newPasswordRequired");
       if (newPassword && newPassword.length < 6)
-        errors.newPassword = "Password must be at least 6 characters.";
+        errors.newPassword = t("profile.error.passwordTooShort");
       if (newPassword !== confirmPassword)
-        errors.confirmPassword = "Passwords do not match.";
+        errors.confirmPassword = t("profile.error.passwordMismatch");
     }
 
     return errors;
@@ -104,13 +106,13 @@ export default function ProfilePage() {
       setNewPassword("");
       setConfirmPassword("");
 
-      setSaveSuccess("Profile updated successfully.");
+      setSaveSuccess(t("profile.success.updated"));
     } catch (err: unknown) {
       const axiosErr = err as AxiosError<{ error?: string }>;
       if (axiosErr.response) {
-        setSaveError(axiosErr.response.data?.error ?? "Failed to save profile.");
+        setSaveError(axiosErr.response.data?.error ?? t("profile.error.saveFailed"));
       } else {
-        setSaveError("Network error. Please try again.");
+        setSaveError(t("profile.error.networkError"));
       }
     } finally {
       setSaving(false);
@@ -121,8 +123,8 @@ export default function ProfilePage() {
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white">
       <main className="flex-1 flex flex-col px-6 max-w-lg mx-auto w-full py-10">
         <div className="pb-6">
-          <H1>My Profile</H1>
-          <Paragraph>Update your name, email, or password.</Paragraph>
+          <H1>{t("profile.myProfile")}</H1>
+          <Paragraph>{t("profile.subtitle")}</Paragraph>
         </div>
 
         {loadError && (
@@ -146,10 +148,10 @@ export default function ProfilePage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Name */}
           <Input
-            label="Name"
+            label={t("profile.nameLabel")}
             id="name"
             type="text"
-            placeholder="Your name"
+            placeholder={t("profile.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             error={fieldErrors.name}
@@ -158,10 +160,10 @@ export default function ProfilePage() {
 
           {/* Email */}
           <Input
-            label="Email"
+            label={t("profile.emailLabel")}
             id="email"
             type="email"
-            placeholder="Your email"
+            placeholder={t("profile.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={fieldErrors.email}
@@ -171,36 +173,36 @@ export default function ProfilePage() {
           {/* Password change section */}
           <div className="border-t border-slate-200 dark:border-slate-700 pt-5">
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4">
-              Change Password{" "}
-              <span className="font-normal text-slate-400">(optional)</span>
+              {t("profile.changePassword")}{" "}
+              <span className="font-normal text-slate-400">{t("profile.changePasswordOptional")}</span>
             </p>
 
             <div className="flex flex-col gap-4">
               <Input
-                label="Current Password"
+                label={t("profile.currentPasswordLabel")}
                 id="currentPassword"
                 type="password"
-                placeholder="Enter current password"
+                placeholder={t("profile.currentPasswordPlaceholder")}
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 error={fieldErrors.currentPassword}
               />
 
               <Input
-                label="New Password"
+                label={t("profile.newPasswordLabel")}
                 id="newPassword"
                 type="password"
-                placeholder="Enter new password"
+                placeholder={t("profile.newPasswordPlaceholder")}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 error={fieldErrors.newPassword}
               />
 
               <Input
-                label="Confirm New Password"
+                label={t("profile.confirmPasswordLabel")}
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirm new password"
+                placeholder={t("profile.confirmPasswordPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 error={fieldErrors.confirmPassword}
@@ -209,7 +211,7 @@ export default function ProfilePage() {
           </div>
 
           <Button type="submit" isLoading={saving}>
-            Save Changes
+            {t("profile.saveChanges")}
           </Button>
         </form>
       </main>

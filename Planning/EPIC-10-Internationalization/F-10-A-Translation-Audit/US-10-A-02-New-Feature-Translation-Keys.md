@@ -2,7 +2,7 @@
 
 **Feature:** [[F-10-A-Translation-Audit|F-10-A: Translation Audit & Hardcoded String Fix]]
 **Epic:** [[EPIC-10-Internationalization|EPIC-10: Internationalization (i18n) Hardening]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,5 +18,5 @@ As a **developer**, I want to **add i18n translation keys for all new features**
 - `[FE]` Add `admin` namespace keys for admin panel (if applicable)
 
 ## Acceptance Criteria
-- [ ] All new features implement `t()` from the start — no hardcoded strings in new feature code
-- [ ] Both `en` and `he` dictionaries are updated together when new keys are added
+- [x] All new features implement `t()` from the start — no hardcoded strings in new feature code
+- [x] Both `en` and `he` dictionaries are updated together when new keys are added

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-10-A-Translation-Audit|F-10-A: Translation Audit & Hardcoded String Fix]]
 **Epic:** [[EPIC-10-Internationalization|EPIC-10: Internationalization (i18n) Hardening]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **developer**, I want to **ensure no raw English text appears in JSX outsid
 - `[FE]` Pay special attention to: error messages, form validation text, button labels, empty state messages, toast/alert messages
 
 ## Acceptance Criteria
-- [ ] No visible user-facing text in `.tsx` files is a plain string literal outside of `t()` calls
-- [ ] All replaced strings have corresponding keys in `en` translation file
-- [ ] App renders correctly in English after the migration
+- [x] No visible user-facing text in `.tsx` files is a plain string literal outside of `t()` calls
+- [x] All replaced strings have corresponding keys in `en` translation file
+- [x] App renders correctly in English after the migration

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { formatTime } from "../utils/formatTime";
 import {
   getClientAppointments,
   cancelAppointment,
@@ -24,13 +26,6 @@ function formatDate(iso: string): string {
   });
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 function statusBadgeVariant(
   status: number,
 ): "confirmed" | "cancelled" | "pending" {
@@ -39,17 +34,12 @@ function statusBadgeVariant(
   return "pending"; // completed
 }
 
-function statusLabel(status: number): string {
-  if (status === AppointmentStatus.Scheduled) return "Confirmed";
-  if (status === AppointmentStatus.Canceled) return "Canceled";
-  return "Completed";
-}
-
 type Tab = "upcoming" | "past";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CustomerDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [all, setAll] = useState<AppointmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,9 +61,9 @@ export default function CustomerDashboardPage() {
     setLoading(true);
     getClientAppointments(1, 100)
       .then(setAll)
-      .catch(() => setError("Failed to load appointments."))
+      .catch(() => setError(t("customerAppointments.error.loadFailed")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   const now = new Date();
 
@@ -124,6 +114,14 @@ export default function CustomerDashboardPage() {
     setReviewingAppt(null);
   }
 
+  function statusLabel(status: number): string {
+    if (status === AppointmentStatus.Scheduled)
+      return t("customerAppointments.status.confirmed");
+    if (status === AppointmentStatus.Canceled)
+      return t("customerAppointments.status.canceled");
+    return t("customerAppointments.status.completed");
+  }
+
   const appointments = tab === "upcoming" ? upcoming : past;
 
   return (
@@ -131,10 +129,10 @@ export default function CustomerDashboardPage() {
       {/* Cancel confirm */}
       <ConfirmDialog
         open={confirmCancelId !== null}
-        title="Cancel appointment?"
-        message="Are you sure you want to cancel this appointment? This action cannot be undone."
-        confirmLabel="Yes, cancel it"
-        cancelLabel="Keep it"
+        title={t("customerAppointments.cancelDialog.title")}
+        message={t("customerAppointments.cancelDialog.message")}
+        confirmLabel={t("customerAppointments.cancelDialog.confirm")}
+        cancelLabel={t("customerAppointments.cancelDialog.cancel")}
         destructive
         onConfirm={handleConfirmCancel}
         onCancel={() => setConfirmCancelId(null)}
@@ -159,33 +157,35 @@ export default function CustomerDashboardPage() {
             type="button"
             onClick={() => navigate(-1)}
             className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            aria-label="Back"
+            aria-label={t("common.back")}
           >
             <MaterialIcon name="arrow_back" className="text-xl" />
           </button>
           <div>
             <h1 className="font-bold text-[#111418] dark:text-white text-base">
-              My Appointments
+              {t("customerAppointments.title")}
             </h1>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex">
-          {(["upcoming", "past"] as Tab[]).map((t) => (
+          {(["upcoming", "past"] as Tab[]).map((tabKey) => (
             <button
-              key={t}
+              key={tabKey}
               type="button"
-              onClick={() => setTab(t)}
+              onClick={() => setTab(tabKey)}
               className={[
                 "flex-1 py-3 text-sm font-medium transition-colors border-b-2",
-                tab === t
+                tab === tabKey
                   ? "border-primary text-primary"
                   : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300",
               ].join(" ")}
             >
-              {t === "upcoming" ? "Upcoming" : "Past"}
-              {t === "upcoming" && upcoming.length > 0 && (
+              {tabKey === "upcoming"
+                ? t("customerAppointments.tabs.upcoming")
+                : t("customerAppointments.tabs.past")}
+              {tabKey === "upcoming" && upcoming.length > 0 && (
                 <span className="ml-1.5 rounded-full bg-primary/10 text-primary text-[10px] px-1.5 py-0.5">
                   {upcoming.length}
                 </span>
@@ -225,18 +225,18 @@ export default function CustomerDashboardPage() {
               <div>
                 <p className="font-semibold text-[#111418] dark:text-white">
                   {tab === "upcoming"
-                    ? "No upcoming appointments"
-                    : "No past appointments"}
+                    ? t("customerAppointments.empty.upcoming")
+                    : t("customerAppointments.empty.past")}
                 </p>
                 {tab === "upcoming" && (
                   <p className="text-sm text-gray-500 mt-1">
-                    Book a service to get started.
+                    {t("customerAppointments.empty.text")}
                   </p>
                 )}
               </div>
               {tab === "upcoming" && (
                 <Button variant="primary" onClick={() => navigate("/search")}>
-                  Find a business
+                  {t("customerAppointments.findBusiness")}
                 </Button>
               )}
             </div>
@@ -306,7 +306,9 @@ export default function CustomerDashboardPage() {
                           disabled={cancelingId === appt.id}
                           className="text-xs text-red-500 hover:underline disabled:opacity-50"
                         >
-                          {cancelingId === appt.id ? "Canceling…" : "Cancel"}
+                          {cancelingId === appt.id
+                            ? t("customerAppointments.canceling")
+                            : t("customerAppointments.cancel")}
                         </button>
                       )}
 
@@ -315,7 +317,7 @@ export default function CustomerDashboardPage() {
                         appt.notes?.includes("Service did not take place") && (
                           <span className="flex items-center gap-1 text-xs text-orange-500 font-medium">
                             <MaterialIcon name="info" className="text-sm" />
-                            Business marked as Not Completed
+                            {t("customerAppointments.notCompleted")}
                           </span>
                         )}
 
@@ -327,7 +329,7 @@ export default function CustomerDashboardPage() {
                               name="check_circle"
                               className="text-sm"
                             />
-                            Reviewed
+                            {t("customerAppointments.reviewed")}
                           </span>
                         ) : (
                           <button
@@ -339,7 +341,7 @@ export default function CustomerDashboardPage() {
                               name="star_border"
                               className="text-sm"
                             />
-                            Leave a Review
+                            {t("customerAppointments.leaveReview")}
                           </button>
                         ))}
                     </div>

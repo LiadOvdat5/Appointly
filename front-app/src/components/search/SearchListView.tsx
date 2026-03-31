@@ -1,4 +1,5 @@
 import { useCallback, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import type { Business } from "../../types/search";
 import { BusinessCard } from "./BusinessCard";
 import { MaterialIcon } from "../UI/MaterialIcon";
@@ -43,6 +44,7 @@ export function SearchListView({
   hasActiveSearch = false,
   className,
 }: SearchListViewProps) {
+  const { t } = useTranslation();
   const observerTarget = useRef<HTMLDivElement>(null);
 
   // Infinite scroll observer
@@ -103,7 +105,7 @@ export function SearchListView({
             />
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            Something went wrong
+            {t("search.list.error")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm">{error}</p>
         </div>
@@ -135,10 +137,10 @@ export function SearchListView({
             />
           </div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            No results found
+            {t("search.list.noResults")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            Try adjusting your search or filters
+            {t("search.list.noResultsHint")}
           </p>
         </div>
       </main>
@@ -159,13 +161,13 @@ export function SearchListView({
         <section className="flex flex-col">
           <div className="px-4 pb-3 pt-6 flex justify-between items-end">
             <h3 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
-              Featured Businesses
+              {t("search.list.featuredBusinesses")}
             </h3>
             <a
               href="#"
               className="text-primary text-sm font-medium hover:underline"
             >
-              See all
+              {t("search.list.seeAll")}
             </a>
           </div>
 
@@ -190,7 +192,7 @@ export function SearchListView({
       <section className="flex flex-col">
         <div className="px-4 pb-3 pt-6 flex justify-between items-end">
           <h3 className="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">
-            {featuredResults?.length ? "Near You" : "Search Results"}
+            {featuredResults?.length ? t("search.list.nearYou") : t("search.list.searchResults")}
           </h3>
           {totalCount > 0 && (
             <span className="text-gray-600 dark:text-gray-400 text-sm">
@@ -221,7 +223,7 @@ export function SearchListView({
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Loading more results...
+              {t("search.list.loadingMore")}
             </p>
           </div>
         </div>
@@ -234,7 +236,7 @@ export function SearchListView({
       {!hasMore && results.length > 0 && (
         <div className="px-4 py-8 text-center">
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            No more results to load
+            {t("search.list.noMoreResults")}
           </p>
         </div>
       )}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "../components/UI/Button";
 import { Card } from "../components/UI/Card";
 import { Alert } from "../components/UI/Alert";
@@ -37,11 +38,6 @@ import {
   AppointmentStatus,
   type AppointmentDTO,
 } from "../services/appointmentService";
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const DAY_FULL  = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 // ─── Impact analysis types ────────────────────────────────────────────────────
 
@@ -129,31 +125,35 @@ function buildInitialDayStates(rules: WeeklyRuleDTO[], breaks: BreakRuleDTO[]): 
   return states;
 }
 
-function validateDayStates(states: DayState[]): string[] {
+function validateDayStates(
+  states: DayState[],
+  t: (key: string, opts?: Record<string, unknown>) => string,
+  dayFull: string[],
+): string[] {
   const errors: string[] = [];
 
   for (const day of states) {
     if (!day.isOpen || !day.hasHours) continue;
 
     if (!day.startTime || !day.endTime) {
-      errors.push(`${DAY_FULL[day.dayOfWeek]}: Working hours are incomplete.`);
+      errors.push(t("scheduleEditor.dayHoursIncomplete", { day: dayFull[day.dayOfWeek] }));
       continue;
     }
     if (day.startTime >= day.endTime) {
-      errors.push(`${DAY_FULL[day.dayOfWeek]}: Start time must be before end time.`);
+      errors.push(t("scheduleEditor.dayStartBeforeEnd", { day: dayFull[day.dayOfWeek] }));
     }
 
     for (const brk of day.breaks) {
       if (brk.deleted) continue;
       if (!brk.startTime || !brk.endTime) {
-        errors.push(`${DAY_FULL[day.dayOfWeek]}: A break has incomplete times.`);
+        errors.push(t("scheduleEditor.dayBreakIncomplete", { day: dayFull[day.dayOfWeek] }));
         continue;
       }
       if (brk.startTime >= brk.endTime) {
-        errors.push(`${DAY_FULL[day.dayOfWeek]}: Break start must be before its end.`);
+        errors.push(t("scheduleEditor.dayBreakStartBeforeEnd", { day: dayFull[day.dayOfWeek] }));
       }
       if (brk.startTime < day.startTime || brk.endTime > day.endTime) {
-        errors.push(`${DAY_FULL[day.dayOfWeek]}: Break must fall within working hours.`);
+        errors.push(t("scheduleEditor.dayBreakWithinHours", { day: dayFull[day.dayOfWeek] }));
       }
     }
   }
@@ -164,8 +164,11 @@ function validateDayStates(states: DayState[]): string[] {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ScheduleEditorPage() {
+  const { t } = useTranslation();
   const { businessId, serviceId } = useParams<{ businessId: string; serviceId: string }>();
   const navigate = useNavigate();
+  const DAY_SHORT = t("calendar.daysShort", { returnObjects: true }) as string[];
+  const DAY_FULL = t("calendar.daysFull", { returnObjects: true }) as string[];
 
   // ── Page status ──────────────────────────────────────────────────────────
   const [pageStatus, setPageStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -227,7 +230,7 @@ export default function ScheduleEditorPage() {
       ]);
 
       const svc = services.find((s) => s.id === serviceId);
-      setServiceName(svc?.name ?? "Service");
+      setServiceName(svc?.name ?? t("scheduleEditor.serviceDefault"));
 
       const initialDayStates = buildInitialDayStates(rules, breaks);
       originalDayStatesRef.current = initialDayStates;
@@ -333,7 +336,7 @@ export default function ScheduleEditorPage() {
       if (!wasOpen && shouldBeOpen) {
         // Newly enabled — additive only
         infoMessages.push(
-          `${DAY_FULL[day.dayOfWeek]} added as a working day. New slots will appear after running slot generation.`,
+          t("scheduleEditor.dayAddedAsWorking", { day: DAY_FULL[day.dayOfWeek] }),
         );
       } else if (wasOpen && !shouldBeOpen) {
         // Day disabled — remove all future slots on this DOW
@@ -359,7 +362,7 @@ export default function ScheduleEditorPage() {
         if (day.startTime < orig.startTime || day.endTime > orig.endTime) {
           // Hours expanded — additive only
           infoMessages.push(
-            `${DAY_FULL[day.dayOfWeek]} hours expanded. Run slot generation to fill the new window.`,
+            t("scheduleEditor.dayHoursExpanded", { day: DAY_FULL[day.dayOfWeek] }),
           );
         }
       }
@@ -376,7 +379,7 @@ export default function ScheduleEditorPage() {
         // Breaks being removed — additive, info only
         if (brk.deleted && brk.id) {
           infoMessages.push(
-            `Break removed from ${DAY_FULL[day.dayOfWeek]}. Run slot generation to fill that window with new slots.`,
+            t("scheduleEditor.breakRemovedFrom", { day: DAY_FULL[day.dayOfWeek] }),
           );
         }
       }
@@ -427,7 +430,7 @@ export default function ScheduleEditorPage() {
   // ── Save all ─────────────────────────────────────────────────────────────
 
   async function handleSaveAll() {
-    const errors = validateDayStates(dayStates);
+    const errors = validateDayStates(dayStates, t, DAY_FULL);
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
@@ -511,8 +514,8 @@ export default function ScheduleEditorPage() {
       setSaveSuccess(true);
       await loadData(); // Refresh to get authoritative IDs from backend
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Unknown error";
-      setSaveError(`Failed to save schedule. ${msg}`);
+      const msg = e instanceof Error ? e.message : t("common.unknownError");
+      setSaveError(t("scheduleEditor.failedSave", { msg }));
     } finally {
       setIsSaving(false);
     }
@@ -528,8 +531,8 @@ export default function ScheduleEditorPage() {
       const result = await generateSlots(serviceId!, genStartDate, genEndDate);
       setGenerateResult(result);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Unknown error";
-      setGenerateError(`Failed to generate slots. ${msg}`);
+      const msg = e instanceof Error ? e.message : t("common.unknownError");
+      setGenerateError(t("scheduleEditor.failedGenerate", { msg }));
     } finally {
       setIsGenerating(false);
     }
@@ -548,7 +551,7 @@ export default function ScheduleEditorPage() {
   if (pageStatus === "error") {
     return (
       <div className="max-w-2xl mx-auto p-6">
-        <Alert variant="error">Could not load schedule data. Please try again.</Alert>
+        <Alert variant="error">{t("scheduleEditor.loadError")}</Alert>
       </div>
     );
   }
@@ -576,13 +579,13 @@ export default function ScheduleEditorPage() {
           type="button"
           onClick={() => navigate(`/business/${businessId}`)}
           className="p-2 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
-          aria-label="Back to business page"
+          aria-label={t("scheduleEditor.backAriaLabel")}
         >
           <MaterialIcon name="arrow_back" />
         </button>
         <div>
           <h1 className="text-xl font-bold text-[#111418] dark:text-white">
-            Working Hours
+            {t("scheduleEditor.title")}
           </h1>
           <p className="text-sm text-gray-500">{serviceName}</p>
         </div>
@@ -622,7 +625,7 @@ export default function ScheduleEditorPage() {
               )}
               {!isConfigured && (
                 <span className="text-[9px] leading-tight mt-0.5 opacity-50">
-                  {ds.isOpen ? "no hrs" : "closed"}
+                  {ds.isOpen ? t("scheduleEditor.noHrs") : t("scheduleEditor.closedShort")}
                 </span>
               )}
             </button>
@@ -640,7 +643,7 @@ export default function ScheduleEditorPage() {
           </span>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">
-              {activeDay.isOpen ? "Open" : "Closed"}
+              {activeDay.isOpen ? t("scheduleEditor.open") : t("scheduleEditor.closedLabel")}
             </span>
             <Toggle
               checked={activeDay.isOpen}
@@ -654,7 +657,7 @@ export default function ScheduleEditorPage() {
             {/* Working hours */}
             <div className="flex flex-col gap-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                Working Hours
+                {t("scheduleEditor.workingHoursLabel")}
               </p>
 
               {activeDay.hasHours ? (
@@ -691,7 +694,7 @@ export default function ScheduleEditorPage() {
                       })
                     }
                     className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors"
-                    aria-label="Remove hours"
+                    aria-label={t("scheduleEditor.removeHoursAriaLabel")}
                   >
                     <MaterialIcon name="close" className="text-base" />
                   </button>
@@ -705,7 +708,7 @@ export default function ScheduleEditorPage() {
                   className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors self-start"
                 >
                   <MaterialIcon name="add_circle_outline" className="text-base" />
-                  Add hours
+                  {t("scheduleEditor.addHours")}
                 </button>
               )}
             </div>
@@ -714,11 +717,11 @@ export default function ScheduleEditorPage() {
             {activeDay.hasHours && (
               <div className="flex flex-col gap-2 border-t border-gray-100 dark:border-gray-800 pt-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                  Breaks
+                  {t("scheduleEditor.breaksLabel")}
                 </p>
 
                 {visibleBreaks.length === 0 && (
-                  <p className="text-sm text-gray-400 italic">No breaks added</p>
+                  <p className="text-sm text-gray-400 italic">{t("scheduleEditor.noBreaks")}</p>
                 )}
 
                 {activeDay.breaks.map((brk, idx) => {
@@ -750,7 +753,7 @@ export default function ScheduleEditorPage() {
                         type="button"
                         onClick={() => removeBreak(selectedDay, idx)}
                         className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors"
-                        aria-label="Remove break"
+                        aria-label={t("scheduleEditor.removeBreakAriaLabel")}
                       >
                         <MaterialIcon name="close" className="text-base" />
                       </button>
@@ -764,14 +767,14 @@ export default function ScheduleEditorPage() {
                   className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors self-start"
                 >
                   <MaterialIcon name="add_circle_outline" className="text-base" />
-                  Add break
+                  {t("scheduleEditor.addBreak")}
                 </button>
               </div>
             )}
           </>
         ) : (
           <p className="text-sm text-gray-400 italic">
-            Marked as closed — no slots will be generated for this day.
+            {t("scheduleEditor.markedClosed")}
           </p>
         )}
       </Card>
@@ -781,7 +784,7 @@ export default function ScheduleEditorPage() {
         <div className="rounded-lg p-4 bg-danger/10 border border-danger/20 flex flex-col gap-1.5">
           <p className="text-sm font-semibold text-danger flex items-center gap-2">
             <MaterialIcon name="error" className="text-base" />
-            Please fix the following issues:
+            {t("scheduleEditor.fixIssues")}
           </p>
           {validationErrors.map((err, i) => (
             <p key={i} className="text-sm text-danger/90 ml-6">• {err}</p>
@@ -791,7 +794,7 @@ export default function ScheduleEditorPage() {
 
       {/* ── Save feedback ── */}
       {saveSuccess && (
-        <Alert variant="success">Schedule saved successfully.</Alert>
+        <Alert variant="success">{t("scheduleEditor.savedSuccess")}</Alert>
       )}
       {saveError && (
         <Alert variant="error">{saveError}</Alert>
@@ -804,7 +807,7 @@ export default function ScheduleEditorPage() {
         disabled={isSaving}
         isLoading={isSaving}
       >
-        Save All Changes
+        {t("scheduleEditor.saveAll")}
       </Button>
 
       {/* ── Divider ── */}
@@ -829,17 +832,16 @@ export default function ScheduleEditorPage() {
       <div className="flex flex-col gap-4">
         <div>
           <h2 className="text-base font-semibold text-[#111418] dark:text-white">
-            Generate Available Slots
+            {t("scheduleEditor.generateTitle")}
           </h2>
           <p className="text-sm text-gray-500 mt-1">
-            After saving your working hours, generate bookable slots for a date range.
-            Rule priority: Date Exceptions &gt; Recurring Rules &gt; Weekly Hours, then breaks subtracted.
+            {t("scheduleEditor.generateDesc")}
           </p>
         </div>
 
         <div className="flex items-end gap-3">
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 mb-1.5">From</label>
+            <label className="block text-xs text-gray-500 mb-1.5">{t("scheduleEditor.from")}</label>
             <input
               type="date"
               value={genStartDate}
@@ -856,7 +858,7 @@ export default function ScheduleEditorPage() {
           </div>
           <span className="text-gray-400 pb-2">—</span>
           <div className="flex-1">
-            <label className="block text-xs text-gray-500 mb-1.5">To</label>
+            <label className="block text-xs text-gray-500 mb-1.5">{t("scheduleEditor.to")}</label>
             <input
               type="date"
               value={genEndDate}
@@ -886,7 +888,7 @@ export default function ScheduleEditorPage() {
           disabled={isGenerating || !genStartDate || !genEndDate}
           isLoading={isGenerating}
         >
-          Generate Slots
+          {t("scheduleEditor.generateButton")}
         </Button>
       </div>
 
@@ -895,11 +897,6 @@ export default function ScheduleEditorPage() {
 }
 
 // ─── BlockedDatesCalendar ─────────────────────────────────────────────────────
-
-const MONTH_NAMES = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
-];
 
 interface BlockedEntry { dateStr: string; reason: string | null; }
 
@@ -919,6 +916,8 @@ function BlockedDatesCalendar({
   year, month, blockedDates, togglingDate, error,
   onPrevMonth, onNextMonth, onToggleDate, onPrepareBlock,
 }: BlockedDatesCalendarProps) {
+  const { t } = useTranslation();
+  const monthNames = t("calendar.months", { returnObjects: true }) as string[];
   const [pendingDate, setPendingDate] = useState<string | null>(null);
   const [reasonInput, setReasonInput] = useState("");
 
@@ -968,7 +967,7 @@ function BlockedDatesCalendar({
     <div className="flex flex-col gap-4">
       <div>
         <p className="text-sm text-gray-500">
-          Click a future date to block it. Click a blocked date to unblock it.
+          {t("scheduleEditor.clickToBlock")}
         </p>
       </div>
 
@@ -978,18 +977,18 @@ function BlockedDatesCalendar({
           type="button"
           onClick={onPrevMonth}
           className="p-1.5 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
-          aria-label="Previous month"
+          aria-label={t("calendar.prevMonth")}
         >
           <MaterialIcon name="chevron_left" />
         </button>
         <span className="text-sm font-semibold text-[#111418] dark:text-white">
-          {MONTH_NAMES[month]} {year}
+          {monthNames[month]} {year}
         </span>
         <button
           type="button"
           onClick={onNextMonth}
           className="p-1.5 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
-          aria-label="Next month"
+          aria-label={t("calendar.nextMonth")}
         >
           <MaterialIcon name="chevron_right" />
         </button>
@@ -1028,7 +1027,7 @@ function BlockedDatesCalendar({
             >
               <span className={isBlocked ? "line-through" : ""}>{day}</span>
               {isBlocked && (
-                <span className="text-[8px] leading-none mt-0.5 text-danger/70">blocked</span>
+                <span className="text-[8px] leading-none mt-0.5 text-danger/70">{t("scheduleEditor.blockedCellLabel")}</span>
               )}
               {isToggling && (
                 <span className="absolute inset-0 flex items-center justify-center">
@@ -1046,7 +1045,7 @@ function BlockedDatesCalendar({
       {blockedDates.length > 0 && (
         <div className="rounded-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
           <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 px-3 py-2 bg-gray-50 dark:bg-gray-900">
-            Blocked dates
+            {t("scheduleEditor.blockedDatesListHeader")}
           </p>
           <ul className="divide-y divide-gray-100 dark:divide-gray-800">
             {[...blockedDates]
@@ -1064,7 +1063,7 @@ function BlockedDatesCalendar({
                     disabled={togglingDate === b.dateStr || b.dateStr <= todayStr}
                     onClick={() => onToggleDate(b.dateStr)}
                     className="p-1 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors disabled:opacity-40"
-                    aria-label="Unblock date"
+                    aria-label={t("scheduleEditor.unblockAriaLabel")}
                   >
                     <MaterialIcon name="close" className="text-base" />
                   </button>
@@ -1079,16 +1078,16 @@ function BlockedDatesCalendar({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4">
             <h3 className="text-base font-semibold text-[#111418] dark:text-white">
-              Block {pendingDate}
+              {t("scheduleEditor.blockTitle", { date: pendingDate })}
             </h3>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs text-gray-500">Reason (optional)</label>
+              <label className="text-xs text-gray-500">{t("scheduleEditor.reasonLabel")}</label>
               <input
                 type="text"
                 value={reasonInput}
                 onChange={(e) => setReasonInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") confirmBlock(); if (e.key === "Escape") setPendingDate(null); }}
-                placeholder="e.g. Public Holiday"
+                placeholder={t("scheduleEditor.reasonPlaceholder")}
                 maxLength={255}
                 autoFocus
                 className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900
@@ -1097,8 +1096,8 @@ function BlockedDatesCalendar({
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setPendingDate(null)}>Cancel</Button>
-              <Button variant="primary" onClick={confirmBlock}>Block Date</Button>
+              <Button variant="outline" onClick={() => setPendingDate(null)}>{t("buttons.cancel")}</Button>
+              <Button variant="primary" onClick={confirmBlock}>{t("scheduleEditor.blockDateButton")}</Button>
             </div>
           </div>
         </div>
@@ -1124,6 +1123,7 @@ function ImpactDialog({
   onCancel,
   scheduleUrl,
 }: ImpactDialogProps) {
+  const { t } = useTranslation();
   const hasDestructive = impact.freeSlotCount > 0 || impact.bookedCount > 0;
   const hasInfoOnly = !hasDestructive && impact.infoMessages.length > 0;
 
@@ -1143,10 +1143,10 @@ function ImpactDialog({
           </div>
           <div>
             <h2 className="font-bold text-[#111418] dark:text-white text-base">
-              Schedule change detected
+              {t("scheduleEditor.scheduleChangeTitle")}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Review the impact before saving.
+              {t("scheduleEditor.reviewBeforeSaving")}
             </p>
           </div>
         </div>
@@ -1159,8 +1159,8 @@ function ImpactDialog({
             <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-3 py-2.5">
               <MaterialIcon name="event_busy" className="text-red-500 text-base shrink-0 mt-0.5" />
               <p className="text-sm text-red-700 dark:text-red-300">
-                <span className="font-semibold">{impact.freeSlotCount} available slot{impact.freeSlotCount !== 1 ? "s" : ""}</span>{" "}
-                will be removed if you choose to delete free slots.
+                <span className="font-semibold">{t("scheduleEditor.freeSlots", { count: impact.freeSlotCount })}</span>{" "}
+                {t("scheduleEditor.willBeRemovedIfDelete")}
               </p>
             </div>
           )}
@@ -1170,10 +1170,11 @@ function ImpactDialog({
             <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
               <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
               <p className="text-sm text-amber-700 dark:text-amber-300">
-                <span className="font-semibold">{impact.bookedCount} appointment{impact.bookedCount !== 1 ? "s" : ""} are booked</span>{" "}
-                during the affected hours. They are <strong>not canceled automatically</strong> — cancel them individually from the{" "}
+                <span className="font-semibold">{t("scheduleEditor.appointmentsBooked", { count: impact.bookedCount })}</span>{" "}
+                {t("scheduleEditor.duringAffectedHours")} <strong>{t("scheduleEditor.notCanceled")}</strong>{" "}
+                {t("scheduleEditor.cancelIndividuallyFrom")}{" "}
                 <a href={scheduleUrl} className="underline font-semibold">
-                  Schedule page
+                  {t("scheduleEditor.schedulePage")}
                 </a>
                 .
               </p>
@@ -1202,7 +1203,7 @@ function ImpactDialog({
                   onClick={onDeleteFreeSlots}
                   className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors"
                 >
-                  Delete {impact.freeSlotCount} free slot{impact.freeSlotCount !== 1 ? "s" : ""} &amp; Save
+                  {t("scheduleEditor.deleteAndSave", { count: impact.freeSlotCount })}
                 </button>
               )}
               <button
@@ -1210,14 +1211,14 @@ function ImpactDialog({
                 onClick={onKeepSlots}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors"
               >
-                {impact.freeSlotCount > 0 ? "Keep existing slots & Save" : "Understood, Save anyway"}
+                {impact.freeSlotCount > 0 ? t("scheduleEditor.keepSlotsAndSave") : t("scheduleEditor.understoodSave")}
               </button>
               <button
                 type="button"
                 onClick={onCancel}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
               >
-                Go back
+                {t("scheduleEditor.goBack")}
               </button>
             </>
           ) : (
@@ -1228,14 +1229,14 @@ function ImpactDialog({
                 onClick={onKeepSlots}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors"
               >
-                Got it, Save
+                {t("scheduleEditor.gotItSave")}
               </button>
               <button
                 type="button"
                 onClick={onCancel}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
               >
-                Go back
+                {t("scheduleEditor.goBack")}
               </button>
             </>
           )}
@@ -1280,6 +1281,7 @@ function BlockDateConfirmDialog({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
@@ -1296,10 +1298,10 @@ function BlockDateConfirmDialog({
           </div>
           <div>
             <h2 className="font-bold text-[#111418] dark:text-white text-base">
-              Block {dateStr}?
+              {t("scheduleEditor.blockDateTitle", { date: dateStr })}
             </h2>
             {reason && (
-              <p className="text-xs text-gray-500 mt-0.5">Reason: {reason}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{t("scheduleEditor.reasonPrefix", { reason })}</p>
             )}
           </div>
         </div>
@@ -1310,8 +1312,8 @@ function BlockDateConfirmDialog({
             <div className="flex items-start gap-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 px-3 py-2.5">
               <MaterialIcon name="info" className="text-blue-500 text-base shrink-0 mt-0.5" />
               <p className="text-sm text-blue-700 dark:text-blue-300">
-                <span className="font-semibold">{freeCount} available slot{freeCount !== 1 ? "s" : ""}</span>{" "}
-                will be hidden automatically and restored if you unblock this date.
+                <span className="font-semibold">{t("scheduleEditor.freeSlotsHidden", { count: freeCount })}</span>{" "}
+                {t("scheduleEditor.willBeHiddenAutoRestored")}
               </p>
             </div>
           )}
@@ -1319,9 +1321,9 @@ function BlockDateConfirmDialog({
             <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
               <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
               <p className="text-sm text-amber-700 dark:text-amber-300">
-                <span className="font-semibold">{bookedCount} appointment{bookedCount !== 1 ? "s" : ""} are booked</span>{" "}
-                on this date and are <strong>not canceled automatically</strong>. Cancel them individually from the{" "}
-                <a href={scheduleUrl} className="underline font-semibold">Schedule page</a>.
+                <span className="font-semibold">{t("scheduleEditor.appointmentsOnDate", { count: bookedCount })}</span>{" "}
+                {t("scheduleEditor.bookedOnDateNotCanceled")}{" "}
+                <a href={scheduleUrl} className="underline font-semibold">{t("scheduleEditor.schedulePage")}</a>.
               </p>
             </div>
           )}
@@ -1334,14 +1336,14 @@ function BlockDateConfirmDialog({
             onClick={onConfirm}
             className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-danger hover:bg-danger/90 text-white transition-colors"
           >
-            Block date
+            {t("scheduleEditor.blockDateConfirm")}
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors"
           >
-            Cancel
+            {t("buttons.cancel")}
           </button>
         </div>
       </div>
@@ -1397,6 +1399,8 @@ function ScheduleOverridesSection({
   upcomingSlots: SlotDTO[];
   upcomingAppts: AppointmentDTO[];
 }) {
+  const { t } = useTranslation();
+  const DAY_SHORT = t("calendar.daysShort", { returnObjects: true }) as string[];
   const today = new Date().toISOString().slice(0, 10);
   const inputCls =
     "flex-1 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/40";
@@ -1441,7 +1445,7 @@ function ScheduleOverridesSection({
         }
       }
     } catch {
-      setExceptionsError("Failed to update blocked dates. Please try again.");
+      setExceptionsError(t("scheduleEditor.failedUpdateBlocked"));
     } finally {
       setTogglingDate(null);
     }
@@ -1496,11 +1500,11 @@ function ScheduleOverridesSection({
 
   function prepareAdd() {
     if (!newStart || !newEnd || newDays.size === 0 || !newStartTime || !newEndTime) {
-      setAddFormError("Please fill in all fields and select at least one day.");
+      setAddFormError(t("scheduleEditor.fillAllFieldsDay"));
       return;
     }
-    if (newStart > newEnd) { setAddFormError("Start date must be before end date."); return; }
-    if (newStartTime >= newEndTime) { setAddFormError("Start time must be before end time."); return; }
+    if (newStart > newEnd) { setAddFormError(t("scheduleEditor.startBeforeEnd")); return; }
+    if (newStartTime >= newEndTime) { setAddFormError(t("scheduleEditor.startTimeBeforeEndTime")); return; }
     setAddFormError(null);
 
     const from = new Date(`${newStart}T00:00:00`);
@@ -1556,7 +1560,7 @@ function ScheduleOverridesSection({
       onRulesChange((prev) => [...prev, created]);
       setNewStart(""); setNewEnd(""); setNewDays(new Set()); setNewStartTime(""); setNewEndTime("");
     } catch {
-      setAddFormError("Failed to create rule. Please try again.");
+      setAddFormError(t("scheduleEditor.failedCreateRule"));
     } finally {
       setRecurringActionLoading(false);
     }
@@ -1591,7 +1595,7 @@ function ScheduleOverridesSection({
       await deleteRecurringRule(ruleId);
       onRulesChange((prev) => prev.filter((r) => r.id !== ruleId));
     } catch {
-      setAddFormError("Failed to delete rule.");
+      setAddFormError(t("scheduleEditor.failedDeleteRule"));
     } finally {
       setRecurringActionLoading(false);
       setDeleting(null);
@@ -1618,11 +1622,11 @@ function ScheduleOverridesSection({
 
   function prepareAddException() {
     if (!excDate || !excStartTime || !excEndTime) {
-      setExcFormError("Please fill in the date, start time, and end time.");
+      setExcFormError(t("scheduleEditor.fillDateAndTime"));
       return;
     }
     if (excStartTime >= excEndTime) {
-      setExcFormError("Start time must be before end time.");
+      setExcFormError(t("scheduleEditor.startTimeBeforeEndTime"));
       return;
     }
     setExcFormError(null);
@@ -1671,7 +1675,7 @@ function ScheduleOverridesSection({
       onExceptionsChange((prev) => [...prev, created]);
       setExcDate(""); setExcStartTime(""); setExcEndTime("");
     } catch {
-      setExcFormError("Failed to create date exception. Please try again.");
+      setExcFormError(t("scheduleEditor.failedCreateException"));
     } finally {
       setExcActionLoading(false);
     }
@@ -1714,7 +1718,7 @@ function ScheduleOverridesSection({
       await deleteDateException(excId);
       onExceptionsChange((prev) => prev.filter((e) => e.id !== excId));
     } catch {
-      setExcFormError("Failed to delete date exception.");
+      setExcFormError(t("scheduleEditor.failedDeleteException"));
     } finally {
       setExcActionLoading(false);
       setExcDeleting(null);
@@ -1754,9 +1758,9 @@ function ScheduleOverridesSection({
               </div>
               <div>
                 <h2 className="font-bold text-[#111418] dark:text-white text-base">
-                  {recurringImpact.type === "add" ? "Add recurring rule?" : "Remove recurring rule?"}
+                  {recurringImpact.type === "add" ? t("scheduleEditor.addRecurringRuleTitle") : t("scheduleEditor.removeRecurringRuleTitle")}
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">Review the impact on existing slots.</p>
+                <p className="text-xs text-gray-500 mt-0.5">{t("scheduleEditor.reviewImpact")}</p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -1765,11 +1769,11 @@ function ScheduleOverridesSection({
                   <MaterialIcon name="event_busy" className="text-red-500 text-base shrink-0 mt-0.5" />
                   <p className="text-sm text-red-700 dark:text-red-300">
                     <span className="font-semibold">
-                      {recurringImpact.freeCount} free slot{recurringImpact.freeCount !== 1 ? "s" : ""}
+                      {t("scheduleEditor.freeSlotsRule", { count: recurringImpact.freeCount })}
                     </span>{" "}
                     {recurringImpact.type === "add"
-                      ? "fall outside the new rule's hours and can be removed."
-                      : "exist within this rule's period and can be removed."}
+                      ? t("scheduleEditor.fallOutsideNewRuleHours", { count: recurringImpact.freeCount })
+                      : t("scheduleEditor.existWithinRulePeriod", { count: recurringImpact.freeCount })}
                   </p>
                 </div>
               )}
@@ -1778,10 +1782,10 @@ function ScheduleOverridesSection({
                   <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-700 dark:text-amber-300">
                     <span className="font-semibold">
-                      {recurringImpact.bookedCount} appointment{recurringImpact.bookedCount !== 1 ? "s" : ""} are booked
+                      {t("scheduleEditor.appointmentsPeriod", { count: recurringImpact.bookedCount })}
                     </span>{" "}
-                    in this period — they are <strong>not canceled automatically</strong>. Cancel individually from the{" "}
-                    <a href={`/business/${businessId}/schedule`} className="underline font-semibold">Schedule page</a>.
+                    {t("scheduleEditor.inPeriodNotCanceled")}{" "}
+                    <a href={`/business/${businessId}/schedule`} className="underline font-semibold">{t("scheduleEditor.schedulePage")}</a>.
                   </p>
                 </div>
               )}
@@ -1798,8 +1802,9 @@ function ScheduleOverridesSection({
                     }
                   }}
                   className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-60">
-                  Delete {recurringImpact.freeCount} free slot{recurringImpact.freeCount !== 1 ? "s" : ""} &amp;{" "}
-                  {recurringImpact.type === "add" ? "Add Rule" : "Remove Rule"}
+                  {recurringImpact.type === "add"
+                    ? t("scheduleEditor.deleteAndAddRule", { count: recurringImpact.freeCount })
+                    : t("scheduleEditor.deleteAndRemoveRule", { count: recurringImpact.freeCount })}
                 </button>
               )}
               <button type="button"
@@ -1813,12 +1818,12 @@ function ScheduleOverridesSection({
                 }}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors disabled:opacity-60">
                 {recurringImpact.freeCount > 0
-                  ? `Keep slots & ${recurringImpact.type === "add" ? "Add" : "Remove"} Rule`
-                  : `Understood, ${recurringImpact.type === "add" ? "Add" : "Remove"} Rule`}
+                  ? (recurringImpact.type === "add" ? t("scheduleEditor.keepSlotsAndAddRule") : t("scheduleEditor.keepSlotsAndRemoveRule"))
+                  : (recurringImpact.type === "add" ? t("scheduleEditor.understoodAddRule") : t("scheduleEditor.understoodRemoveRule"))}
               </button>
               <button type="button" onClick={() => setRecurringImpact(null)}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
-                Go back
+                {t("scheduleEditor.goBack")}
               </button>
             </div>
           </div>
@@ -1831,11 +1836,11 @@ function ScheduleOverridesSection({
           <MaterialIcon name="warning" className="text-amber-500 shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
-              {blockDateWarning.bookedCount} appointment{blockDateWarning.bookedCount !== 1 ? "s" : ""} booked on {blockDateWarning.date}
+              {t("scheduleEditor.appointmentsBookedOn", { count: blockDateWarning.bookedCount, date: blockDateWarning.date })}
             </p>
             <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-              Available slots hidden automatically. Cancel booked appointments individually from the{" "}
-              <a href={`/business/${businessId}/schedule`} className="underline font-semibold">Schedule page</a>.
+              {t("scheduleEditor.slotsHiddenCancelFrom")}{" "}
+              <a href={`/business/${businessId}/schedule`} className="underline font-semibold">{t("scheduleEditor.schedulePage")}</a>.
             </p>
           </div>
           <button type="button" onClick={() => setBlockDateWarning(null)}
@@ -1857,9 +1862,9 @@ function ScheduleOverridesSection({
               </div>
               <div>
                 <h2 className="font-bold text-[#111418] dark:text-white text-base">
-                  {excImpact.type === "add" ? "Add date exception?" : "Remove date exception?"}
+                  {excImpact.type === "add" ? t("scheduleEditor.addExceptionTitle") : t("scheduleEditor.removeExceptionTitle")}
                 </h2>
-                <p className="text-xs text-gray-500 mt-0.5">Review the impact on existing slots.</p>
+                <p className="text-xs text-gray-500 mt-0.5">{t("scheduleEditor.reviewImpact")}</p>
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -1867,8 +1872,10 @@ function ScheduleOverridesSection({
                 <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-3 py-2.5">
                   <MaterialIcon name="event_busy" className="text-red-500 text-base shrink-0 mt-0.5" />
                   <p className="text-sm text-red-700 dark:text-red-300">
-                    <span className="font-semibold">{excImpact.freeCount} free slot{excImpact.freeCount !== 1 ? "s" : ""}</span>{" "}
-                    {excImpact.type === "add" ? "fall outside the exception's hours." : "exist within this exception's period."}
+                    <span className="font-semibold">{t("scheduleEditor.freeSlotsExc", { count: excImpact.freeCount })}</span>{" "}
+                    {excImpact.type === "add"
+                      ? t("scheduleEditor.fallOutsideExcHours", { count: excImpact.freeCount })
+                      : t("scheduleEditor.existWithinExcPeriod", { count: excImpact.freeCount })}
                   </p>
                 </div>
               )}
@@ -1876,9 +1883,9 @@ function ScheduleOverridesSection({
                 <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2.5">
                   <MaterialIcon name="person_alert" className="text-amber-500 text-base shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-700 dark:text-amber-300">
-                    <span className="font-semibold">{excImpact.bookedCount} appointment{excImpact.bookedCount !== 1 ? "s" : ""} booked</span>{" "}
-                    on this date — <strong>not canceled automatically</strong>. Cancel from the{" "}
-                    <a href={`/business/${businessId}/schedule`} className="underline font-semibold">Schedule page</a>.
+                    <span className="font-semibold">{t("scheduleEditor.appointmentsExc", { count: excImpact.bookedCount })}</span>{" "}
+                    {t("scheduleEditor.bookedNotCanceledCancelFrom")}{" "}
+                    <a href={`/business/${businessId}/schedule`} className="underline font-semibold">{t("scheduleEditor.schedulePage")}</a>.
                   </p>
                 </div>
               )}
@@ -1891,8 +1898,9 @@ function ScheduleOverridesSection({
                     else if (excImpact.type === "remove" && excImpact.excId) doRemoveException(excImpact.excId, excImpact.deletionPlans);
                   }}
                   className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-60">
-                  Delete {excImpact.freeCount} free slot{excImpact.freeCount !== 1 ? "s" : ""} &amp;{" "}
-                  {excImpact.type === "add" ? "Add Exception" : "Remove Exception"}
+                  {excImpact.type === "add"
+                    ? t("scheduleEditor.deleteAndAddException", { count: excImpact.freeCount })
+                    : t("scheduleEditor.deleteAndRemoveException", { count: excImpact.freeCount })}
                 </button>
               )}
               <button type="button" disabled={excActionLoading}
@@ -1902,12 +1910,12 @@ function ScheduleOverridesSection({
                 }}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-primary hover:bg-primary/90 text-white transition-colors disabled:opacity-60">
                 {excImpact.freeCount > 0
-                  ? `Keep slots & ${excImpact.type === "add" ? "Add" : "Remove"} Exception`
-                  : `Understood, ${excImpact.type === "add" ? "Add" : "Remove"} Exception`}
+                  ? (excImpact.type === "add" ? t("scheduleEditor.keepSlotsAndAddException") : t("scheduleEditor.keepSlotsAndRemoveException"))
+                  : (excImpact.type === "add" ? t("scheduleEditor.understoodAddException") : t("scheduleEditor.understoodRemoveException"))}
               </button>
               <button type="button" onClick={() => setExcImpact(null)}
                 className="w-full rounded-xl px-4 py-2.5 text-sm font-semibold bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 transition-colors">
-                Go back
+                {t("scheduleEditor.goBack")}
               </button>
             </div>
           </div>
@@ -1916,11 +1924,11 @@ function ScheduleOverridesSection({
 
       {/* ── Tab toggle (left-aligned, no outer header) ── */}
       <div className="flex rounded-xl bg-gray-100 dark:bg-gray-800 p-1 gap-1 self-start">
-        {([
-          ["blocked",   "event_busy",    "Blocked Dates"],
-          ["exception", "edit_calendar", "Date Exception"],
-          ["recurring", "loop",          "Recurring Rules"],
-        ] as const).map(([key, icon, label]) => (
+        {(([
+          ["blocked",   "event_busy",    t("scheduleEditor.blockedDatesTab")],
+          ["exception", "edit_calendar", t("scheduleEditor.dateExceptionTab")],
+          ["recurring", "loop",          t("scheduleEditor.recurringRulesTab")],
+        ] as Array<["blocked" | "exception" | "recurring", string, string]>)).map(([key, icon, label]) => (
           <button key={key} type="button" onClick={() => setMode(key)}
             className={[
               "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap",
@@ -1938,8 +1946,8 @@ function ScheduleOverridesSection({
       {mode === "blocked" && (
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-[#111418] dark:text-white">Blocked Dates</h2>
-            <InfoTooltip text="Block specific dates when you are unavailable — e.g. holidays, vacations, or one-off closures. Blocked dates override ALL other rules: no slots will be generated and existing available slots are hidden. Booked appointments are NOT canceled automatically." />
+            <h2 className="text-base font-semibold text-[#111418] dark:text-white">{t("scheduleEditor.blockedDatesTitle")}</h2>
+            <InfoTooltip text={t("scheduleEditor.blockedDatesTooltip")} />
           </div>
           <BlockedDatesCalendar
             year={calYear}
@@ -1967,8 +1975,8 @@ function ScheduleOverridesSection({
       {mode === "exception" && (
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-[#111418] dark:text-white">Date Exception</h2>
-            <InfoTooltip text="Set custom working hours for a single specific date — e.g. a shorter day before a holiday or a one-off late opening. This overrides both Weekly Hours and Recurring Rules for that date. The date must still have slots generated after adding the exception." />
+            <h2 className="text-base font-semibold text-[#111418] dark:text-white">{t("scheduleEditor.dateExceptionTitle")}</h2>
+            <InfoTooltip text={t("scheduleEditor.dateExceptionTooltip")} />
           </div>
 
           {/* Existing working-day exceptions */}
@@ -2005,24 +2013,24 @@ function ScheduleOverridesSection({
               </ul>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 italic">No date exceptions added.</p>
+            <p className="text-sm text-gray-400 italic">{t("scheduleEditor.noDateExceptions")}</p>
           )}
 
           {/* Add form */}
           <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Add exception</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{t("scheduleEditor.addExceptionHeader")}</p>
             <div className="flex-1">
-              <label className="block text-xs text-gray-500 mb-1">Date</label>
+              <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.dateLabel")}</label>
               <input type="date" value={excDate} min={today} onChange={(e) => setExcDate(e.target.value)} className={inputCls} />
             </div>
             <div className="flex items-end gap-3">
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">Start time</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.startTimeLabel")}</label>
                 <input type="time" value={excStartTime} onChange={(e) => setExcStartTime(e.target.value)} className={inputCls} />
               </div>
               <span className="text-gray-400 pb-2">—</span>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">End time</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.endTimeLabel")}</label>
                 <input type="time" value={excEndTime} onChange={(e) => setExcEndTime(e.target.value)} className={inputCls} />
               </div>
             </div>
@@ -2032,7 +2040,7 @@ function ScheduleOverridesSection({
               </p>
             )}
             <Button variant="secondary" onClick={prepareAddException} disabled={excActionLoading} isLoading={excActionLoading}>
-              Add Date Exception
+              {t("scheduleEditor.addDateExceptionButton")}
             </Button>
           </div>
         </div>
@@ -2042,8 +2050,8 @@ function ScheduleOverridesSection({
       {mode === "recurring" && (
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2">
-            <h2 className="text-base font-semibold text-[#111418] dark:text-white">Recurring Rules</h2>
-            <InfoTooltip text="Temporarily override your weekly hours for a date range. Useful for seasonal schedule changes (e.g. shorter summer hours) or temporary adjustments on specific days. Priority: Recurring rules override Weekly Hours but are overridden by Date Exceptions." />
+            <h2 className="text-base font-semibold text-[#111418] dark:text-white">{t("scheduleEditor.recurringRulesTitle")}</h2>
+            <InfoTooltip text={t("scheduleEditor.recurringRulesTooltip")} />
           </div>
 
           {recurringRules.length > 0 ? (
@@ -2086,24 +2094,24 @@ function ScheduleOverridesSection({
               </ul>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 italic">No recurring rules added.</p>
+            <p className="text-sm text-gray-400 italic">{t("scheduleEditor.noRecurringRules")}</p>
           )}
 
           <div className="rounded-xl border border-dashed border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Add rule</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{t("scheduleEditor.addRuleHeader")}</p>
             <div className="flex items-end gap-3">
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">From</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.from")}</label>
                 <input type="date" value={newStart} min={today} onChange={(e) => setNewStart(e.target.value)} className={inputCls} />
               </div>
               <span className="text-gray-400 pb-2">—</span>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">To</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.to")}</label>
                 <input type="date" value={newEnd} min={newStart || today} onChange={(e) => setNewEnd(e.target.value)} className={inputCls} />
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1.5">Days of week</label>
+              <label className="block text-xs text-gray-500 mb-1.5">{t("scheduleEditor.daysOfWeekLabel")}</label>
               <div className="flex gap-1">
                 {DAY_SHORT.map((label, i) => (
                   <button key={i} type="button" onClick={() => toggleDay(i)}
@@ -2116,12 +2124,12 @@ function ScheduleOverridesSection({
             </div>
             <div className="flex items-end gap-3">
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">Start time</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.startTimeLabel")}</label>
                 <input type="time" value={newStartTime} onChange={(e) => setNewStartTime(e.target.value)} className={inputCls} />
               </div>
               <span className="text-gray-400 pb-2">—</span>
               <div className="flex-1">
-                <label className="block text-xs text-gray-500 mb-1">End time</label>
+                <label className="block text-xs text-gray-500 mb-1">{t("scheduleEditor.endTimeLabel")}</label>
                 <input type="time" value={newEndTime} onChange={(e) => setNewEndTime(e.target.value)} className={inputCls} />
               </div>
             </div>
@@ -2131,7 +2139,7 @@ function ScheduleOverridesSection({
               </p>
             )}
             <Button variant="secondary" onClick={prepareAdd} disabled={recurringActionLoading} isLoading={recurringActionLoading}>
-              Add Recurring Rule
+              {t("scheduleEditor.addRecurringRuleButton")}
             </Button>
           </div>
         </div>

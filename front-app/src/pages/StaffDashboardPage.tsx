@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { formatTime } from "../utils/formatTime";
+import { useTranslation } from "react-i18next";
 import type { RootState } from "../redux/store";
 import {
   getBusinessAppointments,
@@ -26,19 +28,15 @@ function formatDate(iso: string): string {
   });
 }
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 export default function StaffDashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { businessId } = useParams<{ businessId: string }>();
   const authUser = useSelector((s: RootState) => s.auth.user);
 
-  const [assignedServices, setAssignedServices] = useState<ServiceProfile[]>([]);
+  const [assignedServices, setAssignedServices] = useState<ServiceProfile[]>(
+    [],
+  );
   const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,7 +61,9 @@ export default function StaffDashboardPage() {
       getBusinessAppointments(bid, 1, 100).catch(() => [] as AppointmentDTO[]),
     ])
       .then(([allServices, assignedIds, allAppts]) => {
-        const myServices = allServices.filter((s) => assignedIds.includes(s.id));
+        const myServices = allServices.filter((s) =>
+          assignedIds.includes(s.id),
+        );
         setAssignedServices(myServices);
         setAllAppointments(allAppts);
       })
@@ -78,7 +78,9 @@ export default function StaffDashboardPage() {
         for (const r of reviews) map[r.appointmentId] = r;
         setReviewMap(map);
       })
-      .catch(() => {/* silently ignore */});
+      .catch(() => {
+        /* silently ignore */
+      });
   }, [bid]);
 
   const now = new Date();
@@ -92,7 +94,8 @@ export default function StaffDashboardPage() {
     )
     .sort(
       (a, b) =>
-        new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime(),
+        new Date(a.startDateTime).getTime() -
+        new Date(b.startDateTime).getTime(),
     )
     .slice(0, 10);
 
@@ -105,7 +108,8 @@ export default function StaffDashboardPage() {
     )
     .sort(
       (a, b) =>
-        new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime(),
+        new Date(b.startDateTime).getTime() -
+        new Date(a.startDateTime).getTime(),
     )
     .slice(0, 20);
 
@@ -117,9 +121,11 @@ export default function StaffDashboardPage() {
     setCancelError(null);
     try {
       const updated = await cancelAppointment(id, "Service did not take place");
-      setAllAppointments((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setAllAppointments((prev) =>
+        prev.map((a) => (a.id === id ? updated : a)),
+      );
     } catch {
-      setCancelError("Failed to void appointment. Please try again.");
+      setCancelError(t("staffDashboard.error.voidFailed"));
     } finally {
       setCancelingId(null);
     }
@@ -137,10 +143,10 @@ export default function StaffDashboardPage() {
     <>
       <ConfirmDialog
         open={confirmCancelId !== null}
-        title="Cancel completed appointment?"
-        message="This will mark the appointment as canceled. Use this only if the service did not take place."
-        confirmLabel="Yes, cancel it"
-        cancelLabel="Keep it"
+        title={t("staffDashboard.cancelDialog.title")}
+        message={t("staffDashboard.cancelDialog.message")}
+        confirmLabel={t("staffDashboard.cancelDialog.confirm")}
+        cancelLabel={t("staffDashboard.cancelDialog.cancel")}
         destructive
         onConfirm={handleConfirmCancel}
         onCancel={() => setConfirmCancelId(null)}
@@ -154,9 +160,18 @@ export default function StaffDashboardPage() {
       )}
       {cancelError && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3 shadow-lg">
-          <MaterialIcon name="error_outline" className="text-red-500 shrink-0" />
-          <p className="text-sm text-red-600 dark:text-red-400">{cancelError}</p>
-          <button type="button" onClick={() => setCancelError(null)} className="ml-2 text-red-400 hover:text-red-600">
+          <MaterialIcon
+            name="error_outline"
+            className="text-red-500 shrink-0"
+          />
+          <p className="text-sm text-red-600 dark:text-red-400">
+            {cancelError}
+          </p>
+          <button
+            type="button"
+            onClick={() => setCancelError(null)}
+            className="ml-2 text-red-400 hover:text-red-600"
+          >
             <MaterialIcon name="close" className="text-base" />
           </button>
         </div>
@@ -167,31 +182,33 @@ export default function StaffDashboardPage() {
         <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
           <div className="max-w-2xl mx-auto">
             <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-              Staff Dashboard
+              {t("staffDashboard.title")}
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              {authUser?.name} · Staff member
+              {authUser?.name} · {t("staffDashboard.subtitle")}
             </p>
           </div>
         </div>
 
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
-
           {/* ── Assigned Services ── */}
           <section>
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-              My Services
+              {t("staffDashboard.myServices")}
             </h2>
 
             {assignedServices.length === 0 ? (
               <Card className="p-6 flex flex-col items-center gap-3 text-center">
-                <MaterialIcon name="design_services" className="text-3xl text-gray-400" />
+                <MaterialIcon
+                  name="design_services"
+                  className="text-3xl text-gray-400"
+                />
                 <div>
                   <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                    No services assigned yet
+                    {t("staffDashboard.noServices.title")}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    Your business owner will assign services to you.
+                    {t("staffDashboard.noServices.text")}
                   </p>
                 </div>
               </Card>
@@ -201,7 +218,10 @@ export default function StaffDashboardPage() {
                   <Card key={svc.id} className="p-4">
                     <div className="flex items-center gap-4">
                       <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <MaterialIcon name="design_services" className="text-base text-primary" />
+                        <MaterialIcon
+                          name="design_services"
+                          className="text-base text-primary"
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
@@ -209,7 +229,9 @@ export default function StaffDashboardPage() {
                         </p>
                         <p className="text-xs text-gray-500">
                           {svc.duration} min
-                          {svc.price != null ? ` · $${svc.price.toFixed(2)}` : ""}
+                          {svc.price != null
+                            ? ` · $${svc.price.toFixed(2)}`
+                            : ""}
                         </p>
                       </div>
                       <div className="flex gap-2 shrink-0">
@@ -217,9 +239,13 @@ export default function StaffDashboardPage() {
                           variant="outline"
                           size="sm"
                           className="w-auto! px-3"
-                          onClick={() => navigate(`/business/${bid}/schedule?serviceId=${svc.id}`)}
+                          onClick={() =>
+                            navigate(
+                              `/business/${bid}/schedule?serviceId=${svc.id}`,
+                            )
+                          }
                         >
-                          View Schedule
+                          {t("staffDashboard.viewSchedule")}
                         </Button>
                         <Button
                           variant="primary"
@@ -227,7 +253,7 @@ export default function StaffDashboardPage() {
                           className="w-auto! px-3"
                           onClick={() => navigate(`/schedule/${bid}/${svc.id}`)}
                         >
-                          Edit Availability
+                          {t("staffDashboard.editAvailability")}
                         </Button>
                       </div>
                     </div>
@@ -240,18 +266,21 @@ export default function StaffDashboardPage() {
           {/* ── Upcoming Appointments ── */}
           <section>
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-              Upcoming Appointments
+              {t("staffDashboard.upcoming")}
             </h2>
 
             {upcoming.length === 0 ? (
               <Card className="p-6 flex flex-col items-center gap-3 text-center">
-                <MaterialIcon name="calendar_today" className="text-3xl text-gray-400" />
+                <MaterialIcon
+                  name="calendar_today"
+                  className="text-3xl text-gray-400"
+                />
                 <div>
                   <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                    No upcoming appointments
+                    {t("staffDashboard.noUpcoming.title")}
                   </p>
                   <p className="text-xs text-gray-500 mt-0.5">
-                    New bookings will appear here.
+                    {t("staffDashboard.noUpcoming.text")}
                   </p>
                 </div>
               </Card>
@@ -268,12 +297,16 @@ export default function StaffDashboardPage() {
                       </p>
                       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
                         <span className="flex items-center gap-1">
-                          <MaterialIcon name="calendar_today" className="text-xs" />
+                          <MaterialIcon
+                            name="calendar_today"
+                            className="text-xs"
+                          />
                           {formatDate(appt.startDateTime)}
                         </span>
                         <span className="flex items-center gap-1">
                           <MaterialIcon name="schedule" className="text-xs" />
-                          {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                          {formatTime(appt.startDateTime)} –{" "}
+                          {formatTime(appt.endDateTime)}
                         </span>
                       </div>
                     </div>
@@ -286,14 +319,17 @@ export default function StaffDashboardPage() {
           {/* ── Completed Appointments ── */}
           <section>
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-              Completed Appointments
+              {t("staffDashboard.completed")}
             </h2>
 
             {completed.length === 0 ? (
               <Card className="p-6 flex flex-col items-center gap-3 text-center">
-                <MaterialIcon name="check_circle" className="text-3xl text-gray-400" />
+                <MaterialIcon
+                  name="check_circle"
+                  className="text-3xl text-gray-400"
+                />
                 <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                  No completed appointments yet
+                  {t("staffDashboard.noCompleted")}
                 </p>
               </Card>
             ) : (
@@ -312,12 +348,19 @@ export default function StaffDashboardPage() {
                           </p>
                           <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
                             <span className="flex items-center gap-1">
-                              <MaterialIcon name="calendar_today" className="text-xs" />
+                              <MaterialIcon
+                                name="calendar_today"
+                                className="text-xs"
+                              />
                               {formatDate(appt.startDateTime)}
                             </span>
                             <span className="flex items-center gap-1">
-                              <MaterialIcon name="schedule" className="text-xs" />
-                              {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                              <MaterialIcon
+                                name="schedule"
+                                className="text-xs"
+                              />
+                              {formatTime(appt.startDateTime)} –{" "}
+                              {formatTime(appt.endDateTime)}
                             </span>
                           </div>
                         </div>
@@ -328,7 +371,9 @@ export default function StaffDashboardPage() {
                             disabled={cancelingId === appt.id}
                             className="shrink-0 text-xs text-red-500 hover:underline disabled:opacity-50"
                           >
-                            {cancelingId === appt.id ? "Canceling…" : "Didn't happen"}
+                            {cancelingId === appt.id
+                              ? t("staffDashboard.canceling")
+                              : t("staffDashboard.didntHappen")}
                           </button>
                         )}
                       </div>
@@ -338,7 +383,7 @@ export default function StaffDashboardPage() {
                         {appt.status === AppointmentStatus.Canceled ? (
                           <p className="text-xs text-orange-500 font-medium flex items-center gap-1">
                             <MaterialIcon name="block" className="text-sm" />
-                            Marked as not completed
+                            {t("staffDashboard.markedNotCompleted")}
                           </p>
                         ) : review ? (
                           <button
@@ -350,7 +395,9 @@ export default function StaffDashboardPage() {
                               {[1, 2, 3, 4, 5].map((s) => (
                                 <MaterialIcon
                                   key={s}
-                                  name={review.rating >= s ? "star" : "star_border"}
+                                  name={
+                                    review.rating >= s ? "star" : "star_border"
+                                  }
                                   className={`text-sm ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
                                 />
                               ))}
@@ -360,12 +407,18 @@ export default function StaffDashboardPage() {
                                 ? `"${review.comment.slice(0, 40)}${review.comment.length > 40 ? "…" : ""}"`
                                 : "View review"}
                             </span>
-                            <MaterialIcon name="open_in_new" className="text-xs ml-auto" />
+                            <MaterialIcon
+                              name="open_in_new"
+                              className="text-xs ml-auto"
+                            />
                           </button>
                         ) : (
                           <p className="text-xs text-gray-400 flex items-center gap-1">
-                            <MaterialIcon name="rate_review" className="text-sm" />
-                            No review yet
+                            <MaterialIcon
+                              name="rate_review"
+                              className="text-sm"
+                            />
+                            {t("staffDashboard.noReview")}
                           </p>
                         )}
                       </div>
@@ -375,7 +428,6 @@ export default function StaffDashboardPage() {
               </div>
             )}
           </section>
-
         </div>
       </div>
     </>

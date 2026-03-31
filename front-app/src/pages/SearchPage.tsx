@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../redux/store";
@@ -35,7 +36,6 @@ import {
   searchBusinesses,
   getFeaturedBusinesses,
   getNearbyBusinesses,
-  getAllBusinesses,
   searchByAvailability,
 } from "../services/businessService";
 import { fetchCategories } from "../services/categoryService";
@@ -61,6 +61,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
  * - Featured businesses loading
  */
 export function SearchPage() {
+  const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
@@ -113,7 +114,9 @@ export function SearchPage() {
     if (!isAuthenticated) return;
     getFollowedBusinesses()
       .then((businesses) => setFollowedIds(businesses.map((b) => b.id)))
-      .catch(() => {/* silently ignore */});
+      .catch(() => {
+        /* silently ignore */
+      });
   }, [isAuthenticated]);
 
   // Load featured businesses on mount
@@ -160,7 +163,9 @@ export function SearchPage() {
         dispatch(setResults(result));
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "Failed to fetch nearby businesses";
+          err instanceof Error
+            ? err.message
+            : "Failed to fetch nearby businesses";
         dispatch(setError(errorMessage));
       }
     };
@@ -187,7 +192,9 @@ export function SearchPage() {
       const cats = catOverride ?? selectedCategories;
       const date = dateOverride !== undefined ? dateOverride : availabilityDate;
       const timeFrom =
-        timeFromOverride !== undefined ? timeFromOverride : availabilityTimeFrom;
+        timeFromOverride !== undefined
+          ? timeFromOverride
+          : availabilityTimeFrom;
       const timeTo =
         timeToOverride !== undefined ? timeToOverride : availabilityTimeTo;
 
@@ -217,7 +224,13 @@ export function SearchPage() {
         dispatch(setError(errorMessage));
       }
     },
-    [dispatch, selectedCategories, availabilityDate, availabilityTimeFrom, availabilityTimeTo],
+    [
+      dispatch,
+      selectedCategories,
+      availabilityDate,
+      availabilityTimeFrom,
+      availabilityTimeTo,
+    ],
   );
 
   // Handle category filter change
@@ -260,7 +273,9 @@ export function SearchPage() {
       const isFollowing = followedIds.includes(businessId);
       // Optimistic update
       setFollowedIds((prev) =>
-        isFollowing ? prev.filter((id) => id !== businessId) : [...prev, businessId],
+        isFollowing
+          ? prev.filter((id) => id !== businessId)
+          : [...prev, businessId],
       );
       try {
         if (isFollowing) {
@@ -271,7 +286,9 @@ export function SearchPage() {
       } catch {
         // Revert optimistic update on failure
         setFollowedIds((prev) =>
-          isFollowing ? [...prev, businessId] : prev.filter((id) => id !== businessId),
+          isFollowing
+            ? [...prev, businessId]
+            : prev.filter((id) => id !== businessId),
         );
       }
     },
@@ -300,9 +317,21 @@ export function SearchPage() {
   const handleAvailabilityDateChange = useCallback(
     (date: string | null) => {
       dispatch(setAvailabilityDate(date));
-      handleSearch(searchQuery, undefined, date, availabilityTimeFrom, availabilityTimeTo);
+      handleSearch(
+        searchQuery,
+        undefined,
+        date,
+        availabilityTimeFrom,
+        availabilityTimeTo,
+      );
     },
-    [dispatch, handleSearch, searchQuery, availabilityTimeFrom, availabilityTimeTo],
+    [
+      dispatch,
+      handleSearch,
+      searchQuery,
+      availabilityTimeFrom,
+      availabilityTimeTo,
+    ],
   );
 
   // Handle availability time range change
@@ -342,8 +371,11 @@ export function SearchPage() {
       label: cat.name,
       icon: cat.iconName || "category", // fallback icon when none provided
     }));
-    return [{ id: "all", label: "All", icon: "star" }, ...dynamic];
-  }, [categories]);
+    return [
+      { id: "all", label: t("search.filters.all"), icon: "star" },
+      ...dynamic,
+    ];
+  }, [categories, t]);
 
   return (
     <div className="flex flex-col h-screen w-full bg-white dark:bg-gray-900">
@@ -393,7 +425,11 @@ export function SearchPage() {
             onViewServicesClick={handleViewServicesClick}
             favorites={followedIds}
             currentUserId={authUser?.id}
-            hasActiveSearch={!!searchQuery || selectedCategories.length > 0 || !!availabilityDate}
+            hasActiveSearch={
+              !!searchQuery ||
+              selectedCategories.length > 0 ||
+              !!availabilityDate
+            }
             featuredResults={
               searchQuery
                 ? undefined
@@ -419,11 +455,10 @@ export function SearchPage() {
                     />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                    Explore Businesses
+                    {t("search.emptyState.title")}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 text-sm max-w-xs mx-auto">
-                    Search for your favorite salons, doctors, fitness centers, and
-                    more
+                    {t("search.emptyState.text")}
                   </p>
                 </div>
               </div>

@@ -40,7 +40,9 @@
       "Bash(grep -r \"staff\\\\|partner\\\\|notification\\\\|translation\\\\|i18n\" 'd:\\\\Coding\\\\.Net + React\\\\BizSlot/Planning' --include=*.md)",
       "Bash(for f:*)",
       "Bash(do sed:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(find . -name *.tsx)",
+      "Bash(grep -rn \">[A-Z][a-z ]\\\\{5,\\\\}<\" --include=\"*.tsx\" pages/)"
     ]
   }
 }

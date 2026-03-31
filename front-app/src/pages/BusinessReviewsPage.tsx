@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { getBusinessReviews, flagReview, type ReviewDTO } from "../services/reviewService";
 import { getPublicServicesForBusiness } from "../services/businessManagementService";
-import { getMyBusinesses, getBusinessById } from "../services/businessManagementService";
+import { getMyBusinesses } from "../services/businessManagementService";
 import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
@@ -30,6 +31,7 @@ function FlagModal({
   submitting: boolean;
   error: string | null;
 }) {
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
 
   return (
@@ -43,8 +45,8 @@ function FlagModal({
       >
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h2 className="font-bold text-[#111418] dark:text-white text-base">Flag Review</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Describe why this review is inappropriate</p>
+            <h2 className="font-bold text-[#111418] dark:text-white text-base">{t("reviews.flag.title")}</h2>
+            <p className="text-xs text-gray-500 mt-0.5">{t("reviews.flag.subtitle")}</p>
           </div>
           <button
             type="button"
@@ -58,7 +60,7 @@ function FlagModal({
         <textarea
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="e.g. This review contains false information or abusive language…"
+          placeholder={t("reviews.flag.placeholder")}
           rows={4}
           maxLength={500}
           className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 text-sm text-[#111418] dark:text-white outline-none resize-none focus:ring-2 focus:ring-primary"
@@ -79,7 +81,7 @@ function FlagModal({
             ) : (
               <MaterialIcon name="flag" className="text-base" />
             )}
-            {submitting ? "Submitting…" : "Submit Flag"}
+            {submitting ? t("reviews.flag.submitting") : t("reviews.flag.submitButton")}
           </button>
           <button
             type="button"
@@ -87,7 +89,7 @@ function FlagModal({
             disabled={submitting}
             className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm font-semibold py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t("reviews.flag.cancel")}
           </button>
         </div>
       </div>
@@ -104,6 +106,8 @@ function ReviewCard({
   review: ReviewDTO;
   onFlag: (id: string) => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <Card className={`p-5 space-y-3 ${review.isFlagged ? "border-orange-200 dark:border-orange-800" : ""}`}>
       {/* Header row */}
@@ -116,7 +120,7 @@ function ReviewCard({
             {review.isFlagged && (
               <span className="flex items-center gap-1 text-xs font-semibold text-orange-500 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-full px-2 py-0.5 shrink-0">
                 <MaterialIcon name="flag" className="text-xs leading-none" />
-                Flagged
+                {t("reviews.badge.flagged")}
               </span>
             )}
           </div>
@@ -148,7 +152,7 @@ function ReviewCard({
             type="button"
             disabled={review.isFlagged}
             onClick={() => onFlag(review.id)}
-            title={review.isFlagged ? "Already flagged" : "Flag as inappropriate"}
+            title={review.isFlagged ? t("reviews.flag.alreadyFlagged") : t("reviews.flag.flagAsInappropriate")}
             className={`p-1.5 rounded-lg transition-colors ${
               review.isFlagged
                 ? "text-orange-400 cursor-not-allowed"
@@ -174,7 +178,7 @@ function ReviewCard({
       {review.isFlagged && (
         <p className="text-xs text-orange-500 flex items-center gap-1 pt-2 border-t border-orange-100 dark:border-orange-900/30">
           <MaterialIcon name="info" className="text-sm leading-none" />
-          Pending admin review — still visible on public page until reviewed
+          {t("reviews.flag.pendingNote")}
         </p>
       )}
     </Card>
@@ -186,6 +190,7 @@ function ReviewCard({
 const PAGE_SIZE = 20;
 
 export default function BusinessReviewsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { businessId: paramBusinessId } = useParams<{ businessId?: string }>();
 
@@ -266,7 +271,7 @@ export default function BusinessReviewsPage() {
       setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
       setFlaggingId(null);
     } catch {
-      setFlagError("Failed to flag the review. Please try again.");
+      setFlagError(t("reviews.flag.errorSubmit"));
     } finally {
       setFlagSubmitting(false);
     }
@@ -298,6 +303,13 @@ export default function BusinessReviewsPage() {
       ? filtered.reduce((s, r) => s + r.rating, 0) / filtered.length
       : 0;
 
+  function clearFilters() {
+    setFilterService("all");
+    setFilterRating(0);
+    setFilterFrom("");
+    setFilterTo("");
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
@@ -324,12 +336,12 @@ export default function BusinessReviewsPage() {
             </button>
             <div className="flex-1 min-w-0">
               <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-                Reviews
+                {t("reviews.title")}
               </h1>
               {!loading && (
                 <p className="text-xs text-gray-500">
-                  {filtered.length} of {reviews.length} review{reviews.length !== 1 ? "s" : ""}
-                  {avgRating > 0 && ` · ${avgRating.toFixed(1)} avg`}
+                  {filtered.length} of {reviews.length} {reviews.length !== 1 ? "reviews" : "review"}
+                  {avgRating > 0 && ` · ${avgRating.toFixed(1)} ${t("reviews.avgSuffix")}`}
                 </p>
               )}
             </div>
@@ -342,19 +354,14 @@ export default function BusinessReviewsPage() {
           <Card className="p-4 space-y-4">
             <div className="flex items-center gap-2">
               <MaterialIcon name="filter_list" className="text-base text-gray-500" />
-              <span className="text-sm font-semibold text-[#111418] dark:text-white">Filters</span>
+              <span className="text-sm font-semibold text-[#111418] dark:text-white">{t("reviews.filters.title")}</span>
               {hasActiveFilters && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setFilterService("all");
-                    setFilterRating(0);
-                    setFilterFrom("");
-                    setFilterTo("");
-                  }}
+                  onClick={clearFilters}
                   className="ml-auto text-xs text-primary hover:underline"
                 >
-                  Clear all
+                  {t("reviews.filters.clearAll")}
                 </button>
               )}
             </div>
@@ -363,14 +370,14 @@ export default function BusinessReviewsPage() {
               {/* Service filter */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Service
+                  {t("reviews.filters.service")}
                 </label>
                 <select
                   value={filterService}
                   onChange={(e) => setFilterService(e.target.value)}
                   className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="all">All services</option>
+                  <option value="all">{t("reviews.filters.allServices")}</option>
                   {services.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.name}
@@ -382,7 +389,7 @@ export default function BusinessReviewsPage() {
               {/* Rating filter */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Rating
+                  {t("reviews.filters.rating")}
                 </label>
                 <div className="flex gap-1.5">
                   {[0, 1, 2, 3, 4, 5].map((r) => (
@@ -397,7 +404,7 @@ export default function BusinessReviewsPage() {
                           : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500 hover:border-primary hover:text-primary",
                       ].join(" ")}
                     >
-                      {r === 0 ? "All" : `${r}★`}
+                      {r === 0 ? t("reviews.filters.all") : `${r}★`}
                     </button>
                   ))}
                 </div>
@@ -406,7 +413,7 @@ export default function BusinessReviewsPage() {
               {/* Date from */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  From
+                  {t("reviews.filters.from")}
                 </label>
                 <input
                   type="date"
@@ -419,7 +426,7 @@ export default function BusinessReviewsPage() {
               {/* Date to */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  To
+                  {t("reviews.filters.to")}
                 </label>
                 <input
                   type="date"
@@ -447,20 +454,15 @@ export default function BusinessReviewsPage() {
             <Card className="p-10 flex flex-col items-center gap-3 text-center">
               <MaterialIcon name="rate_review" className="text-4xl text-gray-300 dark:text-gray-700" />
               <p className="text-sm font-semibold text-[#111418] dark:text-white">
-                {hasActiveFilters ? "No reviews match your filters" : "No reviews yet"}
+                {hasActiveFilters ? t("reviews.empty.noMatch") : t("reviews.empty.noReviews")}
               </p>
               {hasActiveFilters && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setFilterService("all");
-                    setFilterRating(0);
-                    setFilterFrom("");
-                    setFilterTo("");
-                  }}
+                  onClick={clearFilters}
                   className="text-xs text-primary hover:underline"
                 >
-                  Clear filters
+                  {t("reviews.clearFilters")}
                 </button>
               )}
             </Card>
@@ -483,14 +485,14 @@ export default function BusinessReviewsPage() {
                   ) : (
                     <>
                       <MaterialIcon name="expand_more" className="text-base leading-none" />
-                      Load more reviews
+                      {t("reviews.loadMore")}
                     </>
                   )}
                 </button>
               )}
               {hasMore && hasActiveFilters && (
                 <p className="text-center text-xs text-gray-400 py-2">
-                  More reviews may exist — clear filters to load all
+                  {t("reviews.loadMoreNote")}
                 </p>
               )}
             </div>

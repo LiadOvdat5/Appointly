@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   getMyInvitations,
   respondToInvitation,
@@ -36,6 +37,7 @@ function InvitationCard({
   invitation: MyInvitation;
   onRespond: (id: string, accept: boolean) => Promise<void>;
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState<"accept" | "decline" | null>(null);
   const isPending = invitation.status === InvitationStatus.Pending;
   const days = daysUntil(invitation.expirationDate);
@@ -61,7 +63,7 @@ function InvitationCard({
             {invitation.businessName}
           </p>
           <p className="text-xs text-gray-500 mt-0.5">
-            Invited {formatDate(invitation.invitedAt)}
+            {t("invitations.invitedAt", { date: formatDate(invitation.invitedAt) })}
           </p>
 
           {isPending && (
@@ -77,8 +79,8 @@ function InvitationCard({
             >
               <MaterialIcon name="timer" className="text-xs leading-none" />
               {days === 0
-                ? "Expires today"
-                : `Expires in ${days} day${days !== 1 ? "s" : ""}`}
+                ? t("invitations.expiresToday")
+                : t("invitations.expiresIn_other", { count: days })}
             </p>
           )}
         </div>
@@ -96,10 +98,10 @@ function InvitationCard({
             ].join(" ")}
           >
             {invitation.status === InvitationStatus.Accepted
-              ? "Accepted"
+              ? t("invitations.status.accepted")
               : invitation.status === InvitationStatus.Declined
-                ? "Declined"
-                : "Expired"}
+                ? t("invitations.status.declined")
+                : t("invitations.status.expired")}
           </span>
         )}
       </div>
@@ -121,7 +123,7 @@ function InvitationCard({
             disabled={loading !== null}
             onClick={() => handle(true)}
           >
-            Accept
+            {t("invitations.actions.accept")}
           </Button>
           <Button
             variant="outline"
@@ -130,7 +132,7 @@ function InvitationCard({
             disabled={loading !== null}
             onClick={() => handle(false)}
           >
-            Decline
+            {t("invitations.actions.decline")}
           </Button>
         </div>
       )}
@@ -141,6 +143,7 @@ function InvitationCard({
 // ─── InvitationsPage ──────────────────────────────────────────────────────────
 
 export default function InvitationsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [invitations, setInvitations] = useState<MyInvitation[]>([]);
@@ -151,9 +154,9 @@ export default function InvitationsPage() {
     setLoading(true);
     getMyInvitations()
       .then(setInvitations)
-      .catch(() => setError("Failed to load invitations."))
+      .catch(() => setError(t("invitations.error.loadFailed")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   async function handleRespond(invitationId: string, accept: boolean) {
     const updated = await respondToInvitation(invitationId, accept);
@@ -203,17 +206,17 @@ export default function InvitationsPage() {
             type="button"
             onClick={() => navigate(-1)}
             className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            aria-label="Back"
+            aria-label={t("common.back")}
           >
             <MaterialIcon name="arrow_back" className="text-xl" />
           </button>
           <div>
             <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-              Business Invitations
+              {t("invitations.title")}
             </h1>
             {pending.length > 0 && (
               <p className="text-xs text-indigo-500 font-semibold mt-0.5">
-                {pending.length} pending invite{pending.length !== 1 ? "s" : ""}
+                {t("invitations.pendingCount_other", { count: pending.length })}
               </p>
             )}
           </div>
@@ -229,7 +232,7 @@ export default function InvitationsPage() {
         {pending.length > 0 && (
           <section>
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-              Pending
+              {t("invitations.sections.pending")}
             </h2>
             <div className="space-y-4">
               {pending.map((inv) => (
@@ -251,10 +254,10 @@ export default function InvitationsPage() {
             </div>
             <div>
               <p className="font-semibold text-[#111418] dark:text-white text-sm">
-                No invitations yet
+                {t("invitations.empty.title")}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                When a business owner invites you to join their team, it will appear here.
+                {t("invitations.empty.text")}
               </p>
             </div>
           </div>
@@ -264,7 +267,7 @@ export default function InvitationsPage() {
         {past.length > 0 && (
           <section>
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-              Past
+              {t("invitations.sections.past")}
             </h2>
             <div className="space-y-4">
               {past.map((inv) => (
