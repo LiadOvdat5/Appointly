@@ -83,6 +83,11 @@ export const getPublicBusinessById = async (id: string): Promise<BusinessProfile
   return response.data;
 };
 
+export const getPublicBusinessBySlug = async (slug: string): Promise<BusinessProfile> => {
+  const response = await apiClient.get<BusinessProfile>(`/businesses/by-slug/${slug}`);
+  return response.data;
+};
+
 export const getPublicServicesForBusiness = async (businessId: string): Promise<ServiceProfile[]> => {
   const response = await apiClient.get<ServiceProfile[]>(`/businesses/${businessId}/services`);
   return response.data;

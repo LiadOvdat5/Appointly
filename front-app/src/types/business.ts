@@ -6,6 +6,7 @@
 export interface BusinessProfile {
   id: string;
   ownerId: string;
+  slug: string;
   name: string;
   address: string;
   phone: string;

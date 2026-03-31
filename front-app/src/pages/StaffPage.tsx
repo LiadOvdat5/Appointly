@@ -14,7 +14,11 @@ import {
   type StaffInvitation,
   type StaffReport,
 } from "../services/staffService";
-import { getServicesForBusiness } from "../services/businessManagementService";
+import {
+  getServicesForBusiness,
+  getBusinessById,
+  getPublicBusinessBySlug,
+} from "../services/businessManagementService";
 import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { Button } from "../components/UI/Button";
@@ -395,8 +399,9 @@ function StaffDetailModal({
 export default function StaffPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { businessId } = useParams<{ businessId: string }>();
+  const { businessSlug } = useParams<{ businessSlug: string }>();
 
+  const [bid, setBid] = useState<string>("");
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<StaffInvitation[]>([]);
   const [allServices, setAllServices] = useState<ServiceProfile[]>([]);
@@ -410,7 +415,13 @@ export default function StaffPage() {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  const bid = businessId ?? "";
+  // Resolve slug → UUID
+  useEffect(() => {
+    if (!businessSlug) return;
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(businessSlug);
+    const load = isUUID ? getBusinessById(businessSlug) : getPublicBusinessBySlug(businessSlug);
+    load.then((biz) => setBid(biz.id)).catch(() => setError(t("staff.error.loadFailed")));
+  }, [businessSlug, t]);
 
   // ── Load data ──────────────────────────────────────────────────────────────
   useEffect(() => {

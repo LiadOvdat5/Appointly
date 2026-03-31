@@ -4,6 +4,7 @@ using WebAPI.Data;
 using WebAPI.Models;
 using WebAPI.Mappers;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace WebAPI.Repositories
 {
@@ -18,12 +19,36 @@ namespace WebAPI.Repositories
             _userRepository = userRepository;
         }
 
+        private static string GenerateBaseSlug(string name)
+        {
+            var slug = name.ToLowerInvariant();
+            slug = slug.Replace(" ", "-");
+            slug = Regex.Replace(slug, @"[^a-z0-9\-]", "");
+            slug = Regex.Replace(slug, @"-{2,}", "-");
+            slug = slug.Trim('-');
+            return string.IsNullOrEmpty(slug) ? "business" : slug;
+        }
+
+        private async Task<string> GetUniqueSlugAsync(string baseName)
+        {
+            var baseSlug = GenerateBaseSlug(baseName);
+            var candidate = baseSlug;
+            var counter = 2;
+            while (await _context.Businesses.AnyAsync(b => b.Slug == candidate))
+            {
+                candidate = $"{baseSlug}-{counter}";
+                counter++;
+            }
+            return candidate;
+        }
+
         public async Task<BusinessDTO> CreateBusinessAsync(Guid ownerId, CreateBusinessDTO createBusinessDto)
         {
             if (string.IsNullOrWhiteSpace(createBusinessDto.Name))
                 throw new ArgumentException("Business name is required.");
 
             var business = BusinessMapper.ToBusiness(ownerId, createBusinessDto);
+            business.Slug = await GetUniqueSlugAsync(createBusinessDto.Name);
 
             // Auto-add owner as an Accepted partner so they can be assigned to services
             business.Partners.Add(new BusinessPartner
@@ -57,6 +82,29 @@ namespace WebAPI.Repositories
             {
                 categoryGuids = business.CategoryIds.Select(Guid.Parse).ToList();
             }
+
+            var categories = new List<CategoryDTO>();
+            if (categoryGuids.Any())
+            {
+                categories = await _context.Categories
+                    .Where(c => categoryGuids.Contains(c.Id))
+                    .Select(c => new CategoryDTO { Id = c.Id, Name = c.Name, Description = c.Description, IconName = c.IconName })
+                    .ToListAsync();
+            }
+
+            return BusinessMapper.ToBusinessDTO(business, categories);
+        }
+
+        public async Task<BusinessDTO> GetBusinessBySlugAsync(string slug)
+        {
+            var business = await _context.Businesses
+                .FirstOrDefaultAsync(b => b.Slug == slug.ToLowerInvariant());
+            if (business == null)
+                throw new KeyNotFoundException($"Business with slug '{slug}' not found.");
+
+            var categoryGuids = new List<Guid>();
+            if (business.CategoryIds != null && business.CategoryIds.Any())
+                categoryGuids = business.CategoryIds.Select(Guid.Parse).ToList();
 
             var categories = new List<CategoryDTO>();
             if (categoryGuids.Any())

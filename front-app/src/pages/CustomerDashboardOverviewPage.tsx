@@ -711,7 +711,7 @@ export default function CustomerDashboardOverviewPage() {
                     <div className="flex-1 min-w-0">
                       <button
                         type="button"
-                        onClick={() => navigate(`/business/${biz.id}`)}
+                        onClick={() => navigate(`/business/${biz.slug ?? biz.id}`)}
                         className="font-semibold text-sm text-[#111418] dark:text-white hover:text-primary transition-colors truncate block text-left"
                       >
                         {biz.name}
@@ -735,7 +735,7 @@ export default function CustomerDashboardOverviewPage() {
                       <Button
                         variant="primary"
                         size="sm"
-                        onClick={() => navigate(`/business/${biz.id}`)}
+                        onClick={() => navigate(`/business/${biz.slug ?? biz.id}`)}
                       >
                         Book
                       </Button>

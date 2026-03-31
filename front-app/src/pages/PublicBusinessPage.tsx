@@ -11,6 +11,7 @@ import {
 } from "../features/search/searchSelectors";
 import {
   getPublicBusinessById,
+  getPublicBusinessBySlug,
   getPublicServicesForBusiness,
   updateBusiness,
   createService,
@@ -428,7 +429,7 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
 function ServiceCardItem({
   service,
-  businessId,
+  businessSlug,
   slots,
   slotsLoading,
   isAuthenticated,
@@ -439,7 +440,7 @@ function ServiceCardItem({
   onManageSchedule,
 }: {
   service: ServiceProfile;
-  businessId: string;
+  businessSlug: string;
   slots: SlotDTO[];
   slotsLoading: boolean;
   isAuthenticated: boolean;
@@ -451,8 +452,8 @@ function ServiceCardItem({
 }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const bookingPath = `/book/${businessId}/${service.id}`;
-  const loginRedirect = `/login?from=/business/${businessId}`;
+  const bookingPath = `/book/${businessSlug}/${service.id}`;
+  const loginRedirect = `/login?from=/business/${businessSlug}`;
 
   function handleBook(extra = "") {
     if (!isAuthenticated) {
@@ -688,9 +689,11 @@ function ServiceForm({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default function PublicBusinessPage() {
   const { t } = useTranslation();
-  const { businessId } = useParams<{ businessId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const authUser = useSelector((state: RootState) => state.auth.user);
@@ -707,6 +710,10 @@ export default function PublicBusinessPage() {
   const logoInputRef = useRef<HTMLInputElement>(null);
   const bannerInputRef = useRef<HTMLInputElement>(null);
   const searchImageInputRef = useRef<HTMLInputElement>(null);
+
+  // Derive UUID and slug from loaded business (used for API calls and navigation)
+  const businessId = page.status === "ready" ? page.business.id : undefined;
+  const businessSlug = page.status === "ready" ? page.business.slug : slug;
 
   // Is the current user the owner?
   const isOwner =
@@ -727,32 +734,42 @@ export default function PublicBusinessPage() {
 
   // ── Load business + services + categories ──────────────────────────────────
   useEffect(() => {
-    if (!businessId) return;
+    if (!slug) return;
     let cancelled = false;
 
-    Promise.all([
-      getPublicBusinessById(businessId),
-      getPublicServicesForBusiness(businessId),
-      fetchCategories(),
-    ])
-      .then(([biz, svcs, cats]) => {
-        if (!cancelled)
-          dispatch({
-            type: "LOADED",
-            business: biz,
-            services: svcs,
-            categories: cats,
-          });
-      })
-      .catch((err) => {
-        if (!cancelled && err?.response?.status === 404)
-          dispatch({ type: "NOT_FOUND" });
-      });
+    const isUUID = UUID_REGEX.test(slug);
+
+    const loadBusiness = async () => {
+      let biz;
+      if (isUUID) {
+        // Legacy UUID URL — fetch by ID then redirect to slug URL
+        biz = await getPublicBusinessById(slug);
+        if (!cancelled && biz.slug) {
+          navigate(`/business/${biz.slug}`, { replace: true });
+          return;
+        }
+      } else {
+        biz = await getPublicBusinessBySlug(slug);
+      }
+
+      const [svcs, cats] = await Promise.all([
+        getPublicServicesForBusiness(biz.id),
+        fetchCategories(),
+      ]);
+
+      if (!cancelled)
+        dispatch({ type: "LOADED", business: biz, services: svcs, categories: cats });
+    };
+
+    loadBusiness().catch((err) => {
+      if (!cancelled && err?.response?.status === 404)
+        dispatch({ type: "NOT_FOUND" });
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [businessId]);
+  }, [slug, navigate]);
 
   // ── Load follow status once business is ready ────────────────────────────
   useEffect(() => {
@@ -1700,7 +1717,7 @@ export default function PublicBusinessPage() {
                   <ServiceCardItem
                     key={svc.id}
                     service={svc}
-                    businessId={businessId!}
+                    businessSlug={businessSlug!}
                     slots={slotsByService[svc.id] ?? []}
                     slotsLoading={slotsLoadingFor.has(svc.id)}
                     isAuthenticated={isAuthenticated}

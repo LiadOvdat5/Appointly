@@ -299,18 +299,20 @@ export function SearchPage() {
   const handleBusinessClick = useCallback(
     (businessId: string) => {
       dispatch(selectBusiness(businessId));
-      navigate(`/business/${businessId}`);
+      const business = results.find((b) => b.id === businessId);
+      navigate(`/business/${business?.slug ?? businessId}`);
     },
-    [dispatch, navigate],
+    [dispatch, navigate, results],
   );
 
   // Handle "View Business" button click
   const handleViewServicesClick = useCallback(
     (businessId: string) => {
       dispatch(selectBusiness(businessId));
-      navigate(`/business/${businessId}`);
+      const business = results.find((b) => b.id === businessId);
+      navigate(`/business/${business?.slug ?? businessId}`);
     },
-    [dispatch, navigate],
+    [dispatch, navigate, results],
   );
 
   // Handle availability date change

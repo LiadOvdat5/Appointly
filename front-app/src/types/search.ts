@@ -4,6 +4,7 @@
 export interface Business {
   id: string;
   ownerId?: string;
+  slug?: string;
   name: string;
   description?: string;
   rating?: number;

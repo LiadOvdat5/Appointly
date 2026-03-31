@@ -15,6 +15,7 @@ import {
 import {
   getMyBusinesses,
   getBusinessById,
+  getPublicBusinessBySlug,
 } from "../services/businessManagementService";
 import type { BusinessProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
@@ -209,7 +210,7 @@ function AnalyticCard({
 export default function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { businessId: paramBusinessId } = useParams<{ businessId?: string }>();
+  const { businessSlug: paramBusinessSlug } = useParams<{ businessSlug?: string }>();
   const authUser = useSelector((s: RootState) => s.auth.user);
 
   // Business
@@ -248,12 +249,21 @@ export default function DashboardPage() {
   // ── Load business ────────────────────────────────────────────────────────
   useEffect(() => {
     setBusinessLoading(true);
-    const load = paramBusinessId
-      ? getBusinessById(paramBusinessId)
-      : getMyBusinesses().then((list) => {
-          if (list.length === 0) throw new Error("no-business");
-          return list[0];
-        });
+    let load: Promise<BusinessProfile>;
+    if (paramBusinessSlug) {
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(paramBusinessSlug);
+      load = isUUID
+        ? getBusinessById(paramBusinessSlug).then((biz) => {
+            if (biz.slug) navigate(`/dashboard/${biz.slug}`, { replace: true });
+            return biz;
+          })
+        : getPublicBusinessBySlug(paramBusinessSlug);
+    } else {
+      load = getMyBusinesses().then((list) => {
+        if (list.length === 0) throw new Error("no-business");
+        return list[0];
+      });
+    }
 
     load
       .then(setBusiness)
@@ -265,7 +275,7 @@ export default function DashboardPage() {
         }
       })
       .finally(() => setBusinessLoading(false));
-  }, [paramBusinessId, t]);
+  }, [paramBusinessSlug, t, navigate]);
 
   // ── Load appointments ────────────────────────────────────────────────────
   useEffect(() => {
@@ -443,7 +453,7 @@ export default function DashboardPage() {
             {/* Edit business page button */}
             <button
               type="button"
-              onClick={() => navigate(`/business/${business.id}?edit=true`)}
+              onClick={() => navigate(`/business/${business.slug}?edit=true`)}
               className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline shrink-0"
             >
               <MaterialIcon name="edit" className="text-base" />
@@ -634,7 +644,7 @@ export default function DashboardPage() {
               </h2>
               <button
                 type="button"
-                onClick={() => navigate(`/business/${business.id}/schedule`)}
+                onClick={() => navigate(`/business/${business.slug}/schedule`)}
                 className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
               >
                 {t("dashboard.viewAll")}
@@ -717,7 +727,7 @@ export default function DashboardPage() {
                 {/* View full schedule CTA */}
                 <button
                   type="button"
-                  onClick={() => navigate(`/business/${business.id}/schedule`)}
+                  onClick={() => navigate(`/business/${business.slug}/schedule`)}
                   className="w-full text-center text-sm text-primary font-semibold py-2 hover:underline"
                 >
                   {t("dashboard.manageAll")}
@@ -866,7 +876,7 @@ export default function DashboardPage() {
               {/* Services & Working Hours */}
               <button
                 type="button"
-                onClick={() => navigate(`/dashboard/${business.id}/services`)}
+                onClick={() => navigate(`/dashboard/${business.slug}/services`)}
                 className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
               >
                 <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center shrink-0">
@@ -892,7 +902,7 @@ export default function DashboardPage() {
               {/* Public business page */}
               <button
                 type="button"
-                onClick={() => navigate(`/business/${business.id}`)}
+                onClick={() => navigate(`/business/${business.slug}`)}
                 className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
               >
                 <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
@@ -918,7 +928,7 @@ export default function DashboardPage() {
               {/* Edit business page */}
               <button
                 type="button"
-                onClick={() => navigate(`/business/${business.id}?edit=true`)}
+                onClick={() => navigate(`/business/${business.slug}?edit=true`)}
                 className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
               >
                 <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
@@ -944,7 +954,7 @@ export default function DashboardPage() {
               {/* Staff management */}
               <button
                 type="button"
-                onClick={() => navigate(`/dashboard/${business.id}/staff`)}
+                onClick={() => navigate(`/dashboard/${business.slug}/staff`)}
                 className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
               >
                 <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
@@ -970,7 +980,7 @@ export default function DashboardPage() {
               {/* Reviews */}
               <button
                 type="button"
-                onClick={() => navigate(`/dashboard/${business.id}/reviews`)}
+                onClick={() => navigate(`/dashboard/${business.slug}/reviews`)}
                 className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
               >
                 <div className="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center shrink-0">

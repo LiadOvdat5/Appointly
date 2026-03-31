@@ -89,6 +89,27 @@ namespace WebAPI.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("by-slug/{slug}")]
+        [EndpointSummary("Get Business by Slug")]
+        [EndpointDescription("Retrieve full business information by URL slug (e.g. 'johns-barbershop'). Returns 404 for unknown slugs. Authorization: Public.")]
+        public async Task<IActionResult> GetBusinessBySlug(string slug)
+        {
+            try
+            {
+                var business = await _businessRepository.GetBusinessBySlugAsync(slug);
+                return Ok(business);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         [EndpointSummary("Get Business Details")]
         [EndpointDescription("Retrieve full business information including name, description, address, phone, and categories. " +

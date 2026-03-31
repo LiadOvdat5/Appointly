@@ -2,7 +2,7 @@
 
 **Feature:** [[F-11-A-Slug-Based-URLs|F-11-A: Slug-Based URLs]]
 **Epic:** [[EPIC-11-Sharing-and-URLs|EPIC-11: Sharing & URL Improvements]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,8 +18,8 @@ As the **system**, I want to **automatically generate a unique, URL-safe slug fo
 - `[BE]` Include `Slug` in `BusinessDTO` so the frontend can use it for link generation
 
 ## Acceptance Criteria
-- [ ] Every business has a unique, non-null slug after migration
-- [ ] New businesses automatically get a slug on creation
-- [ ] Slug contains only lowercase letters, digits, and hyphens — no spaces or special chars
-- [ ] Slug collision is resolved by appending a counter suffix
-- [ ] `GET /businesses/by-slug/{slug}` returns 404 for unknown slugs
+- [x] Every business has a unique, non-null slug after migration
+- [x] New businesses automatically get a slug on creation
+- [x] Slug contains only lowercase letters, digits, and hyphens — no spaces or special chars
+- [x] Slug collision is resolved by appending a counter suffix
+- [x] `GET /businesses/by-slug/{slug}` returns 404 for unknown slugs

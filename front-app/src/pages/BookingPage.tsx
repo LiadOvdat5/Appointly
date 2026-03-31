@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { formatTime } from "../utils/formatTime";
 import {
   getPublicBusinessById,
+  getPublicBusinessBySlug,
   getPublicServicesForBusiness,
 } from "../services/businessManagementService";
 import {
@@ -43,8 +44,8 @@ function formatDateLong(date: Date): string {
 
 export default function BookingPage() {
   const { t } = useTranslation();
-  const { businessId, serviceId } = useParams<{
-    businessId: string;
+  const { businessSlug, serviceId } = useParams<{
+    businessSlug: string;
     serviceId: string;
   }>();
   const [searchParams] = useSearchParams();
@@ -81,13 +82,17 @@ export default function BookingPage() {
 
   // Load business + service metadata
   useEffect(() => {
-    if (!businessId || !serviceId) return;
+    if (!businessSlug || !serviceId) return;
     setMetaLoading(true);
-    Promise.all([
-      getPublicBusinessById(businessId),
-      getPublicServicesForBusiness(businessId),
-    ])
-      .then(([biz, services]) => {
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(businessSlug);
+    const bizPromise = isUUID ? getPublicBusinessById(businessSlug) : getPublicBusinessBySlug(businessSlug);
+    bizPromise
+      .then(async (biz) => {
+        if (isUUID && biz.slug) {
+          navigate(`/book/${biz.slug}/${serviceId}`, { replace: true });
+          return;
+        }
+        const services = await getPublicServicesForBusiness(biz.id);
         setBusiness(biz);
         const svc = services.find((s) => s.id === serviceId) ?? null;
         setService(svc);
@@ -95,7 +100,7 @@ export default function BookingPage() {
       })
       .catch(() => setMetaError(t("booking.errorLoadFailed")))
       .finally(() => setMetaLoading(false));
-  }, [businessId, serviceId, t]);
+  }, [businessSlug, serviceId, t, navigate]);
 
   // Load time slots when a date is selected
   useEffect(() => {
@@ -245,7 +250,7 @@ export default function BookingPage() {
             <Button
               variant="outline"
               onClick={() =>
-                navigate(`/business/${confirmedAppointment.businessId}`)
+                navigate(`/business/${business?.slug ?? confirmedAppointment.businessId}`)
               }
             >
               {t("booking.confirmed.backToBusiness")}
@@ -262,7 +267,7 @@ export default function BookingPage() {
       <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
         <button
           type="button"
-          onClick={() => navigate(`/business/${businessId}`)}
+          onClick={() => navigate(`/business/${business?.slug ?? businessSlug}`)}
           className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           aria-label={t("common.back")}
         >

@@ -574,7 +574,7 @@ function FavoritesSection({
                 key={b.id}
                 type="button"
                 onClick={() => {
-                  navigate(`/business/${b.id}`);
+                  navigate(`/business/${b.slug ?? b.id}`);
                   onClose?.();
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"

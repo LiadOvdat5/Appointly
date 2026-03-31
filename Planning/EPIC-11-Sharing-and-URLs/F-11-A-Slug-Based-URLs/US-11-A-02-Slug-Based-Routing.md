@@ -2,7 +2,7 @@
 
 **Feature:** [[F-11-A-Slug-Based-URLs|F-11-A: Slug-Based URLs]]
 **Epic:** [[EPIC-11-Sharing-and-URLs|EPIC-11: Sharing & URL Improvements]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,7 +18,7 @@ As a **customer or visitor**, I want to **access a business page via a readable 
 - `[FE]` Update schedule routes: `/business/:businessId/schedule` → `/business/:businessSlug/schedule`
 
 ## Acceptance Criteria
-- [ ] `/business/johns-barbershop` loads the correct business page
-- [ ] All internal navigation uses slugs — no UUID visible in any app URL
-- [ ] The booking flow works end-to-end with slug-based URLs
-- [ ] 404 page is shown for unknown slugs
+- [x] `/business/johns-barbershop` loads the correct business page
+- [x] All internal navigation uses slugs — no UUID visible in any app URL
+- [x] The booking flow works end-to-end with slug-based URLs
+- [x] 404 page is shown for unknown slugs

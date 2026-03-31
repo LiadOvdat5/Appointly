@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
-import { getServicesForBusiness } from "../services/businessManagementService";
+import {
+  getServicesForBusiness,
+  getBusinessById,
+  getPublicBusinessBySlug,
+} from "../services/businessManagementService";
 import { getBusinessAppointments, AppointmentStatus, type AppointmentDTO } from "../services/appointmentService";
 import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
@@ -11,13 +15,22 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 
 export default function ServiceSelectionPage() {
   const { t } = useTranslation();
-  const { businessId } = useParams<{ businessId: string }>();
+  const { businessSlug } = useParams<{ businessSlug: string }>();
   const navigate = useNavigate();
 
+  const [businessId, setBusinessId] = useState<string>("");
   const [services, setServices] = useState<ServiceProfile[]>([]);
   const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Resolve slug → UUID
+  useEffect(() => {
+    if (!businessSlug) return;
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(businessSlug);
+    const load = isUUID ? getBusinessById(businessSlug) : getPublicBusinessBySlug(businessSlug);
+    load.then((biz) => setBusinessId(biz.id)).catch(() => setError(t("serviceSelection.error.loadFailed")));
+  }, [businessSlug, t]);
 
   useEffect(() => {
     if (!businessId) return;
@@ -99,7 +112,7 @@ export default function ServiceSelectionPage() {
             </div>
             <button
               type="button"
-              onClick={() => navigate(`/business/${businessId}?edit=true`)}
+              onClick={() => navigate(`/business/${businessSlug}?edit=true`)}
               className="text-sm font-semibold text-primary hover:underline"
             >
               {t("serviceSelection.empty.goToBusinessPage")}

@@ -38,9 +38,9 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> },
       { path: "not-found", element: <NotFoundPage /> },
       { path: "search", element: <SearchPage /> },
-      { path: "business/:businessId", element: <PublicBusinessPage /> },
+      { path: "business/:slug", element: <PublicBusinessPage /> },
       {
-        path: "book/:businessId/:serviceId",
+        path: "book/:businessSlug/:serviceId",
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <BookingPage />
@@ -72,7 +72,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/:businessId",
+        path: "dashboard/:businessSlug",
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <DashboardPage />
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/:businessId/services",
+        path: "dashboard/:businessSlug/services",
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <ServiceSelectionPage />
@@ -88,7 +88,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/:businessId/staff",
+        path: "dashboard/:businessSlug/staff",
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <StaffPage />
@@ -96,7 +96,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/:businessId/reviews",
+        path: "dashboard/:businessSlug/reviews",
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <BusinessReviewsPage />
@@ -152,7 +152,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "business/:businessId/schedule",
+        path: "business/:slug/schedule",
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <BusinessSchedulePage />

@@ -16,6 +16,7 @@ import {
 import {
   getServicesForBusiness,
   getPublicBusinessById,
+  getPublicBusinessBySlug,
 } from "../services/businessManagementService";
 import type { ServiceProfile, BusinessProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
@@ -81,7 +82,7 @@ interface MergedSlot {
 
 export default function BusinessSchedulePage() {
   const { t } = useTranslation();
-  const { businessId } = useParams<{ businessId: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedServiceId = searchParams.get("serviceId") ?? "";
@@ -89,6 +90,9 @@ export default function BusinessSchedulePage() {
   // Meta
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
   const [services, setServices] = useState<ServiceProfile[]>([]);
+
+  // Derived UUID — only available after business is loaded
+  const businessId = business?.id;
 
   // View toggle
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -158,20 +162,23 @@ export default function BusinessSchedulePage() {
 
   // ── Load meta ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!businessId) return;
-    Promise.all([
-      getPublicBusinessById(businessId),
-      getServicesForBusiness(businessId),
-    ]).then(([biz, svcs]) => {
+    if (!slug) return;
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    const loadBiz = isUUID ? getPublicBusinessById(slug) : getPublicBusinessBySlug(slug);
+    loadBiz.then(async (biz) => {
+      if (isUUID && biz.slug) {
+        navigate(`/business/${biz.slug}/schedule`, { replace: true });
+        return;
+      }
+      const svcs = await getServicesForBusiness(biz.id);
       setBusiness(biz);
       setServices(svcs);
       if (svcs.length > 0 && !preselectedServiceId)
         setGridServiceId(svcs[0].id);
+      fetchListAppointments(biz.id, false);
     });
-
-    fetchListAppointments(businessId, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [businessId]);
+  }, [slug]);
 
   // ── Load reviews ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -465,7 +472,7 @@ export default function BusinessSchedulePage() {
 
             <button
               type="button"
-              onClick={() => navigate(`/business/${businessId}`)}
+              onClick={() => navigate(`/business/${business?.slug ?? slug}`)}
               className="text-xs text-primary hover:underline flex items-center gap-1 shrink-0"
             >
               {t("businessSchedule.viewPage")}

@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getBusinessReviews, flagReview, type ReviewDTO } from "../services/reviewService";
-import { getPublicServicesForBusiness } from "../services/businessManagementService";
-import { getMyBusinesses } from "../services/businessManagementService";
+import {
+  getPublicServicesForBusiness,
+  getMyBusinesses,
+  getPublicBusinessBySlug,
+  getBusinessById,
+} from "../services/businessManagementService";
 import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
@@ -192,7 +196,7 @@ const PAGE_SIZE = 20;
 export default function BusinessReviewsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { businessId: paramBusinessId } = useParams<{ businessId?: string }>();
+  const { businessSlug: paramBusinessSlug } = useParams<{ businessSlug?: string }>();
 
   // Business id resolved from param or owner's first business
   const [businessId, setBusinessId] = useState<string | null>(null);
@@ -219,14 +223,18 @@ export default function BusinessReviewsPage() {
 
   // ── Resolve business id ───────────────────────────────────────────────────
   useEffect(() => {
-    if (paramBusinessId) {
-      setBusinessId(paramBusinessId);
+    if (paramBusinessSlug) {
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(paramBusinessSlug);
+      const load = isUUID ? getBusinessById(paramBusinessSlug) : getPublicBusinessBySlug(paramBusinessSlug);
+      load
+        .then((biz) => setBusinessId(biz.id))
+        .catch(() => setError("Failed to load business."));
       return;
     }
     getMyBusinesses()
       .then((list) => list.length > 0 ? setBusinessId(list[0].id) : setError("No business found."))
       .catch(() => setError("Failed to load business."));
-  }, [paramBusinessId]);
+  }, [paramBusinessSlug]);
 
   // ── Load reviews + services once businessId is known ─────────────────────
   useEffect(() => {

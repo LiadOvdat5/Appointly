@@ -21,6 +21,9 @@ namespace WebAPI.Models
         [MaxLength(100, ErrorMessage = "Business name cannot exceed 100 characters.")]
         public string Name { get; set; } = string.Empty;
 
+        [MaxLength(120)]
+        public string Slug { get; set; } = string.Empty;
+
         public string? Description { get; set; }
         public string? Address { get; set; }
         [MaxLength(20, ErrorMessage = "Phone number cannot exceed 20 characters.")]

@@ -27,6 +27,7 @@ namespace WebAPI.Mappers
             {
                 Id = business.Id,
                 OwnerId = business.OwnerId,
+                Slug = business.Slug,
                 Name = business.Name,
                 Description = business.Description,
                 Address = business.Address ?? string.Empty,

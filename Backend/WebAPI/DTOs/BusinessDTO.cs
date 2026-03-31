@@ -4,6 +4,7 @@ namespace WebAPI.DTOs
     {
         public Guid Id { get; set; }
         public Guid OwnerId { get; set; }
+        public string Slug { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public string Address { get; set; } = string.Empty;

@@ -41,6 +41,11 @@ namespace WebAPI.Data
             modelBuilder.Entity<BusinessPartner>()
                 .HasKey(bp => new { bp.UserId, bp.BusinessId });
 
+            // Unique slug per business
+            modelBuilder.Entity<Business>()
+                .HasIndex(b => b.Slug)
+                .IsUnique();
+
             // =====================================================
             // Follow Relationships
             // =====================================================
