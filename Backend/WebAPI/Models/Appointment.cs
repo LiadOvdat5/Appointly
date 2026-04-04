@@ -51,6 +51,18 @@ namespace WebAPI.Models
         [Required]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+        /// <summary>
+        /// Set when a 24-hour reminder notification has been sent for this appointment.
+        /// Null means no reminder has been sent yet.
+        /// </summary>
+        public DateTime? ReminderSentAt { get; set; }
+
+        /// <summary>
+        /// Set when a post-appointment review prompt notification has been sent.
+        /// Null means no prompt has been sent yet.
+        /// </summary>
+        public DateTime? ReviewPromptSentAt { get; set; }
+
         // Navigation properties
         public Service? Service { get; set; }
         public User? Client { get; set; }

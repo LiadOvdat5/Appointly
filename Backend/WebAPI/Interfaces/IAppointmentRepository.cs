@@ -86,5 +86,17 @@ namespace WebAPI.Interfaces
         /// Get all appointments for a client within a date range
         /// </summary>
         Task<List<Appointment>> GetByClientIdAndDateRangeAsync(Guid clientId, DateTime startDate, DateTime endDate);
+
+        /// <summary>
+        /// Get scheduled appointments whose start time is between now+23h and now+25h
+        /// and have not yet had a reminder sent (ReminderSentAt is null).
+        /// </summary>
+        Task<List<Appointment>> GetDueForReminderAsync();
+
+        /// <summary>
+        /// Get completed appointments whose end time was 1–2 hours ago,
+        /// have not yet received a review prompt, and have no existing review.
+        /// </summary>
+        Task<List<Appointment>> GetDueForReviewPromptAsync();
     }
 }

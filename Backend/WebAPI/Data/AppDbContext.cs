@@ -27,6 +27,7 @@ namespace WebAPI.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Follow> Follows => Set<Follow>();
         public DbSet<Review> Reviews => Set<Review>();
+        public DbSet<Notification> Notifications => Set<Notification>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -139,6 +140,21 @@ namespace WebAPI.Data
             modelBuilder.Entity<Review>()
                 .HasIndex(r => r.AppointmentId)
                 .IsUnique();
+
+            // =====================================================
+            // Notification Relationships
+            // =====================================================
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.CreatedAt });
+            modelBuilder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.IsRead });
 
             // =====================================================
             // Appointment Relationships

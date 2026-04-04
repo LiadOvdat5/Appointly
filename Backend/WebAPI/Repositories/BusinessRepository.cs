@@ -255,5 +255,10 @@ namespace WebAPI.Repositories
             _context.Businesses.Update(business);
             await _context.SaveChangesAsync();
         }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

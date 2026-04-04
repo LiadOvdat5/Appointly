@@ -1018,6 +1018,32 @@ export default function DashboardPage() {
                   className="text-gray-400 ml-auto shrink-0"
                 />
               </button>
+
+              {/* Notification Settings */}
+              <button
+                type="button"
+                onClick={() => navigate(`/dashboard/${business.slug}/notifications`)}
+                className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm hover:shadow-md transition text-left"
+              >
+                <div className="h-12 w-12 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
+                  <MaterialIcon
+                    name="notifications"
+                    className="text-2xl text-sky-500"
+                  />
+                </div>
+                <div>
+                  <p className="font-bold text-[#111418] dark:text-white text-sm">
+                    {t("dashboard.notificationSettings")}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {t("dashboard.notificationSettingsSubtext")}
+                  </p>
+                </div>
+                <MaterialIcon
+                  name="chevron_right"
+                  className="text-gray-400 ml-auto shrink-0"
+                />
+              </button>
             </div>
           </section>
         </div>

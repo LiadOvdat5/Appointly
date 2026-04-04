@@ -244,5 +244,46 @@ namespace WebAPI.Repositories
                 .OrderBy(a => a.StartDateTime)
                 .ToListAsync();
         }
+
+        /// <summary>
+        /// Get scheduled appointments whose start time falls in the 23–25 hour window
+        /// from now and have not yet received a reminder notification.
+        /// </summary>
+        public async Task<List<Appointment>> GetDueForReminderAsync()
+        {
+            var now = DateTime.UtcNow;
+            var windowStart = now.AddHours(23);
+            var windowEnd   = now.AddHours(25);
+
+            return await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Business)
+                .Where(a => a.Status == AppointmentStatus.scheduled
+                    && a.ReminderSentAt == null
+                    && a.StartDateTime >= windowStart
+                    && a.StartDateTime <= windowEnd)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Get completed appointments whose end time was 1–2 hours ago,
+        /// have not yet received a review prompt, and have no existing review.
+        /// </summary>
+        public async Task<List<Appointment>> GetDueForReviewPromptAsync()
+        {
+            var now         = DateTime.UtcNow;
+            var windowStart = now.AddHours(-2);
+            var windowEnd   = now.AddHours(-1);
+
+            return await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Business)
+                .Where(a => a.Status == AppointmentStatus.completed
+                    && a.ReviewPromptSentAt == null
+                    && a.EndDateTime >= windowStart
+                    && a.EndDateTime <= windowEnd
+                    && !_context.Reviews.Any(r => r.AppointmentId == a.Id))
+                .ToListAsync();
+        }
     }
 }

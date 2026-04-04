@@ -23,5 +23,9 @@ namespace WebAPI.DTOs
         // Rating fields — populated once Reviews epic is implemented
         public double? AverageRating { get; set; }
         public int ReviewCount { get; set; }
+
+        // Notification preferences
+        public bool NotifyOnNewBooking { get; set; }
+        public bool NotifyOnCancellation { get; set; }
     }
 }

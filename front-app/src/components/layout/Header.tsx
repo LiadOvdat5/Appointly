@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { H1 } from "../UI/Typography";
 import { LanguageToggle } from "../LanguageToggle";
-//import { useCanGoBack } from "../../navigation/NavigationContext"; // if you added it
+import { NotificationBell } from "../NotificationBell";
+import { useAppSelector } from "../../redux/hooks";
+import { selectIsAuthenticated } from "../../redux/authSelectors";
 
 export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
   const navigate = useNavigate();
-  //const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  //const dispatch = useAppDispatch();
-  //const canGoBack = typeof useCanGoBack === "function" ? useCanGoBack() : true;
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const canGoBack = true;
 
   return (
@@ -36,9 +36,10 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
       {/* Center */}
       <H1 className="flex-1 text-center">BizSlot</H1>
 
-      {/* Right: Language toggle and menu */}
-      <div className="flex items-center gap-2 w-20 justify-end">
+      {/* Right: Language toggle, notification bell (auth only), menu */}
+      <div className="flex items-center gap-1 w-auto justify-end">
         <LanguageToggle compact={true} />
+        {isAuthenticated && <NotificationBell />}
         <button
           onClick={onOpenMenu}
           className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"

@@ -20,6 +20,8 @@ export interface BusinessProfile {
   longitude?: number;
   averageRating?: number;
   reviewCount?: number;
+  notifyOnNewBooking?: boolean;
+  notifyOnCancellation?: boolean;
 }
 
 export interface BusinessCategory {

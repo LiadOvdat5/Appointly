@@ -40,7 +40,9 @@ namespace WebAPI.Mappers
                 Longitude = business.Longitude,
                 Categories = categories?.ToList() ?? new List<CategoryDTO>(),
                 AverageRating = business.AverageRating > 0 ? business.AverageRating : null,
-                ReviewCount = business.ReviewCount
+                ReviewCount = business.ReviewCount,
+                NotifyOnNewBooking = business.NotifyOnNewBooking,
+                NotifyOnCancellation = business.NotifyOnCancellation
             };
         }
 

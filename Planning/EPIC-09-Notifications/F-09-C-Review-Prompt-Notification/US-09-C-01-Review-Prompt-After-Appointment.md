@@ -2,7 +2,7 @@
 
 **Feature:** [[F-09-C-Review-Prompt-Notification|F-09-C: Post-Appointment Review Prompt]]
 **Epic:** [[EPIC-09-Notifications|EPIC-09: Notifications]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,8 +17,8 @@ As a **customer**, I want to **receive a notification after my appointment time 
 - `[FE]` Clicking the review prompt notification navigates to the customer dashboard with the review modal pre-opened for that appointment
 
 ## Acceptance Criteria
-- [ ] Customer receives exactly one review prompt per completed appointment
-- [ ] Prompt is only sent after the appointment end time has passed
-- [ ] If customer already left a review, no prompt is sent
-- [ ] Clicking the notification opens the review submission UI directly
-- [ ] Depends on [[EPIC-08-Reviews-and-Ratings|EPIC-08]] being implemented (reviews must exist before prompts are meaningful)
+- [x] Customer receives exactly one review prompt per completed appointment
+- [x] Prompt is only sent after the appointment end time has passed
+- [x] If customer already left a review, no prompt is sent
+- [x] Clicking the notification opens the review submission UI directly
+- [x] Depends on [[EPIC-08-Reviews-and-Ratings|EPIC-08]] being implemented (reviews must exist before prompts are meaningful)

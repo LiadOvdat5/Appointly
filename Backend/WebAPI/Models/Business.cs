@@ -50,6 +50,10 @@ namespace WebAPI.Models
         public double AverageRating { get; set; } = 0;
         public int ReviewCount { get; set; } = 0;
 
+        // Notification preferences
+        public bool NotifyOnNewBooking { get; set; } = true;
+        public bool NotifyOnCancellation { get; set; } = true;
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]

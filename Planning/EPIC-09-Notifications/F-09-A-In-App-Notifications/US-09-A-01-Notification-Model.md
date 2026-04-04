@@ -2,7 +2,7 @@
 
 **Feature:** [[F-09-A-In-App-Notifications|F-09-A: In-App Notification Center]]
 **Epic:** [[EPIC-09-Notifications|EPIC-09: Notifications]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -20,7 +20,7 @@ As the **system**, I want to **store and serve in-app notifications per user** s
 - `[BE]` `POST /notifications/read-all` — marks all notifications as read
 
 ## Acceptance Criteria
-- [ ] Notifications are scoped to the authenticated user — users cannot see each other's notifications
-- [ ] Unread count endpoint is cheap (single COUNT query)
-- [ ] Marking as read is idempotent (no error if already read)
-- [ ] Notifications are returned newest first
+- [x] Notifications are scoped to the authenticated user — users cannot see each other's notifications
+- [x] Unread count endpoint is cheap (single COUNT query)
+- [x] Marking as read is idempotent (no error if already read)
+- [x] Notifications are returned newest first

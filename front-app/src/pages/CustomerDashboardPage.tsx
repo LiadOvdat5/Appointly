@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatTime } from "../utils/formatTime";
 import {
@@ -41,6 +41,8 @@ type Tab = "upcoming" | "past";
 export default function CustomerDashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [all, setAll] = useState<AppointmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -60,9 +62,22 @@ export default function CustomerDashboardPage() {
   useEffect(() => {
     setLoading(true);
     getClientAppointments(1, 100)
-      .then(setAll)
+      .then((appointments) => {
+        setAll(appointments);
+        // If navigated from a review prompt notification, auto-open the modal
+        const reviewId = searchParams.get("review");
+        if (reviewId) {
+          const target = appointments.find((a) => a.id === reviewId);
+          if (target) {
+            setTab("past");
+            setReviewingAppt(target);
+          }
+        }
+      })
       .catch(() => setError(t("customerAppointments.error.loadFailed")))
       .finally(() => setLoading(false));
+  // searchParams intentionally excluded — only run on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t]);
 
   const now = new Date();

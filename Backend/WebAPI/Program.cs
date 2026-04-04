@@ -78,6 +78,13 @@ builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 
+// Register Notification Repository and Service
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Register background service for appointment reminders
+builder.Services.AddHostedService<AppointmentReminderService>();
+
 // Add authorization services
 builder.Services.AddAuthorization();
 

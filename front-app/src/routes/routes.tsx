@@ -25,6 +25,7 @@ import StaffPage from "../pages/StaffPage.tsx";
 import StaffDashboardPage from "../pages/StaffDashboardPage.tsx";
 import InvitationsPage from "../pages/InvitationsPage.tsx";
 import BusinessReviewsPage from "../pages/BusinessReviewsPage.tsx";
+import BusinessNotificationSettingsPage from "../pages/BusinessNotificationSettingsPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -100,6 +101,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <BusinessReviewsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/:businessSlug/notifications",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <BusinessNotificationSettingsPage />
           </ProtectedRoute>
         ),
       },

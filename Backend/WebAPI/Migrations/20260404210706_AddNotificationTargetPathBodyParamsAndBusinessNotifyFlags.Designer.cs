@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Data;
 
@@ -11,9 +12,11 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260404210706_AddNotificationTargetPathBodyParamsAndBusinessNotifyFlags")]
+    partial class AddNotificationTargetPathBodyParamsAndBusinessNotifyFlags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,9 +56,6 @@ namespace WebAPI.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("ReminderSentAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ReviewPromptSentAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("ServiceId")

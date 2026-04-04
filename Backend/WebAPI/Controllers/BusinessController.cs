@@ -673,5 +673,49 @@ namespace WebAPI.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        [Authorize]
+        [HttpPatch("{id}/notification-settings")]
+        [EndpointSummary("Update Business Notification Settings")]
+        [EndpointDescription("Allows the business owner to opt in or out of in-app notifications for new bookings and cancellations. " +
+            "Fields are optional — only provided fields are updated. Authorization: Only the business owner.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateNotificationSettings(
+            Guid id,
+            [FromBody] UpdateBusinessNotificationSettingsDTO dto)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var business = await _businessRepository.GetBusinessEntityByIdAsync(id);
+                if (business == null) return NotFound(new { error = "Business not found." });
+                if (business.OwnerId != userId) return Forbid();
+
+                if (dto.NotifyOnNewBooking.HasValue)
+                    business.NotifyOnNewBooking = dto.NotifyOnNewBooking.Value;
+
+                if (dto.NotifyOnCancellation.HasValue)
+                    business.NotifyOnCancellation = dto.NotifyOnCancellation.Value;
+
+                business.UpdatedAt = DateTime.UtcNow;
+                await _businessRepository.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    business.NotifyOnNewBooking,
+                    business.NotifyOnCancellation
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }

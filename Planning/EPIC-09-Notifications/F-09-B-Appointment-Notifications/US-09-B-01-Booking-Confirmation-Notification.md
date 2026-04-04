@@ -2,7 +2,7 @@
 
 **Feature:** [[F-09-B-Appointment-Notifications|F-09-B: Appointment Notifications]]
 **Epic:** [[EPIC-09-Notifications|EPIC-09: Notifications]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **business owner**, I want to **receive a notification when a customer book
 - `[BE]` Also notify the customer: type `AppointmentBooked`, title "Booking Confirmed", body "Your {ServiceName} appointment at {BusinessName} on {Date} is confirmed"
 
 ## Acceptance Criteria
-- [ ] Owner receives a notification immediately after a customer books
-- [ ] Customer receives a booking confirmation notification
-- [ ] Notifications link to the relevant appointment when clicked
+- [x] Owner receives a notification immediately after a customer books
+- [x] Customer receives a booking confirmation notification
+- [x] Notifications link to the relevant appointment when clicked

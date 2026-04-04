@@ -17,5 +17,6 @@ namespace WebAPI.Interfaces
         Task<BusinessDTO> UpdateBusinessBannerAsync(Guid businessId, Guid userId, string bannerUrl);
         Task<BusinessDTO> UpdateBusinessSearchImageAsync(Guid businessId, Guid userId, string searchImageUrl);
         Task UpdateRatingAsync(Guid businessId, double averageRating, int reviewCount);
+        Task SaveChangesAsync();
     }
 }

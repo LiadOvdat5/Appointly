@@ -18,6 +18,7 @@ namespace WebAPI.Services
         private readonly IServiceScheduleRepository _scheduleRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly IBusinessRepository _businessRepository;
+        private readonly INotificationService _notificationService;
         private readonly AppointmentValidator _validator;
         private readonly AppDbContext _context;
 
@@ -26,6 +27,7 @@ namespace WebAPI.Services
             IServiceScheduleRepository scheduleRepository,
             IServiceRepository serviceRepository,
             IBusinessRepository businessRepository,
+            INotificationService notificationService,
             AppointmentValidator validator,
             AppDbContext context)
         {
@@ -33,6 +35,7 @@ namespace WebAPI.Services
             _scheduleRepository = scheduleRepository;
             _serviceRepository = serviceRepository;
             _businessRepository = businessRepository;
+            _notificationService = notificationService;
             _validator = validator;
             _context = context;
         }
@@ -215,6 +218,48 @@ namespace WebAPI.Services
             schedule.AppointmentId = createdAppointment.Id;
             await _scheduleRepository.UpdateAsync(schedule);
 
+            // ── Notifications ────────────────────────────────────────────────
+            var clientName   = createdAppointment.Client?.Name   ?? string.Empty;
+            var serviceName  = createdAppointment.Service?.Name  ?? string.Empty;
+            var businessName = createdAppointment.Business?.Name ?? string.Empty;
+            var businessSlug = createdAppointment.Business?.Slug ?? string.Empty;
+            var ownerId      = createdAppointment.Business?.OwnerId;
+            var notifyBooking = createdAppointment.Business?.NotifyOnNewBooking ?? true;
+            var dateLabel    = createdAppointment.StartDateTime.ToLocalTime().ToString("MMM d, h:mm tt");
+
+            // Notify business owner (if opted in)
+            if (ownerId.HasValue && notifyBooking)
+            {
+                await _notificationService.CreateNotificationAsync(
+                    userId: ownerId.Value,
+                    titleKey: "notifications.appointmentBooked.ownerTitle",
+                    bodyKey: "notifications.appointmentBooked.ownerBody",
+                    type: Models.NotificationType.AppointmentBooked,
+                    relatedEntityId: createdAppointment.Id,
+                    targetPath: $"/dashboard/{businessSlug}",
+                    bodyParams: new Dictionary<string, string>
+                    {
+                        ["clientName"]   = clientName,
+                        ["serviceName"]  = serviceName,
+                        ["date"]         = dateLabel
+                    });
+            }
+
+            // Notify customer
+            await _notificationService.CreateNotificationAsync(
+                userId: clientId,
+                titleKey: "notifications.appointmentBooked.customerTitle",
+                bodyKey: "notifications.appointmentBooked.customerBody",
+                type: Models.NotificationType.AppointmentBooked,
+                relatedEntityId: createdAppointment.Id,
+                targetPath: "/customer-dashboard",
+                bodyParams: new Dictionary<string, string>
+                {
+                    ["serviceName"]  = serviceName,
+                    ["businessName"] = businessName,
+                    ["date"]         = dateLabel
+                });
+
             return AppointmentMapper.ToDTO(createdAppointment);
         }
 
@@ -269,6 +314,51 @@ namespace WebAPI.Services
                 schedule.Status = ScheduleStatus.AVAILABLE;
                 schedule.AppointmentId = null;
                 await _scheduleRepository.UpdateAsync(schedule);
+            }
+
+            // ── Cancellation notifications ────────────────────────────────────
+            var appt              = updatedAppointment;
+            var cName             = appt.Client?.Name   ?? string.Empty;
+            var sName             = appt.Service?.Name  ?? string.Empty;
+            var bName             = appt.Business?.Name ?? string.Empty;
+            var bSlug             = appt.Business?.Slug ?? string.Empty;
+            var ownerIdCancel     = appt.Business?.OwnerId;
+            var notifyCancel      = appt.Business?.NotifyOnCancellation ?? true;
+            var dateCancel        = appt.StartDateTime.ToLocalTime().ToString("MMM d, h:mm tt");
+
+            if (isBusinessMember && !isClient)
+            {
+                // Business cancelled — notify the customer
+                await _notificationService.CreateNotificationAsync(
+                    userId: appt.ClientId,
+                    titleKey: "notifications.appointmentCancelled.customerTitle",
+                    bodyKey: "notifications.appointmentCancelled.customerBody",
+                    type: Models.NotificationType.AppointmentCancelled,
+                    relatedEntityId: appt.Id,
+                    targetPath: "/customer-dashboard",
+                    bodyParams: new Dictionary<string, string>
+                    {
+                        ["serviceName"]  = sName,
+                        ["businessName"] = bName,
+                        ["date"]         = dateCancel
+                    });
+            }
+            else if (isClient && !isBusinessMember && ownerIdCancel.HasValue && notifyCancel)
+            {
+                // Customer cancelled — notify the owner (if opted in)
+                await _notificationService.CreateNotificationAsync(
+                    userId: ownerIdCancel.Value,
+                    titleKey: "notifications.appointmentCancelled.ownerTitle",
+                    bodyKey: "notifications.appointmentCancelled.ownerBody",
+                    type: Models.NotificationType.AppointmentCancelled,
+                    relatedEntityId: appt.Id,
+                    targetPath: $"/dashboard/{bSlug}",
+                    bodyParams: new Dictionary<string, string>
+                    {
+                        ["clientName"]  = cName,
+                        ["serviceName"] = sName,
+                        ["date"]        = dateCancel
+                    });
             }
 
             return AppointmentMapper.ToDTO(updatedAppointment);

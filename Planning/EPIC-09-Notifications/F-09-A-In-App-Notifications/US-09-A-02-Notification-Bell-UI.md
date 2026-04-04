@@ -2,7 +2,7 @@
 
 **Feature:** [[F-09-A-In-App-Notifications|F-09-A: In-App Notification Center]]
 **Epic:** [[EPIC-09-Notifications|EPIC-09: Notifications]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,8 +19,8 @@ As a **logged-in user**, I want to **see a notification bell icon in the header 
 - `[FE]` Poll unread count every 60 seconds while the app is open (no WebSocket required at this stage)
 
 ## Acceptance Criteria
-- [ ] Bell badge count updates within 60 seconds of a new notification being created
-- [ ] Unread notifications are visually distinct from read ones
-- [ ] Clicking a notification correctly navigates to the relevant entity
-- [ ] "Mark all as read" clears the badge and marks all items as read
-- [ ] Panel is accessible on both mobile and desktop layouts
+- [x] Bell badge count updates within 60 seconds of a new notification being created
+- [x] Unread notifications are visually distinct from read ones
+- [x] Clicking a notification correctly navigates to the relevant entity
+- [x] "Mark all as read" clears the badge and marks all items as read
+- [x] Panel is accessible on both mobile and desktop layouts

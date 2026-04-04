@@ -179,6 +179,15 @@ i18n.use(initReactI18next).init({
           notSignedIn: "Not signed in",
         },
 
+        // ============ NOTIFICATION SETTINGS PAGE ============
+        notificationSettings: {
+          description: "Choose which in-app notifications you receive for your business.",
+          newBooking: "New Booking",
+          newBookingDesc: "Get notified when a customer books an appointment",
+          cancellation: "Cancellation",
+          cancellationDesc: "Get notified when a customer cancels their appointment",
+        },
+
         // ============ BUTTONS ============
         buttons: {
           save: "Save",
@@ -318,6 +327,41 @@ i18n.use(initReactI18next).init({
           version: "Version",
         },
 
+        // ============ NOTIFICATIONS ============
+        notifications: {
+          title: "Notifications",
+          empty: "No notifications yet",
+          markAllRead: "Mark all as read",
+
+          timeAgo: {
+            justNow: "just now",
+            minutesAgo: "{{count}}m ago",
+            hoursAgo: "{{count}}h ago",
+            daysAgo: "{{count}}d ago",
+          },
+
+          appointmentBooked: {
+            ownerTitle: "New Appointment",
+            ownerBody: "{{clientName}} booked {{serviceName}} on {{date}}",
+            customerTitle: "Booking Confirmed",
+            customerBody: "Your {{serviceName}} appointment at {{businessName}} on {{date}} is confirmed",
+          },
+          appointmentCancelled: {
+            ownerTitle: "Appointment Cancelled",
+            ownerBody: "{{clientName}} cancelled their {{serviceName}} appointment on {{date}}",
+            customerTitle: "Appointment Cancelled",
+            customerBody: "Your {{serviceName}} appointment at {{businessName}} on {{date}} was cancelled by the business",
+          },
+          appointmentReminder: {
+            title: "Appointment Reminder",
+            body: "Reminder: {{serviceName}} at {{businessName}} is tomorrow at {{date}}",
+          },
+          reviewPrompt: {
+            title: "How was your visit?",
+            body: "How was your appointment at {{businessName}}? Leave a review!",
+          },
+        },
+
         // ============ COMMON ============
         common: {
           direction: "ltr",
@@ -326,6 +370,9 @@ i18n.use(initReactI18next).init({
           back: "Back",
           home: "Home",
           unknownError: "Unknown error",
+          saving: "Saving...",
+          saved: "Saved",
+          errorOccurred: "An error occurred. Please try again.",
           about: "About",
           contact: "Contact",
           help: "Help",
@@ -622,6 +669,8 @@ i18n.use(initReactI18next).init({
           reviewCount_one: "{{count}} review",
           reviewCount_other: "{{count}} reviews",
           noReviewsYet: "No reviews yet",
+          notificationSettings: "Notification Settings",
+          notificationSettingsSubtext: "Manage which notifications you receive",
           servicesHours: "Services & Hours",
           servicesHoursDesc: "Edit working hours, breaks & availability",
           viewPublicPage: "View Public Page",
@@ -1333,6 +1382,15 @@ i18n.use(initReactI18next).init({
           notSignedIn: "לא מחובר",
         },
 
+        // ============ NOTIFICATION SETTINGS PAGE ============
+        notificationSettings: {
+          description: "בחר אילו התראות בתוך האפליקציה אתה מקבל עבור העסק שלך.",
+          newBooking: "הזמנה חדשה",
+          newBookingDesc: "קבל התראה כאשר לקוח קובע תור",
+          cancellation: "ביטול",
+          cancellationDesc: "קבל התראה כאשר לקוח מבטל תור",
+        },
+
         // ============ BUTTONS ============
         buttons: {
           save: "שמור",
@@ -1472,6 +1530,41 @@ i18n.use(initReactI18next).init({
           version: "גרסה",
         },
 
+        // ============ NOTIFICATIONS ============
+        notifications: {
+          title: "התראות",
+          empty: "אין התראות עדיין",
+          markAllRead: "סמן הכל כנקרא",
+
+          timeAgo: {
+            justNow: "עכשיו",
+            minutesAgo: "לפני {{count}} דקות",
+            hoursAgo: "לפני {{count}} שעות",
+            daysAgo: "לפני {{count}} ימים",
+          },
+
+          appointmentBooked: {
+            ownerTitle: "תור חדש",
+            ownerBody: "{{clientName}} קבע תור ל{{serviceName}} בתאריך {{date}}",
+            customerTitle: "ההזמנה אושרה",
+            customerBody: "תורך ל{{serviceName}} אצל {{businessName}} בתאריך {{date}} אושר",
+          },
+          appointmentCancelled: {
+            ownerTitle: "תור בוטל",
+            ownerBody: "{{clientName}} ביטל את תור ה{{serviceName}} בתאריך {{date}}",
+            customerTitle: "תור בוטל",
+            customerBody: "תורך ל{{serviceName}} אצל {{businessName}} בתאריך {{date}} בוטל על ידי העסק",
+          },
+          appointmentReminder: {
+            title: "תזכורת לתור",
+            body: "תזכורת: {{serviceName}} אצל {{businessName}} מחר בשעה {{date}}",
+          },
+          reviewPrompt: {
+            title: "איך היה הביקור?",
+            body: "איך היה התור שלך אצל {{businessName}}? השאר ביקורת!",
+          },
+        },
+
         // ============ COMMON ============
         common: {
           direction: "rtl",
@@ -1486,6 +1579,9 @@ i18n.use(initReactI18next).init({
           terms: "תנאי השירות",
           privacy: "מדיניות פרטיות",
           unknownError: "שגיאה לא ידועה",
+          saving: "שומר...",
+          saved: "נשמר",
+          errorOccurred: "אירעה שגיאה. אנא נסה שוב.",
           durationMin: "{{count}} דק׳",
           durationHour: "{{count}} ש׳",
           durationHourMin: "{{count}} ש׳ {{minutes}} דק׳",
@@ -1773,6 +1869,8 @@ i18n.use(initReactI18next).init({
           reviewCount_one: "ביקורת אחת",
           reviewCount_other: "{{count}} ביקורות",
           noReviewsYet: "אין ביקורות עדיין",
+          notificationSettings: "הגדרות התראות",
+          notificationSettingsSubtext: "נהל אילו התראות אתה מקבל",
           servicesHours: "שירותים ושעות",
           servicesHoursDesc: "ערוך שעות עבודה, הפסקות וזמינות",
           viewPublicPage: "הצג דף ציבורי",
