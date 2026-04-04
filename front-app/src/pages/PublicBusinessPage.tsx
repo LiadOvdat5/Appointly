@@ -41,6 +41,7 @@ import { Select } from "../components/UI/Select";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
 import type { AddressResult } from "../components/UI/AddressAutocomplete";
+import { ShareModal } from "../components/UI/ShareModal";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -725,6 +726,9 @@ export default function PublicBusinessPage() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
 
+  // ── Share modal ───────────────────────────────────────────────────────────
+  const [isShareOpen, setIsShareOpen] = useState(false);
+
   // ── Reviews state ─────────────────────────────────────────────────────────
   const [reviews, setReviews] = useState<ReviewDTO[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
@@ -1155,6 +1159,17 @@ export default function PublicBusinessPage() {
           >
             <MaterialIcon name="edit" className="text-base" />
             {t("buttons.edit")}
+          </button>
+        )}
+        {!isEditing && (
+          <button
+            type="button"
+            onClick={() => setIsShareOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold
+              text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <MaterialIcon name="share" className="text-base" />
+            {t("share.button")}
           </button>
         )}
         {isEditing && (
@@ -1852,6 +1867,16 @@ export default function PublicBusinessPage() {
           </section>
         )}
       </div>
+
+      {/* Share modal */}
+      {page.status === "ready" && (
+        <ShareModal
+          open={isShareOpen}
+          businessSlug={businessSlug ?? ""}
+          businessName={page.business.name}
+          onClose={() => setIsShareOpen(false)}
+        />
+      )}
     </div>
   );
 }

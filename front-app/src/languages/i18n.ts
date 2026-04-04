@@ -1086,6 +1086,20 @@ i18n.use(initReactI18next).init({
           goBack: "Go back",
         },
 
+        // ============ SHARE ============
+        share: {
+          button: "Share",
+          modalTitle: "Share {{name}}",
+          tabLink: "Copy Link",
+          tabQR: "QR Code",
+          linkDescription: "Copy the link and share it anywhere.",
+          copyButton: "Copy Link",
+          copied: "Link copied!",
+          copyFallback: "Copy this link:",
+          qrDescription: "Let customers scan this code to open your page.",
+          downloadQR: "Download QR Code",
+        },
+
         // ============ BUSINESS SCHEDULE PAGE ============
         businessSchedule: {
           failedLoadSlots: "Failed to load slot data.",
@@ -2206,6 +2220,20 @@ i18n.use(initReactI18next).init({
           notFound: "עסק לא נמצא",
           notFoundDesc: "דף עסק זה אינו קיים או שהוסר.",
           goBack: "חזור",
+        },
+
+        // ============ SHARE ============
+        share: {
+          button: "שתף",
+          modalTitle: "שתף את {{name}}",
+          tabLink: "העתק קישור",
+          tabQR: "קוד QR",
+          linkDescription: "העתק את הקישור ושתף אותו בכל מקום.",
+          copyButton: "העתק קישור",
+          copied: "הקישור הועתק!",
+          copyFallback: "העתק קישור זה:",
+          qrDescription: "תן ללקוחות לסרוק את הקוד כדי לפתוח את הדף שלך.",
+          downloadQR: "הורד קוד QR",
         },
 
         // ============ BUSINESS SCHEDULE PAGE ============

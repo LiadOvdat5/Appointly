@@ -24,6 +24,7 @@ import { Button } from "../components/UI/Button";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { ConfirmDialog } from "../components/UI/ConfirmDialog";
 import { ReviewViewModal } from "../components/UI/ReviewViewModal";
+import { ShareModal } from "../components/UI/ShareModal";
 import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -230,6 +231,9 @@ export default function DashboardPage() {
   // Reviews
   const [reviewMap, setReviewMap] = useState<Record<string, ReviewDTO>>({});
   const [viewingReview, setViewingReview] = useState<ReviewDTO | null>(null);
+
+  // Share modal
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   // Report / stats
   const [report, setReport] = useState<BusinessReportDTO | null>(null);
@@ -450,15 +454,25 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Edit business page button */}
-            <button
-              type="button"
-              onClick={() => navigate(`/business/${business.slug}?edit=true`)}
-              className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline shrink-0"
-            >
-              <MaterialIcon name="edit" className="text-base" />
-              {t("dashboard.editPage")}
-            </button>
+            {/* Header actions */}
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setIsShareOpen(true)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                <MaterialIcon name="share" className="text-base" />
+                {t("share.button")}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(`/business/${business.slug}?edit=true`)}
+                className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+              >
+                <MaterialIcon name="edit" className="text-base" />
+                {t("dashboard.editPage")}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1008,6 +1022,16 @@ export default function DashboardPage() {
           </section>
         </div>
       </div>
+
+      {/* Share modal */}
+      {business && (
+        <ShareModal
+          open={isShareOpen}
+          businessSlug={business.slug}
+          businessName={business.name}
+          onClose={() => setIsShareOpen(false)}
+        />
+      )}
     </>
   );
 }

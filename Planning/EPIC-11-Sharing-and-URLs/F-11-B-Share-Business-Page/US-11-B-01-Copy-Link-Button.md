@@ -2,7 +2,7 @@
 
 **Feature:** [[F-11-B-Share-Business-Page|F-11-B: Share Business Page]]
 **Epic:** [[EPIC-11-Sharing-and-URLs|EPIC-11: Sharing & URL Improvements]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **copy a direct link to my business page** so
 - `[FE]` Also add a share button in the owner's business dashboard
 
 ## Acceptance Criteria
-- [ ] Clicking the share button copies the full slug-based URL to the clipboard
-- [ ] "Link copied!" feedback is shown and disappears after ~2 seconds
-- [ ] The copied URL is the clean slug URL, not a UUID URL
-- [ ] Works on modern browsers (Clipboard API); shows a fallback prompt on unsupported browsers
+- [x] Clicking the share button copies the full slug-based URL to the clipboard
+- [x] "Link copied!" feedback is shown and disappears after ~2 seconds
+- [x] The copied URL is the clean slug URL, not a UUID URL
+- [x] Works on modern browsers (Clipboard API); shows a fallback prompt on unsupported browsers

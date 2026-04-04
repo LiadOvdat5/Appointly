@@ -2,7 +2,7 @@
 
 **Feature:** [[F-11-B-Share-Business-Page|F-11-B: Share Business Page]]
 **Epic:** [[EPIC-11-Sharing-and-URLs|EPIC-11: Sharing & URL Improvements]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **generate a QR code for my business page** s
 - `[FE]` QR code encodes the full slug-based business page URL
 
 ## Acceptance Criteria
-- [ ] Owner can open a modal showing the QR code for their business page
-- [ ] QR code is scannable and leads to the correct business page
-- [ ] "Download" button saves the QR code as an image file
-- [ ] No backend calls are needed — QR generation is fully client-side
+- [x] Owner can open a modal showing the QR code for their business page
+- [x] QR code is scannable and leads to the correct business page
+- [x] "Download" button saves the QR code as an image file
+- [x] No backend calls are needed — QR generation is fully client-side
