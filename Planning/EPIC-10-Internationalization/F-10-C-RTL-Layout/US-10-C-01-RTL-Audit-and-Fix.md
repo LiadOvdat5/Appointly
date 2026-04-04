@@ -2,7 +2,7 @@
 
 **Feature:** [[F-10-C-RTL-Layout|F-10-C: RTL Layout Correctness]]
 **Epic:** [[EPIC-10-Internationalization|EPIC-10: Internationalization (i18n) Hardening]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,8 +19,8 @@ As a **Hebrew-speaking user**, I want to **see all app layouts correctly mirrore
 - `[FE]` Test booking flow and schedule editor in RTL mode
 
 ## Acceptance Criteria
-- [ ] `dir="rtl"` is applied to the document when the language is Hebrew
-- [ ] Sidebar appears on the right side in RTL mode
-- [ ] All form fields show text right-aligned in Hebrew
-- [ ] No elements visually overlap or overflow due to direction change
-- [ ] The booking flow is fully usable in RTL mode
+- [x] `dir="rtl"` is applied to the document when the language is Hebrew
+- [x] Sidebar appears on the right side in RTL mode
+- [x] All form fields show text right-aligned in Hebrew
+- [x] No elements visually overlap or overflow due to direction change
+- [x] The booking flow is fully usable in RTL mode

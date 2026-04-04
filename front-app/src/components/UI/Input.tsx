@@ -104,12 +104,12 @@ export function Input({
     rightSlotCount === 0
       ? ""
       : rightSlotCount === 1
-        ? "pr-10"
+        ? "ltr:pr-10 rtl:pl-10"
         : rightSlotCount === 2
-          ? "pr-16"
-          : "pr-20";
+          ? "ltr:pr-16 rtl:pl-16"
+          : "ltr:pr-20 rtl:pl-20";
 
-  const plClass = hasStart ? "pl-10" : "";
+  const plClass = hasStart ? "ltr:pl-10 rtl:pr-10" : "";
 
   const baseInput =
     "w-full rounded-lg border bg-white p-3 text-[#111418] outline-none transition " +
@@ -151,7 +151,7 @@ export function Input({
 
       <div className="relative">
         {hasStart && (
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <span className="pointer-events-none absolute ltr:left-3 rtl:right-3 top-1/2 -translate-y-1/2 text-gray-400">
             {startIcon}
           </span>
         )}
@@ -179,8 +179,8 @@ export function Input({
           {...rest}
         />
 
-        {/* Right side controls (clear, password toggle, end icon) */}
-        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
+        {/* End-side controls (clear, password toggle, end icon) */}
+        <div className="absolute ltr:right-2 rtl:left-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
           {hasClear && (
             <button
               type="button"

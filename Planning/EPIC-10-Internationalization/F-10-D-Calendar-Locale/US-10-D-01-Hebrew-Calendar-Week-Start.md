@@ -2,7 +2,7 @@
 
 **Feature:** [[F-10-D-Calendar-Locale|F-10-D: Calendar Locale (Week Start Day)]]
 **Epic:** [[EPIC-10-Internationalization|EPIC-10: Internationalization (i18n) Hardening]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **Hebrew-speaking user**, I want to **see Sunday as the first day of the we
 - `[FE]` Day headers in the calendar (Sun/Mon/Tue…) should also be translated to Hebrew (ראשון/שני/שלישי…) using the `he` translation keys
 
 ## Acceptance Criteria
-- [ ] In Hebrew mode, all calendars start the week on Sunday
-- [ ] In English mode, all calendars start the week on Monday
-- [ ] Day header labels are translated to Hebrew when the language is Hebrew
-- [ ] No visual regression occurs in English mode after the change
+- [x] In Hebrew mode, all calendars start the week on Sunday
+- [x] In English mode, all calendars start the week on Monday
+- [x] Day header labels are translated to Hebrew when the language is Hebrew
+- [x] No visual regression occurs in English mode after the change

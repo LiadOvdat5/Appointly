@@ -46,8 +46,8 @@ function SidebarOverlay({
         className="absolute inset-0 bg-black/40"
       />
 
-      {/* Panel - right side */}
-      <div className="absolute inset-y-0 right-0 w-[280px] max-w-[85vw]">
+      {/* Panel - right side (always LTR layout regardless of document direction) */}
+      <div className="absolute inset-y-0 right-0 w-[280px] max-w-[85vw]" dir="ltr">
         <div className="h-full shadow-xl">
           {/* Make RoleSidebar fill height, but it should NOT be sticky now */}
           <div className="h-full bg-white dark:bg-background-dark border-l border-gray-200 dark:border-gray-800">

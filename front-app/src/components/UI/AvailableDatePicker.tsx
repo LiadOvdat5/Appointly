@@ -46,11 +46,15 @@ function toDateKey(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-/** Returns an array of {day, isCurrentMonth} objects for the calendar grid (6 weeks × 7 days) */
-function buildCalendarGrid(year: number, month: number) {
+/** Returns an array of {day, isCurrentMonth} objects for the calendar grid (6 weeks × 7 days).
+ *  weekStartsOn: 0 = Sunday (Israeli standard), 1 = Monday (international default) */
+function buildCalendarGrid(year: number, month: number, weekStartsOn: 0 | 1 = 1) {
   const firstDay = new Date(year, month, 1);
-  // Monday-first: 0=Mon … 6=Sun
-  const startOffset = (firstDay.getDay() + 6) % 7;
+  // Convert JS getDay() (0=Sun) to offset relative to week start
+  const startOffset =
+    weekStartsOn === 0
+      ? firstDay.getDay()            // 0=Sun is already correct
+      : (firstDay.getDay() + 6) % 7; // shift so 0=Mon
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const daysInPrevMonth = new Date(year, month, 0).getDate();
 
@@ -83,9 +87,10 @@ function buildCalendarGrid(year: number, month: number) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const MONTHS = t("calendar.months", { returnObjects: true }) as string[];
   const DAYS = t("calendar.days", { returnObjects: true }) as string[];
+  const weekStartsOn: 0 | 1 = i18n.language === "he" ? 0 : 1;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -131,7 +136,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
   const isCurrentMonth =
     state.year === today.getFullYear() && state.month === today.getMonth();
 
-  const cells = buildCalendarGrid(state.year, state.month);
+  const cells = buildCalendarGrid(state.year, state.month, weekStartsOn);
 
   const selectedKey =
     selectedDate != null

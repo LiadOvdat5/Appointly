@@ -12,7 +12,7 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
 
   return (
     <div
-      className="sticky top-0 z-10 flex items-center justify-between bg-background-light/90 p-4 backdrop-blur-sm dark:bg-background-dark/90 ltr"
+      className="sticky top-0 z-10 flex items-center justify-between bg-background-light/90 p-4 backdrop-blur-sm dark:bg-background-dark/90"
       dir="ltr"
     >
       {/* Left: Back only when meaningful */}

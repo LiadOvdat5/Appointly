@@ -332,6 +332,9 @@ i18n.use(initReactI18next).init({
           faq: "FAQ",
           terms: "Terms of Service",
           privacy: "Privacy Policy",
+          durationMin: "{{count}} min",
+          durationHour: "{{count}}h",
+          durationHourMin: "{{count}}h {{minutes}}m",
         },
 
         // ============ DIALOG ============
@@ -1483,6 +1486,9 @@ i18n.use(initReactI18next).init({
           terms: "תנאי השירות",
           privacy: "מדיניות פרטיות",
           unknownError: "שגיאה לא ידועה",
+          durationMin: "{{count}} דק׳",
+          durationHour: "{{count}} ש׳",
+          durationHourMin: "{{count}} ש׳ {{minutes}} דק׳",
         },
 
         // ============ DIALOG ============
@@ -1509,7 +1515,7 @@ i18n.use(initReactI18next).init({
             "נובמבר",
             "דצמבר",
           ],
-          days: ["ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳", "א׳"],
+          days: ["א׳", "ב׳", "ג׳", "ד׳", "ה׳", "ו׳", "ש׳"],
           daysShort: ["שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת", "ראשון"],
           daysFull: [
             "יום שני",

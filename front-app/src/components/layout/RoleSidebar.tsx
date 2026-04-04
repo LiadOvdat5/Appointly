@@ -406,7 +406,7 @@ function BusinessNavItem({
       </button>
 
       {subExpanded && (
-        <div className="ml-4 space-y-0.5 border-l border-gray-200 dark:border-gray-700 pl-3">
+        <div className="ltr:ml-4 rtl:mr-4 space-y-0.5 ltr:border-l rtl:border-r border-gray-200 dark:border-gray-700 ltr:pl-3 rtl:pr-3">
           {[
             {
               label: t("sidebar.businessPage"),
@@ -559,7 +559,7 @@ function FavoritesSection({
       </button>
 
       {expanded && (
-        <div className="ml-4 border-l border-gray-200 dark:border-gray-700 pl-3 space-y-0.5 py-1">
+        <div className="ltr:ml-4 rtl:mr-4 ltr:border-l rtl:border-r border-gray-200 dark:border-gray-700 ltr:pl-3 rtl:pr-3 space-y-0.5 py-1">
           {loading ? (
             <div className="flex justify-center py-3">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />

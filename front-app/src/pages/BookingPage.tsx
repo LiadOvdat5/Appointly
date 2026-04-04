@@ -24,15 +24,17 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min`;
+function formatDuration(minutes: number, t: (key: string, opts?: Record<string, unknown>) => string): string {
+  if (minutes < 60) return t("common.durationMin", { count: minutes });
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m ? `${h}h ${m}m` : `${h}h`;
+  return m
+    ? t("common.durationHourMin", { count: h, minutes: m })
+    : t("common.durationHour", { count: h });
 }
 
-function formatDateLong(date: Date): string {
-  return date.toLocaleDateString(undefined, {
+function formatDateLong(date: Date, locale: string): string {
+  return date.toLocaleDateString(locale, {
     weekday: "long",
     year: "numeric",
     month: "long",
@@ -43,7 +45,7 @@ function formatDateLong(date: Date): string {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function BookingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { businessSlug, serviceId } = useParams<{
     businessSlug: string;
     serviceId: string;
@@ -214,7 +216,7 @@ export default function BookingPage() {
               <span className="font-medium text-[#111418] dark:text-white">
                 {new Date(
                   confirmedAppointment.startDateTime,
-                ).toLocaleDateString(undefined, {
+                ).toLocaleDateString(i18n.language, {
                   weekday: "short",
                   month: "short",
                   day: "numeric",
@@ -297,7 +299,7 @@ export default function BookingPage() {
                   name="schedule"
                   className="text-sm leading-none"
                 />
-                {formatDuration(service.duration)}
+                {formatDuration(service.duration, t)}
               </span>
               {service.price != null && (
                 <span className="font-semibold text-primary">
@@ -330,7 +332,7 @@ export default function BookingPage() {
               {t("booking.availableTimes")}
             </h2>
             <p className="text-xs text-gray-400 mb-4">
-              {formatDateLong(selectedDate)}
+              {formatDateLong(selectedDate, i18n.language)}
             </p>
 
             {slotsLoading ? (
@@ -378,7 +380,7 @@ export default function BookingPage() {
                 <span>{t("booking.summaryDate")}</span>
                 <span className="font-medium text-[#111418] dark:text-white">
                   {selectedDate
-                    ? selectedDate.toLocaleDateString(undefined, {
+                    ? selectedDate.toLocaleDateString(i18n.language, {
                         weekday: "short",
                         month: "short",
                         day: "numeric",
