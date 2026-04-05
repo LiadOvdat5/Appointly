@@ -14,7 +14,7 @@ const SelectionPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative flex h-screen w-full flex-col bg-[#f0f7ff] dark:bg-background-dark">
+    <div className="relative flex h-dvh w-full flex-col bg-[#f0f7ff] dark:bg-background-dark">
       <div className="flex-1 flex flex-col px-6 pt-8 pb-10 justify-center gap-8">
         <div className="text-center space-y-2">
           <h1 className="text-[#0e141b] dark:text-white text-3xl font-black leading-tight tracking-tight">
@@ -70,7 +70,7 @@ const SelectionPage = () => {
       </div>
 
       <div className="p-6 text-center">
-        <p className="text-xs text-[#4e7397] dark:text-gray-400">
+        <p className="text-sm text-[#4e7397] dark:text-gray-400">
           {t("selection.termsNotice")}
         </p>
         <div className="h-8"></div>

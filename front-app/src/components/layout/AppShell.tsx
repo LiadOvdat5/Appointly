@@ -16,7 +16,7 @@ export function AppShell() {
       <Header onOpenMenu={() => setSidebarOpen(!sidebarOpen)} />
 
       {/* Content area below header */}
-      <main className="mx-auto w-full max-w-lg pb-20">
+      <main className="mx-auto w-full max-w-lg pb-20" style={{ paddingBottom: "calc(5rem + env(safe-area-inset-bottom))" }}>
         <Outlet />
       </main>
 

@@ -380,7 +380,7 @@ export function SearchPage() {
   }, [categories, t]);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-white dark:bg-gray-900">
+    <div className="flex flex-col h-dvh w-full bg-white dark:bg-gray-900">
       {/* Header with Search and Filters */}
       <SearchHeader
         searchQuery={searchQuery}

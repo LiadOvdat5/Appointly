@@ -19,7 +19,7 @@ export function TimeSlot({
       onClick={onClick}
       disabled={disabled}
       className={[
-        "py-2 rounded-lg font-medium text-sm border text-center transition",
+        "min-h-11 py-2 rounded-lg font-medium text-sm border text-center transition",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
         "ring-offset-white dark:ring-offset-background-dark",
         disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer",

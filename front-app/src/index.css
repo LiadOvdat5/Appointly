@@ -17,6 +17,11 @@ html, body, #root {
   min-height: max(884px, 100dvh);
 }
 
+/* iOS safe area — prevents content from hiding behind the home indicator */
+#root {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Material Symbols filled variant (FILL axis = 1) */
 .icon-filled {
   font-variation-settings: 'FILL' 1;

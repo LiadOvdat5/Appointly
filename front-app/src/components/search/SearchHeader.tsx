@@ -120,7 +120,7 @@ export function SearchHeader({
       <div className="px-4 py-3 flex items-center justify-between">
         <button
           onClick={() => setFilterOpen((o) => !o)}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          className="flex min-h-11 items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           aria-label={t("search.filterAriaLabel")}
         >
           <MaterialIcon name="filter_list" className="text-[20px]" />

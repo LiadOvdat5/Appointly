@@ -2,7 +2,7 @@
 
 **Feature:** [[F-13-C-Mobile-UX-Audit|F-13-C: Mobile UX Audit]]
 **Epic:** [[EPIC-13-PWA|EPIC-13: Progressive Web App (PWA)]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,8 +19,8 @@ As a **mobile user**, I want to **use BizSlot comfortably on my phone** so that 
 - `[FE]` Add a mobile-friendly bottom navigation bar or hamburger menu if the sidebar is not usable on small screens
 
 ## Acceptance Criteria
-- [ ] All pages render without horizontal scroll on a 375px viewport
-- [ ] All interactive elements are comfortably tappable
-- [ ] The full booking flow can be completed on a mobile device
-- [ ] No text is clipped or unreadably small on mobile
+- [x] All pages render without horizontal scroll on a 375px viewport
+- [x] All interactive elements are comfortably tappable
+- [x] The full booking flow can be completed on a mobile device
+- [x] No text is clipped or unreadably small on mobile
 - [ ] Lighthouse PWA audit score is ≥ 90

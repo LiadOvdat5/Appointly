@@ -270,7 +270,7 @@ export default function BookingPage() {
         <button
           type="button"
           onClick={() => navigate(`/business/${business?.slug ?? businessSlug}`)}
-          className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          className="flex size-11 shrink-0 -ml-1 items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
           aria-label={t("common.back")}
         >
           <MaterialIcon name="arrow_back" className="text-xl" />

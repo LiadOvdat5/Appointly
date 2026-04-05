@@ -20,7 +20,7 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
         {canGoBack && (
           <button
             onClick={() => navigate(-1)}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
             aria-label="Back"
           >
             <span
@@ -42,7 +42,7 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
         {isAuthenticated && <NotificationBell />}
         <button
           onClick={onOpenMenu}
-          className="flex size-10 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
+          className="flex size-11 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
           aria-label="Open menu"
         >
           <span
