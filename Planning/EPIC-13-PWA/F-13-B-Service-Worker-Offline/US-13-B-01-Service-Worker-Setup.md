@@ -2,7 +2,7 @@
 
 **Feature:** [[F-13-B-Service-Worker-Offline|F-13-B: Service Worker & Offline Shell]]
 **Epic:** [[EPIC-13-PWA|EPIC-13: Progressive Web App (PWA)]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As the **system**, I want to **register a service worker that caches the app she
 - `[FE]` The plugin auto-generates `sw.js` and injects the manifest link — remove any manual manifest link added in F-13-A to avoid duplication (or configure the plugin to reference the existing manifest)
 
 ## Acceptance Criteria
-- [ ] Service worker is registered and visible in browser DevTools > Application > Service Workers
-- [ ] App shell (HTML, JS bundles, CSS) is cached after first visit
-- [ ] Subsequent visits load from cache (fast) even when the network is slow
-- [ ] Service worker updates automatically when a new version is deployed
+- [x] Service worker is registered and visible in browser DevTools > Application > Service Workers
+- [x] App shell (HTML, JS bundles, CSS) is cached after first visit
+- [x] Subsequent visits load from cache (fast) even when the network is slow
+- [x] Service worker updates automatically when a new version is deployed

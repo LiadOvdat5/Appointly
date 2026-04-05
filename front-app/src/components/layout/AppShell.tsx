@@ -3,12 +3,15 @@ import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Header } from "./Header";
 import { RoleSidebar } from "./RoleSidebar";
+import { OfflineBanner } from "./OfflineBanner";
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className=" bg-background-light dark:bg-background-dark">
+      {/* Offline indicator — shown when network is unavailable */}
+      <OfflineBanner />
       {/* Header */}
       <Header onOpenMenu={() => setSidebarOpen(!sidebarOpen)} />
 

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>You're Offline — BizSlot</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: Inter, system-ui, sans-serif;
+        background-color: #f8fafc;
+        color: #0f172a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100dvh;
+        padding: 24px;
+        text-align: center;
+      }
+
+      .icon-wrap {
+        width: 80px;
+        height: 80px;
+        background: #2563eb;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      p {
+        font-size: 1rem;
+        color: #64748b;
+        max-width: 320px;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      button {
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 12px 28px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      button:hover { background: #1d4ed8; }
+
+      .brand {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2563eb;
+        letter-spacing: -0.02em;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="brand">BizSlot</span>
+
+    <!-- Inline BizSlot calendar icon (same SVG as icon.svg) -->
+    <div class="icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 512 512" fill="none">
+        <rect x="88" y="160" width="336" height="288" rx="28" fill="white"/>
+        <rect x="88" y="160" width="336" height="96" rx="28" fill="#1E40AF"/>
+        <rect x="88" y="216" width="336" height="40" fill="#1E40AF"/>
+        <rect x="172" y="112" width="24" height="80" rx="12" fill="#BFDBFE"/>
+        <rect x="316" y="112" width="24" height="80" rx="12" fill="#BFDBFE"/>
+        <path d="M 168 316 L 224 372 L 344 252" stroke="white" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h1>You're offline</h1>
+    <p>Please check your internet connection and try again.</p>
+
+    <button onclick="window.location.reload()">Try again</button>
+  </body>
+</html>
