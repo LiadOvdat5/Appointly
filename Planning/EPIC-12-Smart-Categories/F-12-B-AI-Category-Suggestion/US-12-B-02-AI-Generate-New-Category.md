@@ -2,7 +2,7 @@
 
 **Feature:** [[F-12-B-AI-Category-Suggestion|F-12-B: AI-Assisted Category Suggestion]]
 **Epic:** [[EPIC-12-Smart-Categories|EPIC-12: Smart Categories]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,7 +19,7 @@ As a **business owner whose service doesn't fit any existing category**, I want 
 - `[FE]` In the meantime, allow the owner to skip category assignment or pick the closest existing one
 
 ## Acceptance Criteria
-- [ ] Owner can submit a new category request with their description
-- [ ] AI proposes a generic, reusable name (not a business-specific name)
-- [ ] Request is stored as `Pending` and visible in the admin panel
-- [ ] Owner is not blocked from completing their setup while the request is pending
+- [x] Owner can submit a new category request with their description
+- [x] AI proposes a generic, reusable name (not a business-specific name)
+- [x] Request is stored as `Pending` and visible in the admin panel
+- [x] Owner is not blocked from completing their setup while the request is pending

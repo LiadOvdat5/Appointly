@@ -22,6 +22,7 @@ import PublicBusinessPage from "../pages/PublicBusinessPage.tsx";
 import ScheduleEditorPage from "../pages/ScheduleEditorPage.tsx";
 import BookingPage from "../pages/BookingPage.tsx";
 import StaffPage from "../pages/StaffPage.tsx";
+import ServiceEditPage from "../pages/ServiceEditPage.tsx";
 import StaffDashboardPage from "../pages/StaffDashboardPage.tsx";
 import InvitationsPage from "../pages/InvitationsPage.tsx";
 import BusinessReviewsPage from "../pages/BusinessReviewsPage.tsx";
@@ -85,6 +86,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <ServiceSelectionPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/:businessSlug/services/:serviceId/edit",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <ServiceEditPage />
           </ProtectedRoute>
         ),
       },

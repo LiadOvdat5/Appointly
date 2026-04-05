@@ -47,7 +47,10 @@
       "Bash(sqlcmd -S \"MSI\\\\SQLEXPRESS\" -d BizSlot -Q \"UPDATE Businesses SET NotifyOnNewBooking=1, NotifyOnCancellation=1\" -E)",
       "Bash(taskkill /PID 20284 /F)",
       "Bash(powershell -Command \"Stop-Process -Id 20284 -Force -ErrorAction SilentlyContinue; Start-Sleep 2\")",
-      "Bash(node scripts/generate-pwa-icons.mjs)"
+      "Bash(node scripts/generate-pwa-icons.mjs)",
+      "mcp__browser__browser_run_code",
+      "Bash(findstr \":5142 \\\\|:5173 \")",
+      "Bash(findstr LISTENING)"
     ]
   }
 }

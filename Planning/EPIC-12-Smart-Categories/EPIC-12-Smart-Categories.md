@@ -12,5 +12,5 @@
 | #   | Feature                                                                            | Status         |
 | --- | ---------------------------------------------------------------------------------- | -------------- |
 | A   | [[F-12-A-Category-Governance\|Feature A: Category Governance]]                    | ✅ Done        |
-| B   | [[F-12-B-AI-Category-Suggestion\|Feature B: AI-Assisted Category Suggestion]]     | 🔲 Not Started |
+| B   | [[F-12-B-AI-Category-Suggestion\|Feature B: AI-Assisted Category Suggestion]]     | ✅ Done        |
 | C   | [[F-12-C-Admin-Category-Approval\|Feature C: Admin Category Approval]]            | 🔲 Not Started |

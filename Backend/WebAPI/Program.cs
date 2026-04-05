@@ -82,6 +82,9 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Register Gemini AI Service
+builder.Services.AddHttpClient<IGeminiService, GeminiService>();
+
 // Register background service for appointment reminders
 builder.Services.AddHostedService<AppointmentReminderService>();
 

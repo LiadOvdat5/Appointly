@@ -125,51 +125,56 @@ export default function ServiceSelectionPage() {
           services.map((svc) => {
             const upcoming = upcomingCountForService(svc.id);
             return (
-              <button
-                key={svc.id}
-                type="button"
-                onClick={() => navigate(`/schedule/${businessId}/${svc.id}`)}
-                className="w-full text-left"
-              >
-                <Card className="p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-4">
-                    {/* Icon */}
-                    <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
-                      <MaterialIcon name="content_cut" className="text-xl text-purple-600 dark:text-purple-400" />
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#111418] dark:text-white text-sm truncate">
-                        {svc.name}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 mt-1">
-                        {/* Duration */}
-                        <span className="flex items-center gap-1 text-xs text-gray-500">
-                          <MaterialIcon name="schedule" className="text-sm leading-none" />
-                          {svc.duration} min
-                        </span>
-                        {/* Price */}
-                        {svc.price != null && (
-                          <span className="flex items-center gap-1 text-xs text-gray-500">
-                            <MaterialIcon name="payments" className="text-sm leading-none" />
-                            ${svc.price.toFixed(2)}
-                          </span>
-                        )}
-                        {/* Upcoming appointments badge */}
-                        {upcoming > 0 && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
-                            <MaterialIcon name="event" className="text-xs leading-none" />
-                            {t("serviceSelection.upcoming", { count: upcoming })}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <MaterialIcon name="chevron_right" className="text-gray-400 shrink-0" />
+              <Card key={svc.id} className="p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  {/* Icon */}
+                  <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                    <MaterialIcon name="content_cut" className="text-xl text-purple-600 dark:text-purple-400" />
                   </div>
-                </Card>
-              </button>
+
+                  {/* Info — clicking navigates to schedule */}
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/schedule/${businessId}/${svc.id}`)}
+                    className="flex-1 min-w-0 text-left"
+                  >
+                    <p className="font-bold text-[#111418] dark:text-white text-sm truncate">
+                      {svc.name}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <MaterialIcon name="schedule" className="text-sm leading-none" />
+                        {svc.duration} min
+                      </span>
+                      {svc.price != null && (
+                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                          <MaterialIcon name="payments" className="text-sm leading-none" />
+                          ₪{svc.price.toFixed(2)}
+                        </span>
+                      )}
+                      {upcoming > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
+                          <MaterialIcon name="event" className="text-xs leading-none" />
+                          {t("serviceSelection.upcoming", { count: upcoming })}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Edit button → ServiceEditPage */}
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/dashboard/${businessSlug}/services/${svc.id}/edit`)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/5 transition shrink-0"
+                    aria-label={t("serviceSelection.editService")}
+                    title={t("serviceSelection.editService")}
+                  >
+                    <MaterialIcon name="edit" className="text-lg" />
+                  </button>
+
+                  <MaterialIcon name="chevron_right" className="text-gray-300 dark:text-gray-600 shrink-0" />
+                </div>
+              </Card>
             );
           })}
 

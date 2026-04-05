@@ -74,4 +74,5 @@ export interface UpdateServiceInput {
   description?: string;
   duration?: number;
   price?: number;
+  categoryId?: string;
 }

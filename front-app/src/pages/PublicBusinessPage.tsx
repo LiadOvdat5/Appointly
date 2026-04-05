@@ -606,7 +606,7 @@ function ServiceForm({
     draft.duration !== "" &&
     !durationError &&
     !priceError &&
-    (!isNew || draft.categoryId !== "");
+    draft.categoryId !== "";
 
   return (
     <Card className="p-5 flex flex-col gap-4 border-2 border-primary/30 bg-primary/5 dark:bg-primary/10">
@@ -647,14 +647,12 @@ function ServiceForm({
             error={priceError}
           />
         </div>
-        {isNew && (
-          <CategorySearchSelect
-            label={t("publicBusiness.categoryLabel")}
-            value={draft.categoryId}
-            onChange={(v) => onField("categoryId", v)}
-            categories={categories}
-          />
-        )}
+        <CategorySearchSelect
+          label={t("publicBusiness.categoryLabel")}
+          value={draft.categoryId}
+          onChange={(v) => onField("categoryId", v)}
+          categories={categories}
+        />
       </div>
 
       {error && <p className="text-xs text-danger">{error}</p>}

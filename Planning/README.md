@@ -30,6 +30,6 @@
 | 09 | [[EPIC-09-Notifications\|Notifications]] | ✅ Done |
 | 10 | [[EPIC-10-Internationalization\|Internationalization (i18n) Hardening]] | ✅ Done |
 | 11 | [[EPIC-11-Sharing-and-URLs\|Sharing & URL Improvements]] | 🔲 Not Started |
-| 12 | [[EPIC-12-Smart-Categories\|Smart Categories]] | 🔲 Not Started |
+| 12 | [[EPIC-12-Smart-Categories\|Smart Categories]] | 🔄 In Progress (F-12-A ✅, F-12-B ✅, F-12-C 🔲) |
 | 13 | [[EPIC-13-PWA\|Progressive Web App (PWA)]] | 🔲 Not Started |
 | 14 | [[EPIC-14-Admin-Panel\|Admin Panel]] | 🔲 Not Started |
