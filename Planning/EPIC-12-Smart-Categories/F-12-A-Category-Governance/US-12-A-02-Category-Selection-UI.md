@@ -2,7 +2,7 @@
 
 **Feature:** [[F-12-A-Category-Governance|F-12-A: Category Governance]]
 **Epic:** [[EPIC-12-Smart-Categories|EPIC-12: Smart Categories]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **business owner**, I want to **pick a category from an existing curated li
 - `[FE]` If the owner cannot find a matching category, show a "Can't find your category? Describe it →" option that leads into the AI suggestion flow (F-12-B)
 
 ## Acceptance Criteria
-- [ ] Category selection is a searchable list, not a free-text input
-- [ ] All existing categories are available in the list
-- [ ] "Can't find your category?" option is clearly visible at the bottom of the list
-- [ ] Selecting a category from the list saves correctly to the business/service
+- [x] Category selection is a searchable list, not a free-text input
+- [x] All existing categories are available in the list
+- [x] "Can't find your category?" option is clearly visible at the bottom of the list
+- [x] Selecting a category from the list saves correctly to the business/service

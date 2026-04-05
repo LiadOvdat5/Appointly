@@ -2,7 +2,7 @@
 
 **Feature:** [[F-12-A-Category-Governance|F-12-A: Category Governance]]
 **Epic:** [[EPIC-12-Smart-Categories|EPIC-12: Smart Categories]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ As an **admin**, I want to **prevent business owners from freely creating new ca
 - `[DB]` Migration if `UserRole` enum change requires a schema update
 
 ## Acceptance Criteria
-- [ ] Business owners cannot call `POST /categories` — receive 403
-- [ ] Admin users can still create and manage categories directly
-- [ ] Existing categories are unaffected
+- [x] Business owners cannot call `POST /categories` — receive 403
+- [x] Admin users can still create and manage categories directly
+- [x] Existing categories are unaffected

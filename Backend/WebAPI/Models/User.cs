@@ -7,7 +7,8 @@ namespace WebAPI.Models
     {
         client,
         partner,
-        owner
+        owner,
+        admin
     }
 
     public class User

@@ -37,7 +37,7 @@ import type { Category } from "../types/search";
 import { Button } from "../components/UI/Button";
 import { Card } from "../components/UI/Card";
 import { Input } from "../components/UI/Input";
-import { Select } from "../components/UI/Select";
+import { CategorySearchSelect } from "../components/UI/CategorySearchSelect";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
 import type { AddressResult } from "../components/UI/AddressAutocomplete";
@@ -589,10 +589,6 @@ function ServiceForm({
   onCancel: () => void;
 }) {
   const { t } = useTranslation();
-  const categoryOptions = [
-    { value: "", label: t("publicBusiness.selectCategory") },
-    ...categories.map((c) => ({ value: c.id, label: c.name })),
-  ];
 
   const durationNum = Number(draft.duration);
   const priceNum = Number(draft.price);
@@ -652,11 +648,11 @@ function ServiceForm({
           />
         </div>
         {isNew && (
-          <Select
+          <CategorySearchSelect
             label={t("publicBusiness.categoryLabel")}
             value={draft.categoryId}
             onChange={(v) => onField("categoryId", v)}
-            options={categoryOptions}
+            categories={categories}
           />
         )}
       </div>

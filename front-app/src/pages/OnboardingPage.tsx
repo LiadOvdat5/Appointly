@@ -10,7 +10,7 @@ import { createBusiness, createService } from "../services/businessManagementSer
 import { fetchCategories } from "../services/categoryService";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
-import { Select } from "../components/UI/Select";
+import { CategorySearchSelect } from "../components/UI/CategorySearchSelect";
 import { Alert } from "../components/UI/Alert";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
@@ -318,11 +318,6 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
     }
   };
 
-  const categoryOptions = [
-    { value: "", label: t("onboarding.step2.categoryPlaceholder") },
-    ...categories.map((c) => ({ value: c.id, label: c.name })),
-  ];
-
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -397,15 +392,13 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
           />
         </div>
 
-        <Select
+        <CategorySearchSelect
           label={t("onboarding.step2.categoryLabel")}
           value={draft.categoryId}
           onChange={set("categoryId")}
-          options={categoryOptions}
+          categories={categories}
+          error={touched.categoryId ? errors.categoryId : undefined}
         />
-        {touched.categoryId && errors.categoryId && (
-          <p className="text-xs text-danger -mt-2">{errors.categoryId}</p>
-        )}
 
         <Button variant="secondary" onClick={handleAddService} isLoading={isAdding}>
           <MaterialIcon name="add" className="text-[18px]!" />

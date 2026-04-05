@@ -16,7 +16,7 @@ namespace WebAPI.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDTO dto)
         {
@@ -42,7 +42,7 @@ namespace WebAPI.Controllers
             return Ok(categories);
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] CreateCategoryDTO dto)
         {
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Roles = "admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
