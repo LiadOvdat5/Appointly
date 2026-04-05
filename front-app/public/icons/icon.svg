@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- App background -->
+  <rect width="512" height="512" rx="96" fill="#2563EB"/>
+  <!-- Calendar body -->
+  <rect x="88" y="160" width="336" height="288" rx="28" fill="white"/>
+  <!-- Calendar header -->
+  <rect x="88" y="160" width="336" height="96" rx="28" fill="#1E40AF"/>
+  <rect x="88" y="216" width="336" height="40" fill="#1E40AF"/>
+  <!-- Pin stems -->
+  <rect x="172" y="112" width="24" height="80" rx="12" fill="#BFDBFE"/>
+  <rect x="316" y="112" width="24" height="80" rx="12" fill="#BFDBFE"/>
+  <!-- Checkmark (appointment confirmed) -->
+  <path d="M 168 316 L 224 372 L 344 252" stroke="#2563EB" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

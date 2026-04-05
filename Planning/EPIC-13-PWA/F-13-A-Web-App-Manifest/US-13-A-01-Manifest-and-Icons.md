@@ -2,7 +2,7 @@
 
 **Feature:** [[F-13-A-Web-App-Manifest|F-13-A: Web App Manifest]]
 **Epic:** [[EPIC-13-PWA|EPIC-13: Progressive Web App (PWA)]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **mobile user**, I want to **add BizSlot to my home screen** so that **I ca
 - `[FE]` Add apple touch icon `<link>` for iOS home screen icon
 
 ## Acceptance Criteria
-- [ ] Chrome on Android shows "Add to Home Screen" prompt when visiting the app
-- [ ] App opens in standalone mode (no browser chrome) when launched from home screen
-- [ ] App icon appears correctly on the home screen on both Android and iOS
-- [ ] `start_url` launches the app at the correct route
+- [x] Chrome on Android shows "Add to Home Screen" prompt when visiting the app
+- [x] App opens in standalone mode (no browser chrome) when launched from home screen
+- [x] App icon appears correctly on the home screen on both Android and iOS
+- [x] `start_url` launches the app at the correct route
