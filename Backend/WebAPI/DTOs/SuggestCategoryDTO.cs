@@ -14,6 +14,7 @@ namespace WebAPI.DTOs
     public class CreateCategoryRequestDTO
     {
         public string Description { get; set; } = string.Empty;
+        public Guid? BusinessId { get; set; }
     }
 
     public class CategoryRequestResponseDTO

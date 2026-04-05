@@ -200,6 +200,7 @@ export default function ServiceEditPage() {
               onChange={setCategoryId}
               categories={categories}
               error={categoryId === "" ? t("onboarding.error.categoryRequired") : undefined}
+              businessId={businessId}
             />
 
             <Button onClick={handleSave} isLoading={saving} disabled={!canSave}>

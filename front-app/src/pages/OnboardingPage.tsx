@@ -398,6 +398,7 @@ function Step2AddServices({ businessId, ownerId, onNext, onBack }: Step2Props) {
           onChange={set("categoryId")}
           categories={categories}
           error={touched.categoryId ? errors.categoryId : undefined}
+          businessId={businessId}
         />
 
         <Button variant="secondary" onClick={handleAddService} isLoading={isAdding}>

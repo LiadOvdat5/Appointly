@@ -17,6 +17,9 @@ namespace WebAPI.Models
         [Required]
         public Guid RequestedByUserId { get; set; }
 
+        /// <summary>The business whose service triggered this request. Null for legacy records.</summary>
+        public Guid? BusinessId { get; set; }
+
         [Required]
         [MaxLength(500)]
         public string Description { get; set; } = string.Empty;

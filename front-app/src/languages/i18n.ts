@@ -177,6 +177,35 @@ i18n.use(initReactI18next).init({
           loading: "Loading…",
           signedIn: "Signed in",
           notSignedIn: "Not signed in",
+          adminSection: "Admin",
+          categoryRequests: "Category Requests",
+        },
+
+        // ============ ADMIN ============
+        admin: {
+          categoryRequests: {
+            title: "Category Requests",
+            subtitle: "Review and approve AI-suggested categories from business owners",
+            loadError: "Failed to load category requests.",
+            approveError: "Failed to approve request. Please try again.",
+            rejectError: "Failed to reject request. Please try again.",
+            requester: "Requested by",
+            description: "Service description",
+            aiSuggestion: "AI Suggestion",
+            noName: "No name suggested",
+            noAiSuggestion: "No AI suggestion — please enter a name manually.",
+            addName: "Add name",
+            edit: "Edit",
+            editTitle: "Override AI suggestion",
+            namePlaceholder: "Category name (e.g. Personal Training)",
+            iconPlaceholder: "Material icon name (e.g. fitness_center)",
+            approve: "Approve",
+            reject: "Reject",
+            empty: {
+              title: "All caught up!",
+              text: "No pending category requests.",
+            },
+          },
         },
 
         // ============ NOTIFICATION SETTINGS PAGE ============
@@ -1424,6 +1453,35 @@ i18n.use(initReactI18next).init({
           loading: "טוען…",
           signedIn: "מחובר",
           notSignedIn: "לא מחובר",
+          adminSection: "ניהול",
+          categoryRequests: "בקשות קטגוריה",
+        },
+
+        // ============ ADMIN ============
+        admin: {
+          categoryRequests: {
+            title: "בקשות קטגוריה",
+            subtitle: "סקור ואשר קטגוריות שהוצעו על ידי בעלי עסקים",
+            loadError: "טעינת הבקשות נכשלה.",
+            approveError: "אישור הבקשה נכשל. נסה שנית.",
+            rejectError: "דחיית הבקשה נכשלה. נסה שנית.",
+            requester: "בוקש על ידי",
+            description: "תיאור השירות",
+            aiSuggestion: "הצעת בינה מלאכותית",
+            noName: "לא הוצע שם",
+            noAiSuggestion: "אין הצעת AI — יש להזין שם ידנית.",
+            addName: "הוסף שם",
+            edit: "ערוך",
+            editTitle: "דרוס הצעת AI",
+            namePlaceholder: "שם קטגוריה (למשל: אימון אישי)",
+            iconPlaceholder: "שם אייקון Material (למשל: fitness_center)",
+            approve: "אשר",
+            reject: "דחה",
+            empty: {
+              title: "הכל מסודר!",
+              text: "אין בקשות קטגוריה ממתינות.",
+            },
+          },
         },
 
         // ============ NOTIFICATION SETTINGS PAGE ============

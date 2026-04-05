@@ -208,6 +208,9 @@ export function RoleSidebar({
           </div>
         ))}
 
+        {/* Admin section */}
+        {role === Role.Admin && <AdminSection onClose={onClose} />}
+
         {/* Partner section — only visible when user is a partner */}
         {role === Role.Partner && user?.businessId && (
           <PartnerSection businessId={user.businessId} onClose={onClose} />
@@ -586,6 +589,34 @@ function FavoritesSection({
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Admin section ─────────────────────────────────────────────────────────────
+
+function AdminSection({ onClose }: { onClose?: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <div className="mb-3">
+      <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        {t("sidebar.adminSection")}
+      </div>
+      <NavLink
+        to="/admin/categories"
+        onClick={() => onClose?.()}
+        className={({ isActive }) =>
+          [
+            "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors",
+            isActive
+              ? "bg-primary/10 text-primary"
+              : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
+          ].join(" ")
+        }
+      >
+        <Icon name="admin_panel_settings" />
+        <span className="truncate font-medium">{t("sidebar.categoryRequests")}</span>
+      </NavLink>
     </div>
   );
 }

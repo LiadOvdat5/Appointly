@@ -25,6 +25,8 @@ type Props = {
   categories: Category[];
   error?: string;
   placeholder?: string;
+  /** Pass the current businessId so category requests are linked to the right business on approval. */
+  businessId?: string;
 };
 
 export function CategorySearchSelect({
@@ -34,6 +36,7 @@ export function CategorySearchSelect({
   categories,
   error,
   placeholder,
+  businessId,
 }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -144,7 +147,7 @@ export function CategorySearchSelect({
     setRequestError(null);
     setMode("request");
     try {
-      await requestNewCategory(description.trim());
+      await requestNewCategory(description.trim(), businessId);
       onChange(UNCATEGORIZED_CATEGORY_ID);
       setMode("submitted");
     } catch {

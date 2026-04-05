@@ -2,7 +2,7 @@
 
 **Feature:** [[F-12-C-Admin-Category-Approval|F-12-C: Admin Category Approval]]
 **Epic:** [[EPIC-12-Smart-Categories|EPIC-12: Smart Categories]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -20,8 +20,8 @@ As an **admin**, I want to **review AI-generated category requests, edit the pro
 - `[FE]` Reject button with optional reason
 
 ## Acceptance Criteria
-- [ ] Admin can see all pending category requests in one place
-- [ ] Admin can edit the AI-suggested name before approving
-- [ ] Approving creates the category and it immediately appears in the category list for all users
-- [ ] Requester's business/service is updated to use the new category on approval
-- [ ] Rejecting marks the request as rejected (requester can try again or pick an existing category)
+- [x] Admin can see all pending category requests in one place
+- [x] Admin can edit the AI-suggested name before approving
+- [x] Approving creates the category and it immediately appears in the category list for all users
+- [x] Requester's business/service is updated to use the new category on approval
+- [x] Rejecting marks the request as rejected (requester can try again or pick an existing category)

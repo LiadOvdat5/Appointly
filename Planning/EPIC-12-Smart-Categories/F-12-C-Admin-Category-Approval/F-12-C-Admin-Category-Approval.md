@@ -1,7 +1,7 @@
 # F-12-C: Admin Category Approval
 
 **Epic:** [[EPIC-12-Smart-Categories|EPIC-12: Smart Categories]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 

@@ -56,8 +56,15 @@ export interface CategoryRequestResult {
 /**
  * US-12-B-02: Submit a new category request for admin review.
  * The backend calls AI to propose a name and stores it as Pending.
+ * Pass businessId so the admin can update the right services on approval.
  */
-export const requestNewCategory = async (description: string): Promise<CategoryRequestResult> => {
-  const response = await apiClient.post<CategoryRequestResult>("/categories/request", { description });
+export const requestNewCategory = async (
+  description: string,
+  businessId?: string,
+): Promise<CategoryRequestResult> => {
+  const response = await apiClient.post<CategoryRequestResult>("/categories/request", {
+    description,
+    businessId: businessId ?? null,
+  });
   return response.data;
 };

@@ -186,6 +186,7 @@ namespace WebAPI.Controllers
             {
                 Id = Guid.NewGuid(),
                 RequestedByUserId = userId,
+                BusinessId = dto.BusinessId,
                 Description = dto.Description.Trim(),
                 AiSuggestedName = aiName?.Trim(),
                 AiSuggestedIcon = aiIcon?.Trim(),

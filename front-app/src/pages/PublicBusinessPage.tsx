@@ -652,6 +652,7 @@ function ServiceForm({
           value={draft.categoryId}
           onChange={(v) => onField("categoryId", v)}
           categories={categories}
+          businessId={businessId}
         />
       </div>
 
