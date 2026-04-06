@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-B-Admin-Dashboard|F-14-B: Admin Dashboard]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As an **admin**, I want to **see key platform metrics on a single dashboard page
 - `[FE]` "Pending Flags" card is highlighted (e.g., orange) when count > 0 and links to the flagged reviews page
 
 ## Acceptance Criteria
-- [ ] All counts are accurate and reflect live DB data
-- [ ] Pending flagged reviews count is prominently surfaced with a link to the moderation queue
-- [ ] Page is accessible only to users with `admin` role
+- [x] All counts are accurate and reflect live DB data
+- [x] Pending flagged reviews count is prominently surfaced with a link to the moderation queue
+- [x] Page is accessible only to users with `admin` role

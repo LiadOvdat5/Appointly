@@ -178,6 +178,7 @@ i18n.use(initReactI18next).init({
           signedIn: "Signed in",
           notSignedIn: "Not signed in",
           adminSection: "Admin",
+          adminDashboard: "Admin Dashboard",
           categoryRequests: "Category Requests",
         },
 
@@ -1454,6 +1455,7 @@ i18n.use(initReactI18next).init({
           signedIn: "מחובר",
           notSignedIn: "לא מחובר",
           adminSection: "ניהול",
+          adminDashboard: "לוח בקרה ניהול",
           categoryRequests: "בקשות קטגוריה",
         },
 

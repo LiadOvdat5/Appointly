@@ -1,5 +1,18 @@
 import { apiClient } from "./apiClient";
 
+export interface AdminStats {
+  totalUsers: number;
+  totalBusinesses: number;
+  totalAppointments: number;
+  totalReviews: number;
+  pendingFlaggedReviews: number;
+}
+
+export const getAdminStats = async (): Promise<AdminStats> => {
+  const res = await apiClient.get<AdminStats>("/admin/stats");
+  return res.data;
+};
+
 export interface AdminCategoryRequest {
   id: string;
   description: string;

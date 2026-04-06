@@ -21,6 +21,26 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
+        /// <summary>GET /admin/stats — platform-wide counts for the admin dashboard.</summary>
+        [HttpGet("stats")]
+        public async Task<IActionResult> GetStats()
+        {
+            var totalUsers = await _context.Users.CountAsync();
+            var totalBusinesses = await _context.Businesses.CountAsync();
+            var totalAppointments = await _context.Appointments.CountAsync();
+            var totalReviews = await _context.Reviews.CountAsync();
+            var pendingFlaggedReviews = await _context.Reviews.CountAsync(r => r.IsFlagged);
+
+            return Ok(new
+            {
+                totalUsers,
+                totalBusinesses,
+                totalAppointments,
+                totalReviews,
+                pendingFlaggedReviews,
+            });
+        }
+
         /// <summary>GET /admin/category-requests — all Pending requests with requester + business info.</summary>
         [HttpGet("category-requests")]
         public async Task<IActionResult> GetPendingRequests()

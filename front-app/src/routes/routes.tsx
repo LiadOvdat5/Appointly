@@ -30,7 +30,6 @@ import BusinessNotificationSettingsPage from "../pages/BusinessNotificationSetti
 import AdminCategoryRequestsPage from "../pages/AdminCategoryRequestsPage.tsx";
 import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
 import { AdminRoute } from "./AdminRoute.tsx";
-import { AdminLayout } from "../components/admin/AdminLayout.tsx";
 
 const router = createBrowserRouter([
   {
@@ -190,18 +189,6 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "admin",
-        element: (
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        ),
-        children: [
-          { index: true, element: <AdminDashboardPage /> },
-          { path: "categories", element: <AdminCategoryRequestsPage /> },
-        ],
-      },
-      {
         path: "login",
         element: (
           <ProtectedRoute requireAuth={false} redirectTo="/">
@@ -215,6 +202,23 @@ const router = createBrowserRouter([
           <ProtectedRoute requireAuth={false} redirectTo="/">
             <RegisterPage />
           </ProtectedRoute>
+        ),
+      },
+      // Admin pages — inside AppShell, no separate layout
+      {
+        path: "admin",
+        element: (
+          <AdminRoute>
+            <AdminDashboardPage />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "admin/categories",
+        element: (
+          <AdminRoute>
+            <AdminCategoryRequestsPage />
+          </AdminRoute>
         ),
       },
     ],
