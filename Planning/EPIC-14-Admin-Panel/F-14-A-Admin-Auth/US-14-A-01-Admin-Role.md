@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-A-Admin-Auth|F-14-A: Admin Role & Authentication]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,7 +19,7 @@ As a **platform operator**, I want to **designate a user as an admin** so that *
 - `[FE]` After login, redirect admin users to `/admin` instead of `/`
 
 ## Acceptance Criteria
-- [ ] An `admin` user can log in via the existing `/auth/login` endpoint
-- [ ] The JWT issued to an admin contains `role: admin`
-- [ ] A non-admin hitting `/admin/*` is redirected to `/` (or a 403 page)
-- [ ] The seed runs once — does not create duplicate admin accounts on restart
+- [x] An `admin` user can log in via the existing `/auth/login` endpoint
+- [x] The JWT issued to an admin contains `role: admin`
+- [x] A non-admin hitting `/admin/*` is redirected to `/` (or a 403 page)
+- [x] The seed runs once — does not create duplicate admin accounts on restart

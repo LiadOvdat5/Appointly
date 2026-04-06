@@ -128,6 +128,28 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
+// Seed admin user on startup (idempotent — skipped if admin already exists)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (!db.Users.Any(u => u.Role == WebAPI.Models.UserRole.admin))
+    {
+        var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<WebAPI.Models.User>();
+        var admin = new WebAPI.Models.User
+        {
+            Id = Guid.NewGuid(),
+            Name = "Admin",
+            Email = "admin@bizslot.com",
+            Role = WebAPI.Models.UserRole.admin,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+        };
+        admin.Password = passwordHasher.HashPassword(admin, "Admin@BizSlot1!");
+        db.Users.Add(admin);
+        db.SaveChanges();
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

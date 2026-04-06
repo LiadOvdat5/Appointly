@@ -44,7 +44,9 @@ export default function LoginPage() {
       setError("");
 
       // Redirect based on role
-      if (session.user.role === Role.Partner && session.user.businessId) {
+      if (session.user.role === Role.Admin) {
+        navigate("/admin");
+      } else if (session.user.role === Role.Partner && session.user.businessId) {
         navigate(`/staff-dashboard/${session.user.businessId}`);
       } else if (session.user.role === Role.Owner) {
         navigate("/dashboard");

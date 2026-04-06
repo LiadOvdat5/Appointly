@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-A-Admin-Auth|F-14-A: Admin Role & Authentication]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ As an **admin**, I want **all `/admin` pages to be inaccessible to non-admin use
 - `[FE]` Show a 403 / "Access Denied" page for logged-in non-admin users who navigate to `/admin`
 
 ## Acceptance Criteria
-- [ ] A logged-out user visiting `/admin` is redirected to `/login`
-- [ ] A logged-in customer or owner visiting `/admin` sees an "Access Denied" page
-- [ ] Admin layout renders a sidebar with navigation to all admin sections
+- [x] A logged-out user visiting `/admin` is redirected to `/login`
+- [x] A logged-in customer or owner visiting `/admin` sees an "Access Denied" page
+- [x] Admin layout renders a sidebar with navigation to all admin sections

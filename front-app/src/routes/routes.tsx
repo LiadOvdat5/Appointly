@@ -2,7 +2,6 @@ import App from "../App.tsx";
 import UIShowcase from "../pages/UIShowcase.tsx";
 import { createBrowserRouter } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.tsx";
-import { Role } from "../constants/roles.ts";
 
 // Pages
 import LoginPage from "../pages/LoginPage.tsx";
@@ -29,6 +28,9 @@ import InvitationsPage from "../pages/InvitationsPage.tsx";
 import BusinessReviewsPage from "../pages/BusinessReviewsPage.tsx";
 import BusinessNotificationSettingsPage from "../pages/BusinessNotificationSettingsPage.tsx";
 import AdminCategoryRequestsPage from "../pages/AdminCategoryRequestsPage.tsx";
+import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
+import { AdminRoute } from "./AdminRoute.tsx";
+import { AdminLayout } from "../components/admin/AdminLayout.tsx";
 
 const router = createBrowserRouter([
   {
@@ -188,12 +190,16 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "admin/categories",
+        path: "admin",
         element: (
-          <ProtectedRoute requireAuth={true} requireRole={Role.Admin}>
-            <AdminCategoryRequestsPage />
-          </ProtectedRoute>
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
         ),
+        children: [
+          { index: true, element: <AdminDashboardPage /> },
+          { path: "categories", element: <AdminCategoryRequestsPage /> },
+        ],
       },
       {
         path: "login",
