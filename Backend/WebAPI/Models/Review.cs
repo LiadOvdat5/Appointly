@@ -32,6 +32,13 @@ namespace WebAPI.Models
         [MaxLength(500)]
         public string? FlagReason { get; set; }
 
+        public DateTime? FlaggedAt { get; set; }
+
+        // Moderation resolution fields (set by admin)
+        public bool IsRemoved { get; set; } = false;
+        public DateTime? ResolvedAt { get; set; }
+        public Guid? ResolvedByAdminId { get; set; }
+
         // Navigation properties
         public Business? Business { get; set; }
         public User? Customer { get; set; }

@@ -13,6 +13,7 @@ export interface ReviewDTO {
   createdAt: string;
   isFlagged: boolean;
   flagReason?: string;
+  isFlagDismissed: boolean;
 }
 
 export interface CreateReviewDTO {

@@ -112,8 +112,21 @@ function ReviewCard({
 }) {
   const { t } = useTranslation();
 
+  const cardBorder = review.isFlagged
+    ? "border-orange-200 dark:border-orange-800"
+    : review.isFlagDismissed
+    ? "border-blue-100 dark:border-blue-900/40"
+    : "";
+
+  const flagButtonDisabled = review.isFlagged || review.isFlagDismissed;
+  const flagButtonTitle = review.isFlagged
+    ? t("reviews.flag.alreadyFlagged")
+    : review.isFlagDismissed
+    ? t("reviews.flag.dismissedNote")
+    : t("reviews.flag.flagAsInappropriate");
+
   return (
-    <Card className={`p-5 space-y-3 ${review.isFlagged ? "border-orange-200 dark:border-orange-800" : ""}`}>
+    <Card className={`p-5 space-y-3 ${cardBorder}`}>
       {/* Header row */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5 min-w-0">
@@ -125,6 +138,12 @@ function ReviewCard({
               <span className="flex items-center gap-1 text-xs font-semibold text-orange-500 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-full px-2 py-0.5 shrink-0">
                 <MaterialIcon name="flag" className="text-xs leading-none" />
                 {t("reviews.badge.flagged")}
+              </span>
+            )}
+            {review.isFlagDismissed && (
+              <span className="flex items-center gap-1 text-xs font-semibold text-blue-500 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-full px-2 py-0.5 shrink-0">
+                <MaterialIcon name="verified_user" className="text-xs leading-none" />
+                {t("reviews.badge.flagDismissed")}
               </span>
             )}
           </div>
@@ -154,17 +173,19 @@ function ReviewCard({
           </div>
           <button
             type="button"
-            disabled={review.isFlagged}
-            onClick={() => onFlag(review.id)}
-            title={review.isFlagged ? t("reviews.flag.alreadyFlagged") : t("reviews.flag.flagAsInappropriate")}
+            disabled={flagButtonDisabled}
+            onClick={() => !flagButtonDisabled && onFlag(review.id)}
+            title={flagButtonTitle}
             className={`p-1.5 rounded-lg transition-colors ${
               review.isFlagged
                 ? "text-orange-400 cursor-not-allowed"
+                : review.isFlagDismissed
+                ? "text-blue-300 dark:text-blue-700 cursor-not-allowed"
                 : "text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
             }`}
           >
             <MaterialIcon
-              name={review.isFlagged ? "flag" : "outlined_flag"}
+              name={review.isFlagged ? "flag" : review.isFlagDismissed ? "verified_user" : "outlined_flag"}
               className="text-base leading-none"
             />
           </button>
@@ -178,11 +199,17 @@ function ReviewCard({
         </p>
       )}
 
-      {/* Flagged note */}
+      {/* Status notes */}
       {review.isFlagged && (
         <p className="text-xs text-orange-500 flex items-center gap-1 pt-2 border-t border-orange-100 dark:border-orange-900/30">
           <MaterialIcon name="info" className="text-sm leading-none" />
           {t("reviews.flag.pendingNote")}
+        </p>
+      )}
+      {review.isFlagDismissed && (
+        <p className="text-xs text-blue-500 dark:text-blue-400 flex items-center gap-1 pt-2 border-t border-blue-100 dark:border-blue-900/30">
+          <MaterialIcon name="verified_user" className="text-sm leading-none" />
+          {t("reviews.flag.dismissedNote")}
         </p>
       )}
     </Card>

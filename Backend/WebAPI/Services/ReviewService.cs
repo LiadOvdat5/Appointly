@@ -93,6 +93,9 @@ namespace WebAPI.Services
             if (review.IsFlagged)
                 throw new InvalidAppointmentOperationException("This review has already been flagged.");
 
+            if (review.ResolvedAt.HasValue && !review.IsRemoved)
+                throw new InvalidAppointmentOperationException("This review's flag was already reviewed and dismissed by an admin.");
+
             var flagged = await _reviewRepository.FlagAsync(reviewId, reason);
             return ToDTO(flagged!, flagged!.Customer?.Name);
         }
@@ -118,7 +121,8 @@ namespace WebAPI.Services
             Comment = r.Comment,
             CreatedAt = r.CreatedAt,
             IsFlagged = r.IsFlagged,
-            FlagReason = r.FlagReason
+            FlagReason = r.FlagReason,
+            IsFlagDismissed = r.ResolvedAt.HasValue && !r.IsRemoved,
         };
     }
 }

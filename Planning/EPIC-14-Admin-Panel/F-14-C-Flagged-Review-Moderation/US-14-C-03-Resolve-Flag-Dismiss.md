@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-C-Flagged-Review-Moderation|F-14-C: Flagged Review Moderation]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As an **admin**, I want to **dismiss a flag when the review does not violate pol
 - `[FE]` In the owner's dashboard review list, a dismissed-flag review shows no "Flagged" badge (the flag was cleared)
 
 ## Acceptance Criteria
-- [ ] Dismissed review is no longer `IsFlagged = true` — flag badge disappears everywhere
-- [ ] The review remains fully visible on the public business page
-- [ ] The review disappears from the admin moderation queue after dismissal
-- [ ] Owner's dashboard review list no longer shows the "Flagged" badge for the dismissed review
+- [x] Dismissed review is no longer `IsFlagged = true` — flag badge disappears everywhere
+- [x] The review remains fully visible on the public business page
+- [x] The review disappears from the admin moderation queue after dismissal
+- [x] Owner's dashboard review list no longer shows the "Flagged" badge for the dismissed review

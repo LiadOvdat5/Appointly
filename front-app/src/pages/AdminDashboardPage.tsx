@@ -175,21 +175,19 @@ export default function AdminDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
-      {/* Header bar */}
-      <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
-        <div className="max-w-lg mx-auto">
-          <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
-            Admin Dashboard
-          </h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Platform-wide overview and moderation tools
-          </p>
-        </div>
+    <div className="px-4 py-6 space-y-4">
+      <div>
+        <h1 className="font-bold text-[#111418] dark:text-white text-xl leading-tight">
+          Admin Dashboard
+        </h1>
+        <p className="text-xs text-gray-500 mt-0.5">
+          Platform-wide overview and moderation tools
+        </p>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-3">
-        {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-sm text-red-500">{error}</p>}
+
+      <div className="space-y-3">
         {cards.map((card) => (
           <DashboardNavCard key={card.label} {...card} countLoading={loading} />
         ))}

@@ -1,7 +1,7 @@
 # F-14-C: Flagged Review Moderation
 
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ This is the core use case that triggered EPIC-14. When a business owner flags a 
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-14-C-01-View-Flagged-Reviews\|US-14-C-01]] | View the moderation queue of flagged reviews | 🔲 Not Started |
-| [[US-14-C-02-Resolve-Flag-Remove\|US-14-C-02]] | Approve flag — remove the review | 🔲 Not Started |
-| [[US-14-C-03-Resolve-Flag-Dismiss\|US-14-C-03]] | Dismiss flag — restore the review as clean | 🔲 Not Started |
+| [[US-14-C-01-View-Flagged-Reviews\|US-14-C-01]] | View the moderation queue of flagged reviews | ✅ Done |
+| [[US-14-C-02-Resolve-Flag-Remove\|US-14-C-02]] | Approve flag — remove the review | ✅ Done |
+| [[US-14-C-03-Resolve-Flag-Dismiss\|US-14-C-03]] | Dismiss flag — restore the review as clean | ✅ Done |

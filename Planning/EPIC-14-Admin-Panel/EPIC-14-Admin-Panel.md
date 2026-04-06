@@ -15,7 +15,7 @@ Give a trusted `admin` user full visibility and control over the platform: moder
 |----|---------|----------|--------|
 | [[F-14-A-Admin-Auth\|F-14-A]] | Admin Role & Authentication | P0 — blocker for all others | ✅ Done |
 | [[F-14-B-Admin-Dashboard\|F-14-B]] | Admin Dashboard (platform overview) | P1 | ✅ Done |
-| [[F-14-C-Flagged-Review-Moderation\|F-14-C]] | Flagged Review Moderation | P0 — core use case | 🔲 Not Started |
+| [[F-14-C-Flagged-Review-Moderation\|F-14-C]] | Flagged Review Moderation | P0 — core use case | ✅ Done |
 | [[F-14-D-User-Management\|F-14-D]] | User Management (view / suspend) | P2 | 🔲 Not Started |
 | [[F-14-E-Business-Moderation\|F-14-E]] | Business Moderation (view / suspend) | P2 | 🔲 Not Started |
 

@@ -33,7 +33,7 @@ namespace WebAPI.Repositories
             return await _context.Reviews
                 .Include(r => r.Customer)
                 .Include(r => r.Appointment).ThenInclude(a => a!.Service)
-                .Where(r => r.BusinessId == businessId)
+                .Where(r => r.BusinessId == businessId && !r.IsRemoved)
                 .OrderByDescending(r => r.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -50,7 +50,7 @@ namespace WebAPI.Repositories
         public async Task<(double averageRating, int reviewCount)> GetRatingStatsAsync(Guid businessId)
         {
             var reviews = await _context.Reviews
-                .Where(r => r.BusinessId == businessId)
+                .Where(r => r.BusinessId == businessId && !r.IsRemoved)
                 .ToListAsync();
 
             if (reviews.Count == 0)
@@ -71,6 +71,7 @@ namespace WebAPI.Repositories
 
             review.IsFlagged = true;
             review.FlagReason = reason;
+            review.FlaggedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return review;
         }

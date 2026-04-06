@@ -633,9 +633,12 @@ i18n.use(initReactI18next).init({
             flagAsInappropriate: "Flag as inappropriate",
             pendingNote:
               "Pending admin review — still visible on public page until reviewed",
+            dismissedNote:
+              "Flag reviewed and dismissed by admin — this review cannot be re-flagged",
           },
           badge: {
             flagged: "Flagged",
+            flagDismissed: "Flag Dismissed",
           },
         },
 
@@ -1907,9 +1910,11 @@ i18n.use(initReactI18next).init({
             alreadyFlagged: "כבר דווח",
             flagAsInappropriate: "דווח כלא מתאים",
             pendingNote: "ממתין לבדיקת מנהל — עדיין גלוי בדף הציבורי עד לבדיקה",
+            dismissedNote: "הדיווח נבדק ונדחה על ידי מנהל — לא ניתן לדווח שוב על ביקורת זו",
           },
           badge: {
             flagged: "מדווח",
+            flagDismissed: "דיווח נדחה",
           },
         },
 

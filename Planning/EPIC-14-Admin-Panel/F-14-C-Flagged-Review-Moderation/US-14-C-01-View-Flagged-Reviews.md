@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-C-Flagged-Review-Moderation|F-14-C: Flagged Review Moderation]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,7 +18,7 @@ As an **admin**, I want to **see a list of all flagged reviews with the owner's 
 - `[FE]` Empty state when no reviews are pending moderation
 
 ## Acceptance Criteria
-- [ ] Only reviews that are flagged AND not yet resolved appear in the queue
-- [ ] Each entry clearly shows the owner's reason for flagging
-- [ ] The list is accessible only to admins
-- [ ] Empty queue shows a "No pending flags" message
+- [x] Only reviews that are flagged AND not yet resolved appear in the queue
+- [x] Each entry clearly shows the owner's reason for flagging
+- [x] The list is accessible only to admins
+- [x] Empty queue shows a "No pending flags" message

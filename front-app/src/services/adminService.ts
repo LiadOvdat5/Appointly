@@ -41,3 +41,28 @@ export const approveCategoryRequest = async (
 export const rejectCategoryRequest = async (id: string): Promise<void> => {
   await apiClient.post(`/admin/category-requests/${id}/reject`);
 };
+
+// ── Flagged Reviews ───────────────────────────────────────────────────────────
+
+export interface AdminFlaggedReview {
+  id: string;
+  businessId: string;
+  businessName: string;
+  customerName: string;
+  rating: number;
+  comment: string | null;
+  flagReason: string | null;
+  flaggedAt: string | null;
+  createdAt: string;
+}
+
+export type ResolveAction = "remove" | "dismiss";
+
+export const getFlaggedReviews = async (): Promise<AdminFlaggedReview[]> => {
+  const res = await apiClient.get<AdminFlaggedReview[]>("/admin/reviews/flagged");
+  return res.data;
+};
+
+export const resolveReview = async (id: string, action: ResolveAction): Promise<void> => {
+  await apiClient.post(`/admin/reviews/${id}/resolve`, { action });
+};

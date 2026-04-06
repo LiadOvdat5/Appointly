@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-C-Flagged-Review-Moderation|F-14-C: Flagged Review Moderation]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -20,7 +20,7 @@ As an **admin**, I want to **approve a flagged review and remove it from the pla
 - `[FE]` The business's rating on the public page and search results updates to reflect the removal
 
 ## Acceptance Criteria
-- [ ] Removed reviews no longer appear on the public business page
-- [ ] The business's average rating and review count are recalculated after removal
-- [ ] The moderation action is recorded (who resolved it and when)
-- [ ] Only admins can call the resolve endpoint
+- [x] Removed reviews no longer appear on the public business page
+- [x] The business's average rating and review count are recalculated after removal
+- [x] The moderation action is recorded (who resolved it and when)
+- [x] Only admins can call the resolve endpoint
