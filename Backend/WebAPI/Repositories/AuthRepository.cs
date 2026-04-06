@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs;
+using WebAPI.Exceptions;
 using WebAPI.Interfaces;
 using WebAPI.Models;
 using System.Security.Cryptography;
@@ -52,6 +53,10 @@ namespace WebAPI.Repositories
             var result = passwordHasher.VerifyHashedPassword(user, user.Password, loginDto.Password);
             if (result != PasswordVerificationResult.Success)
                 throw new Exception("Invalid credentials.");
+
+            // Block suspended accounts
+            if (user.IsSuspended)
+                throw new SuspendedAccountException(user.SuspendedReason);
 
             // For partner users, include their associated businessId in the JWT
             Guid? partnerBusinessId = null;

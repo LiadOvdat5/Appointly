@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-D-User-Management|F-14-D: User Management]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,6 +18,6 @@ As an **admin**, I want to **suspend a user account** so that **a bad actor is b
 - `[FE]` Suspended users cannot log in — the login page shows the suspension message
 
 ## Acceptance Criteria
-- [ ] A suspended user receives a clear error message when attempting to log in
-- [ ] Admin can reactivate a suspended account and the user can log in again
-- [ ] Suspension reason is recorded and visible to the admin in the user list
+- [x] A suspended user receives a clear error message when attempting to log in
+- [x] Admin can reactivate a suspended account and the user can log in again
+- [x] Suspension reason is recorded and visible to the admin in the user list

@@ -21,6 +21,94 @@ namespace WebAPI.Controllers
             _context = context;
         }
 
+        /// <summary>GET /admin/users — paginated list of all users, filterable by name/email and role.</summary>
+        [HttpGet("users")]
+        public async Task<IActionResult> GetUsers(
+            [FromQuery] string? search,
+            [FromQuery] string? role,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1 || pageSize > 100) pageSize = 20;
+
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                query = query.Where(u =>
+                    u.Name.ToLower().Contains(term) ||
+                    u.Email.ToLower().Contains(term));
+            }
+
+            if (!string.IsNullOrWhiteSpace(role) &&
+                Enum.TryParse<WebAPI.Models.UserRole>(role, ignoreCase: true, out var parsedRole))
+            {
+                query = query.Where(u => u.Role == parsedRole);
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var users = await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(u => new AdminUserDTO
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Email = u.Email,
+                    Role = u.Role.ToString(),
+                    CreatedAt = u.CreatedAt,
+                    IsSuspended = u.IsSuspended,
+                    SuspendedReason = u.SuspendedReason,
+                })
+                .ToListAsync();
+
+            return Ok(new AdminUsersPageDTO
+            {
+                Users = users,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+            });
+        }
+
+        /// <summary>POST /admin/users/{userId}/suspend — suspend a user account.</summary>
+        [HttpPost("users/{userId:guid}/suspend")]
+        public async Task<IActionResult> SuspendUser(Guid userId, [FromBody] SuspendUserDTO dto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound(new { error = "User not found." });
+            if (user.IsSuspended) return Conflict(new { error = "User is already suspended." });
+
+            user.IsSuspended = true;
+            user.SuspendedReason = dto.Reason?.Trim();
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { userId, isSuspended = true, reason = user.SuspendedReason });
+        }
+
+        /// <summary>POST /admin/users/{userId}/reactivate — lift a suspension.</summary>
+        [HttpPost("users/{userId:guid}/reactivate")]
+        public async Task<IActionResult> ReactivateUser(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound(new { error = "User not found." });
+            if (!user.IsSuspended) return Conflict(new { error = "User is not suspended." });
+
+            user.IsSuspended = false;
+            user.SuspendedReason = null;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { userId, isSuspended = false });
+        }
+
         /// <summary>GET /admin/stats — platform-wide counts for the admin dashboard.</summary>
         [HttpGet("stats")]
         public async Task<IActionResult> GetStats()

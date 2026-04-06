@@ -41,5 +41,10 @@ namespace WebAPI.Models
 
         [Required]
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+        public bool IsSuspended { get; set; } = false;
+
+        [MaxLength(500)]
+        public string? SuspendedReason { get; set; }
     }
 }

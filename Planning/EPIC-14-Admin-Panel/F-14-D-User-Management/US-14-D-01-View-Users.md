@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-D-User-Management|F-14-D: User Management]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As an **admin**, I want to **browse and search all registered users** so that **
 - `[FE]` Show role badge (Customer / Owner / Admin) and suspension status per row
 
 ## Acceptance Criteria
-- [ ] All users are listed with name, email, role, and join date
-- [ ] Search by name or email works
-- [ ] Filter by role works
-- [ ] Suspended users are visually distinguished
+- [x] All users are listed with name, email, role, and join date
+- [x] Search by name or email works
+- [x] Filter by role works
+- [x] Suspended users are visually distinguished

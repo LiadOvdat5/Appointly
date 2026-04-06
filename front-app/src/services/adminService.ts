@@ -42,6 +42,44 @@ export const rejectCategoryRequest = async (id: string): Promise<void> => {
   await apiClient.post(`/admin/category-requests/${id}/reject`);
 };
 
+// ── Users ─────────────────────────────────────────────────────────────────────
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  isSuspended: boolean;
+  suspendedReason: string | null;
+}
+
+export interface AdminUsersPage {
+  users: AdminUser[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export const getAdminUsers = async (params: {
+  search?: string;
+  role?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<AdminUsersPage> => {
+  const res = await apiClient.get<AdminUsersPage>("/admin/users", { params });
+  return res.data;
+};
+
+export const suspendUser = async (userId: string, reason?: string): Promise<void> => {
+  await apiClient.post(`/admin/users/${userId}/suspend`, { reason: reason ?? null });
+};
+
+export const reactivateUser = async (userId: string): Promise<void> => {
+  await apiClient.post(`/admin/users/${userId}/reactivate`);
+};
+
 // ── Flagged Reviews ───────────────────────────────────────────────────────────
 
 export interface AdminFlaggedReview {

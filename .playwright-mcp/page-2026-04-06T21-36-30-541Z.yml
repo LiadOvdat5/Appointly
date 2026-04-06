@@ -1,0 +1,39 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Back" [ref=e6]:
+      - generic [ref=e7]: arrow_back
+    - heading "BizSlot" [level=1] [ref=e8]
+    - generic [ref=e9]:
+      - button "Toggle language" [ref=e10]:
+        - generic [ref=e11]: language
+      - button "Open menu" [ref=e12]:
+        - generic [ref=e13]: menu
+  - main [ref=e14]:
+    - main [ref=e16]:
+      - generic [ref=e17]:
+        - heading "Sign In" [level=1] [ref=e18]
+        - paragraph [ref=e19]: Welcome back
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: Email
+          - textbox "Email" [ref=e24]:
+            - /placeholder: your@email.com
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]: Password
+            - generic [ref=e28]:
+              - textbox "Password" [ref=e29]:
+                - /placeholder: Enter your password
+              - button "Show password" [ref=e31]:
+                - generic [ref=e32]: visibility
+          - link "Forgot Password?" [ref=e34] [cursor=pointer]:
+            - /url: /forgot-password
+        - button "Sign In" [ref=e35]
+      - paragraph [ref=e40]: Or continue with
+      - button "Google" [ref=e41]:
+        - img [ref=e42]
+        - text: Google
+      - paragraph [ref=e48]:
+        - text: Don't have an account?
+        - link "Sign Up" [ref=e49] [cursor=pointer]:
+          - /url: /register

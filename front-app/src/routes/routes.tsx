@@ -30,6 +30,7 @@ import BusinessNotificationSettingsPage from "../pages/BusinessNotificationSetti
 import AdminCategoryRequestsPage from "../pages/AdminCategoryRequestsPage.tsx";
 import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
 import AdminFlaggedReviewsPage from "../pages/AdminFlaggedReviewsPage.tsx";
+import AdminUsersPage from "../pages/AdminUsersPage.tsx";
 import { AdminRoute } from "./AdminRoute.tsx";
 
 const router = createBrowserRouter([
@@ -227,6 +228,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <AdminFlaggedReviewsPage />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "admin/users",
+        element: (
+          <AdminRoute>
+            <AdminUsersPage />
           </AdminRoute>
         ),
       },

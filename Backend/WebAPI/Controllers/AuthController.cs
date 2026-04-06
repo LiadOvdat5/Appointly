@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs;
+using WebAPI.Exceptions;
 using WebAPI.Interfaces;
 using WebAPI.Models;
 using WebAPI.Services;
@@ -72,6 +73,10 @@ namespace WebAPI.Controllers
                     expiresAt = loginResult.ExpiresAt
                 });
             }
+            catch (SuspendedAccountException ex)
+            {
+                return StatusCode(403, new { error = ex.Message });
+            }
             catch (Exception ex)
             {
                 return Unauthorized(new { error = ex.Message });
@@ -109,6 +114,11 @@ namespace WebAPI.Controllers
 
                 if (user == null)
                     return NotFound(new { error = "User not found" });
+
+                if (user.IsSuspended)
+                    return StatusCode(403, new { error = string.IsNullOrWhiteSpace(user.SuspendedReason)
+                        ? "Your account has been suspended."
+                        : $"Your account has been suspended: {user.SuspendedReason}" });
 
                 // Read token expiry from the JWT exp claim (Unix seconds → DateTime)
                 var expClaim = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Exp)?.Value;

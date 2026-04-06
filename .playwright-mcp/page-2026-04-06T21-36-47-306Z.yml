@@ -1,0 +1,126 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Back" [ref=e6]:
+      - generic [ref=e7]: arrow_back
+    - heading "BizSlot" [level=1] [ref=e8]
+    - generic [ref=e9]:
+      - button "Toggle language" [ref=e10]:
+        - generic [ref=e11]: language
+      - button "Notifications" [ref=e13]:
+        - generic [ref=e14]: notifications
+      - button "Open menu" [ref=e15]:
+        - generic [ref=e16]: menu
+  - main [ref=e17]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - button "Back" [ref=e20]:
+          - generic [ref=e21]: arrow_back
+        - generic [ref=e22]:
+          - heading "Users" [level=1] [ref=e23]
+          - paragraph [ref=e24]: 10 registered
+      - generic [ref=e25]:
+        - searchbox "Search by name or email…" [ref=e29]
+        - combobox [ref=e30]:
+          - option "All roles" [selected]
+          - option "Customer"
+          - option "Owner"
+          - option "Staff"
+          - option "Admin"
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33]: A
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Admin
+            - paragraph [ref=e36]: Admin@gmail.com
+            - generic [ref=e38]: Admin
+            - paragraph [ref=e39]: Joined Apr 5, 2026
+        - generic [ref=e40]:
+          - generic [ref=e41]: C
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: Claude Test
+            - paragraph [ref=e44]: claude_test@bizslot.com
+            - generic [ref=e46]: Owner
+            - paragraph [ref=e47]: Joined Mar 25, 2026
+          - button "block Suspend" [ref=e48]:
+            - generic [ref=e49]: block
+            - text: Suspend
+        - generic [ref=e50]:
+          - generic [ref=e51]: O
+          - generic [ref=e52]:
+            - paragraph [ref=e53]: owner2
+            - paragraph [ref=e54]: owner2@gmail.com
+            - generic [ref=e56]: Owner
+            - paragraph [ref=e57]: Joined Mar 25, 2026
+          - button "block Suspend" [ref=e58]:
+            - generic [ref=e59]: block
+            - text: Suspend
+        - generic [ref=e60]:
+          - generic [ref=e61]: U
+          - generic [ref=e62]:
+            - paragraph [ref=e63]: User3
+            - paragraph [ref=e64]: user3@gmail.com
+            - generic [ref=e66]: Staff
+            - paragraph [ref=e67]: Joined Jan 24, 2026
+          - button "block Suspend" [ref=e68]:
+            - generic [ref=e69]: block
+            - text: Suspend
+        - generic [ref=e70]:
+          - generic [ref=e71]: U
+          - generic [ref=e72]:
+            - paragraph [ref=e73]: user2
+            - paragraph [ref=e74]: user2@gmail.com
+            - generic [ref=e76]: Customer
+            - paragraph [ref=e77]: Joined Jan 15, 2026
+          - button "block Suspend" [ref=e78]:
+            - generic [ref=e79]: block
+            - text: Suspend
+        - generic [ref=e80]:
+          - generic [ref=e81]: U
+          - generic [ref=e82]:
+            - paragraph [ref=e83]: user1
+            - paragraph [ref=e84]: user1@gmail.com
+            - generic [ref=e86]: Customer
+            - paragraph [ref=e87]: Joined Jan 3, 2026
+          - button "block Suspend" [ref=e88]:
+            - generic [ref=e89]: block
+            - text: Suspend
+        - generic [ref=e90]:
+          - generic [ref=e91]: P
+          - generic [ref=e92]:
+            - paragraph [ref=e93]: partner1
+            - paragraph [ref=e94]: partner@gmail.com
+            - generic [ref=e96]: Staff
+            - paragraph [ref=e97]: Joined Dec 25, 2025
+          - button "block Suspend" [ref=e98]:
+            - generic [ref=e99]: block
+            - text: Suspend
+        - generic [ref=e100]:
+          - generic [ref=e101]: O
+          - generic [ref=e102]:
+            - paragraph [ref=e103]: owner
+            - paragraph [ref=e104]: owner@gmail.com
+            - generic [ref=e106]: Owner
+            - paragraph [ref=e107]: Joined Oct 25, 2025
+          - button "block Suspend" [ref=e108]:
+            - generic [ref=e109]: block
+            - text: Suspend
+        - generic [ref=e110]:
+          - generic [ref=e111]: T
+          - generic [ref=e112]:
+            - paragraph [ref=e113]: test
+            - paragraph [ref=e114]: test@g.com
+            - generic [ref=e116]: Customer
+            - paragraph [ref=e117]: Joined Sep 27, 2025
+          - button "block Suspend" [ref=e118]:
+            - generic [ref=e119]: block
+            - text: Suspend
+        - generic [ref=e120]:
+          - generic [ref=e121]: T
+          - generic [ref=e122]:
+            - paragraph [ref=e123]: test1
+            - paragraph [ref=e124]: test1@g.com
+            - generic [ref=e126]: Customer
+            - paragraph [ref=e127]: Joined Sep 27, 2025
+          - button "block Suspend" [ref=e128]:
+            - generic [ref=e129]: block
+            - text: Suspend
