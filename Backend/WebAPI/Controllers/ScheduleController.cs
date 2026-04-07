@@ -273,14 +273,7 @@ namespace WebAPI.Controllers
                 if (error != null)
                     return error;
 
-                var slots = await _serviceScheduleRepository.GetByServiceIdAsync(serviceId);
-                int deletedCount = 0;
-
-                foreach (var slot in slots)
-                {
-                    await _serviceScheduleRepository.DeleteAsync(slot.Id);
-                    deletedCount++;
-                }
+                var deletedCount = await _serviceScheduleRepository.ClearAllSlotsAsync(serviceId);
 
                 return Ok(new { message = $"Cleared {deletedCount} slots for service", serviceId, deletedCount });
             }
@@ -311,19 +304,17 @@ namespace WebAPI.Controllers
                 if (error != null)
                     return error;
 
-                slot.Status = ScheduleStatus.BLOCKED;
-                slot.UpdatedAt = DateTime.UtcNow;
-                var updated = await _serviceScheduleRepository.UpdateAsync(slot);
+                var updated = await _serviceScheduleRepository.BlockSlotAsync(slotId);
 
                 return Ok(new ServiceScheduleDTO
                 {
-                    Id = updated.Id,
-                    ServiceId = updated.ServiceId,
+                    Id            = updated!.Id,
+                    ServiceId     = updated.ServiceId,
                     StartDateTime = updated.StartDateTime,
-                    EndDateTime = updated.EndDateTime,
-                    Status = updated.Status,
-                    CreatedAt = updated.CreatedAt,
-                    UpdatedAt = updated.UpdatedAt
+                    EndDateTime   = updated.EndDateTime,
+                    Status        = updated.Status,
+                    CreatedAt     = updated.CreatedAt,
+                    UpdatedAt     = updated.UpdatedAt,
                 });
             }
             catch (Exception ex)
@@ -355,19 +346,17 @@ namespace WebAPI.Controllers
                 if (slot.Status != ScheduleStatus.BLOCKED)
                     return BadRequest("Can only unblock slots with BLOCKED status");
 
-                slot.Status = ScheduleStatus.AVAILABLE;
-                slot.UpdatedAt = DateTime.UtcNow;
-                var updated = await _serviceScheduleRepository.UpdateAsync(slot);
+                var updated = await _serviceScheduleRepository.UnblockSlotAsync(slotId);
 
                 return Ok(new ServiceScheduleDTO
                 {
-                    Id = updated.Id,
-                    ServiceId = updated.ServiceId,
+                    Id            = updated!.Id,
+                    ServiceId     = updated.ServiceId,
                     StartDateTime = updated.StartDateTime,
-                    EndDateTime = updated.EndDateTime,
-                    Status = updated.Status,
-                    CreatedAt = updated.CreatedAt,
-                    UpdatedAt = updated.UpdatedAt
+                    EndDateTime   = updated.EndDateTime,
+                    Status        = updated.Status,
+                    CreatedAt     = updated.CreatedAt,
+                    UpdatedAt     = updated.UpdatedAt,
                 });
             }
             catch (Exception ex)

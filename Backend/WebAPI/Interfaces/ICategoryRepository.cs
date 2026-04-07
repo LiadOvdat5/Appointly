@@ -10,5 +10,6 @@ namespace WebAPI.Interfaces
         Task<CategoryDTO> UpdateCategoryAsync(Guid categoryId, CreateCategoryDTO updateDto);
         Task DeleteCategoryAsync(Guid categoryId);
         Task<Category?> GetByIdAsync(Guid categoryId);
+        Task<CategoryRequestResponseDTO> CreateCategoryRequestAsync(Guid requestedByUserId, Guid? businessId, string description, string? aiSuggestedName, string? aiSuggestedIcon);
     }
 }

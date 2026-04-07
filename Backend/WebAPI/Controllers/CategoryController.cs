@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Services;
-using WebAPI.Data;
-using WebAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
@@ -15,13 +13,11 @@ namespace WebAPI.Controllers
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IGeminiService _gemini;
-        private readonly AppDbContext _context;
 
-        public CategoryController(ICategoryRepository categoryRepository, IGeminiService gemini, AppDbContext context)
+        public CategoryController(ICategoryRepository categoryRepository, IGeminiService gemini)
         {
             _categoryRepository = categoryRepository;
             _gemini = gemini;
-            _context = context;
         }
 
         [Authorize(Roles = "admin")]
@@ -182,30 +178,10 @@ namespace WebAPI.Controllers
                 // Non-fatal — store the request without AI suggestion
             }
 
-            var categoryRequest = new CategoryRequest
-            {
-                Id = Guid.NewGuid(),
-                RequestedByUserId = userId,
-                BusinessId = dto.BusinessId,
-                Description = dto.Description.Trim(),
-                AiSuggestedName = aiName?.Trim(),
-                AiSuggestedIcon = aiIcon?.Trim(),
-                Status = CategoryRequestStatus.Pending,
-                CreatedAt = DateTime.UtcNow
-            };
+            var response = await _categoryRepository.CreateCategoryRequestAsync(
+                userId, dto.BusinessId, dto.Description, aiName, aiIcon);
 
-            _context.CategoryRequests.Add(categoryRequest);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(RequestCategory), new { id = categoryRequest.Id }, new CategoryRequestResponseDTO
-            {
-                Id = categoryRequest.Id,
-                Description = categoryRequest.Description,
-                AiSuggestedName = categoryRequest.AiSuggestedName,
-                AiSuggestedIcon = categoryRequest.AiSuggestedIcon,
-                Status = categoryRequest.Status.ToString(),
-                CreatedAt = categoryRequest.CreatedAt
-            });
+            return CreatedAtAction(nameof(RequestCategory), new { id = response.Id }, response);
         }
     }
 }

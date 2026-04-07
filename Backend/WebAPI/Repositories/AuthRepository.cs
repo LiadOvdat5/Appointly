@@ -89,5 +89,12 @@ namespace WebAPI.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
+
+        public async Task<Guid?> GetPartnerBusinessIdAsync(Guid userId)
+        {
+            var partnerRecord = await _context.BusinessPartners
+                .FirstOrDefaultAsync(p => p.UserId == userId && p.Status == InvitationStatus.Accepted);
+            return partnerRecord?.BusinessId;
+        }
     }
 }

@@ -172,30 +172,61 @@ namespace WebAPI.Repositories
 
         public async Task<bool> InsertIfNotExistsAsync(Guid serviceId, DateTime startDateTime, DateTime endDateTime)
         {
-            // Check if slot already exists
             var exists = await _context.ServiceSchedules
                 .AnyAsync(ss => ss.ServiceId == serviceId
                     && ss.StartDateTime == startDateTime
                     && ss.EndDateTime == endDateTime);
 
             if (exists)
-                return false; // Slot already exists, no insertion
+                return false;
 
-            // Create new slot
             var schedule = new ServiceSchedule
             {
-                Id = Guid.NewGuid(),
-                ServiceId = serviceId,
+                Id            = Guid.NewGuid(),
+                ServiceId     = serviceId,
                 StartDateTime = startDateTime,
-                EndDateTime = endDateTime,
-                Status = ScheduleStatus.AVAILABLE,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                EndDateTime   = endDateTime,
+                Status        = ScheduleStatus.AVAILABLE,
+                CreatedAt     = DateTime.UtcNow,
+                UpdatedAt     = DateTime.UtcNow,
             };
 
             _context.ServiceSchedules.Add(schedule);
             await _context.SaveChangesAsync();
-            return true; // Successfully inserted
+            return true;
+        }
+
+        public async Task<ServiceSchedule?> BlockSlotAsync(Guid slotId)
+        {
+            var slot = await _context.ServiceSchedules.FindAsync(slotId);
+            if (slot == null) return null;
+
+            slot.Status    = ScheduleStatus.BLOCKED;
+            slot.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return slot;
+        }
+
+        public async Task<ServiceSchedule?> UnblockSlotAsync(Guid slotId)
+        {
+            var slot = await _context.ServiceSchedules.FindAsync(slotId);
+            if (slot == null) return null;
+
+            slot.Status    = ScheduleStatus.AVAILABLE;
+            slot.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return slot;
+        }
+
+        public async Task<int> ClearAllSlotsAsync(Guid serviceId)
+        {
+            var slots = await _context.ServiceSchedules
+                .Where(ss => ss.ServiceId == serviceId)
+                .ToListAsync();
+
+            _context.ServiceSchedules.RemoveRange(slots);
+            await _context.SaveChangesAsync();
+            return slots.Count;
         }
     }
 }

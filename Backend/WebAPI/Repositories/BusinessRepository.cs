@@ -258,6 +258,25 @@ namespace WebAPI.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateNotificationSettingsAsync(
+            Guid businessId, Guid ownerId, bool? notifyOnNewBooking, bool? notifyOnCancellation)
+        {
+            var business = await _context.Businesses.FindAsync(businessId)
+                ?? throw new KeyNotFoundException("Business not found.");
+
+            if (business.OwnerId != ownerId)
+                throw new UnauthorizedAccessException();
+
+            if (notifyOnNewBooking.HasValue)
+                business.NotifyOnNewBooking = notifyOnNewBooking.Value;
+
+            if (notifyOnCancellation.HasValue)
+                business.NotifyOnCancellation = notifyOnCancellation.Value;
+
+            business.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

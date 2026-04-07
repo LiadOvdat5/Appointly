@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.EntityFrameworkCore;
-using WebAPI.Data;
 using WebAPI.DTOs;
 using WebAPI.Exceptions;
 using WebAPI.Interfaces;
@@ -18,13 +16,11 @@ namespace WebAPI.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IJwtService _jwtService;
-        private readonly AppDbContext _context;
 
-        public AuthController(IAuthRepository authRepository, IJwtService jwtService, AppDbContext context)
+        public AuthController(IAuthRepository authRepository, IJwtService jwtService)
         {
             _authRepository = authRepository;
             _jwtService = jwtService;
-            _context = context;
         }
 
 
@@ -133,9 +129,7 @@ namespace WebAPI.Controllers
 
                 if (businessId == null && user.Role == UserRole.partner)
                 {
-                    var partnerRecord = await _context.BusinessPartners
-                        .FirstOrDefaultAsync(p => p.UserId == user.Id && p.Status == InvitationStatus.Accepted);
-                    businessId = partnerRecord?.BusinessId;
+                    businessId = await _authRepository.GetPartnerBusinessIdAsync(user.Id);
                 }
 
                 return Ok(new

@@ -10,6 +10,6 @@ namespace WebAPI.Interfaces
         Task<LoginResponseDTO?> LoginAsync(LoginDTO loginDto);
         Task<bool> LogoutAsync(string userId);
         Task<User?> GetUserByEmailAsync(string email);
-
+        Task<Guid?> GetPartnerBusinessIdAsync(Guid userId);
     }
 }

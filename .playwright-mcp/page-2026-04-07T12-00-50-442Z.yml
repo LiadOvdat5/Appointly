@@ -1,0 +1,514 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Open Menu" [ref=e7] [cursor=pointer]:
+      - img [ref=e8]
+      - generic [ref=e10]: Open Menu
+    - main "Open API Documentation for WebAPI | v1" [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e16]:
+          - generic [ref=e17]:
+            - generic [ref=e18]: v1.0.0
+            - generic [ref=e19]: OAS 3.0.1
+          - heading "WebAPI | v1" [level=1] [ref=e22]
+          - generic [ref=e24]:
+            - generic [ref=e26]:
+              - button "Download OpenAPI Document" [ref=e27] [cursor=pointer]:
+                - generic [ref=e28]: Download OpenAPI Document
+              - button "Download OpenAPI Document" [ref=e29] [cursor=pointer]:
+                - generic [ref=e30]: Download OpenAPI Document
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - generic [ref=e35]: Server
+                - generic [ref=e37]:
+                  - generic [ref=e38]: "Server:"
+                  - generic [ref=e39]: http://localhost:5142
+              - region "Authentication Optional" [ref=e42]:
+                - generic [ref=e43]:
+                  - button "Authentication Optional" [disabled] [expanded] [ref=e44]:
+                    - heading "Authentication Optional" [level=2] [ref=e45]:
+                      - generic [ref=e47]:
+                        - generic [ref=e48]: Authentication
+                        - generic [ref=e49] [cursor=pointer]: Optional
+                  - button "Select Auth Type" [ref=e53] [cursor=pointer]:
+                    - generic [ref=e54]: Select
+                    - text: Auth Type
+                    - img [ref=e55]
+                - generic [ref=e60]: No authentication selected
+              - generic [ref=e62]:
+                - generic [ref=e63]: Client Libraries
+                - tablist "Client Libraries" [ref=e64]:
+                  - generic [ref=e65]:
+                    - tab "Shell" [selected] [ref=e66] [cursor=pointer]:
+                      - img [ref=e68]
+                      - generic [ref=e70]: Shell
+                    - tab "Ruby" [ref=e71] [cursor=pointer]:
+                      - img [ref=e73]
+                      - generic [ref=e75]: Ruby
+                    - tab "Node.js" [ref=e76] [cursor=pointer]:
+                      - img [ref=e78]
+                      - generic [ref=e81]: Node.js
+                    - tab "PHP" [ref=e82] [cursor=pointer]:
+                      - img [ref=e84]
+                      - generic [ref=e86]: PHP
+                    - tab "Python" [ref=e87] [cursor=pointer]:
+                      - img [ref=e89]
+                      - generic [ref=e91]: Python
+                    - button [ref=e93] [cursor=pointer]
+                - tabpanel "Shell" [ref=e98]: Shell Curl
+        - generic [ref=e99]:
+          - region "Admin" [ref=e100]:
+            - generic [ref=e103]:
+              - heading "Admin" [level=2] [ref=e105]
+              - button "Copy link" [ref=e106] [cursor=pointer]:
+                - img [ref=e107]
+                - generic [ref=e110]: Copy link
+            - region "Admin Operations" [ref=e115]:
+              - generic [ref=e117]:
+                - generic [ref=e118]: Admin
+                - text: Operations
+              - list "Admin endpoints" [ref=e120]:
+                - listitem [ref=e121]:
+                  - link "get /admin/users" [ref=e122] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/users"
+                    - generic [ref=e123]: get
+                    - generic [ref=e124]: /admin/users
+                - listitem [ref=e125]:
+                  - 'link "post /admin/users/{userId}/suspend" [ref=e126] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/users/{userId}/suspend"
+                    - generic [ref=e127]: post
+                    - generic [ref=e128]: "/admin/users/{userId}/suspend"
+                - listitem [ref=e129]:
+                  - 'link "post /admin/users/{userId}/reactivate" [ref=e130] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/users/{userId}/reactivate"
+                    - generic [ref=e131]: post
+                    - generic [ref=e132]: "/admin/users/{userId}/reactivate"
+                - listitem [ref=e133]:
+                  - link "get /admin/stats" [ref=e134] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/stats"
+                    - generic [ref=e135]: get
+                    - generic [ref=e136]: /admin/stats
+                - listitem [ref=e137]:
+                  - link "get /admin/reviews/flagged" [ref=e138] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/reviews/flagged"
+                    - generic [ref=e139]: get
+                    - generic [ref=e140]: /admin/reviews/flagged
+                - listitem [ref=e141]:
+                  - 'link "post /admin/reviews/{reviewId}/resolve" [ref=e142] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/reviews/{reviewId}/resolve"
+                    - generic [ref=e143]: post
+                    - generic [ref=e144]: "/admin/reviews/{reviewId}/resolve"
+                - listitem [ref=e145]:
+                  - link "get /admin/businesses" [ref=e146] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/businesses"
+                    - generic [ref=e147]: get
+                    - generic [ref=e148]: /admin/businesses
+                - listitem [ref=e149]:
+                  - 'link "post /admin/businesses/{businessId}/suspend" [ref=e150] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/businesses/{businessId}/suspend"
+                    - generic [ref=e151]: post
+                    - generic [ref=e152]: "/admin/businesses/{businessId}/suspend"
+                - listitem [ref=e153]:
+                  - 'link "post /admin/businesses/{businessId}/reactivate" [ref=e154] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/businesses/{businessId}/reactivate"
+                    - generic [ref=e155]: post
+                    - generic [ref=e156]: "/admin/businesses/{businessId}/reactivate"
+                - listitem [ref=e157]:
+                  - link "get /admin/appointments/analytics" [ref=e158] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/appointments/analytics"
+                    - generic [ref=e159]: get
+                    - generic [ref=e160]: /admin/appointments/analytics
+                - listitem [ref=e161]:
+                  - link "get /admin/reviews/analytics" [ref=e162] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/reviews/analytics"
+                    - generic [ref=e163]: get
+                    - generic [ref=e164]: /admin/reviews/analytics
+                - listitem [ref=e165]:
+                  - link "get /admin/category-requests" [ref=e166] [cursor=pointer]:
+                    - /url: "#tag/admin/get/admin/category-requests"
+                    - generic [ref=e167]: get
+                    - generic [ref=e168]: /admin/category-requests
+                - listitem [ref=e169]:
+                  - 'link "post /admin/category-requests/{id}/approve" [ref=e170] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/category-requests/{id}/approve"
+                    - generic [ref=e171]: post
+                    - generic [ref=e172]: "/admin/category-requests/{id}/approve"
+                - listitem [ref=e173]:
+                  - 'link "post /admin/category-requests/{id}/reject" [ref=e174] [cursor=pointer]':
+                    - /url: "#tag/admin/post/admin/category-requests/{id}/reject"
+                    - generic [ref=e175]: post
+                    - generic [ref=e176]: "/admin/category-requests/{id}/reject"
+            - generic [ref=e177]:
+              - region "/admin/users" [ref=e178]:
+                - generic [ref=e179]:
+                  - generic [ref=e183]:
+                    - heading "/admin/users" [level=3] [ref=e185]
+                    - button "Copy link" [ref=e186] [cursor=pointer]:
+                      - img [ref=e187]
+                      - generic [ref=e190]: Copy link
+                  - generic [ref=e191]:
+                    - generic [ref=e193]:
+                      - generic [ref=e194]:
+                        - generic [ref=e195]: Query Parameters
+                        - list [ref=e196]:
+                          - listitem [ref=e197]:
+                            - generic [ref=e200]:
+                              - generic [ref=e202]:
+                                - text: search
+                                - button "Copy link to search" [ref=e203] [cursor=pointer]:
+                                  - img [ref=e204]
+                                  - generic [ref=e207]: Copy link to search
+                              - generic [ref=e209]:
+                                - generic [ref=e210]: "Type:"
+                                - text: string
+                          - listitem [ref=e211]:
+                            - generic [ref=e214]:
+                              - generic [ref=e216]:
+                                - text: role
+                                - button "Copy link to role" [ref=e217] [cursor=pointer]:
+                                  - img [ref=e218]
+                                  - generic [ref=e221]: Copy link to role
+                              - generic [ref=e223]:
+                                - generic [ref=e224]: "Type:"
+                                - text: string
+                          - listitem [ref=e225]:
+                            - generic [ref=e227]:
+                              - generic [ref=e228]:
+                                - generic [ref=e230]:
+                                  - text: page
+                                  - button "Copy link to page" [ref=e231] [cursor=pointer]:
+                                    - img [ref=e232]
+                                    - generic [ref=e235]: Copy link to page
+                                - generic [ref=e237]:
+                                  - generic [ref=e238]: "Type:"
+                                  - text: integer
+                                - generic [ref=e239]:
+                                  - text: ·
+                                  - generic [ref=e240]:
+                                    - generic [ref=e241]: "Format:"
+                                    - text: int32
+                                - generic [ref=e242]:
+                                  - text: ·
+                                  - generic [ref=e243]: "default:"
+                                  - generic [ref=e244]: "1"
+                              - paragraph [ref=e247]: Signed 32-bit integers (commonly used integer type).
+                          - listitem [ref=e248]:
+                            - generic [ref=e250]:
+                              - generic [ref=e251]:
+                                - generic [ref=e253]:
+                                  - text: pageSize
+                                  - button "Copy link to pageSize" [ref=e254] [cursor=pointer]:
+                                    - img [ref=e255]
+                                    - generic [ref=e258]: Copy link to pageSize
+                                - generic [ref=e260]:
+                                  - generic [ref=e261]: "Type:"
+                                  - text: integer
+                                - generic [ref=e262]:
+                                  - text: ·
+                                  - generic [ref=e263]:
+                                    - generic [ref=e264]: "Format:"
+                                    - text: int32
+                                - generic [ref=e265]:
+                                  - text: ·
+                                  - generic [ref=e266]: "default:"
+                                  - generic [ref=e267]: "20"
+                              - paragraph [ref=e270]: Signed 32-bit integers (commonly used integer type).
+                      - generic [ref=e271]:
+                        - generic [ref=e272]: Responses
+                        - list [ref=e273]:
+                          - listitem [ref=e274]:
+                            - generic [ref=e276]:
+                              - generic [ref=e279]:
+                                - text: "200"
+                                - button "Copy link to 200" [ref=e280] [cursor=pointer]:
+                                  - img [ref=e281]
+                                  - generic [ref=e284]: Copy link to 200
+                              - paragraph [ref=e287]: OK
+                    - generic [ref=e289]:
+                      - region "Request Example for get/admin/users" [ref=e290]:
+                        - generic [ref=e291]:
+                          - generic [ref=e292]:
+                            - generic [ref=e293]: Request Example for
+                            - generic [ref=e294]: get
+                            - generic [ref=e295]: /admin/users
+                          - button "Shell Curl" [ref=e298] [cursor=pointer]:
+                            - generic [ref=e299]: Shell Curl
+                            - img [ref=e300]
+                        - generic [ref=e305]:
+                          - button "Copy" [ref=e306] [cursor=pointer]:
+                            - img [ref=e307]
+                          - code [ref=e311]:
+                            - generic [ref=e312]: curl 'http://localhost:5142/admin/users?search=&role=&page=1&pageSize=20' \
+                            - generic [ref=e313]: "--header 'Authorization: Bearer YOUR_SECRET_TOKEN'"
+                        - button "Test Request (get /admin/users)" [ref=e315] [cursor=pointer]:
+                          - img [ref=e316]
+                          - generic [ref=e319]: Test Request
+                          - generic [ref=e320]: (get /admin/users)
+                      - 'region "Status: 200" [ref=e321]':
+                        - tablist [ref=e324]:
+                          - 'tab "Status: 200" [selected] [ref=e325] [cursor=pointer]':
+                            - generic [ref=e326]:
+                              - generic [ref=e327]: "Status:"
+                              - text: "200"
+                        - generic [ref=e329]: No Body
+                        - paragraph [ref=e333]: OK
+              - 'region "/admin/users/{userId}/suspend" [ref=e334]':
+                - generic [ref=e335]:
+                  - generic [ref=e339]:
+                    - 'heading "/admin/users/{userId}/suspend" [level=3] [ref=e341]'
+                    - button "Copy link" [ref=e342] [cursor=pointer]:
+                      - img [ref=e343]
+                      - generic [ref=e346]: Copy link
+                  - generic [ref=e347]:
+                    - generic [ref=e349]:
+                      - generic [ref=e350]:
+                        - generic [ref=e351]: Path Parameters
+                        - list [ref=e352]:
+                          - listitem [ref=e353]:
+                            - generic [ref=e356]:
+                              - generic [ref=e358]:
+                                - text: userId
+                                - button "Copy link to userId" [ref=e359] [cursor=pointer]:
+                                  - img [ref=e360]
+                                  - generic [ref=e363]: Copy link to userId
+                              - generic [ref=e365]:
+                                - generic [ref=e366]: "Type:"
+                                - text: string
+                              - generic [ref=e367]:
+                                - text: ·
+                                - generic [ref=e368]:
+                                  - generic [ref=e369]: "Format:"
+                                  - text: uuid
+                              - generic [ref=e370]: required
+                      - generic [ref=e371]:
+                        - generic [ref=e372]:
+                          - generic [ref=e373]:
+                            - text: Body
+                            - generic [ref=e374]: required
+                          - 'button "Selected Content Type: application/json" [ref=e376] [cursor=pointer]':
+                            - generic [ref=e377]: "Selected Content Type:"
+                            - generic [ref=e378]: application/json
+                            - img [ref=e379]
+                        - list [ref=e385]:
+                          - listitem [ref=e386]:
+                            - generic [ref=e387]:
+                              - generic [ref=e389]:
+                                - text: reason
+                                - button "Copy link to reason" [ref=e390] [cursor=pointer]:
+                                  - img [ref=e391]
+                                  - generic [ref=e394]: Copy link to reason
+                              - generic [ref=e396]:
+                                - generic [ref=e397]: "Type:"
+                                - text: string | null
+                      - generic [ref=e398]:
+                        - generic [ref=e399]: Responses
+                        - list [ref=e400]:
+                          - listitem [ref=e401]:
+                            - generic [ref=e403]:
+                              - generic [ref=e406]:
+                                - text: "200"
+                                - button "Copy link to 200" [ref=e407] [cursor=pointer]:
+                                  - img [ref=e408]
+                                  - generic [ref=e411]: Copy link to 200
+                              - paragraph [ref=e414]: OK
+                    - generic [ref=e416]:
+                      - 'region "Request Example for post/admin/users/{userId}/suspend" [ref=e417]':
+                        - generic [ref=e418]:
+                          - generic [ref=e419]:
+                            - generic [ref=e420]: Request Example for
+                            - generic [ref=e421]: post
+                            - generic [ref=e422]:
+                              - text: /admin/users/
+                              - emphasis [ref=e423]: "{userId}"
+                              - text: /suspend
+                          - button "Shell Curl" [ref=e426] [cursor=pointer]:
+                            - generic [ref=e427]: Shell Curl
+                            - img [ref=e428]
+                        - generic [ref=e433]:
+                          - button "Copy" [ref=e434] [cursor=pointer]:
+                            - img [ref=e435]
+                          - code [ref=e439]:
+                            - generic [ref=e440]: curl http://localhost:5142/admin/users/123e4567-e89b-12d3-a456-426614174000/suspend \
+                            - generic [ref=e441]:
+                              - generic [ref=e442]: "--request POST"
+                              - text: \
+                            - generic [ref=e443]: "--header 'Content-Type: application/json' \\"
+                            - generic [ref=e444]: "--header 'Authorization: Bearer YOUR_SECRET_TOKEN' \\"
+                            - generic [ref=e445]: "--data '{"
+                            - generic [ref=e446]: "\"reason\": null"
+                            - generic [ref=e447]: "}'"
+                        - 'button "Test Request (post /admin/users/{userId}/suspend)" [ref=e449] [cursor=pointer]':
+                          - img [ref=e450]
+                          - generic [ref=e453]: Test Request
+                          - generic [ref=e454]: "(post /admin/users/{userId}/suspend)"
+                      - 'region "Status: 200" [ref=e455]':
+                        - tablist [ref=e458]:
+                          - 'tab "Status: 200" [selected] [ref=e459] [cursor=pointer]':
+                            - generic [ref=e460]:
+                              - generic [ref=e461]: "Status:"
+                              - text: "200"
+                        - generic [ref=e463]: No Body
+                        - paragraph [ref=e467]: OK
+          - region "Appointment (Collapsed)" [ref=e468]:
+            - generic [ref=e471]:
+              - heading "Appointment (Collapsed)" [level=2] [ref=e473]:
+                - text: Appointment
+                - generic [ref=e474]: (Collapsed)
+              - button "Copy link" [ref=e475] [cursor=pointer]:
+                - img [ref=e476]
+                - generic [ref=e479]: Copy link
+            - region "Appointment Operations" [ref=e484]:
+              - generic [ref=e486]:
+                - generic [ref=e487]: Appointment
+                - text: Operations
+              - list "Appointment endpoints" [ref=e489]:
+                - listitem [ref=e490]:
+                  - 'link "get /api/Appointment/{id}" [ref=e491] [cursor=pointer]':
+                    - /url: "#tag/appointment/get/api/Appointment/{id}"
+                    - generic [ref=e492]: get
+                    - generic [ref=e493]: "/api/Appointment/{id}"
+                - listitem [ref=e494]:
+                  - 'link "patch /api/Appointment/{id}" [ref=e495] [cursor=pointer]':
+                    - /url: "#tag/appointment/patch/api/Appointment/{id}"
+                    - generic [ref=e496]: patch
+                    - generic [ref=e497]: "/api/Appointment/{id}"
+                - listitem [ref=e498]:
+                  - link "get /api/Appointment/client" [ref=e499] [cursor=pointer]:
+                    - /url: "#tag/appointment/get/api/Appointment/client"
+                    - generic [ref=e500]: get
+                    - generic [ref=e501]: /api/Appointment/client
+                - listitem [ref=e502]:
+                  - link "get /api/Appointment/partner" [ref=e503] [cursor=pointer]:
+                    - /url: "#tag/appointment/get/api/Appointment/partner"
+                    - generic [ref=e504]: get
+                    - generic [ref=e505]: /api/Appointment/partner
+                - listitem [ref=e506]:
+                  - 'link "get /api/Appointment/service/{serviceId}" [ref=e507] [cursor=pointer]':
+                    - /url: "#tag/appointment/get/api/Appointment/service/{serviceId}"
+                    - generic [ref=e508]: get
+                    - generic [ref=e509]: "/api/Appointment/service/{serviceId}"
+                - listitem [ref=e510]:
+                  - 'link "get /api/Appointment/business/{businessId}" [ref=e511] [cursor=pointer]':
+                    - /url: "#tag/appointment/get/api/Appointment/business/{businessId}"
+                    - generic [ref=e512]: get
+                    - generic [ref=e513]: "/api/Appointment/business/{businessId}"
+                - listitem [ref=e514]:
+                  - 'link "get /api/Appointment/business/{businessId}/range" [ref=e515] [cursor=pointer]':
+                    - /url: "#tag/appointment/get/api/Appointment/business/{businessId}/range"
+                    - generic [ref=e516]: get
+                    - generic [ref=e517]: "/api/Appointment/business/{businessId}/range"
+                - listitem [ref=e518]:
+                  - link "post /api/Appointment" [ref=e519] [cursor=pointer]:
+                    - /url: "#tag/appointment/post/api/Appointment"
+                    - generic [ref=e520]: post
+                    - generic [ref=e521]: /api/Appointment
+                - listitem [ref=e522]:
+                  - 'link "patch /api/Appointment/{id}/cancel" [ref=e523] [cursor=pointer]':
+                    - /url: "#tag/appointment/patch/api/Appointment/{id}/cancel"
+                    - generic [ref=e524]: patch
+                    - generic [ref=e525]: "/api/Appointment/{id}/cancel"
+                - listitem [ref=e526]:
+                  - 'link "patch /api/Appointment/{id}/complete" [ref=e527] [cursor=pointer]':
+                    - /url: "#tag/appointment/patch/api/Appointment/{id}/complete"
+                    - generic [ref=e528]: patch
+                    - generic [ref=e529]: "/api/Appointment/{id}/complete"
+                - listitem [ref=e530]:
+                  - link "get /api/Appointment/client/count" [ref=e531] [cursor=pointer]:
+                    - /url: "#tag/appointment/get/api/Appointment/client/count"
+                    - generic [ref=e532]: get
+                    - generic [ref=e533]: /api/Appointment/client/count
+                - listitem [ref=e534]:
+                  - link "get /api/Appointment/partner/count" [ref=e535] [cursor=pointer]:
+                    - /url: "#tag/appointment/get/api/Appointment/partner/count"
+                    - generic [ref=e536]: get
+                    - generic [ref=e537]: /api/Appointment/partner/count
+            - button "Show all Appointment endpoints" [ref=e538] [cursor=pointer]:
+              - text: Show More
+              - img [ref=e539]
+        - region "Models" [ref=e543]:
+          - heading "Models" [level=2] [ref=e546]
+          - generic [ref=e547]:
+            - button "AppointmentDTO Copy link" [ref=e549] [cursor=pointer]:
+              - img [ref=e550]
+              - generic [ref=e553]:
+                - heading "AppointmentDTO" [level=3] [ref=e555]:
+                  - generic [ref=e556]: AppointmentDTO
+                - button "Copy link" [ref=e557]:
+                  - img [ref=e558]
+                  - generic [ref=e561]: Copy link
+            - button "AppointmentStatus Copy link" [ref=e563] [cursor=pointer]:
+              - img [ref=e564]
+              - generic [ref=e567]:
+                - heading "AppointmentStatus" [level=3] [ref=e569]:
+                  - generic [ref=e570]: AppointmentStatus
+                - button "Copy link" [ref=e571]:
+                  - img [ref=e572]
+                  - generic [ref=e575]: Copy link
+            - button "ApproveCategoryRequestDTO Copy link" [ref=e577] [cursor=pointer]:
+              - img [ref=e578]
+              - generic [ref=e581]:
+                - heading "ApproveCategoryRequestDTO" [level=3] [ref=e583]:
+                  - generic [ref=e584]: ApproveCategoryRequestDTO
+                - button "Copy link" [ref=e585]:
+                  - img [ref=e586]
+                  - generic [ref=e589]: Copy link
+            - button "BreakRuleDTO Copy link" [ref=e591] [cursor=pointer]:
+              - img [ref=e592]
+              - generic [ref=e595]:
+                - heading "BreakRuleDTO" [level=3] [ref=e597]:
+                  - generic [ref=e598]: BreakRuleDTO
+                - button "Copy link" [ref=e599]:
+                  - img [ref=e600]
+                  - generic [ref=e603]: Copy link
+            - button "BusinessDTO Copy link" [ref=e605] [cursor=pointer]:
+              - img [ref=e606]
+              - generic [ref=e609]:
+                - heading "BusinessDTO" [level=3] [ref=e611]:
+                  - generic [ref=e612]: BusinessDTO
+                - button "Copy link" [ref=e613]:
+                  - img [ref=e614]
+                  - generic [ref=e617]: Copy link
+            - button "BusinessReportDTO Copy link" [ref=e619] [cursor=pointer]:
+              - img [ref=e620]
+              - generic [ref=e623]:
+                - heading "BusinessReportDTO" [level=3] [ref=e625]:
+                  - generic [ref=e626]: BusinessReportDTO
+                - button "Copy link" [ref=e627]:
+                  - img [ref=e628]
+                  - generic [ref=e631]: Copy link
+            - button "CancelAppointmentDTO Copy link" [ref=e633] [cursor=pointer]:
+              - img [ref=e634]
+              - generic [ref=e637]:
+                - heading "CancelAppointmentDTO" [level=3] [ref=e639]:
+                  - generic [ref=e640]: CancelAppointmentDTO
+                - button "Copy link" [ref=e641]:
+                  - img [ref=e642]
+                  - generic [ref=e645]: Copy link
+            - button "CategoryDTO Copy link" [ref=e647] [cursor=pointer]:
+              - img [ref=e648]
+              - generic [ref=e651]:
+                - heading "CategoryDTO" [level=3] [ref=e653]:
+                  - generic [ref=e654]: CategoryDTO
+                - button "Copy link" [ref=e655]:
+                  - img [ref=e656]
+                  - generic [ref=e659]: Copy link
+            - button "CreateAppointmentDTO Copy link" [ref=e661] [cursor=pointer]:
+              - img [ref=e662]
+              - generic [ref=e665]:
+                - heading "CreateAppointmentDTO" [level=3] [ref=e667]:
+                  - generic [ref=e668]: CreateAppointmentDTO
+                - button "Copy link" [ref=e669]:
+                  - img [ref=e670]
+                  - generic [ref=e673]: Copy link
+            - button "CreateBreakRuleDTO Copy link" [ref=e675] [cursor=pointer]:
+              - img [ref=e676]
+              - generic [ref=e679]:
+                - heading "CreateBreakRuleDTO" [level=3] [ref=e681]:
+                  - generic [ref=e682]: CreateBreakRuleDTO
+                - button "Copy link" [ref=e683]:
+                  - img [ref=e684]
+                  - generic [ref=e687]: Copy link
+          - button "Show More" [ref=e688] [cursor=pointer]:
+            - text: Show More
+            - img [ref=e689]
+  - region "Notifications alt+T":
+    - list

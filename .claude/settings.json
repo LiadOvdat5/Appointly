@@ -53,7 +53,10 @@
       "Bash(findstr LISTENING)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:5142/businesses/by-slug/test-categories\")",
       "Bash(cmd /c \"wmic process where \\\\\"ExecutablePath like '%BizSlot%WebAPI%'\\\\\" get ProcessId,ExecutablePath 2>&1\")",
-      "Bash(cmd /c \"wmic process where \\\\\"name='WebAPI.exe'\\\\\" get ProcessId,ExecutablePath 2>&1\")"
+      "Bash(cmd /c \"wmic process where \\\\\"name='WebAPI.exe'\\\\\" get ProcessId,ExecutablePath 2>&1\")",
+      "Bash(dotnet script:*)",
+      "Bash(dotnet-csharp /tmp/GenHash.cs)",
+      "Bash(dotnet fsi:*)"
     ]
   }
 }

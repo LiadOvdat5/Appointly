@@ -79,5 +79,38 @@ namespace WebAPI.Repositories
         {
             return await _context.Categories.FindAsync(categoryId);
         }
+
+        public async Task<CategoryRequestResponseDTO> CreateCategoryRequestAsync(
+            Guid requestedByUserId,
+            Guid? businessId,
+            string description,
+            string? aiSuggestedName,
+            string? aiSuggestedIcon)
+        {
+            var categoryRequest = new CategoryRequest
+            {
+                Id                 = Guid.NewGuid(),
+                RequestedByUserId  = requestedByUserId,
+                BusinessId         = businessId,
+                Description        = description.Trim(),
+                AiSuggestedName    = aiSuggestedName?.Trim(),
+                AiSuggestedIcon    = aiSuggestedIcon?.Trim(),
+                Status             = CategoryRequestStatus.Pending,
+                CreatedAt          = DateTime.UtcNow,
+            };
+
+            _context.CategoryRequests.Add(categoryRequest);
+            await _context.SaveChangesAsync();
+
+            return new CategoryRequestResponseDTO
+            {
+                Id              = categoryRequest.Id,
+                Description     = categoryRequest.Description,
+                AiSuggestedName = categoryRequest.AiSuggestedName,
+                AiSuggestedIcon = categoryRequest.AiSuggestedIcon,
+                Status          = categoryRequest.Status.ToString(),
+                CreatedAt       = categoryRequest.CreatedAt,
+            };
+        }
     }
 }

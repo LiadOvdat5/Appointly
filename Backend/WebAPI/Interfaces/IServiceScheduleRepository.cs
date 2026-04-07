@@ -32,5 +32,14 @@ namespace WebAPI.Interfaces
             int? dayOfWeek = null,
             string? startTime = null,
             string? endTime = null);
+
+        /// <summary>Set a slot's status to BLOCKED. Returns the updated slot, or null if not found.</summary>
+        Task<ServiceSchedule?> BlockSlotAsync(Guid slotId);
+
+        /// <summary>Set a BLOCKED slot's status back to AVAILABLE. Returns the updated slot, or null if not found.</summary>
+        Task<ServiceSchedule?> UnblockSlotAsync(Guid slotId);
+
+        /// <summary>Delete ALL slots for a service regardless of status. Returns the count deleted.</summary>
+        Task<int> ClearAllSlotsAsync(Guid serviceId);
     }
 }

@@ -41,6 +41,9 @@ builder.Services.AddCors(options =>
 
 
 
+// Register AdminRepository
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+
 // Register AuthRepository and JwtService
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();

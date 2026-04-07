@@ -703,24 +703,24 @@ namespace WebAPI.Controllers
                 if (userIdString == null) return Unauthorized();
                 Guid userId = Guid.Parse(userIdString);
 
+                await _businessRepository.UpdateNotificationSettingsAsync(
+                    id, userId, dto.NotifyOnNewBooking, dto.NotifyOnCancellation);
+
+                // Return current values by fetching the updated entity
                 var business = await _businessRepository.GetBusinessEntityByIdAsync(id);
-                if (business == null) return NotFound(new { error = "Business not found." });
-                if (business.OwnerId != userId) return Forbid();
-
-                if (dto.NotifyOnNewBooking.HasValue)
-                    business.NotifyOnNewBooking = dto.NotifyOnNewBooking.Value;
-
-                if (dto.NotifyOnCancellation.HasValue)
-                    business.NotifyOnCancellation = dto.NotifyOnCancellation.Value;
-
-                business.UpdatedAt = DateTime.UtcNow;
-                await _businessRepository.SaveChangesAsync();
-
                 return Ok(new
                 {
-                    business.NotifyOnNewBooking,
-                    business.NotifyOnCancellation
+                    business!.NotifyOnNewBooking,
+                    business.NotifyOnCancellation,
                 });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
             }
             catch (Exception ex)
             {
