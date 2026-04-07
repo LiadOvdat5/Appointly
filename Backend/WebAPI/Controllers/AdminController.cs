@@ -209,6 +209,127 @@ namespace WebAPI.Controllers
             return Ok(new { reviewId, action = dto.Action });
         }
 
+        /// <summary>GET /admin/businesses — paginated list of all businesses.</summary>
+        [HttpGet("businesses")]
+        public async Task<IActionResult> GetBusinesses(
+            [FromQuery] string? search,
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 20)
+        {
+            if (page < 1) page = 1;
+            if (pageSize < 1 || pageSize > 100) pageSize = 20;
+
+            var query = _context.Businesses.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var term = search.Trim().ToLower();
+                query = query.Where(b => b.Name.ToLower().Contains(term));
+            }
+
+            var totalCount = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            var businesses = await query
+                .OrderByDescending(b => b.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var ownerIds = businesses.Select(b => b.OwnerId).Distinct().ToList();
+            var owners = await _context.Users
+                .Where(u => ownerIds.Contains(u.Id))
+                .Select(u => new { u.Id, u.Name, u.Email })
+                .ToListAsync();
+            var ownerMap = owners.ToDictionary(o => o.Id);
+
+            // Resolve category names from stored string IDs
+            var allCategoryIdStrings = businesses
+                .Where(b => b.CategoryIds != null)
+                .SelectMany(b => b.CategoryIds)
+                .Distinct()
+                .ToList();
+
+            var categoryGuids = allCategoryIdStrings
+                .Select(s => Guid.TryParse(s, out var g) ? (Guid?)g : null)
+                .Where(g => g.HasValue)
+                .Select(g => g!.Value)
+                .ToList();
+
+            var categories = categoryGuids.Count > 0
+                ? await _context.Categories
+                    .Where(c => categoryGuids.Contains(c.Id))
+                    .Select(c => new { c.Id, c.Name })
+                    .ToListAsync()
+                : [];
+            var categoryMap = categories.ToDictionary(c => c.Id.ToString(), c => c.Name);
+
+            var result = businesses.Select(b =>
+            {
+                ownerMap.TryGetValue(b.OwnerId, out var owner);
+                var categoryNames = b.CategoryIds?
+                    .Where(id => categoryMap.ContainsKey(id))
+                    .Select(id => categoryMap[id])
+                    .ToList() ?? [];
+
+                return new AdminBusinessDTO
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Slug = b.Slug,
+                    OwnerName = owner?.Name ?? "Unknown",
+                    OwnerEmail = owner?.Email ?? "",
+                    Categories = categoryNames,
+                    AverageRating = b.AverageRating,
+                    ReviewCount = b.ReviewCount,
+                    IsSuspended = b.IsSuspended,
+                    SuspendedReason = b.SuspendedReason,
+                    CreatedAt = b.CreatedAt,
+                };
+            }).ToList();
+
+            return Ok(new AdminBusinessesPageDTO
+            {
+                Businesses = result,
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+            });
+        }
+
+        /// <summary>POST /admin/businesses/{businessId}/suspend — suspend a business.</summary>
+        [HttpPost("businesses/{businessId:guid}/suspend")]
+        public async Task<IActionResult> SuspendBusiness(Guid businessId, [FromBody] SuspendBusinessDTO dto)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null) return NotFound(new { error = "Business not found." });
+            if (business.IsSuspended) return Conflict(new { error = "Business is already suspended." });
+
+            business.IsSuspended = true;
+            business.SuspendedReason = dto.Reason?.Trim();
+            business.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { businessId, isSuspended = true, reason = business.SuspendedReason });
+        }
+
+        /// <summary>POST /admin/businesses/{businessId}/reactivate — lift a business suspension.</summary>
+        [HttpPost("businesses/{businessId:guid}/reactivate")]
+        public async Task<IActionResult> ReactivateBusiness(Guid businessId)
+        {
+            var business = await _context.Businesses.FindAsync(businessId);
+            if (business == null) return NotFound(new { error = "Business not found." });
+            if (!business.IsSuspended) return Conflict(new { error = "Business is not suspended." });
+
+            business.IsSuspended = false;
+            business.SuspendedReason = null;
+            business.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { businessId, isSuspended = false });
+        }
+
         private static string AnonymizeName(string? fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName)) return "Anonymous";

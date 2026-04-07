@@ -54,6 +54,10 @@ namespace WebAPI.Models
         public bool NotifyOnNewBooking { get; set; } = true;
         public bool NotifyOnCancellation { get; set; } = true;
 
+        // Moderation
+        public bool IsSuspended { get; set; } = false;
+        public string? SuspendedReason { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]

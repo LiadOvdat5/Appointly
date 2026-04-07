@@ -125,8 +125,10 @@ namespace WebAPI.Repositories
 
         public async Task<IEnumerable<BusinessDTO>> GetAllBusinessesAsync(Guid? categoryId = null)
         {
-            // Load all businesses and apply category filter in memory to handle string storage of category IDs
-            var businesses = await _context.Businesses.ToListAsync();
+            // Load all non-suspended businesses and apply category filter in memory to handle string storage of category IDs
+            var businesses = await _context.Businesses
+                .Where(b => !b.IsSuspended)
+                .ToListAsync();
             if (categoryId.HasValue)
             {
                 var categoryIdString = categoryId.Value.ToString();

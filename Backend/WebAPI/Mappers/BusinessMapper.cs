@@ -42,7 +42,9 @@ namespace WebAPI.Mappers
                 AverageRating = business.AverageRating > 0 ? business.AverageRating : null,
                 ReviewCount = business.ReviewCount,
                 NotifyOnNewBooking = business.NotifyOnNewBooking,
-                NotifyOnCancellation = business.NotifyOnCancellation
+                NotifyOnCancellation = business.NotifyOnCancellation,
+                IsSuspended = business.IsSuspended,
+                SuspendedReason = business.SuspendedReason
             };
         }
 

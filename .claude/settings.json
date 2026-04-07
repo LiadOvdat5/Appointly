@@ -50,7 +50,10 @@
       "Bash(node scripts/generate-pwa-icons.mjs)",
       "mcp__browser__browser_run_code",
       "Bash(findstr \":5142 \\\\|:5173 \")",
-      "Bash(findstr LISTENING)"
+      "Bash(findstr LISTENING)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://localhost:5142/businesses/by-slug/test-categories\")",
+      "Bash(cmd /c \"wmic process where \\\\\"ExecutablePath like '%BizSlot%WebAPI%'\\\\\" get ProcessId,ExecutablePath 2>&1\")",
+      "Bash(cmd /c \"wmic process where \\\\\"name='WebAPI.exe'\\\\\" get ProcessId,ExecutablePath 2>&1\")"
     ]
   }
 }

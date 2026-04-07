@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-E-Business-Moderation|F-14-E: Business Moderation]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As an **admin**, I want to **browse all registered businesses** so that **I can 
 - `[FE]` Clicking a business row opens its public page in a new tab
 
 ## Acceptance Criteria
-- [ ] All businesses are listed with name, owner, category, rating, and suspension status
-- [ ] Search by business name works
-- [ ] Suspended businesses are visually distinguished
+- [x] All businesses are listed with name, owner, category, rating, and suspension status
+- [x] Search by business name works
+- [x] Suspended businesses are visually distinguished

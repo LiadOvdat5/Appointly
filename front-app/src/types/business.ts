@@ -22,6 +22,8 @@ export interface BusinessProfile {
   reviewCount?: number;
   notifyOnNewBooking?: boolean;
   notifyOnCancellation?: boolean;
+  isSuspended?: boolean;
+  suspendedReason?: string | null;
 }
 
 export interface BusinessCategory {

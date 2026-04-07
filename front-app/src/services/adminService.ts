@@ -104,3 +104,44 @@ export const getFlaggedReviews = async (): Promise<AdminFlaggedReview[]> => {
 export const resolveReview = async (id: string, action: ResolveAction): Promise<void> => {
   await apiClient.post(`/admin/reviews/${id}/resolve`, { action });
 };
+
+// ── Businesses ────────────────────────────────────────────────────────────────
+
+export interface AdminBusiness {
+  id: string;
+  name: string;
+  slug: string;
+  ownerName: string;
+  ownerEmail: string;
+  categories: string[];
+  averageRating: number;
+  reviewCount: number;
+  isSuspended: boolean;
+  suspendedReason: string | null;
+  createdAt: string;
+}
+
+export interface AdminBusinessesPage {
+  businesses: AdminBusiness[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export const getAdminBusinesses = async (params: {
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}): Promise<AdminBusinessesPage> => {
+  const res = await apiClient.get<AdminBusinessesPage>("/admin/businesses", { params });
+  return res.data;
+};
+
+export const suspendBusiness = async (businessId: string, reason?: string): Promise<void> => {
+  await apiClient.post(`/admin/businesses/${businessId}/suspend`, { reason: reason ?? null });
+};
+
+export const reactivateBusiness = async (businessId: string): Promise<void> => {
+  await apiClient.post(`/admin/businesses/${businessId}/reactivate`);
+};

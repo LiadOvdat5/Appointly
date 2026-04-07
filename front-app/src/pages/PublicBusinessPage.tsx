@@ -105,6 +105,7 @@ const emptyServiceDraft = (): DraftService => ({
 type PageState =
   | { status: "loading" }
   | { status: "not_found" }
+  | { status: "suspended" }
   | {
       status: "ready";
       business: BusinessProfile;
@@ -142,6 +143,7 @@ type PageAction =
       categories: Category[];
     }
   | { type: "NOT_FOUND" }
+  | { type: "SUSPENDED" }
   | { type: "SLOTS_LOADING"; serviceId: string }
   | { type: "SLOTS_READY"; serviceId: string; slots: SlotDTO[] }
   | { type: "ENTER_EDIT" }
@@ -218,6 +220,9 @@ function pageReducer(state: PageState, action: PageAction): PageState {
 
     case "NOT_FOUND":
       return { status: "not_found" };
+
+    case "SUSPENDED":
+      return { status: "suspended" };
 
     case "SLOTS_LOADING": {
       if (state.status !== "ready") return state;
@@ -761,8 +766,9 @@ export default function PublicBusinessPage() {
     };
 
     loadBusiness().catch((err) => {
-      if (!cancelled && err?.response?.status === 404)
-        dispatch({ type: "NOT_FOUND" });
+      if (cancelled) return;
+      if (err?.response?.status === 404) dispatch({ type: "NOT_FOUND" });
+      else if (err?.response?.status === 503 || err?.response?.status === 410) dispatch({ type: "SUSPENDED" });
     });
 
     return () => {
@@ -1061,6 +1067,30 @@ export default function PublicBusinessPage() {
           {t("publicBusiness.notFound")}
         </h1>
         <p className="text-gray-500">{t("publicBusiness.notFoundDesc")}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-auto px-6"
+          onClick={() => navigate(-1)}
+        >
+          {t("publicBusiness.goBack")}
+        </Button>
+      </div>
+    );
+  }
+
+  if (page.status === "suspended") {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
+        <div className="h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+          <MaterialIcon name="block" className="text-4xl text-red-500 dark:text-red-400" />
+        </div>
+        <h1 className="text-2xl font-bold text-[#111418] dark:text-white">
+          Business Temporarily Unavailable
+        </h1>
+        <p className="text-gray-500 max-w-xs">
+          This business has been suspended and is not currently accepting new bookings.
+        </p>
         <Button
           variant="outline"
           size="sm"

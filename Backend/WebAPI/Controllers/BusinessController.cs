@@ -91,12 +91,17 @@ namespace WebAPI.Controllers
         [AllowAnonymous]
         [HttpGet("by-slug/{slug}")]
         [EndpointSummary("Get Business by Slug")]
-        [EndpointDescription("Retrieve full business information by URL slug (e.g. 'johns-barbershop'). Returns 404 for unknown slugs. Authorization: Public.")]
+        [EndpointDescription("Retrieve full business information by URL slug (e.g. 'johns-barbershop'). Returns 404 for unknown slugs, 410 if suspended. Authorization: Public.")]
         public async Task<IActionResult> GetBusinessBySlug(string slug)
         {
             try
             {
                 var business = await _businessRepository.GetBusinessBySlugAsync(slug);
+                if (business.IsSuspended)
+                {
+                    Response.Headers["Cache-Control"] = "no-store";
+                    return StatusCode(503, new { error = "suspended" });
+                }
                 return Ok(business);
             }
             catch (KeyNotFoundException ex)
@@ -113,12 +118,17 @@ namespace WebAPI.Controllers
         [HttpGet("{id}")]
         [EndpointSummary("Get Business Details")]
         [EndpointDescription("Retrieve full business information including name, description, address, phone, and categories. " +
-            "Example ID: 550e8400-e29b-41d4-a716-446655440000. Authorization: Public — no authentication required.")]
+            "Example ID: 550e8400-e29b-41d4-a716-446655440000. Returns 503 if suspended. Authorization: Public — no authentication required.")]
         public async Task<IActionResult> GetBusinessById(Guid id)
         {
             try
             {
                 var business = await _businessRepository.GetBusinessByIdAsync(id);
+                if (business.IsSuspended)
+                {
+                    Response.Headers["Cache-Control"] = "no-store";
+                    return StatusCode(503, new { error = "suspended" });
+                }
                 return Ok(business);
             }
             catch (KeyNotFoundException ex)

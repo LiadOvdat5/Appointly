@@ -270,9 +270,17 @@ export default function DashboardPage() {
     }
 
     load
-      .then(setBusiness)
+      .then((biz) => {
+        if (biz.isSuspended) {
+          setBusinessError("suspended");
+        } else {
+          setBusiness(biz);
+        }
+      })
       .catch((err) => {
-        if (err?.message === "no-business") {
+        if (err?.response?.status === 503 || err?.response?.status === 410 || err?.message === "suspended") {
+          setBusinessError("suspended");
+        } else if (err?.message === "no-business") {
           setBusinessError(t("dashboard.error.noBusinessFound"));
         } else {
           setBusinessError(t("dashboard.error.loadFailed"));
@@ -375,6 +383,26 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-background-dark">
         <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+      </div>
+    );
+  }
+
+  if (businessError === "suspended") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50 dark:bg-background-dark p-6 text-center">
+        <div className="h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+          <MaterialIcon name="block" className="text-4xl text-red-500 dark:text-red-400" />
+        </div>
+        <h1 className="text-xl font-bold text-[#111418] dark:text-white">
+          Business Suspended
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 max-w-xs">
+          This business has been suspended by an admin and is temporarily unavailable.
+          Please contact support for more information.
+        </p>
+        <Button variant="outline" className="w-auto px-6" onClick={() => navigate("/")}>
+          Go Home
+        </Button>
       </div>
     );
   }

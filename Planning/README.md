@@ -32,4 +32,4 @@
 | 11 | [[EPIC-11-Sharing-and-URLs\|Sharing & URL Improvements]] | 🔲 Not Started |
 | 12 | [[EPIC-12-Smart-Categories\|Smart Categories]] | ✅ Done |
 | 13 | [[EPIC-13-PWA\|Progressive Web App (PWA)]] | 🔲 Not Started |
-| 14 | [[EPIC-14-Admin-Panel\|Admin Panel]] | 🔲 Not Started |
+| 14 | [[EPIC-14-Admin-Panel\|Admin Panel]] | ✅ Done |

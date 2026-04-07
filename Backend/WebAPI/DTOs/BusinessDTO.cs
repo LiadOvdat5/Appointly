@@ -27,5 +27,9 @@ namespace WebAPI.DTOs
         // Notification preferences
         public bool NotifyOnNewBooking { get; set; }
         public bool NotifyOnCancellation { get; set; }
+
+        // Moderation
+        public bool IsSuspended { get; set; }
+        public string? SuspendedReason { get; set; }
     }
 }

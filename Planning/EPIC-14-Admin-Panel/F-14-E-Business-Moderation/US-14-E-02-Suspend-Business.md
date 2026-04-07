@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-E-Business-Moderation|F-14-E: Business Moderation]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,7 +19,7 @@ As an **admin**, I want to **suspend a business** so that **it no longer appears
 - `[FE]` Suspended business's public page shows "This business is temporarily unavailable" to visitors
 
 ## Acceptance Criteria
-- [ ] Suspended businesses do not appear in search results
-- [ ] Visiting the public page of a suspended business shows a suspension notice
-- [ ] Admin can reactivate a suspended business and it reappears in search
-- [ ] Suspension reason is stored and visible in the admin panel
+- [x] Suspended businesses do not appear in search results
+- [x] Visiting the public page of a suspended business shows a suspension notice
+- [x] Admin can reactivate a suspended business and it reappears in search
+- [x] Suspension reason is stored and visible in the admin panel

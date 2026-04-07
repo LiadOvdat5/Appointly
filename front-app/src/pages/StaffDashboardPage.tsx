@@ -10,7 +10,7 @@ import {
   AppointmentStatus,
   type AppointmentDTO,
 } from "../services/appointmentService";
-import { getServicesForBusiness } from "../services/businessManagementService";
+import { getServicesForBusiness, getPublicBusinessById } from "../services/businessManagementService";
 import { getStaffServices } from "../services/staffService";
 import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
@@ -39,6 +39,7 @@ export default function StaffDashboardPage() {
   );
   const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isSuspended, setIsSuspended] = useState(false);
 
   // Cancel flow
   const [cancelingId, setCancelingId] = useState<string | null>(null);
@@ -55,19 +56,30 @@ export default function StaffDashboardPage() {
     if (!bid || !authUser) return;
     setLoading(true);
 
-    Promise.all([
-      getServicesForBusiness(bid),
-      getStaffServices(bid, authUser.id).catch(() => [] as string[]),
-      getBusinessAppointments(bid, 1, 100).catch(() => [] as AppointmentDTO[]),
-    ])
-      .then(([allServices, assignedIds, allAppts]) => {
-        const myServices = allServices.filter((s) =>
-          assignedIds.includes(s.id),
-        );
-        setAssignedServices(myServices);
-        setAllAppointments(allAppts);
+    // Check suspension first, then load data
+    getPublicBusinessById(bid)
+      .then((biz) => {
+        if (biz.isSuspended) {
+          setIsSuspended(true);
+          setLoading(false);
+          return;
+        }
+        Promise.all([
+          getServicesForBusiness(bid),
+          getStaffServices(bid, authUser.id).catch(() => [] as string[]),
+          getBusinessAppointments(bid, 1, 100).catch(() => [] as AppointmentDTO[]),
+        ])
+          .then(([allServices, assignedIds, allAppts]) => {
+            const myServices = allServices.filter((s) => assignedIds.includes(s.id));
+            setAssignedServices(myServices);
+            setAllAppointments(allAppts);
+          })
+          .finally(() => setLoading(false));
       })
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err?.response?.status === 503 || err?.response?.status === 410) setIsSuspended(true);
+        setLoading(false);
+      });
   }, [bid, authUser]);
 
   useEffect(() => {
@@ -129,6 +141,26 @@ export default function StaffDashboardPage() {
     } finally {
       setCancelingId(null);
     }
+  }
+
+  if (isSuspended) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50 dark:bg-background-dark p-6 text-center">
+        <div className="h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+          <MaterialIcon name="block" className="text-4xl text-red-500 dark:text-red-400" />
+        </div>
+        <h1 className="text-xl font-bold text-[#111418] dark:text-white">
+          Business Suspended
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 max-w-xs">
+          This business has been suspended by an admin and is temporarily unavailable.
+          Please contact support for more information.
+        </p>
+        <Button variant="outline" className="w-auto px-6" onClick={() => navigate("/")}>
+          Go Home
+        </Button>
+      </div>
+    );
   }
 
   if (loading) {
