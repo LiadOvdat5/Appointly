@@ -330,6 +330,127 @@ namespace WebAPI.Controllers
             return Ok(new { businessId, isSuspended = false });
         }
 
+        /// <summary>GET /admin/appointments/analytics — platform-wide appointment analytics.</summary>
+        [HttpGet("appointments/analytics")]
+        public async Task<IActionResult> GetAppointmentAnalytics()
+        {
+            // Aggregate counts by status
+            var statusCounts = await _context.Appointments
+                .GroupBy(a => a.Status)
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var booked    = statusCounts.FirstOrDefault(s => s.Status == AppointmentStatus.scheduled)?.Count ?? 0;
+            var completed = statusCounts.FirstOrDefault(s => s.Status == AppointmentStatus.completed)?.Count ?? 0;
+            var cancelled = statusCounts.FirstOrDefault(s => s.Status == AppointmentStatus.canceled)?.Count  ?? 0;
+            var total     = booked + completed + cancelled;
+
+            var nonPending = completed + cancelled;
+            var completionRate  = nonPending > 0 ? Math.Round(completed * 100.0 / nonPending, 1) : 0.0;
+            var cancellationRate = nonPending > 0 ? Math.Round(cancelled * 100.0 / nonPending, 1) : 0.0;
+
+            // Top 10 businesses by volume
+            var topByVolume = await _context.Appointments
+                .GroupBy(a => a.BusinessId)
+                .Select(g => new { BusinessId = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(10)
+                .ToListAsync();
+
+            var topVolumeIds = topByVolume.Select(x => x.BusinessId).ToList();
+            var topVolumeBusinesses = await _context.Businesses
+                .Where(b => topVolumeIds.Contains(b.Id))
+                .Select(b => new { b.Id, b.Name, b.Slug })
+                .ToListAsync();
+            var topVolumeMap = topVolumeBusinesses.ToDictionary(b => b.Id);
+
+            var topBusinessesByVolume = topByVolume
+                .Where(x => topVolumeMap.ContainsKey(x.BusinessId))
+                .Select(x => new
+                {
+                    businessId = x.BusinessId,
+                    name  = topVolumeMap[x.BusinessId].Name,
+                    slug  = topVolumeMap[x.BusinessId].Slug,
+                    count = x.Count,
+                })
+                .ToList();
+
+            // Top 5 businesses by completion rate (min 5 appointments)
+            var completionCandidates = await _context.Appointments
+                .Where(a => a.Status == AppointmentStatus.completed || a.Status == AppointmentStatus.canceled)
+                .GroupBy(a => a.BusinessId)
+                .Select(g => new
+                {
+                    BusinessId = g.Key,
+                    Total     = g.Count(),
+                    Completed = g.Count(a => a.Status == AppointmentStatus.completed),
+                })
+                .Where(x => x.Total >= 5)
+                .ToListAsync();
+
+            var topCompletionIds = completionCandidates.Select(x => x.BusinessId).ToList();
+            var topCompletionBusinesses = await _context.Businesses
+                .Where(b => topCompletionIds.Contains(b.Id))
+                .Select(b => new { b.Id, b.Name, b.Slug })
+                .ToListAsync();
+            var topCompletionMap = topCompletionBusinesses.ToDictionary(b => b.Id);
+
+            var topBusinessesByCompletion = completionCandidates
+                .Where(x => topCompletionMap.ContainsKey(x.BusinessId))
+                .Select(x => new
+                {
+                    businessId = x.BusinessId,
+                    name = topCompletionMap[x.BusinessId].Name,
+                    slug = topCompletionMap[x.BusinessId].Slug,
+                    rate = Math.Round(x.Completed * 100.0 / x.Total, 1),
+                })
+                .OrderByDescending(x => x.rate)
+                .Take(5)
+                .ToList();
+
+            // Last 12 calendar months — pad with 0 for missing months
+            var now = DateTime.UtcNow;
+            var months = Enumerable.Range(0, 12)
+                .Select(i => new DateTime(now.Year, now.Month, 1).AddMonths(-11 + i))
+                .ToList();
+
+            var rangeStart = months.First();
+            var rangeEnd   = months.Last().AddMonths(1);
+
+            var monthlyCounts = await _context.Appointments
+                .Where(a => a.StartDateTime >= rangeStart && a.StartDateTime < rangeEnd)
+                .GroupBy(a => new { a.StartDateTime.Year, a.StartDateTime.Month })
+                .Select(g => new { g.Key.Year, g.Key.Month, Count = g.Count() })
+                .ToListAsync();
+
+            var monthlyLookup = monthlyCounts.ToDictionary(
+                m => new DateTime(m.Year, m.Month, 1),
+                m => m.Count);
+
+            var appointmentsByMonth = months.Select(m => new
+            {
+                month = m.ToString("yyyy-MM"),
+                count = monthlyLookup.TryGetValue(m, out var c) ? c : 0,
+            }).ToList();
+
+            return Ok(new
+            {
+                totalAppointments = total,
+                byStatus = new
+                {
+                    booked,
+                    completed,
+                    cancelled,
+                    noShow = 0,
+                },
+                completionRate,
+                cancellationRate,
+                topBusinessesByVolume,
+                topBusinessesByCompletion,
+                appointmentsByMonth,
+            });
+        }
+
         private static string AnonymizeName(string? fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName)) return "Anonymous";

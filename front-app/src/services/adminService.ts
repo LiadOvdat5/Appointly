@@ -145,3 +145,44 @@ export const suspendBusiness = async (businessId: string, reason?: string): Prom
 export const reactivateBusiness = async (businessId: string): Promise<void> => {
   await apiClient.post(`/admin/businesses/${businessId}/reactivate`);
 };
+
+// ── Appointment Analytics ──────────────────────────────────────────────────────
+
+export interface AppointmentByMonth {
+  month: string; // "2025-03"
+  count: number;
+}
+
+export interface TopBusinessByVolume {
+  businessId: string;
+  name: string;
+  slug: string;
+  count: number;
+}
+
+export interface TopBusinessByCompletion {
+  businessId: string;
+  name: string;
+  slug: string;
+  rate: number;
+}
+
+export interface AdminAppointmentAnalytics {
+  totalAppointments: number;
+  byStatus: {
+    booked: number;
+    completed: number;
+    cancelled: number;
+    noShow: number;
+  };
+  completionRate: number;
+  cancellationRate: number;
+  topBusinessesByVolume: TopBusinessByVolume[];
+  topBusinessesByCompletion: TopBusinessByCompletion[];
+  appointmentsByMonth: AppointmentByMonth[];
+}
+
+export const getAdminAppointmentAnalytics = async (): Promise<AdminAppointmentAnalytics> => {
+  const res = await apiClient.get<AdminAppointmentAnalytics>("/admin/appointments/analytics");
+  return res.data;
+};

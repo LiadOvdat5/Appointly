@@ -32,6 +32,7 @@ import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
 import AdminFlaggedReviewsPage from "../pages/AdminFlaggedReviewsPage.tsx";
 import AdminUsersPage from "../pages/AdminUsersPage.tsx";
 import AdminBusinessesPage from "../pages/AdminBusinessesPage.tsx";
+import AdminAppointmentsPage from "../pages/AdminAppointmentsPage.tsx";
 import { AdminRoute } from "./AdminRoute.tsx";
 
 const router = createBrowserRouter([
@@ -245,6 +246,14 @@ const router = createBrowserRouter([
         element: (
           <AdminRoute>
             <AdminBusinessesPage />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "admin/appointments",
+        element: (
+          <AdminRoute>
+            <AdminAppointmentsPage />
           </AdminRoute>
         ),
       },
