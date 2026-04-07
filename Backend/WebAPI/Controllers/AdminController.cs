@@ -451,6 +451,167 @@ namespace WebAPI.Controllers
             });
         }
 
+        /// <summary>GET /admin/reviews/analytics — platform-wide review analytics.</summary>
+        [HttpGet("reviews/analytics")]
+        public async Task<IActionResult> GetReviewAnalytics()
+        {
+            var now = DateTime.UtcNow;
+
+            // ── Totals ────────────────────────────────────────────────────────
+            var totalReviews = await _context.Reviews.CountAsync(r => !r.IsRemoved);
+
+            var platformAverageRating = totalReviews > 0
+                ? Math.Round(await _context.Reviews
+                    .Where(r => !r.IsRemoved)
+                    .AverageAsync(r => (double)r.Rating), 1)
+                : 0.0;
+
+            // ── Rating distribution ───────────────────────────────────────────
+            var ratingGroups = await _context.Reviews
+                .Where(r => !r.IsRemoved)
+                .GroupBy(r => r.Rating)
+                .Select(g => new { Star = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var ratingDistribution = new Dictionary<string, int>
+            {
+                ["1"] = ratingGroups.FirstOrDefault(g => g.Star == 1)?.Count ?? 0,
+                ["2"] = ratingGroups.FirstOrDefault(g => g.Star == 2)?.Count ?? 0,
+                ["3"] = ratingGroups.FirstOrDefault(g => g.Star == 3)?.Count ?? 0,
+                ["4"] = ratingGroups.FirstOrDefault(g => g.Star == 4)?.Count ?? 0,
+                ["5"] = ratingGroups.FirstOrDefault(g => g.Star == 5)?.Count ?? 0,
+            };
+
+            // ── Top 10 most-reviewed businesses ───────────────────────────────
+            var topByCount = await _context.Reviews
+                .Where(r => !r.IsRemoved)
+                .GroupBy(r => r.BusinessId)
+                .Select(g => new
+                {
+                    BusinessId = g.Key,
+                    ReviewCount = g.Count(),
+                    AverageRating = Math.Round(g.Average(r => (double)r.Rating), 1),
+                })
+                .OrderByDescending(x => x.ReviewCount)
+                .Take(10)
+                .ToListAsync();
+
+            var topCountIds = topByCount.Select(x => x.BusinessId).ToList();
+            var topCountBusinesses = await _context.Businesses
+                .Where(b => topCountIds.Contains(b.Id))
+                .Select(b => new { b.Id, b.Name, b.Slug })
+                .ToListAsync();
+            var topCountMap = topCountBusinesses.ToDictionary(b => b.Id);
+
+            var topBusinessesByReviewCount = topByCount
+                .Where(x => topCountMap.ContainsKey(x.BusinessId))
+                .Select(x => new
+                {
+                    businessId = x.BusinessId,
+                    name = topCountMap[x.BusinessId].Name,
+                    slug = topCountMap[x.BusinessId].Slug,
+                    reviewCount = x.ReviewCount,
+                    averageRating = x.AverageRating,
+                })
+                .ToList();
+
+            // ── Top 5 highest-rated (min 3 reviews) ───────────────────────────
+            var ratedCandidates = await _context.Reviews
+                .Where(r => !r.IsRemoved)
+                .GroupBy(r => r.BusinessId)
+                .Select(g => new
+                {
+                    BusinessId = g.Key,
+                    ReviewCount = g.Count(),
+                    AverageRating = Math.Round(g.Average(r => (double)r.Rating), 1),
+                })
+                .Where(x => x.ReviewCount >= 3)
+                .ToListAsync();
+
+            var ratedIds = ratedCandidates.Select(x => x.BusinessId).ToList();
+            var ratedBusinesses = await _context.Businesses
+                .Where(b => ratedIds.Contains(b.Id))
+                .Select(b => new { b.Id, b.Name, b.Slug })
+                .ToListAsync();
+            var ratedMap = ratedBusinesses.ToDictionary(b => b.Id);
+
+            var topRatedBusinesses = ratedCandidates
+                .Where(x => ratedMap.ContainsKey(x.BusinessId))
+                .OrderByDescending(x => x.AverageRating)
+                .Take(5)
+                .Select(x => new
+                {
+                    businessId = x.BusinessId,
+                    name = ratedMap[x.BusinessId].Name,
+                    slug = ratedMap[x.BusinessId].Slug,
+                    reviewCount = x.ReviewCount,
+                    averageRating = x.AverageRating,
+                })
+                .ToList();
+
+            var lowestRatedBusinesses = ratedCandidates
+                .Where(x => ratedMap.ContainsKey(x.BusinessId))
+                .OrderBy(x => x.AverageRating)
+                .Take(5)
+                .Select(x => new
+                {
+                    businessId = x.BusinessId,
+                    name = ratedMap[x.BusinessId].Name,
+                    slug = ratedMap[x.BusinessId].Slug,
+                    reviewCount = x.ReviewCount,
+                    averageRating = x.AverageRating,
+                })
+                .ToList();
+
+            // ── Flag stats ────────────────────────────────────────────────────
+            var totalFlagged = await _context.Reviews.CountAsync(r => r.IsFlagged || r.IsRemoved);
+            var pendingFlags = await _context.Reviews.CountAsync(r => r.IsFlagged && r.ResolvedAt == null);
+            var resolvedRemoved = await _context.Reviews.CountAsync(r => r.IsRemoved && r.ResolvedAt != null);
+            var resolvedDismissed = await _context.Reviews.CountAsync(r => !r.IsFlagged && r.ResolvedAt != null && !r.IsRemoved);
+
+            // ── Reviews by month (last 12) ─────────────────────────────────────
+            var months = Enumerable.Range(0, 12)
+                .Select(i => new DateTime(now.Year, now.Month, 1).AddMonths(-11 + i))
+                .ToList();
+
+            var rangeStart = months.First();
+            var rangeEnd = months.Last().AddMonths(1);
+
+            var monthlyReviews = await _context.Reviews
+                .Where(r => !r.IsRemoved && r.CreatedAt >= rangeStart && r.CreatedAt < rangeEnd)
+                .GroupBy(r => new { r.CreatedAt.Year, r.CreatedAt.Month })
+                .Select(g => new { g.Key.Year, g.Key.Month, Count = g.Count() })
+                .ToListAsync();
+
+            var monthlyLookup = monthlyReviews.ToDictionary(
+                m => new DateTime(m.Year, m.Month, 1),
+                m => m.Count);
+
+            var reviewsByMonth = months.Select(m => new
+            {
+                month = m.ToString("yyyy-MM"),
+                count = monthlyLookup.TryGetValue(m, out var c) ? c : 0,
+            }).ToList();
+
+            return Ok(new
+            {
+                totalReviews,
+                platformAverageRating,
+                ratingDistribution,
+                topBusinessesByReviewCount,
+                topRatedBusinesses,
+                lowestRatedBusinesses,
+                flagStats = new
+                {
+                    totalFlagged,
+                    pendingFlags,
+                    resolvedRemoved,
+                    resolvedDismissed,
+                },
+                reviewsByMonth,
+            });
+        }
+
         private static string AnonymizeName(string? fullName)
         {
             if (string.IsNullOrWhiteSpace(fullName)) return "Anonymous";

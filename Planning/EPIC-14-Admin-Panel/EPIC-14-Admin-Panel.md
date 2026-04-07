@@ -19,7 +19,7 @@ Give a trusted `admin` user full visibility and control over the platform: moder
 | [[F-14-D-User-Management\|F-14-D]] | User Management (view / suspend) | P2 | ✅ Done |
 | [[F-14-E-Business-Moderation\|F-14-E]] | Business Moderation (view / suspend) | P2 | ✅ Done |
 | [[F-14-F-Appointment-Analytics\|F-14-F]] | Appointment Analytics (platform-wide) | P2 | ✅ Done |
-| [[F-14-G-Review-Analytics\|F-14-G]] | Review Analytics (platform-wide) | P2 | 🔲 Not Started |
+| [[F-14-G-Review-Analytics\|F-14-G]] | Review Analytics (platform-wide) | P2 | ✅ Done |
 
 ---
 

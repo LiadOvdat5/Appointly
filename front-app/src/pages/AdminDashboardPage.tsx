@@ -149,7 +149,7 @@ export default function AdminDashboardPage() {
       icon: "star",
       iconColor: "text-yellow-500",
       iconBg: "bg-yellow-100 dark:bg-yellow-900/30",
-      to: "/admin/flagged-reviews",
+      to: "/admin/reviews",
       count: stats?.totalReviews,
     },
     {

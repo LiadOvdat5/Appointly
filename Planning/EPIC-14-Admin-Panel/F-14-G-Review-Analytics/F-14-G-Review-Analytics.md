@@ -1,7 +1,7 @@
 # F-14-G: Admin Review Analytics
 
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -14,7 +14,7 @@ Give admins insight into the review landscape across the platform — not a raw 
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-14-G-01-Review-Stats\|US-14-G-01]] | View platform-wide review analytics | 🔲 Not Started |
+| [[US-14-G-01-Review-Stats\|US-14-G-01]] | View platform-wide review analytics | ✅ Done |
 
 ---
 

@@ -186,3 +186,39 @@ export const getAdminAppointmentAnalytics = async (): Promise<AdminAppointmentAn
   const res = await apiClient.get<AdminAppointmentAnalytics>("/admin/appointments/analytics");
   return res.data;
 };
+
+// ── Review Analytics ───────────────────────────────────────────────────────────
+
+export interface ReviewBusinessEntry {
+  businessId: string;
+  name: string;
+  slug: string;
+  reviewCount: number;
+  averageRating: number;
+}
+
+export interface ReviewByMonth {
+  month: string; // "2025-03"
+  count: number;
+}
+
+export interface AdminReviewAnalytics {
+  totalReviews: number;
+  platformAverageRating: number;
+  ratingDistribution: Record<string, number>; // "1".."5"
+  topBusinessesByReviewCount: ReviewBusinessEntry[];
+  topRatedBusinesses: ReviewBusinessEntry[];
+  lowestRatedBusinesses: ReviewBusinessEntry[];
+  flagStats: {
+    totalFlagged: number;
+    pendingFlags: number;
+    resolvedRemoved: number;
+    resolvedDismissed: number;
+  };
+  reviewsByMonth: ReviewByMonth[];
+}
+
+export const getAdminReviewAnalytics = async (): Promise<AdminReviewAnalytics> => {
+  const res = await apiClient.get<AdminReviewAnalytics>("/admin/reviews/analytics");
+  return res.data;
+};

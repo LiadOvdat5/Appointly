@@ -2,7 +2,7 @@
 
 **Feature:** [[F-14-G-Review-Analytics|F-14-G: Admin Review Analytics]]
 **Epic:** [[EPIC-14-Admin-Panel|EPIC-14: Admin Panel]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
