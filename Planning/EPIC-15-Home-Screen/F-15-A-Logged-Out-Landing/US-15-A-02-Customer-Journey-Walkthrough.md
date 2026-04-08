@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-A-Logged-Out-Landing|F-15-A: Logged-Out Landing Page]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **potential customer**, I want to **see how easy it is to book an appointme
 - `[FE]` Highlight key customer capabilities as bullet features: browse by category, map view, see available slots, instant confirmation
 
 ## Acceptance Criteria
-- [ ] Three steps are shown in order with distinct icons/visuals
-- [ ] Each step description is clear and jargon-free
-- [ ] CTA links to the registration page with the Customer role pre-selected
-- [ ] Section is skipped / hidden for authenticated users
+- [x] Three steps are shown in order with distinct icons/visuals
+- [x] Each step description is clear and jargon-free
+- [x] CTA links to the registration page with the Customer role pre-selected
+- [x] Section is skipped / hidden for authenticated users

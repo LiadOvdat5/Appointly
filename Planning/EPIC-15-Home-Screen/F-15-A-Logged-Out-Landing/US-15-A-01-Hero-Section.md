@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-A-Logged-Out-Landing|F-15-A: Logged-Out Landing Page]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **visitor**, I want to **immediately understand what BizSlot is and how to 
 - `[FE]` Retire `SelectionPage` route; redirect `/business-owner` and `/customer` to `/`
 
 ## Acceptance Criteria
-- [ ] Page renders at `/` for unauthenticated users
-- [ ] Headline and description are visible above the fold
-- [ ] Both CTAs are present and route to the correct pages
-- [ ] Authenticated users are NOT shown this section (they see the logged-in view)
+- [x] Page renders at `/` for unauthenticated users
+- [x] Headline and description are visible above the fold
+- [x] Both CTAs are present and route to the correct pages
+- [x] Authenticated users are NOT shown this section (they see the logged-in view)

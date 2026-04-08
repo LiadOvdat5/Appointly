@@ -56,7 +56,11 @@
       "Bash(cmd /c \"wmic process where \\\\\"name='WebAPI.exe'\\\\\" get ProcessId,ExecutablePath 2>&1\")",
       "Bash(dotnet script:*)",
       "Bash(dotnet-csharp /tmp/GenHash.cs)",
-      "Bash(dotnet fsi:*)"
+      "Bash(dotnet fsi:*)",
+      "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && npx tsc --noEmit\")",
+      "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && npx tsc --noEmit --pretty false 2>&1 && echo TSC_OK\")",
+      "mcp__browser__browser_console_messages",
+      "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && start /B npm run dev > \\\\\"%TEMP%\\\\vite-dev.log\\\\\" 2>&1\")"
     ]
   }
 }

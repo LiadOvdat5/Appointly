@@ -1,0 +1,30 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Back" [ref=e6]:
+      - generic [ref=e7]: arrow_back
+    - heading "BizSlot" [level=1] [ref=e8]
+    - generic [ref=e9]:
+      - button "Toggle language" [ref=e10]:
+        - generic [ref=e11]: language
+      - button "Open menu" [ref=e12]:
+        - generic [ref=e13]: menu
+  - main [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - heading "How would you like to use BizSlot?" [level=1] [ref=e18]
+          - paragraph [ref=e19]: Select your account type to get started.
+        - generic [ref=e20]:
+          - generic [ref=e21]:
+            - generic [ref=e25]: storefront
+            - generic [ref=e26]:
+              - heading "Business Owner" [level=3] [ref=e27]
+              - paragraph [ref=e28]: Manage services, team, and growth. Everything you need to scale your local business.
+            - button "Get Started as Owner" [ref=e29]
+          - generic [ref=e30]:
+            - generic [ref=e34]: person_search
+            - generic [ref=e35]:
+              - heading "Customer" [level=3] [ref=e36]
+              - paragraph [ref=e37]: Discover local services and book instantly. Manage all your appointments in one place.
+            - button "Book a Service" [ref=e38]
+      - paragraph [ref=e40]: By continuing, you agree to our Terms of Service and Privacy Policy.

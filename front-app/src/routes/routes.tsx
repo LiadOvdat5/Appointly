@@ -1,15 +1,13 @@
 import App from "../App.tsx";
 import UIShowcase from "../pages/UIShowcase.tsx";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute.tsx";
 
 // Pages
 import LoginPage from "../pages/LoginPage.tsx";
 import RegisterPage from "../pages/RegisterPage.tsx";
 import NotFoundPage from "../pages/NotFoundPage.tsx";
-import SelectionPage from "../pages/SelectionPage.tsx";
-import BusinessOwnerLandingPage from "../pages/BusinessOwnerLandingPage.tsx";
-import CustomerLandingPage from "../pages/CustomerLandingPage.tsx";
+import HomePage from "../pages/HomePage.tsx";
 import { SearchPage } from "../pages/SearchPage.tsx";
 import ProfilePage from "../pages/ProfilePage.tsx";
 import OnboardingPage from "../pages/OnboardingPage.tsx";
@@ -41,9 +39,9 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      { index: true, element: <SelectionPage /> },
-      { path: "business-owner", element: <BusinessOwnerLandingPage /> },
-      { path: "customer", element: <CustomerLandingPage /> },
+      { index: true, element: <HomePage /> },
+      { path: "business-owner", element: <Navigate to="/" replace /> },
+      { path: "customer", element: <Navigate to="/" replace /> },
       { path: "ui-showcase", element: <UIShowcase /> },
       { path: "*", element: <NotFoundPage /> },
       { path: "not-found", element: <NotFoundPage /> },

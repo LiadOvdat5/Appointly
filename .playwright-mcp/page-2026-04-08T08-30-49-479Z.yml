@@ -1,0 +1,11 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Back" [ref=e6]:
+      - generic [ref=e7]: arrow_back
+    - heading "BizSlot" [level=1] [ref=e8]
+    - generic [ref=e9]:
+      - button "Toggle language" [ref=e10]:
+        - generic [ref=e11]: language
+      - button "Open menu" [ref=e12]:
+        - generic [ref=e13]: menu
+  - main [ref=e14]

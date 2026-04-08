@@ -160,6 +160,84 @@ i18n.use(initReactI18next).init({
           },
         },
 
+        // ============ HOME PAGE (logged-out landing) ============
+        homePage: {
+          hero: {
+            headline: "Book appointments with local businesses, effortlessly.",
+            description:
+              "BizSlot connects customers with local businesses for quick, hassle-free appointment booking — and gives owners the tools to manage it all.",
+            ctaFind: "Find a Business",
+            ctaList: "List Your Business",
+            alreadyHaveAccount: "Already have an account?",
+            logIn: "Log in",
+          },
+          customers: {
+            label: "For Customers",
+            title: "Booking made simple",
+            subtitle: "From searching to confirmed — it takes less than a minute.",
+            howItWorksTitle: "How it works",
+            steps: {
+              signUp: {
+                title: "Sign Up",
+                description: "Create a free account in seconds — no credit card required.",
+              },
+              search: {
+                title: "Search a Business",
+                description:
+                  "Browse by category or location and explore business profiles with real photos and reviews.",
+              },
+              book: {
+                title: "Book an Appointment",
+                description:
+                  "Pick an available time slot and confirm instantly — you'll get a notification right away.",
+              },
+            },
+            features: {
+              categories: "Browse by category (barbers, trainers, nail artists & more)",
+              map: "Map view to find businesses near you",
+              slots: "See real-time available slots",
+              confirmation: "Instant booking confirmation",
+            },
+            cta: "Get Started for Free",
+          },
+          owners: {
+            label: "For Business Owners",
+            title: "Grow your business",
+            subtitle:
+              "Get online in minutes. Manage your schedule, services, and customers — all in one place.",
+            howItWorksTitle: "How it works",
+            steps: {
+              signUp: {
+                title: "Sign Up",
+                description: "Create your BizSlot account as a business owner.",
+              },
+              create: {
+                title: "Create Your Business",
+                description:
+                  "Set up your public business page with a name, category, logo, and description.",
+              },
+              services: {
+                title: "Add Services & Schedule",
+                description:
+                  "Define your services with pricing, duration, and working hours. Block holidays with ease.",
+              },
+              launch: {
+                title: "Start Getting Customers",
+                description:
+                  "Go live — customers can find you, view your page, and book appointments instantly.",
+              },
+            },
+            features: {
+              businessPage: "Custom public business page",
+              pricing: "Service & pricing management",
+              schedule: "Full schedule control with exception dates",
+              analytics: "Appointments dashboard & analytics",
+              reviews: "Customer reviews",
+            },
+            cta: "List Your Business",
+          },
+        },
+
         // ============ SIDEBAR ============
         sidebar: {
           search: "Search",
@@ -1446,6 +1524,84 @@ i18n.use(initReactI18next).init({
                   "קבל הזמנות ללא מאמץ ועקוב אחר הגדילה עם תובנות עמוקות.",
               },
             },
+          },
+        },
+
+        // ============ HOME PAGE (logged-out landing) ============
+        homePage: {
+          hero: {
+            headline: "הזמן פגישות עם עסקים מקומיים, בקלות.",
+            description:
+              "BizSlot מחבר לקוחות עם עסקים מקומיים להזמנת פגישות מהירה וחלקה — ונותן לבעלי העסק את הכלים לנהל הכל.",
+            ctaFind: "מצא עסק",
+            ctaList: "הוסף את העסק שלך",
+            alreadyHaveAccount: "כבר יש לך חשבון?",
+            logIn: "כניסה",
+          },
+          customers: {
+            label: "ללקוחות",
+            title: "הזמנה פשוטה",
+            subtitle: "מחיפוש לאישור — לוקח פחות מדקה.",
+            howItWorksTitle: "איך זה עובד",
+            steps: {
+              signUp: {
+                title: "הירשם",
+                description: "צור חשבון חינמי בשניות — ללא כרטיס אשראי.",
+              },
+              search: {
+                title: "חפש עסק",
+                description:
+                  "עיין לפי קטגוריה או מיקום וחקור פרופילי עסקים עם תמונות אמיתיות וביקורות.",
+              },
+              book: {
+                title: "הזמן פגישה",
+                description:
+                  "בחר משבצת זמן פנויה ואשר מיידית — תקבל התראה מיד.",
+              },
+            },
+            features: {
+              categories: "עיין לפי קטגוריה (מספרות, מאמנים, אמני ציפורניים ועוד)",
+              map: "תצוגת מפה למציאת עסקים בסביבתך",
+              slots: "ראה משבצות זמן פנויות בזמן אמת",
+              confirmation: "אישור הזמנה מיידי",
+            },
+            cta: "התחל בחינם",
+          },
+          owners: {
+            label: "לבעלי עסקים",
+            title: "הגדל את העסק שלך",
+            subtitle:
+              "התחל תוך דקות. נהל את לוח הזמנים, השירותים והלקוחות — במקום אחד.",
+            howItWorksTitle: "איך זה עובד",
+            steps: {
+              signUp: {
+                title: "הירשם",
+                description: "צור חשבון BizSlot כבעל עסק.",
+              },
+              create: {
+                title: "צור את העסק שלך",
+                description:
+                  "הגדר דף עסק ציבורי עם שם, קטגוריה, לוגו ותיאור.",
+              },
+              services: {
+                title: "הוסף שירותים ולוח זמנים",
+                description:
+                  "הגדר שירותים עם מחיר, משך וזמני עבודה. חסום חגים בקלות.",
+              },
+              launch: {
+                title: "התחל לקבל לקוחות",
+                description:
+                  "היה פעיל — לקוחות יוכלו למצוא אותך, לצפות בדף שלך ולהזמין פגישות מיידית.",
+              },
+            },
+            features: {
+              businessPage: "דף עסק ציבורי מותאם אישית",
+              pricing: "ניהול שירותים ומחירים",
+              schedule: "שליטה מלאה בלוח הזמנים עם תאריכים חריגים",
+              analytics: "לוח בקרה לפגישות ואנליטיקה",
+              reviews: "ביקורות לקוחות",
+            },
+            cta: "הוסף את העסק שלך",
           },
         },
 
