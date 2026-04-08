@@ -33,3 +33,4 @@
 | 12 | [[EPIC-12-Smart-Categories\|Smart Categories]] | ✅ Done |
 | 13 | [[EPIC-13-PWA\|Progressive Web App (PWA)]] | 🔲 Not Started |
 | 14 | [[EPIC-14-Admin-Panel\|Admin Panel]] | 🔄 In Progress (F-14-A ✅, F-14-B ✅, F-14-C ✅, F-14-D ✅, F-14-E ✅, F-14-F ✅, F-14-G 🔲) |
+| 15 | [[EPIC-15-Home-Screen\|Home Screen Experience]] | 🔲 Not Started |
