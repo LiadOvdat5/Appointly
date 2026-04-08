@@ -13,7 +13,7 @@ namespace WebAPI.Mappers
                 Name = dto.Name,
                 Email = dto.Email,
                 Password = string.Empty, // Set password hash separately
-                Role = UserRole.client,
+                Role = dto.Role ?? UserRole.client,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

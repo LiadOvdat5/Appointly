@@ -164,7 +164,7 @@ export default function LoginPage() {
           Google
         </Button>
         {/* Footer */}
-        <div className="mt-auto py-8 text-center">
+        <div className="mt-8 py-8 text-center">
           <p className="text-slate-600 dark:text-slate-400 text-sm">
             {t("login.noAccount")}{" "}
             <a

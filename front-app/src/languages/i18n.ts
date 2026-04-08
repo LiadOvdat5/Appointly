@@ -56,12 +56,21 @@ i18n.use(initReactI18next).init({
           emailPlaceholder: "your@email.com",
           password: "Password",
           passwordPlaceholder: "Create a strong password",
+          confirmPassword: "Confirm Password",
+          confirmPasswordPlaceholder: "Re-enter your password",
           button: "Sign Up",
           haveAccount: "Already have an account?",
           signIn: "Sign In",
           loading: "Creating account...",
           error: "Registration failed",
           networkError: "Network error. Please try again.",
+          orContinueWith: "Or continue with",
+          validation: {
+            nameRequired: "Full name is required",
+            emailInvalid: "Please enter a valid email address",
+            passwordTooShort: "Password must be at least 6 characters",
+            passwordMismatch: "Passwords do not match",
+          },
         },
 
         // ============ SELECTION PAGE ============
@@ -1338,12 +1347,21 @@ i18n.use(initReactI18next).init({
           emailPlaceholder: "your@email.com",
           password: "סיסמה",
           passwordPlaceholder: "צור סיסמה חזקה",
+          confirmPassword: "אימות סיסמה",
+          confirmPasswordPlaceholder: "הזן את הסיסמה שוב",
           button: "הרשמה",
           haveAccount: "יש לך כבר חשבון?",
           signIn: "כניסה",
           loading: "יוצר חשבון...",
           error: "ההרשמה נכשלה",
           networkError: "שגיאת רשת. בחזור שוב.",
+          orContinueWith: "או המשך עם",
+          validation: {
+            nameRequired: "שם מלא הוא שדה חובה",
+            emailInvalid: "יש להזין כתובת דוא״ל תקינה",
+            passwordTooShort: "הסיסמה חייבת להכיל לפחות 6 תווים",
+            passwordMismatch: "הסיסמאות אינן תואמות",
+          },
         },
 
         // ============ SELECTION PAGE ============

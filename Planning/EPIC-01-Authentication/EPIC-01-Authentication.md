@@ -15,3 +15,4 @@
 | B | [[F-01-B-Login-Logout\|Feature B: Login & Logout]] | ✅ Done |
 | C | [[F-01-C-Protected-Routes\|Feature C: Protected Routes]] | ✅ Done |
 | D | [[F-01-D-User-Profile\|Feature D: User Profile]] | ✅ Done |
+| E | [[F-01-E-Registration-Page\|Feature E: Sign-Up Page — Role Selection & Post-Registration Flow]] | ✅ Done |

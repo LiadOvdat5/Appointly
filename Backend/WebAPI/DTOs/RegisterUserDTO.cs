@@ -18,6 +18,7 @@ namespace WebAPI.DTOs
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
         public string Password { get; set; } = string.Empty;
 
-    // Role is set automatically to 'client' in backend logic
+        // Optional — defaults to client when omitted
+        public UserRole? Role { get; set; }
     }
 }

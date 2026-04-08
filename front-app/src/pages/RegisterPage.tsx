@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
@@ -8,36 +9,60 @@ import { register, login } from "../api/auth";
 import { Alert } from "../components/UI/Alert";
 import { useAppDispatch } from "../redux/hooks";
 import { setSession } from "../redux/authSlice";
+import { Role } from "../constants/roles";
 
 export default function RegisterPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const dispatch = useAppDispatch();
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
 
-  // Transform expiresAt to epoch milliseconds
   function toEpochMs(expiresAt: string) {
     const ms = new Date(expiresAt).getTime();
     return Number.isFinite(ms) ? ms : Date.now();
   }
 
+  function validate() {
+    const errors: typeof fieldErrors = {};
+    if (!name.trim()) errors.name = t("register.validation.nameRequired");
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      errors.email = t("register.validation.emailInvalid");
+    if (password.length < 6)
+      errors.password = t("register.validation.passwordTooShort");
+    if (password !== confirmPassword)
+      errors.confirmPassword = t("register.validation.passwordMismatch");
+    return errors;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      // First, register the user
-      await register({ name, email, password });
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
+    setLoading(true);
 
-      // Then automatically log them in
+    try {
+      await register({ name, email, password });
       const session = await login({ email, password });
 
-      // Store session in Redux
       dispatch(
         setSession({
           user: session.user,
@@ -45,15 +70,16 @@ export default function RegisterPage() {
         }),
       );
 
-      // TODO: redirect to dashboard
-      // navigate("/dashboard");
+      if (session.user.role === Role.Owner) {
+        navigate("/onboarding");
+      } else {
+        navigate("/customer-dashboard");
+      }
     } catch (err: unknown) {
-      // Axios error handling
-      const error = err as AxiosError<{ error?: string; title?: string }>;
+      const axiosErr = err as AxiosError<{ error?: string; title?: string }>;
       console.error("Registration error:", err);
-      if (error.response) {
-        // Backend responded with 4xx / 5xx
-        setError(error.response.data?.error ?? t("register.error"));
+      if (axiosErr.response) {
+        setError(axiosErr.response.data?.error ?? t("register.error"));
       } else {
         setError(t("register.networkError"));
       }
@@ -64,24 +90,19 @@ export default function RegisterPage() {
 
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white">
-      {/* Main Content */}
       <main className="flex-1 flex flex-col px-6 max-w-md mx-auto w-full">
-        {/* Header Text */}
         <div className="pt-4 pb-8 text-center">
           <H1>{t("register.title")}</H1>
           <Paragraph>{t("register.subtitle")}</Paragraph>
         </div>
 
-        {/* Error Message */}
         {error && (
           <Alert variant="error" className="mb-4">
             {error}
           </Alert>
         )}
 
-        {/* Form Fields */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {/* Name Field */}
           <Input
             label={t("register.name")}
             id="name"
@@ -89,10 +110,9 @@ export default function RegisterPage() {
             placeholder={t("register.namePlaceholder")}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+            error={fieldErrors.name}
           />
 
-          {/* Email Field */}
           <Input
             label={t("register.email")}
             id="email"
@@ -100,10 +120,9 @@ export default function RegisterPage() {
             placeholder={t("register.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            error={fieldErrors.email}
           />
 
-          {/* Password Field */}
           <Input
             label={t("register.password")}
             id="password"
@@ -111,34 +130,39 @@ export default function RegisterPage() {
             placeholder={t("register.passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            error={fieldErrors.password}
           />
 
-          {/* Primary Action */}
+          <Input
+            label={t("register.confirmPassword")}
+            id="confirmPassword"
+            type="password"
+            placeholder={t("register.confirmPasswordPlaceholder")}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            error={fieldErrors.confirmPassword}
+          />
+
           <Button type="submit" isLoading={loading}>
             {t("register.button")}
           </Button>
         </form>
 
-        {/* Divider */}
         <div className="relative py-8">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
           </div>
           <div className="relative flex justify-center text-sm">
             <Paragraph className="bg-background-light dark:bg-background-dark px-2">
-              Or continue with
+              {t("register.orContinueWith")}
             </Paragraph>
           </div>
         </div>
 
-        {/* Social Actions */}
         <Button
           variant="outline"
           className="bg-white"
-          onClick={() => {
-            return console.log("Google signup");
-          }}
+          onClick={() => console.log("Google signup")}
         >
           <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24">
             <path
@@ -161,8 +185,7 @@ export default function RegisterPage() {
           Google
         </Button>
 
-        {/* Footer */}
-        <div className="mt-auto py-8 text-center">
+        <div className="mt-8 py-8 text-center">
           <p className="text-slate-600 dark:text-slate-400 text-sm">
             {t("register.haveAccount")}{" "}
             <a
