@@ -9,6 +9,7 @@ import {
 import { Role } from "../constants/roles";
 import { HowItWorks } from "../components/UI/HowItWorks";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import CustomerHomePage from "./CustomerHomePage";
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -41,12 +42,13 @@ const HomePage = () => {
     );
   }
 
-  // Authenticated users are redirected away from this page
+  // Authenticated users — render role-specific home or redirect
   if (isAuthenticated && user) {
     if (user.role === Role.Owner) return <Navigate to="/dashboard" replace />;
     if (user.role === Role.Partner) return <Navigate to="/dashboard" replace />;
     if (user.role === Role.Admin) return <Navigate to="/admin" replace />;
-    return <Navigate to="/customer-dashboard" replace />;
+    // Customer: render the personalised home screen inline
+    return <CustomerHomePage />;
   }
 
   const customerSteps = [

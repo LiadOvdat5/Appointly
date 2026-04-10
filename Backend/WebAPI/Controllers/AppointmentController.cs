@@ -515,6 +515,35 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
+        /// Get completed appointments for the authenticated client that have no review yet
+        /// </summary>
+        /// <param name="limit">Maximum number of results (default: 3)</param>
+        /// <returns>List of appointments pending review</returns>
+        [HttpGet("pending-reviews")]
+        [EndpointSummary("Get Pending Review Appointments")]
+        [EndpointDescription("Return completed appointments for the authenticated customer that have not yet received a review. " +
+            "Ordered by most recent appointment date. Used to prompt customers to leave reviews on the home screen.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<ActionResult<List<AppointmentDTO>>> GetPendingReviews([FromQuery] int limit = 3)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (!userId.HasValue)
+                    return Unauthorized("User is not authenticated.");
+
+                var appointments = await _appointmentService.GetPendingReviewsAsync(userId.Value, limit);
+                return Ok(appointments);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    $"An error occurred while retrieving pending reviews: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Get appointment count for the authenticated partner
         /// </summary>
         /// <returns>Count of partner appointments</returns>

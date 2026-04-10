@@ -29,6 +29,8 @@ namespace WebAPI.DTOs
         // Business Information
         public Guid BusinessId { get; set; }
         public string BusinessName { get; set; } = string.Empty;
+        public string BusinessSlug { get; set; } = string.Empty;
+        public string? BusinessLogoUrl { get; set; }
         public string? BusinessAddress { get; set; }
         public string? BusinessPhone { get; set; }
 

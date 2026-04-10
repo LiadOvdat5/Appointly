@@ -438,5 +438,14 @@ namespace WebAPI.Services
         {
             return await _appointmentRepository.GetPartnerAppointmentCountAsync(partnerId);
         }
+
+        /// <summary>
+        /// Get completed appointments for a client that have no associated review, newest first.
+        /// </summary>
+        public async Task<List<AppointmentDTO>> GetPendingReviewsAsync(Guid clientId, int limit = 3)
+        {
+            var appointments = await _appointmentRepository.GetPendingReviewsForClientAsync(clientId, limit);
+            return appointments.Select(AppointmentMapper.ToDTO).ToList();
+        }
     }
 }

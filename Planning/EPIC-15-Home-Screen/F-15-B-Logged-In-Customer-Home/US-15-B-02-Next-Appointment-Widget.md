@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-B-Logged-In-Customer-Home|F-15-B: Logged-In Customer Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **logged-in customer**, I want to **see my next upcoming appointment at a g
 - `[FE]` Empty state: "No upcoming appointments. [Find a business →]" linking to `/search`
 
 ## Acceptance Criteria
-- [ ] Only the next (soonest) confirmed future appointment is shown
-- [ ] Card displays business name, service, and formatted date/time
-- [ ] Empty state is shown when there are no upcoming appointments
-- [ ] "View all" link navigates correctly
+- [x] Only the next (soonest) confirmed future appointment is shown
+- [x] Card displays business name, service, and formatted date/time
+- [x] Empty state is shown when there are no upcoming appointments
+- [x] "View all" link navigates correctly

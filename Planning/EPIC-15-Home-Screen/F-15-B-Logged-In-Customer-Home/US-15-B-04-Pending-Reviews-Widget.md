@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-B-Logged-In-Customer-Home|F-15-B: Logged-In Customer Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **logged-in customer**, I want to **be prompted to leave a review for appoi
 - `[FE]` Section is hidden entirely when there are no pending reviews
 
 ## Acceptance Criteria
-- [ ] Only appointments with `status = Completed` and no existing review are listed
-- [ ] Up to 3 prompts are shown at once
-- [ ] Tapping a prompt leads the user to the review submission UI
-- [ ] Section does not appear when there are no pending reviews
+- [x] Only appointments with `status = Completed` and no existing review are listed
+- [x] Up to 3 prompts are shown at once
+- [x] Tapping a prompt leads the user to the review submission UI
+- [x] Section does not appear when there are no pending reviews

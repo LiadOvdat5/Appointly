@@ -1,7 +1,7 @@
 # F-15-B: Logged-In Customer Home
 
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -9,10 +9,10 @@
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-15-B-01-Customer-Greeting\|US-15-B-01]] | Personalised greeting | 🔲 Not Started |
-| [[US-15-B-02-Next-Appointment-Widget\|US-15-B-02]] | Next appointment widget | 🔲 Not Started |
-| [[US-15-B-03-Recent-Businesses-Widget\|US-15-B-03]] | Recently booked businesses | 🔲 Not Started |
-| [[US-15-B-04-Pending-Reviews-Widget\|US-15-B-04]] | Pending review prompts | 🔲 Not Started |
+| [[US-15-B-01-Customer-Greeting\|US-15-B-01]] | Personalised greeting | ✅ Done |
+| [[US-15-B-02-Next-Appointment-Widget\|US-15-B-02]] | Next appointment widget | ✅ Done |
+| [[US-15-B-03-Recent-Businesses-Widget\|US-15-B-03]] | Recently booked businesses | ✅ Done |
+| [[US-15-B-04-Pending-Reviews-Widget\|US-15-B-04]] | Pending review prompts | ✅ Done |
 
 ## Notes
 

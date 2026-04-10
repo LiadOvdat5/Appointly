@@ -98,5 +98,10 @@ namespace WebAPI.Interfaces
         /// have not yet received a review prompt, and have no existing review.
         /// </summary>
         Task<List<Appointment>> GetDueForReviewPromptAsync();
+
+        /// <summary>
+        /// Get completed appointments for a client that have no associated review, newest first.
+        /// </summary>
+        Task<List<Appointment>> GetPendingReviewsForClientAsync(Guid clientId, int limit = 3);
     }
 }

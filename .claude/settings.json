@@ -60,7 +60,9 @@
       "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && npx tsc --noEmit\")",
       "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && npx tsc --noEmit --pretty false 2>&1 && echo TSC_OK\")",
       "mcp__browser__browser_console_messages",
-      "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && start /B npm run dev > \\\\\"%TEMP%\\\\vite-dev.log\\\\\" 2>&1\")"
+      "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && start /B npm run dev > \\\\\"%TEMP%\\\\vite-dev.log\\\\\" 2>&1\")",
+      "Bash(pkill -f \"vite\")",
+      "Bash(kill 402 403 411)"
     ]
   }
 }

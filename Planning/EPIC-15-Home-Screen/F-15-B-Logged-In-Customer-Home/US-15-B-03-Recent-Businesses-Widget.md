@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-B-Logged-In-Customer-Home|F-15-B: Logged-In Customer Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **logged-in customer**, I want to **see businesses I've recently booked** s
 - `[FE]` Empty state: "You haven't booked with anyone yet. [Explore businesses →]" linking to `/search`
 
 ## Acceptance Criteria
-- [ ] Up to 5 distinct businesses are shown, ordered by most recent booking
-- [ ] Each card shows at minimum the business name and category
-- [ ] Clicking a card navigates to the correct business page
-- [ ] Empty state message and CTA are shown when there are no past bookings
+- [x] Up to 5 distinct businesses are shown, ordered by most recent booking
+- [x] Each card shows at minimum the business name and category
+- [x] Clicking a card navigates to the correct business page
+- [x] Empty state message and CTA are shown when there are no past bookings

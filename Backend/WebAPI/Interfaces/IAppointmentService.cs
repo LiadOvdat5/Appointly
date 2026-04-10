@@ -66,5 +66,10 @@ namespace WebAPI.Interfaces
         /// Get appointment count for a partner
         /// </summary>
         Task<int> GetPartnerAppointmentCountAsync(Guid partnerId);
+
+        /// <summary>
+        /// Get completed appointments for a client that have no associated review, newest first.
+        /// </summary>
+        Task<List<AppointmentDTO>> GetPendingReviewsAsync(Guid clientId, int limit = 3);
     }
 }

@@ -266,6 +266,22 @@ namespace WebAPI.Repositories
         }
 
         /// <summary>
+        /// Get completed appointments for a client that have no associated review, limit n.
+        /// </summary>
+        public async Task<List<Appointment>> GetPendingReviewsForClientAsync(Guid clientId, int limit = 3)
+        {
+            return await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Business)
+                .Where(a => a.ClientId == clientId
+                    && a.Status == AppointmentStatus.completed
+                    && !_context.Reviews.Any(r => r.AppointmentId == a.Id))
+                .OrderByDescending(a => a.StartDateTime)
+                .Take(limit)
+                .ToListAsync();
+        }
+
+        /// <summary>
         /// Get completed appointments whose end time was 1–2 hours ago,
         /// have not yet received a review prompt, and have no existing review.
         /// </summary>

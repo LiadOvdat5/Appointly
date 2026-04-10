@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-B-Logged-In-Customer-Home|F-15-B: Logged-In Customer Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **logged-in customer**, I want to **see a personalised greeting when I open
 - `[FE]` Include a quick-search shortcut bar (links to `/search`) directly beneath the greeting
 
 ## Acceptance Criteria
-- [ ] Greeting uses the user's first name from the auth slice
-- [ ] Sub-line reflects whether the user has any upcoming appointments
-- [ ] Quick-search bar is visible and navigates to `/search`
+- [x] Greeting uses the user's first name from the auth slice
+- [x] Sub-line reflects whether the user has any upcoming appointments
+- [x] Quick-search bar is visible and navigates to `/search`

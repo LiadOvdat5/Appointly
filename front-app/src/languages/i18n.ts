@@ -238,6 +238,28 @@ i18n.use(initReactI18next).init({
           },
         },
 
+        // ============ CUSTOMER HOME ============
+        customerHome: {
+          greeting: "Hello, {{name}}!",
+          greetingSubUpcoming: "You have an upcoming appointment.",
+          greetingSubEmpty: "No appointments yet — find a business to get started.",
+          searchPlaceholder: "Search for a business...",
+          nextAppointment: {
+            label: "Next Appointment",
+            viewAll: "View all appointments",
+            empty: "No upcoming appointments.",
+            findBusiness: "Find a business →",
+          },
+          recentBusinesses: {
+            label: "Recently Booked",
+            empty: "You haven't booked with anyone yet.",
+            explore: "Explore businesses →",
+          },
+          pendingReviews: {
+            label: "Leave a Review",
+          },
+        },
+
         // ============ SIDEBAR ============
         sidebar: {
           search: "Search",
@@ -1602,6 +1624,28 @@ i18n.use(initReactI18next).init({
               reviews: "ביקורות לקוחות",
             },
             cta: "הוסף את העסק שלך",
+          },
+        },
+
+        // ============ CUSTOMER HOME ============
+        customerHome: {
+          greeting: "שלום, {{name}}!",
+          greetingSubUpcoming: "יש לך פגישה קרובה.",
+          greetingSubEmpty: "עדיין אין פגישות — מצא עסק כדי להתחיל.",
+          searchPlaceholder: "חפש עסק...",
+          nextAppointment: {
+            label: "הפגישה הקרובה",
+            viewAll: "צפה בכל הפגישות",
+            empty: "אין פגישות קרובות.",
+            findBusiness: "מצא עסק ←",
+          },
+          recentBusinesses: {
+            label: "עסקים שהוזמנו לאחרונה",
+            empty: "עדיין לא הזמנת אצל אף אחד.",
+            explore: "גלה עסקים ←",
+          },
+          pendingReviews: {
+            label: "השאר ביקורת",
           },
         },
 

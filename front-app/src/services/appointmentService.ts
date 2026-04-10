@@ -14,6 +14,8 @@ export interface AppointmentDTO {
   servicePrice?: number;
   businessId: string;
   businessName: string;
+  businessSlug: string;
+  businessLogoUrl?: string;
   businessAddress?: string;
   serviceScheduleId: string;
   startDateTime: string;
@@ -134,6 +136,14 @@ export async function getCustomerReport(
   if (startDate) params.startDate = startDate.toISOString();
   if (endDate) params.endDate = endDate.toISOString();
   const response = await apiClient.get<CustomerReportDTO>("/api/reports/customer", { params });
+  return response.data;
+}
+
+export async function getPendingReviews(limit = 3): Promise<AppointmentDTO[]> {
+  const response = await apiClient.get<AppointmentDTO[]>(
+    "/api/appointment/pending-reviews",
+    { params: { limit } },
+  );
   return response.data;
 }
 
