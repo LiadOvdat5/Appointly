@@ -40,7 +40,9 @@ export const getAvailableDatesForMonth = async (
   year: number,
   month: number, // 0-indexed (JS Date convention)
 ): Promise<Set<string>> => {
-  const startDate = new Date(year, month, 1);
+  const monthStart = new Date(year, month, 1);
+  const now = new Date();
+  const startDate = monthStart < now ? now : monthStart;
   const endDate = new Date(year, month + 1, 0, 23, 59, 59); // last moment of the month
   const slots = await getAvailableSlotsForService(serviceId, startDate, endDate);
   const dates = new Set<string>();
@@ -88,7 +90,10 @@ export const getAvailableSlotsForDate = async (
   serviceId: string,
   date: Date,
 ): Promise<SlotDTO[]> => {
-  const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+  const isToday = date.toDateString() === new Date().toDateString();
+  const startDate = isToday
+    ? new Date()
+    : new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
   const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
   return getAvailableSlotsForService(serviceId, startDate, endDate);
 };
