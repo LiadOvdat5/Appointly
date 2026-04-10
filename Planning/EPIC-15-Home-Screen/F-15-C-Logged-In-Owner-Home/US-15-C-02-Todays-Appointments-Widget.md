@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-C-Logged-In-Owner-Home|F-15-C: Logged-In Business Owner Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,8 +17,8 @@ As a **logged-in business owner**, I want to **see today's appointments at a gla
 - `[FE]` Empty state: "No appointments today. [Manage schedule →]"
 
 ## Acceptance Criteria
-- [ ] Only today's confirmed/upcoming appointments are shown
-- [ ] Each row shows customer name, service name, and appointment time
-- [ ] Overflow count is shown when there are more than 5
-- [ ] Empty state is shown when there are no appointments today
-- [ ] "View full schedule" links to the correct dashboard route
+- [x] Only today's confirmed/upcoming appointments are shown
+- [x] Each row shows customer name, service name, and appointment time
+- [x] Overflow count is shown when there are more than 5
+- [x] Empty state is shown when there are no appointments today
+- [x] "View full schedule" links to the correct dashboard route

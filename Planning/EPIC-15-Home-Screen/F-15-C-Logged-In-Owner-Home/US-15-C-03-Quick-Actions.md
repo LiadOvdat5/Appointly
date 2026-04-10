@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-C-Logged-In-Owner-Home|F-15-C: Logged-In Business Owner Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,7 +18,7 @@ As a **logged-in business owner**, I want to **access the most common management
 - `[FE]` Hide this section entirely if the owner has no business yet
 
 ## Acceptance Criteria
-- [ ] Four quick-action tiles are shown for owners with an active business
-- [ ] Each tile has an icon and a clear label
-- [ ] Each tile navigates to the correct route
-- [ ] Section is hidden for owners who have not yet created a business
+- [x] Four quick-action tiles are shown for owners with an active business
+- [x] Each tile has an icon and a clear label
+- [x] Each tile navigates to the correct route
+- [x] Section is hidden for owners who have not yet created a business

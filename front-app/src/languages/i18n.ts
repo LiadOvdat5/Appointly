@@ -260,6 +260,29 @@ i18n.use(initReactI18next).init({
           },
         },
 
+        // ============ OWNER HOME ============
+        ownerHome: {
+          greeting: "Hello, {{name}}!",
+          noBusinessPrompt: "Welcome! Ready to list your business?",
+          completeSetup: "Complete Setup",
+          businessSubtitle: "{{name}}",
+          yourBusinesses: "Your Businesses",
+          todaySchedule: {
+            label: "Today's Schedule",
+            viewAll: "View full schedule",
+            empty: "No appointments today.",
+            manage: "Manage schedule →",
+            more: "+{{count}} more",
+          },
+          quickActions: {
+            label: "Quick Actions",
+            businessPage: "My Business Page",
+            services: "Manage Services",
+            schedule: "Manage Schedule",
+            dashboard: "View Dashboard",
+          },
+        },
+
         // ============ SIDEBAR ============
         sidebar: {
           search: "Search",
@@ -1646,6 +1669,29 @@ i18n.use(initReactI18next).init({
           },
           pendingReviews: {
             label: "השאר ביקורת",
+          },
+        },
+
+        // ============ OWNER HOME ============
+        ownerHome: {
+          greeting: "שלום, {{name}}!",
+          noBusinessPrompt: "ברוך הבא! מוכן להוסיף את העסק שלך?",
+          completeSetup: "השלם הגדרה",
+          businessSubtitle: "{{name}}",
+          yourBusinesses: "העסקים שלך",
+          todaySchedule: {
+            label: "לוח היום",
+            viewAll: "צפה בלוח המלא",
+            empty: "אין פגישות היום.",
+            manage: "נהל לוח זמנים ←",
+            more: "+{{count}} נוספים",
+          },
+          quickActions: {
+            label: "פעולות מהירות",
+            businessPage: "דף העסק שלי",
+            services: "ניהול שירותים",
+            schedule: "ניהול לוח זמנים",
+            dashboard: "לוח הבקרה",
           },
         },
 

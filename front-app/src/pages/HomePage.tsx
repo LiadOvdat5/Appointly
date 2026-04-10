@@ -10,6 +10,7 @@ import { Role } from "../constants/roles";
 import { HowItWorks } from "../components/UI/HowItWorks";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import CustomerHomePage from "./CustomerHomePage";
+import OwnerHomePage from "./OwnerHomePage";
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -44,7 +45,7 @@ const HomePage = () => {
 
   // Authenticated users — render role-specific home or redirect
   if (isAuthenticated && user) {
-    if (user.role === Role.Owner) return <Navigate to="/dashboard" replace />;
+    if (user.role === Role.Owner) return <OwnerHomePage />;
     if (user.role === Role.Partner) return <Navigate to="/dashboard" replace />;
     if (user.role === Role.Admin) return <Navigate to="/admin" replace />;
     // Customer: render the personalised home screen inline

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-15-C-Logged-In-Owner-Home|F-15-C: Logged-In Business Owner Home]]
 **Epic:** [[EPIC-15-Home-Screen|EPIC-15: Home Screen Experience]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,7 +15,7 @@ As a **logged-in business owner**, I want to **see a greeting that references my
 - `[FE]` If business exists: show business name as a clickable link (→ `/business/{id}`)
 
 ## Acceptance Criteria
-- [ ] Greeting shows the owner's first name
-- [ ] Business name subtitle appears when the owner has a business
-- [ ] Onboarding prompt appears when the owner has no business
-- [ ] Business name links to the public business page
+- [x] Greeting shows the owner's first name
+- [x] Business name subtitle appears when the owner has a business
+- [x] Onboarding prompt appears when the owner has no business
+- [x] Business name links to the public business page
