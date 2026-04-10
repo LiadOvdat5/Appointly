@@ -1,7 +1,7 @@
 # F-01-F: Google OAuth — Sign Up & Login
 
 **Epic:** [[EPIC-01-Authentication|EPIC-01: Authentication & User Management]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -19,8 +19,8 @@ credential login — so the rest of the app works unchanged.
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-01-F-01-Sign-Up-with-Google\|US-01-F-01]] | Sign up with Google | 🔲 Not Started |
-| [[US-01-F-02-Login-with-Google\|US-01-F-02]] | Log in with Google | 🔲 Not Started |
+| [[US-01-F-01-Sign-Up-with-Google\|US-01-F-01]] | Sign up with Google | ✅ Done |
+| [[US-01-F-02-Login-with-Google\|US-01-F-02]] | Log in with Google | ✅ Done |
 
 ---
 

@@ -19,7 +19,7 @@
 
 | # | Epic | Status |
 |---|------|--------|
-| 01 | [[EPIC-01-Authentication\|Authentication & User Management]] | 🔄 In Progress (F-01-A ✅, F-01-B ✅, F-01-C ✅, F-01-D ✅, F-01-E ✅, F-01-F 🔲, F-01-G 🔲) |
+| 01 | [[EPIC-01-Authentication\|Authentication & User Management]] | 🔄 In Progress (F-01-A ✅, F-01-B ✅, F-01-C ✅, F-01-D ✅, F-01-E ✅, F-01-F ✅, F-01-G 🔲) |
 | 02 | [[EPIC-02-Business-Pages\|Business Pages & Services]] | ✅ Done |
 | 03 | [[EPIC-03-Schedule-and-Availability\|Schedule & Availability]] | ✅ Done (F-03-A ✅, F-03-B ✅, F-03-C ✅) |
 | 04 | [[EPIC-04-Booking-Flow\|Booking Flow]] | ✅ Done |

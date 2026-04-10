@@ -6,6 +6,7 @@ using WebAPI.Exceptions;
 using WebAPI.Interfaces;
 using WebAPI.Models;
 using WebAPI.Services;
+using Microsoft.Extensions.Configuration;
 
 
 namespace WebAPI.Controllers
@@ -16,11 +17,14 @@ namespace WebAPI.Controllers
     {
         private readonly IAuthRepository _authRepository;
         private readonly IJwtService _jwtService;
+        private readonly string _googleClientId;
 
-        public AuthController(IAuthRepository authRepository, IJwtService jwtService)
+        public AuthController(IAuthRepository authRepository, IJwtService jwtService, IConfiguration configuration)
         {
             _authRepository = authRepository;
             _jwtService = jwtService;
+            _googleClientId = configuration["Google:ClientId"]
+                ?? throw new InvalidOperationException("Google:ClientId is not configured.");
         }
 
 
@@ -90,6 +94,41 @@ namespace WebAPI.Controllers
             Response.Cookies.Delete("access_token");
 
             return Ok(new { success = true });
+        }
+
+        [HttpPost("google")]
+        [EndpointSummary("Google OAuth Sign-In / Sign-Up")]
+        [EndpointDescription("Validates a Google id_token, creates the user on first sign-in, and issues the same JWT HTTP-only cookie as credential login. " +
+            "Pass role on first sign-up; omit on subsequent logins.")]
+        public async Task<IActionResult> GoogleAuth([FromBody] GoogleAuthDTO dto)
+        {
+            try
+            {
+                var loginResult = await _authRepository.GoogleAuthAsync(dto, _googleClientId);
+
+                Response.Cookies.Append("access_token", loginResult.Token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = loginResult.ExpiresAt,
+                    Path = "/"
+                });
+
+                return Ok(new
+                {
+                    user = loginResult.User,
+                    expiresAt = loginResult.ExpiresAt
+                });
+            }
+            catch (SuspendedAccountException ex)
+            {
+                return StatusCode(403, new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpGet("me")]

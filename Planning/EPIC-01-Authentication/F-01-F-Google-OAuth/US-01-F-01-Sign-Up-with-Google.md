@@ -2,7 +2,7 @@
 
 **Feature:** [[F-01-F-Google-OAuth|F-01-F: Google OAuth — Sign Up & Login]]
 **Epic:** [[EPIC-01-Authentication|EPIC-01: Authentication & User Management]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -26,8 +26,8 @@ As a **new user**, I want to **sign up using my Google account** so that **I can
 - `[FE]` After successful response dispatch `setUser` to Redux `auth` slice and redirect based on role
 
 ## Acceptance Criteria
-- [ ] Clicking "Continue with Google" opens the Google account picker popup
-- [ ] A new user is prompted to select a role (Owner / Customer) before the account is created
-- [ ] A `User` record is created with `GoogleId` set and `passwordHash` null
-- [ ] The same JWT cookie session is established as with email/password registration
-- [ ] Duplicate email (already registered with credentials) returns a clear error: "An account with this email already exists — please log in with your password"
+- [x] Clicking "Continue with Google" opens the Google account picker popup
+- [x] A new user is prompted to select a role (Owner / Customer) before the account is created
+- [x] A `User` record is created with `GoogleId` set and `passwordHash` null
+- [x] The same JWT cookie session is established as with email/password registration
+- [x] Duplicate email (already registered with credentials) returns a clear error: "An account with this email already exists — please log in with your password"

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-01-F-Google-OAuth|F-01-F: Google OAuth — Sign Up & Login]]
 **Epic:** [[EPIC-01-Authentication|EPIC-01: Authentication & User Management]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -22,7 +22,7 @@ As a **returning user who signed up with Google**, I want to **log in using my G
 - `[FE]` Display API error messages inline (e.g., "No account found — please sign up first")
 
 ## Acceptance Criteria
-- [ ] Returning Google-registered users can log in with one click — no password required
-- [ ] Session and cookie are established identically to email/password login
-- [ ] A user who registered with email/password and tries Google login receives a clear error (no silent account merge)
-- [ ] After login, redirect follows the same role-based logic as credential login
+- [x] Returning Google-registered users can log in with one click — no password required
+- [x] Session and cookie are established identically to email/password login
+- [x] A user who registered with email/password and tries Google login receives a clear error (no silent account merge)
+- [x] After login, redirect follows the same role-based logic as credential login

@@ -41,3 +41,13 @@ export async function me(): Promise<SessionDto> {
 export async function logout(): Promise<void> {
   await http.post("/auth/logout", null);
 }
+
+export type GoogleAuthRequest = {
+  idToken: string;
+  role?: number; // UserRole enum value — required only for new sign-ups
+};
+
+export async function googleAuth(data: GoogleAuthRequest): Promise<SessionDto> {
+  const res = await http.post<SessionDto>("/auth/google", data);
+  return res.data;
+}

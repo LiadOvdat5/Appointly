@@ -12,7 +12,7 @@ namespace WebAPI.Mappers
                 Id = Guid.NewGuid(),
                 Name = dto.Name,
                 Email = dto.Email,
-                Password = string.Empty, // Set password hash separately
+                Password = null, // Set by RegisterAsync after hashing
                 Role = dto.Role ?? UserRole.client,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow

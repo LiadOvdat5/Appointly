@@ -48,6 +48,12 @@ namespace WebAPI.Data
                 .HasIndex(b => b.Slug)
                 .IsUnique();
 
+            // Unique GoogleId per user (sparse — only applies to non-null values)
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.GoogleId)
+                .IsUnique()
+                .HasFilter("[GoogleId] IS NOT NULL");
+
             // =====================================================
             // Follow Relationships
             // =====================================================

@@ -16,5 +16,5 @@
 | C | [[F-01-C-Protected-Routes\|Feature C: Protected Routes]] | ✅ Done |
 | D | [[F-01-D-User-Profile\|Feature D: User Profile]] | ✅ Done |
 | E | [[F-01-E-Registration-Page\|Feature E: Sign-Up Page — Role Selection & Post-Registration Flow]] | ✅ Done |
-| F | [[F-01-F-Google-OAuth\|Feature F: Google OAuth — Sign Up & Login]] | 🔲 Not Started |
+| F | [[F-01-F-Google-OAuth\|Feature F: Google OAuth — Sign Up & Login]] | ✅ Done |
 | G | [[F-01-G-Forgot-Password\|Feature G: Forgot Password]] | 🔲 Not Started |

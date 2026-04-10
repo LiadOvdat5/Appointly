@@ -11,13 +11,16 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store";
 
 import { AuthBootstrap } from "./api/authBootstrap";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <Provider store={store}>
-      <AuthBootstrap>
-        <RouterProvider router={router} />
-      </AuthBootstrap>
-    </Provider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <Provider store={store}>
+        <AuthBootstrap>
+          <RouterProvider router={router} />
+        </AuthBootstrap>
+      </Provider>
+    </GoogleOAuthProvider>
   </StrictMode>,
 );
