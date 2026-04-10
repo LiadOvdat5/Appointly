@@ -5,6 +5,7 @@ import { formatTime } from "../utils/formatTime";
 import {
   getClientAppointments,
   cancelAppointment,
+  getPendingReviews,
   AppointmentStatus,
   type AppointmentDTO,
 } from "../services/appointmentService";
@@ -56,14 +57,15 @@ export default function CustomerDashboardPage() {
   const [reviewingAppt, setReviewingAppt] = useState<AppointmentDTO | null>(
     null,
   );
-  // Track which appointment IDs have been reviewed this session
-  const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
+  // Business IDs that still have no review from this customer
+  const [unreviewedBusinessIds, setUnreviewedBusinessIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setLoading(true);
-    getClientAppointments(1, 100)
-      .then((appointments) => {
+    Promise.all([getClientAppointments(1, 100), getPendingReviews(50)])
+      .then(([appointments, pending]) => {
         setAll(appointments);
+        setUnreviewedBusinessIds(new Set(pending.map((a) => a.businessId)));
         // If navigated from a review prompt notification, auto-open the modal
         const reviewId = searchParams.get("review");
         if (reviewId) {
@@ -125,7 +127,11 @@ export default function CustomerDashboardPage() {
 
   function handleReviewSuccess() {
     if (!reviewingAppt) return;
-    setReviewedIds((prev) => new Set(prev).add(reviewingAppt.id));
+    setUnreviewedBusinessIds((prev) => {
+      const next = new Set(prev);
+      next.delete(reviewingAppt.businessId);
+      return next;
+    });
     setReviewingAppt(null);
   }
 
@@ -260,7 +266,7 @@ export default function CustomerDashboardPage() {
           {/* Appointment list */}
           {!loading &&
             appointments.map((appt) => {
-              const alreadyReviewed = reviewedIds.has(appt.id);
+              const alreadyReviewed = !unreviewedBusinessIds.has(appt.businessId);
               return (
                 <Card key={appt.id} className="p-4 space-y-3">
                   {/* Top row: business + badge */}

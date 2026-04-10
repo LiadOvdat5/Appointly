@@ -266,24 +266,31 @@ namespace WebAPI.Repositories
         }
 
         /// <summary>
-        /// Get completed appointments for a client that have no associated review, limit n.
+        /// Get one completed appointment per business for a client that has no review for that business yet, limit n.
         /// </summary>
         public async Task<List<Appointment>> GetPendingReviewsForClientAsync(Guid clientId, int limit = 3)
         {
-            return await _context.Appointments
+            var appointments = await _context.Appointments
                 .Include(a => a.Service)
                 .Include(a => a.Business)
                 .Where(a => a.ClientId == clientId
                     && a.Status == AppointmentStatus.completed
-                    && !_context.Reviews.Any(r => r.AppointmentId == a.Id))
+                    && !_context.Reviews.Any(r => r.CustomerId == clientId && r.BusinessId == a.BusinessId))
                 .OrderByDescending(a => a.StartDateTime)
-                .Take(limit)
                 .ToListAsync();
+
+            // One per business — pick the most recent appointment for each
+            return appointments
+                .GroupBy(a => a.BusinessId)
+                .Select(g => g.First())
+                .Take(limit)
+                .ToList();
         }
 
         /// <summary>
-        /// Get completed appointments whose end time was 1–2 hours ago,
-        /// have not yet received a review prompt, and have no existing review.
+        /// Get completed appointments whose end time was 1–2 hours ago, have not yet received a
+        /// review prompt, the customer has not reviewed that business yet, and no other appointment
+        /// from the same customer+business has already triggered a review prompt.
         /// </summary>
         public async Task<List<Appointment>> GetDueForReviewPromptAsync()
         {
@@ -298,7 +305,12 @@ namespace WebAPI.Repositories
                     && a.ReviewPromptSentAt == null
                     && a.EndDateTime >= windowStart
                     && a.EndDateTime <= windowEnd
-                    && !_context.Reviews.Any(r => r.AppointmentId == a.Id))
+                    && !_context.Reviews.Any(r => r.CustomerId == a.ClientId && r.BusinessId == a.BusinessId)
+                    && !_context.Appointments.Any(other =>
+                        other.ClientId == a.ClientId
+                        && other.BusinessId == a.BusinessId
+                        && other.ReviewPromptSentAt != null
+                        && other.Id != a.Id))
                 .ToListAsync();
         }
     }

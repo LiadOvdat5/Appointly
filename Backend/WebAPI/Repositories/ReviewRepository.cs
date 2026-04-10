@@ -22,10 +22,10 @@ namespace WebAPI.Repositories
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
-        public async Task<Review?> GetByAppointmentIdAsync(Guid appointmentId)
+        public async Task<Review?> GetByCustomerAndBusinessAsync(Guid customerId, Guid businessId)
         {
             return await _context.Reviews
-                .FirstOrDefaultAsync(r => r.AppointmentId == appointmentId);
+                .FirstOrDefaultAsync(r => r.CustomerId == customerId && r.BusinessId == businessId);
         }
 
         public async Task<List<Review>> GetByBusinessIdAsync(Guid businessId, int page = 1, int pageSize = 20)

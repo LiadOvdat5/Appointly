@@ -137,9 +137,9 @@ namespace WebAPI.Data
                 .HasForeignKey(r => r.AppointmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // One review per appointment
+            // One review per business per customer
             modelBuilder.Entity<Review>()
-                .HasIndex(r => r.AppointmentId)
+                .HasIndex(r => new { r.CustomerId, r.BusinessId })
                 .IsUnique();
 
             // =====================================================

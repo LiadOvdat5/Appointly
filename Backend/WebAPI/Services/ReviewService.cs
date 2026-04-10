@@ -44,8 +44,8 @@ namespace WebAPI.Services
             if (appointment.Status != AppointmentStatus.completed)
                 throw new InvalidAppointmentOperationException("You can only review completed appointments.");
 
-            // One review per appointment
-            var existing = await _reviewRepository.GetByAppointmentIdAsync(dto.AppointmentId);
+            // One review per business per customer
+            var existing = await _reviewRepository.GetByCustomerAndBusinessAsync(customerId, businessId);
             if (existing != null)
                 throw new DuplicateReviewException(dto.AppointmentId);
 
