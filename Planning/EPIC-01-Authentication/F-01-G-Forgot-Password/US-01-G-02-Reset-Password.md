@@ -2,7 +2,7 @@
 
 **Feature:** [[F-01-G-Forgot-Password|F-01-G: Forgot Password]]
 **Epic:** [[EPIC-01-Authentication|EPIC-01: Authentication & User Management]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 

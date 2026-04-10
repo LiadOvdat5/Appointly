@@ -18,6 +18,7 @@ namespace WebAPI.Controllers
         private readonly IAuthRepository _authRepository;
         private readonly IJwtService _jwtService;
         private readonly string _googleClientId;
+        private readonly string _frontendBaseUrl;
 
         public AuthController(IAuthRepository authRepository, IJwtService jwtService, IConfiguration configuration)
         {
@@ -25,6 +26,7 @@ namespace WebAPI.Controllers
             _jwtService = jwtService;
             _googleClientId = configuration["Google:ClientId"]
                 ?? throw new InvalidOperationException("Google:ClientId is not configured.");
+            _frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:5173";
         }
 
 
@@ -124,6 +126,38 @@ namespace WebAPI.Controllers
             catch (SuspendedAccountException ex)
             {
                 return StatusCode(403, new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("forgot-password")]
+        [EndpointSummary("Request Password Reset")]
+        [EndpointDescription("Sends a password-reset email to the given address. Always returns 200 OK — does not reveal whether the email exists.")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO dto)
+        {
+            try
+            {
+                await _authRepository.ForgotPasswordAsync(dto.Email, _frontendBaseUrl);
+                return Ok(new { message = "If an account exists for that email, a reset link has been sent." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        [EndpointSummary("Reset Password")]
+        [EndpointDescription("Validates the reset token and updates the user's password. Token is valid for 1 hour.")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            try
+            {
+                await _authRepository.ResetPasswordAsync(dto.Token, dto.NewPassword);
+                return Ok(new { message = "Password updated successfully. You can now log in." });
             }
             catch (Exception ex)
             {

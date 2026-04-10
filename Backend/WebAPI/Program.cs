@@ -85,6 +85,9 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Register Email Service
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+
 // Register Gemini AI Service
 builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 

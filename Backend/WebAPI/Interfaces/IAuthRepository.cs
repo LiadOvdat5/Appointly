@@ -12,5 +12,7 @@ namespace WebAPI.Interfaces
         Task<User?> GetUserByEmailAsync(string email);
         Task<Guid?> GetPartnerBusinessIdAsync(Guid userId);
         Task<LoginResponseDTO> GoogleAuthAsync(GoogleAuthDTO dto, string googleClientId);
+        Task ForgotPasswordAsync(string email, string frontendBaseUrl);
+        Task ResetPasswordAsync(string token, string newPassword);
     }
 }

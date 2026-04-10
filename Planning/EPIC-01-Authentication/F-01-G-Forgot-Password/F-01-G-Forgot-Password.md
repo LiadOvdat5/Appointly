@@ -1,7 +1,7 @@
 # F-01-G: Forgot Password
 
 **Epic:** [[EPIC-01-Authentication|EPIC-01: Authentication & User Management]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,8 +17,8 @@ link → user sets a new password → backend updates hash and invalidates the t
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-01-G-01-Request-Password-Reset\|US-01-G-01]] | Request a password reset email | 🔲 Not Started |
-| [[US-01-G-02-Reset-Password\|US-01-G-02]] | Reset password via emailed link | 🔲 Not Started |
+| [[US-01-G-01-Request-Password-Reset\|US-01-G-01]] | Request a password reset email | ✅ Done |
+| [[US-01-G-02-Reset-Password\|US-01-G-02]] | Reset password via emailed link | ✅ Done |
 
 ---
 

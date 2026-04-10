@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using WebAPI.Services;
 using WebAPI.Mappers;
+using WebAPI.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
 
@@ -20,12 +21,14 @@ namespace WebAPI.Repositories
     {
         private readonly AppDbContext _context;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
         private static readonly HttpClient _httpClient = new();
 
-        public AuthRepository(AppDbContext context, IJwtService jwtService)
+        public AuthRepository(AppDbContext context, IJwtService jwtService, IEmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
+            _emailService = emailService;
         }
 
         public async Task<UserDTO> RegisterAsync(RegisterUserDTO registerDto)
@@ -179,6 +182,61 @@ namespace WebAPI.Repositories
                 ExpiresAt = tokenResult.ExpiresAt,
                 User = user.ToUserDTO()
             };
+        }
+
+        public async Task ForgotPasswordAsync(string email, string frontendBaseUrl)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            // Always return silently — do not reveal whether the email exists
+            if (user == null || user.GoogleId != null)
+                return;
+
+            // Generate a cryptographically random token (raw = sent in email, hash = stored in DB)
+            var rawTokenBytes = RandomNumberGenerator.GetBytes(64);
+            var rawToken = Convert.ToBase64String(rawTokenBytes)
+                .Replace("+", "-").Replace("/", "_").Replace("=", ""); // URL-safe Base64
+
+            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));
+            var tokenHash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+
+            user.PasswordResetToken = tokenHash;
+            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            var resetLink = $"{frontendBaseUrl}/reset-password?token={Uri.EscapeDataString(rawToken)}";
+            var subject = "Reset your BizSlot password";
+            var body = $"""
+                <p>Hi {user.Name},</p>
+                <p>We received a request to reset your BizSlot password.</p>
+                <p><a href="{resetLink}">Click here to reset your password</a></p>
+                <p>This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email.</p>
+                <p>— The BizSlot Team</p>
+                """;
+
+            await _emailService.SendEmailAsync(email, subject, body);
+        }
+
+        public async Task ResetPasswordAsync(string token, string newPassword)
+        {
+            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+            var tokenHash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == tokenHash);
+            if (user == null)
+                throw new Exception("Invalid or expired reset link.");
+
+            if (user.PasswordResetTokenExpiry == null || user.PasswordResetTokenExpiry < DateTime.UtcNow)
+                throw new Exception("This reset link has expired. Please request a new one.");
+
+            var passwordHasher = new PasswordHasher<User>();
+            user.Password = passwordHasher.HashPassword(user, newPassword);
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
         }
     }
 }

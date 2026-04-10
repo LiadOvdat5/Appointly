@@ -48,5 +48,10 @@ namespace WebAPI.Models
 
         [MaxLength(500)]
         public string? SuspendedReason { get; set; }
+
+        [MaxLength(512)]
+        public string? PasswordResetToken { get; set; }
+
+        public DateTime? PasswordResetTokenExpiry { get; set; }
     }
 }
