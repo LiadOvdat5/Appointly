@@ -125,29 +125,25 @@ export default function ServiceSelectionPage() {
           services.map((svc) => {
             const upcoming = upcomingCountForService(svc.id);
             return (
-              <Card key={svc.id} className="p-4 hover:shadow-md transition-shadow">
+              <Card key={svc.id} className="p-4">
                 <div className="flex items-center gap-4">
                   {/* Icon */}
                   <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
                     <MaterialIcon name="content_cut" className="text-xl text-purple-600 dark:text-purple-400" />
                   </div>
 
-                  {/* Info — clicking navigates to schedule */}
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/schedule/${businessId}/${svc.id}`)}
-                    className="flex-1 min-w-0 text-left"
-                  >
+                  {/* Info — display only */}
+                  <div className="flex-1 min-w-0">
                     <p className="font-bold text-[#111418] dark:text-white text-sm truncate">
                       {svc.name}
                     </p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                      <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <MaterialIcon name="schedule" className="text-sm leading-none" />
                         {svc.duration} min
                       </span>
                       {svc.price != null && (
-                        <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <span className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                           <MaterialIcon name="payments" className="text-sm leading-none" />
                           ₪{svc.price.toFixed(2)}
                         </span>
@@ -159,20 +155,32 @@ export default function ServiceSelectionPage() {
                         </span>
                       )}
                     </div>
-                  </button>
+                  </div>
 
-                  {/* Edit button → ServiceEditPage */}
-                  <button
-                    type="button"
-                    onClick={() => navigate(`/dashboard/${businessSlug}/services/${svc.id}/edit`)}
-                    className="p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/5 transition shrink-0"
-                    aria-label={t("serviceSelection.editService")}
-                    title={t("serviceSelection.editService")}
-                  >
-                    <MaterialIcon name="edit" className="text-lg" />
-                  </button>
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {/* Availability / working hours */}
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/schedule/${businessId}/${svc.id}`)}
+                      className="p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/5 transition"
+                      aria-label={t("serviceSelection.editAvailability")}
+                      title={t("serviceSelection.editAvailability")}
+                    >
+                      <MaterialIcon name="edit_calendar" className="text-lg" />
+                    </button>
 
-                  <MaterialIcon name="chevron_right" className="text-gray-300 dark:text-gray-600 shrink-0" />
+                    {/* Edit service details */}
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/dashboard/${businessSlug}/services/${svc.id}/edit`)}
+                      className="p-2 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/5 transition"
+                      aria-label={t("serviceSelection.editService")}
+                      title={t("serviceSelection.editService")}
+                    >
+                      <MaterialIcon name="edit" className="text-lg" />
+                    </button>
+                  </div>
                 </div>
               </Card>
             );

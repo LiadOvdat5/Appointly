@@ -1,6 +1,10 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { initDarkMode } from "./hooks/useDarkMode";
+
+// Apply saved/system theme before first paint to prevent flash
+initDarkMode();
 
 // React Router Dom
 import { RouterProvider } from "react-router-dom";

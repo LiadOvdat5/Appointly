@@ -9,4 +9,4 @@
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-13-C-01-Mobile-Layout-Audit\|US-13-C-01]] | Audit and fix mobile layout and touch usability issues | 🔲 Not Started |
+| [[US-13-C-01-Mobile-Layout-Audit\|US-13-C-01]] | Audit and fix mobile layout and touch usability issues | ✅ Done |

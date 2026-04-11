@@ -13,6 +13,8 @@ function formatDate(iso: string): string {
   });
 }
 
+const PREVIEW_COUNT = 3;
+
 interface DashboardCompletedSectionProps {
   appointments: AppointmentDTO[];
   loading: boolean;
@@ -20,6 +22,7 @@ interface DashboardCompletedSectionProps {
   reviewMap: Record<string, ReviewDTO>;
   onRequestVoid: (id: string) => void;
   onViewReview: (r: ReviewDTO) => void;
+  viewAllHref: string;
 }
 
 export function DashboardCompletedSection({
@@ -29,14 +32,28 @@ export function DashboardCompletedSection({
   reviewMap,
   onRequestVoid,
   onViewReview,
+  viewAllHref,
 }: DashboardCompletedSectionProps) {
   const { t } = useTranslation();
+  const preview = appointments.slice(0, PREVIEW_COUNT);
+  const hasMore = appointments.length > PREVIEW_COUNT;
 
   return (
     <section>
-      <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
-        {t("dashboard.completedAppointments")}
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide">
+          {t("dashboard.completedAppointments")}
+        </h2>
+        {!loading && appointments.length > 0 && (
+          <a
+            href={viewAllHref}
+            className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+          >
+            {t("dashboard.viewAll")}
+            <MaterialIcon name="chevron_right" className="text-sm leading-none" />
+          </a>
+        )}
+      </div>
 
       {loading ? (
         <div className="space-y-3">
@@ -56,7 +73,7 @@ export function DashboardCompletedSection({
         </Card>
       ) : (
         <div className="space-y-3">
-          {appointments.map((appt) => {
+          {preview.map((appt) => {
             const review = reviewMap[appt.id];
             return (
               <Card key={appt.id} className="p-4 space-y-2">
@@ -137,6 +154,15 @@ export function DashboardCompletedSection({
               </Card>
             );
           })}
+          {hasMore && (
+            <a
+              href={viewAllHref}
+              className="flex items-center justify-center gap-1 py-3 text-xs font-semibold text-primary hover:underline"
+            >
+              {t("dashboard.viewAllAppointments", { count: appointments.length - PREVIEW_COUNT })}
+              <MaterialIcon name="chevron_right" className="text-sm leading-none" />
+            </a>
+          )}
         </div>
       )}
     </section>

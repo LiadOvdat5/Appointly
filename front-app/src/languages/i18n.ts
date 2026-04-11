@@ -14,6 +14,12 @@ i18n.use(initReactI18next).init({
           selectLanguage: "Select Language",
         },
 
+        // ============ THEME ============
+        theme: {
+          switchToDark: "Switch to dark mode",
+          switchToLight: "Switch to light mode",
+        },
+
         // ============ NAVIGATION ============
         nav: {
           home: "Home",
@@ -819,6 +825,7 @@ i18n.use(initReactI18next).init({
           upcomingAppointments: "Upcoming Appointments",
           completedAppointments: "Completed Appointments",
           viewAll: "View all",
+          viewAllAppointments: "+{{count}} more — View all",
           manageAll: "Manage all appointments →",
           noUpcoming: {
             title: "No upcoming appointments",
@@ -1112,7 +1119,8 @@ i18n.use(initReactI18next).init({
           },
           upcoming: "{{count}} upcoming",
           editService: "Edit service details",
-          hint: "Tap a service name to manage its schedule. Use the edit icon to update details and category.",
+          editAvailability: "Edit availability & working hours",
+          hint: "Use the calendar icon to manage working hours. Use the edit icon to update service details.",
         },
 
         // ============ SCHEDULE EDITOR ============
@@ -1429,6 +1437,12 @@ i18n.use(initReactI18next).init({
           english: "English",
           hebrew: "עברית",
           selectLanguage: "בחר שפה",
+        },
+
+        // ============ THEME ============
+        theme: {
+          switchToDark: "עבור למצב כהה",
+          switchToLight: "עבור למצב בהיר",
         },
 
         // ============ NAVIGATION ============
@@ -2230,6 +2244,7 @@ i18n.use(initReactI18next).init({
           upcomingAppointments: "פגישות קרובות",
           completedAppointments: "פגישות שהושלמו",
           viewAll: "הצג הכל",
+          viewAllAppointments: "+{{count}} נוספות — הצג הכל",
           manageAll: "נהל את כל הפגישות ←",
           noUpcoming: {
             title: "אין פגישות קרובות",
@@ -2519,7 +2534,8 @@ i18n.use(initReactI18next).init({
           },
           upcoming: "{{count}} קרובות",
           editService: "עריכת פרטי שירות",
-          hint: "לחץ על שם השירות לניהול לוח הזמנים. לחץ על סמל העריכה לעדכון פרטים וקטגוריה.",
+          editAvailability: "עריכת זמינות ושעות עבודה",
+          hint: "לחץ על סמל הלוח לניהול שעות עבודה. לחץ על סמל העריכה לעדכון פרטי השירות.",
         },
 
         // ============ SCHEDULE EDITOR ============

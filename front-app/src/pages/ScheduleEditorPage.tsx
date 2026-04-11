@@ -383,7 +383,7 @@ export default function ScheduleEditorPage() {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          onClick={() => navigate(`/business/${businessId}`)}
+          onClick={() => navigate(-1)}
           className="p-2 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
           aria-label={t("scheduleEditor.backAriaLabel")}
         >

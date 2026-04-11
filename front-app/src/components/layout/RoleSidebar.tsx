@@ -117,13 +117,6 @@ export function RoleSidebar({
               minRole: Role.Client,
               icon: <SidebarIcon name="person" />,
             },
-            {
-              key: "settings",
-              label: t("settings.title"),
-              to: "/settings",
-              minRole: Role.Client,
-              icon: <SidebarIcon name="settings" />,
-            },
           ],
         },
       ],

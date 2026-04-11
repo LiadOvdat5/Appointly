@@ -399,6 +399,7 @@ export default function DashboardPage() {
             reviewMap={reviewMap}
             onRequestVoid={setConfirmCancelId}
             onViewReview={setViewingReview}
+            viewAllHref={`/business/${business.slug}/schedule`}
           />
 
           <DashboardQuickLinks

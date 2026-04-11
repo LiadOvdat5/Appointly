@@ -1,10 +1,15 @@
 @import "tailwindcss";
 
+/* Tell Tailwind v4 to use class-based dark mode (the "dark" class on <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Tailwind v4 theme tokens */
 @theme {
   --color-primary: #197fe6;
   --color-background-light: #f6f7f8;
   --color-background-dark: #111921;
+  /* Card/panel surface in dark mode — slightly lighter than the page background */
+  --color-surface-dark: #1c2a37;
   --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;

@@ -14,3 +14,4 @@
 | A   | [[F-13-A-Web-App-Manifest\|Feature A: Web App Manifest]]                      | ✅ Done        |
 | B   | [[F-13-B-Service-Worker-Offline\|Feature B: Service Worker & Offline Shell]]  | ✅ Done        |
 | C   | [[F-13-C-Mobile-UX-Audit\|Feature C: Mobile UX Audit]]                        | ✅ Done        |
+| D   | [[F-13-D-Dark-Mode\|Feature D: Dark Mode]]                                    | ✅ Done        |
