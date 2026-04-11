@@ -62,7 +62,8 @@
       "mcp__browser__browser_console_messages",
       "Bash(cmd /c \"cd /d \\\\\"d:\\\\Coding\\\\.Net + React\\\\BizSlot\\\\front-app\\\\\" && start /B npm run dev > \\\\\"%TEMP%\\\\vite-dev.log\\\\\" 2>&1\")",
       "Bash(pkill -f \"vite\")",
-      "Bash(kill 402 403 411)"
+      "Bash(kill 402 403 411)",
+      "Bash(ls -la \"d:/Coding/.Net + React/BizSlot/\"*.png)"
     ]
   }
 }
