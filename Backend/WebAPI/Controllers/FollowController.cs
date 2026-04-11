@@ -107,5 +107,19 @@ namespace WebAPI.Controllers
             var status = await _followRepository.GetFollowStatusAsync(userId.Value, businessId);
             return Ok(status);
         }
+
+        /// <summary>
+        /// Get follower count for a business
+        /// </summary>
+        [HttpGet("count/{businessId:guid}")]
+        [AllowAnonymous]
+        [EndpointSummary("Get Follower Count")]
+        [EndpointDescription("Returns the total number of followers for the specified business. Public endpoint — no authentication required.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<FollowerCountDTO>> GetFollowerCount(Guid businessId)
+        {
+            var count = await _followRepository.GetFollowerCountAsync(businessId);
+            return Ok(new FollowerCountDTO { BusinessId = businessId, FollowerCount = count });
+        }
     }
 }

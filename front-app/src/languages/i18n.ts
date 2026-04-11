@@ -777,6 +777,7 @@ i18n.use(initReactI18next).init({
         // ============ DASHBOARD (Business Owner) ============
         dashboard: {
           editPage: "Edit Page",
+          followers: "Followers",
           performance: "Performance",
           noData: "No data for this period",
           selectMetrics: "Select metrics above to display analytics",
@@ -1330,6 +1331,8 @@ i18n.use(initReactI18next).init({
           phoneLabel: "Phone",
           following: "Following",
           follow: "Follow",
+          followerCount_one: "{{count}} follower",
+          followerCount_other: "{{count}} followers",
           themeColorLabel: "Theme Color",
           themeColorHint: "Live preview updates the page colors",
           saveChanges: "Save changes",
@@ -2185,6 +2188,7 @@ i18n.use(initReactI18next).init({
         // ============ DASHBOARD (Business Owner) ============
         dashboard: {
           editPage: "ערוך דף",
+          followers: "עוקבים",
           performance: "ביצועים",
           noData: "אין נתונים לתקופה זו",
           selectMetrics: "בחר מדדים למעלה להצגת אנליטיקה",
@@ -2726,6 +2730,8 @@ i18n.use(initReactI18next).init({
           phoneLabel: "טלפון",
           following: "עוקב",
           follow: "עקוב",
+          followerCount_one: "עוקב {{count}}",
+          followerCount_other: "{{count}} עוקבים",
           themeColorLabel: "צבע ערכת נושא",
           themeColorHint: "תצוגה מקדימה חיה מעדכנת את צבעי הדף",
           saveChanges: "שמור שינויים",

@@ -24,6 +24,7 @@ import {
   followBusiness,
   unfollowBusiness,
   getFollowStatus,
+  getFollowerCount,
 } from "../services/followService";
 import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 import { fetchCategories } from "../services/categoryService";
@@ -433,6 +434,7 @@ export default function PublicBusinessPage() {
   // ── Follow state ──────────────────────────────────────────────────────────
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(false);
+  const [followerCount, setFollowerCount] = useState<number | null>(null);
 
   // ── Share modal ───────────────────────────────────────────────────────────
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -500,6 +502,22 @@ export default function PublicBusinessPage() {
       cancelled = true;
     };
   }, [page.status, isAuthenticated, isOwner, businessId]);
+
+  // ── Load follower count (public — visible to all) ─────────────────────────
+  useEffect(() => {
+    if (page.status !== "ready" || !businessId) return;
+    let cancelled = false;
+    getFollowerCount(businessId)
+      .then((count) => {
+        if (!cancelled) setFollowerCount(count);
+      })
+      .catch(() => {
+        /* silently ignore */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page.status, businessId]);
 
   // ── Load reviews (page 1) when business is ready ─────────────────────────
   useEffect(() => {
@@ -743,9 +761,11 @@ export default function PublicBusinessPage() {
       if (isFollowing) {
         await unfollowBusiness(businessId);
         setIsFollowing(false);
+        setFollowerCount((c) => (c !== null ? Math.max(0, c - 1) : c));
       } else {
         await followBusiness(businessId);
         setIsFollowing(true);
+        setFollowerCount((c) => (c !== null ? c + 1 : c));
       }
     } catch {
       // Silently ignore — could add a toast later
@@ -1321,36 +1341,51 @@ export default function PublicBusinessPage() {
             </div>
           )}
 
-          {/* Follow button (customers only, view mode) */}
-          {!isEditing && isAuthenticated && !isOwner && (
-            <button
-              type="button"
-              onClick={handleFollowToggle}
-              disabled={isFollowLoading}
-              className={[
-                "flex items-center gap-2 self-start rounded-full px-5 py-2 text-sm font-semibold transition-all disabled:opacity-50",
-                isFollowing
-                  ? "bg-primary/10 text-primary border border-primary/30 hover:bg-red-50 hover:text-red-500 hover:border-red-200 dark:hover:bg-red-900/20"
-                  : "bg-primary text-white hover:brightness-95 shadow-sm",
-              ].join(" ")}
-            >
-              {isFollowLoading ? (
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              ) : (
-                <MaterialIcon
-                  name="favorite"
-                  className={[
-                    "text-base leading-none",
-                    isFollowing ? "icon-filled" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                />
+          {/* Follower count + follow button row (view mode) */}
+          {!isEditing && (
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Follower count — visible to everyone */}
+              {followerCount !== null && (
+                <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                  <MaterialIcon name="favorite" className="text-base text-rose-400 icon-filled" />
+                  <span>
+                    {t("publicBusiness.followerCount", { count: followerCount })}
+                  </span>
+                </div>
               )}
-              {isFollowing
-                ? t("publicBusiness.following")
-                : t("publicBusiness.follow")}
-            </button>
+
+              {/* Follow/unfollow button — authenticated non-owners only */}
+              {isAuthenticated && !isOwner && (
+                <button
+                  type="button"
+                  onClick={handleFollowToggle}
+                  disabled={isFollowLoading}
+                  className={[
+                    "flex items-center gap-2 self-start rounded-full px-5 py-2 text-sm font-semibold transition-all disabled:opacity-50",
+                    isFollowing
+                      ? "bg-primary/10 text-primary border border-primary/30 hover:bg-red-50 hover:text-red-500 hover:border-red-200 dark:hover:bg-red-900/20"
+                      : "bg-primary text-white hover:brightness-95 shadow-sm",
+                  ].join(" ")}
+                >
+                  {isFollowLoading ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <MaterialIcon
+                      name="favorite"
+                      className={[
+                        "text-base leading-none",
+                        isFollowing ? "icon-filled" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    />
+                  )}
+                  {isFollowing
+                    ? t("publicBusiness.following")
+                    : t("publicBusiness.follow")}
+                </button>
+              )}
+            </div>
           )}
 
           {/* Theme color picker (edit mode only) */}

@@ -18,4 +18,10 @@ namespace WebAPI.DTOs
     {
         public Guid BusinessId { get; set; }
     }
+
+    public class FollowerCountDTO
+    {
+        public Guid BusinessId { get; set; }
+        public int FollowerCount { get; set; }
+    }
 }

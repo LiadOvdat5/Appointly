@@ -13,6 +13,11 @@ export interface FollowStatusDTO {
   followId: string | null;
 }
 
+export interface FollowerCountDTO {
+  businessId: string;
+  followerCount: number;
+}
+
 export async function followBusiness(businessId: string): Promise<FollowDTO> {
   const response = await apiClient.post<FollowDTO>("/api/follow", { businessId });
   return response.data;
@@ -30,4 +35,9 @@ export async function getFollowedBusinesses(): Promise<BusinessProfile[]> {
 export async function getFollowStatus(businessId: string): Promise<FollowStatusDTO> {
   const response = await apiClient.get<FollowStatusDTO>(`/api/follow/status/${businessId}`);
   return response.data;
+}
+
+export async function getFollowerCount(businessId: string): Promise<number> {
+  const response = await apiClient.get<FollowerCountDTO>(`/api/follow/count/${businessId}`);
+  return response.data.followerCount;
 }

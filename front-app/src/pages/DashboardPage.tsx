@@ -16,6 +16,7 @@ import {
   getBusinessById,
   getPublicBusinessBySlug,
 } from "../services/businessManagementService";
+import { getFollowerCount } from "../services/followService";
 import type { BusinessProfile } from "../types/business";
 import { Button } from "../components/UI/Button";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
@@ -55,6 +56,9 @@ export default function DashboardPage() {
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
   const [businessLoading, setBusinessLoading] = useState(true);
   const [businessError, setBusinessError] = useState<string | null>(null);
+
+  // Follower count
+  const [followerCount, setFollowerCount] = useState<number | null>(null);
 
   // All appointments — split into upcoming/completed in render
   const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
@@ -125,6 +129,16 @@ export default function DashboardPage() {
       })
       .finally(() => setBusinessLoading(false));
   }, [paramBusinessSlug, t, navigate]);
+
+  // ── Load follower count ──────────────────────────────────────────────────
+  useEffect(() => {
+    if (!business) return;
+    getFollowerCount(business.id)
+      .then(setFollowerCount)
+      .catch(() => {
+        /* silently ignore */
+      });
+  }, [business]);
 
   // ── Load appointments ────────────────────────────────────────────────────
   useEffect(() => {
@@ -342,6 +356,25 @@ export default function DashboardPage() {
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
+          {/* Follower count summary */}
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-surface-dark border border-[#e7edf3] dark:border-gray-800 shadow-sm">
+            <div className="h-11 w-11 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
+              <MaterialIcon name="favorite" className="text-xl text-rose-500 icon-filled" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold">
+                {t("dashboard.followers")}
+              </p>
+              {followerCount === null ? (
+                <div className="h-6 w-12 rounded bg-gray-200 dark:bg-gray-700 animate-pulse mt-0.5" />
+              ) : (
+                <p className="text-2xl font-bold text-[#111418] dark:text-white leading-tight">
+                  {followerCount.toLocaleString()}
+                </p>
+              )}
+            </div>
+          </div>
+
           <DashboardStatsSection
             report={report}
             reportLoading={reportLoading}

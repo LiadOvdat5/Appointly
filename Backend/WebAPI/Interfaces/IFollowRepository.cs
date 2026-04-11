@@ -8,5 +8,6 @@ namespace WebAPI.Interfaces
         Task<bool> UnfollowAsync(Guid userId, Guid businessId);
         Task<IEnumerable<BusinessDTO>> GetFollowedBusinessesAsync(Guid userId);
         Task<FollowStatusDTO> GetFollowStatusAsync(Guid userId, Guid businessId);
+        Task<int> GetFollowerCountAsync(Guid businessId);
     }
 }

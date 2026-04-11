@@ -106,5 +106,11 @@ namespace WebAPI.Repositories
                 FollowId = follow?.Id
             };
         }
+
+        public async Task<int> GetFollowerCountAsync(Guid businessId)
+        {
+            return await _context.Follows
+                .CountAsync(f => f.BusinessId == businessId);
+        }
     }
 }
