@@ -2,7 +2,6 @@ import React, { useEffect, useReducer, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { formatTime } from "../utils/formatTime";
 import type { RootState } from "../redux/store";
 import {
   selectAvailabilityDate,
@@ -37,11 +36,13 @@ import type { Category } from "../types/search";
 import { Button } from "../components/UI/Button";
 import { Card } from "../components/UI/Card";
 import { Input } from "../components/UI/Input";
-import { CategorySearchSelect } from "../components/UI/CategorySearchSelect";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
 import type { AddressResult } from "../components/UI/AddressAutocomplete";
 import { ShareModal } from "../components/UI/ShareModal";
+import { ServiceCard } from "../components/business/ServiceCard";
+import { ServiceFormFields, emptyServiceDraft, type DraftService } from "../components/business/ServiceFormFields";
+import { BusinessReviewsSection } from "../components/business/BusinessReviewsSection";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -52,26 +53,6 @@ function resolveUploadUrl(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith("http")) return path;
   return `${API_BASE}${path}`;
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m ? `${h}h ${m}m` : `${h}h`;
-}
-
-function formatSlotDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatSlotTime(iso: string): string {
-  return formatTime(iso);
 }
 
 // ─── State types ─────────────────────────────────────────────────────────────
@@ -85,22 +66,6 @@ type DraftBusiness = {
   phone: string;
   themeColor: string;
 };
-
-type DraftService = {
-  name: string;
-  description: string;
-  duration: string;
-  price: string;
-  categoryId: string;
-};
-
-const emptyServiceDraft = (): DraftService => ({
-  name: "",
-  description: "",
-  duration: "",
-  price: "",
-  categoryId: "",
-});
 
 type PageState =
   | { status: "loading" }
@@ -429,263 +394,6 @@ function pageReducer(state: PageState, action: PageAction): PageState {
     default:
       return state;
   }
-}
-
-// ─── Service card (view mode) ─────────────────────────────────────────────────
-
-function ServiceCardItem({
-  service,
-  businessSlug,
-  slots,
-  slotsLoading,
-  isAuthenticated,
-  isEditing,
-  isBeingEdited,
-  onEdit,
-  onDelete,
-  onManageSchedule,
-}: {
-  service: ServiceProfile;
-  businessSlug: string;
-  slots: SlotDTO[];
-  slotsLoading: boolean;
-  isAuthenticated: boolean;
-  isEditing: boolean;
-  isBeingEdited: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
-  onManageSchedule: () => void;
-}) {
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const bookingPath = `/book/${businessSlug}/${service.id}`;
-  const loginRedirect = `/login?from=/business/${businessSlug}`;
-
-  function handleBook(extra = "") {
-    if (!isAuthenticated) {
-      navigate(loginRedirect);
-    } else {
-      navigate(extra ? `${bookingPath}${extra}` : bookingPath);
-    }
-  }
-
-  const previewSlots = slots.slice(0, 3);
-
-  return (
-    <Card
-      className={`p-5 flex flex-col gap-4 transition-opacity ${isBeingEdited ? "opacity-40 pointer-events-none" : ""}`}
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <p className="font-bold text-[#111418] dark:text-white text-base">
-            {service.name}
-          </p>
-          {service.description && (
-            <p className="text-sm text-gray-500 mt-0.5">
-              {service.description}
-            </p>
-          )}
-        </div>
-        <div className="flex items-start gap-2">
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            {service.price != null && (
-              <span className="font-bold text-primary text-base">
-                ${service.price.toFixed(2)}
-              </span>
-            )}
-            <span className="text-xs text-gray-400 flex items-center gap-1">
-              <MaterialIcon name="schedule" className="text-sm leading-none" />
-              {formatDuration(service.duration)}
-            </span>
-          </div>
-          {isEditing && (
-            <div className="flex items-center gap-1 ml-1">
-              <button
-                type="button"
-                onClick={onManageSchedule}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
-                aria-label={t("publicBusiness.manageSchedule")}
-              >
-                <MaterialIcon name="calendar_month" className="text-base" />
-              </button>
-              <button
-                type="button"
-                onClick={onEdit}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors"
-                aria-label={t("publicBusiness.editServiceAriaLabel")}
-              >
-                <MaterialIcon name="edit" className="text-base" />
-              </button>
-              <button
-                type="button"
-                onClick={onDelete}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-danger hover:bg-danger/10 transition-colors"
-                aria-label={t("publicBusiness.deleteServiceAriaLabel")}
-              >
-                <MaterialIcon name="delete" className="text-base" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {!isEditing && (
-        <>
-          <div>
-            {slotsLoading ? (
-              <p className="text-xs text-gray-400">
-                {t("publicBusiness.checkingAvailability")}
-              </p>
-            ) : previewSlots.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {previewSlots.map((slot) => (
-                  <button
-                    key={slot.id}
-                    type="button"
-                    onClick={() =>
-                      handleBook(
-                        `?slotId=${slot.id}&slotDate=${encodeURIComponent(slot.startDateTime)}`,
-                      )
-                    }
-                    className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary
-                      hover:bg-primary/10 active:scale-95 transition-all"
-                  >
-                    {formatSlotDate(slot.startDateTime)}{" "}
-                    <span className="font-bold">
-                      {formatSlotTime(slot.startDateTime)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs text-gray-400">
-                {t("publicBusiness.noUpcomingSlots")}
-              </p>
-            )}
-          </div>
-          <Button variant="primary" size="sm" onClick={() => handleBook()}>
-            {t("publicBusiness.book")}
-          </Button>
-        </>
-      )}
-    </Card>
-  );
-}
-
-// ─── Service edit / add form ─────────────────────────────────────────────────
-
-function ServiceForm({
-  draft,
-  categories,
-  isNew,
-  isSaving,
-  error,
-  onField,
-  onSave,
-  onCancel,
-}: {
-  draft: DraftService;
-  categories: Category[];
-  isNew: boolean;
-  isSaving: boolean;
-  error: string | null;
-  onField: (field: keyof DraftService, value: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
-}) {
-  const { t } = useTranslation();
-
-  const durationNum = Number(draft.duration);
-  const priceNum = Number(draft.price);
-  const durationError =
-    draft.duration !== "" && (isNaN(durationNum) || durationNum <= 0)
-      ? t("publicBusiness.durationPositive")
-      : undefined;
-  const priceError =
-    draft.price !== "" && (isNaN(priceNum) || priceNum < 0)
-      ? t("publicBusiness.priceNotNegative")
-      : undefined;
-
-  const canSave =
-    draft.name.trim().length > 0 &&
-    draft.duration !== "" &&
-    !durationError &&
-    !priceError &&
-    draft.categoryId !== "";
-
-  return (
-    <Card className="p-5 flex flex-col gap-4 border-2 border-primary/30 bg-primary/5 dark:bg-primary/10">
-      <p className="text-sm font-bold text-primary">
-        {isNew
-          ? t("publicBusiness.addService")
-          : t("publicBusiness.editServiceTitle")}
-      </p>
-
-      <div className="grid grid-cols-1 gap-3">
-        <Input
-          label={t("publicBusiness.nameLabel")}
-          value={draft.name}
-          onValueChange={(v) => onField("name", v)}
-          placeholder={t("publicBusiness.namePlaceholder")}
-        />
-        <Input
-          label={t("publicBusiness.descriptionOptionalLabel")}
-          value={draft.description}
-          onValueChange={(v) => onField("description", v)}
-          placeholder={t("publicBusiness.descriptionShortPlaceholder")}
-        />
-        <div className="grid grid-cols-2 gap-3">
-          <Input
-            label={t("publicBusiness.durationLabel")}
-            type="number"
-            value={draft.duration}
-            onValueChange={(v) => onField("duration", v)}
-            placeholder="30"
-            error={durationError}
-          />
-          <Input
-            label={t("publicBusiness.priceLabel")}
-            type="number"
-            value={draft.price}
-            onValueChange={(v) => onField("price", v)}
-            placeholder="25.00"
-            error={priceError}
-          />
-        </div>
-        <CategorySearchSelect
-          label={t("publicBusiness.categoryLabel")}
-          value={draft.categoryId}
-          onChange={(v) => onField("categoryId", v)}
-          categories={categories}
-          businessId={businessId}
-        />
-      </div>
-
-      {error && <p className="text-xs text-danger">{error}</p>}
-
-      <div className="flex gap-2">
-        <Button
-          variant="primary"
-          size="sm"
-          className="flex-1"
-          onClick={onSave}
-          disabled={!canSave}
-          isLoading={isSaving}
-        >
-          {isNew ? t("publicBusiness.addService") : t("buttons.save")}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          onClick={onCancel}
-          disabled={isSaving}
-        >
-          {t("buttons.cancel")}
-        </Button>
-      </div>
-    </Card>
-  );
 }
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -1736,25 +1444,22 @@ export default function PublicBusinessPage() {
             <div className="flex flex-col gap-4">
               {services.map((svc) =>
                 isEditing && editingServiceId === svc.id ? (
-                  <ServiceForm
+                  <ServiceFormFields
                     key={svc.id}
                     draft={serviceDraft}
                     categories={categories}
+                    businessId={businessId}
                     isNew={false}
                     isSaving={isServiceSaving}
                     error={serviceError}
                     onField={(f, v) =>
-                      dispatch({
-                        type: "SET_SERVICE_DRAFT",
-                        field: f,
-                        value: v,
-                      })
+                      dispatch({ type: "SET_SERVICE_DRAFT", field: f, value: v })
                     }
                     onSave={handleSaveService}
                     onCancel={() => dispatch({ type: "CANCEL_SERVICE_EDIT" })}
                   />
                 ) : (
-                  <ServiceCardItem
+                  <ServiceCard
                     key={svc.id}
                     service={svc}
                     businessSlug={businessSlug!}
@@ -1778,9 +1483,10 @@ export default function PublicBusinessPage() {
 
               {/* Add service form */}
               {isEditing && editingServiceId === "new" && (
-                <ServiceForm
+                <ServiceFormFields
                   draft={serviceDraft}
                   categories={categories}
+                  businessId={businessId}
                   isNew
                   isSaving={isServiceSaving}
                   error={serviceError}
@@ -1811,85 +1517,12 @@ export default function PublicBusinessPage() {
 
         {/* ── Reviews section ── */}
         {!isEditing && (
-          <section>
-            <h2 className="text-lg font-bold text-[#111418] dark:text-white mb-4">
-              {t("publicBusiness.reviewsTitle")}
-            </h2>
-
-            {reviewsLoading && reviews.length === 0 ? (
-              <div className="space-y-3">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="h-24 rounded-2xl bg-gray-200 dark:bg-gray-800 animate-pulse"
-                  />
-                ))}
-              </div>
-            ) : reviews.length === 0 ? (
-              <Card className="p-8 flex flex-col items-center gap-2 text-center">
-                <MaterialIcon
-                  name="rate_review"
-                  className="text-4xl text-gray-300 dark:text-gray-700"
-                />
-                <p className="text-sm text-gray-500">
-                  {t("publicBusiness.noReviewsYet")}
-                </p>
-              </Card>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {reviews.map((review) => (
-                  <Card key={review.id} className="p-5 flex flex-col gap-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-semibold text-sm text-[#111418] dark:text-white">
-                          {review.customerName}
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          {new Date(review.createdAt).toLocaleDateString(
-                            undefined,
-                            {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            },
-                          )}
-                        </span>
-                      </div>
-                      <div className="flex gap-0.5 shrink-0">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <MaterialIcon
-                            key={s}
-                            name={review.rating >= s ? "star" : "star_border"}
-                            className={`text-base leading-none ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    {review.comment && (
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                        "{review.comment}"
-                      </p>
-                    )}
-                  </Card>
-                ))}
-
-                {reviewsHasMore && (
-                  <button
-                    type="button"
-                    onClick={handleLoadMoreReviews}
-                    disabled={reviewsLoading}
-                    className="w-full py-3 text-sm font-semibold text-primary hover:underline disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {reviewsLoading ? (
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-                    ) : (
-                      t("publicBusiness.loadMoreReviews")
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
-          </section>
+          <BusinessReviewsSection
+            reviews={reviews}
+            reviewsLoading={reviewsLoading}
+            reviewsHasMore={reviewsHasMore}
+            onLoadMore={handleLoadMoreReviews}
+          />
         )}
       </div>
 

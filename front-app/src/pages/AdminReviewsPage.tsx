@@ -5,262 +5,11 @@ import { Card } from "../components/UI/Card";
 import {
   getAdminReviewAnalytics,
   type AdminReviewAnalytics,
-  type ReviewBusinessEntry,
 } from "../services/adminService";
-
-// ── Stat card ─────────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  icon,
-  iconColor,
-  iconBg,
-  loading,
-  linkTo,
-  alert,
-}: {
-  label: string;
-  value: number | string;
-  icon: string;
-  iconColor: string;
-  iconBg: string;
-  loading: boolean;
-  linkTo?: string;
-  alert?: boolean;
-}) {
-  const content = (
-    <Card
-      className={[
-        "flex items-center gap-3 px-4 py-3",
-        alert
-          ? "border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30"
-          : "",
-      ].join(" ")}
-    >
-      <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}>
-        <MaterialIcon name={icon} className={`text-xl ${iconColor}`} />
-      </div>
-      <div className="flex-1 min-w-0">
-        {loading ? (
-          <div className="h-5 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-        ) : (
-          <p
-            className={[
-              "font-bold text-lg leading-tight",
-              alert
-                ? "text-orange-700 dark:text-orange-300"
-                : "text-[#111418] dark:text-white",
-            ].join(" ")}
-          >
-            {typeof value === "number" ? value.toLocaleString() : value}
-          </p>
-        )}
-        <p className="text-xs text-gray-500">{label}</p>
-      </div>
-      {linkTo && !loading && (
-        <MaterialIcon
-          name="open_in_new"
-          className="text-base text-gray-400 shrink-0"
-        />
-      )}
-    </Card>
-  );
-
-  if (linkTo) {
-    return (
-      <Link to={linkTo} className="block">
-        {content}
-      </Link>
-    );
-  }
-  return content;
-}
-
-// ── Rating distribution bar chart ─────────────────────────────────────────────
-
-function RatingDistribution({
-  distribution,
-  total,
-  loading,
-}: {
-  distribution: Record<string, number>;
-  total: number;
-  loading: boolean;
-}) {
-  const stars = [5, 4, 3, 2, 1];
-  const starColors = [
-    "bg-green-500",
-    "bg-lime-500",
-    "bg-yellow-400",
-    "bg-orange-400",
-    "bg-red-500",
-  ];
-  const max = Math.max(...stars.map((s) => distribution[String(s)] ?? 0), 1);
-
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {stars.map((s) => (
-          <div key={s} className="flex items-center gap-2">
-            <span className="text-xs text-gray-400 w-4 text-right">{s}</span>
-            <MaterialIcon name="star" className="text-xs text-gray-300" />
-            <div className="flex-1 h-5 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      {stars.map((s, idx) => {
-        const count = distribution[String(s)] ?? 0;
-        const widthPct = max > 0 ? (count / max) * 100 : 0;
-        const pct = total > 0 ? ((count / total) * 100).toFixed(1) : "0.0";
-        return (
-          <div key={s} className="flex items-center gap-2">
-            <span className="text-xs font-medium text-gray-500 w-3 text-right">{s}</span>
-            <MaterialIcon name="star" className="text-xs text-yellow-400" />
-            <div className="flex-1 relative h-5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
-              <div
-                className={`absolute inset-y-0 left-0 rounded-full transition-all ${starColors[idx]}`}
-                style={{ width: `${widthPct}%` }}
-              />
-            </div>
-            <span className="text-xs text-gray-500 w-14 text-right shrink-0">
-              {count.toLocaleString()} ({pct}%)
-            </span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── Monthly bar chart (CSS-only) ──────────────────────────────────────────────
-
-function MonthlyBarChart({
-  data,
-  loading,
-}: {
-  data: { month: string; count: number }[];
-  loading: boolean;
-}) {
-  const max = Math.max(...data.map((d) => d.count), 1);
-
-  function formatMonth(ym: string) {
-    const [year, month] = ym.split("-");
-    return new Date(Number(year), Number(month) - 1).toLocaleDateString(undefined, {
-      month: "short",
-      year: "2-digit",
-    });
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-end gap-1 h-28">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex-1 animate-pulse rounded-t bg-gray-200 dark:bg-gray-700"
-            style={{ height: `${30 + (i % 5) * 15}%` }}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-end gap-1 h-28">
-        {data.map((d) => {
-          const heightPct = max > 0 ? (d.count / max) * 100 : 0;
-          return (
-            <div key={d.month} className="flex-1 relative h-full group">
-              <div
-                className="absolute bottom-0 left-0 right-0 bg-yellow-400 dark:bg-yellow-500 rounded-t transition-all"
-                style={{ height: `${heightPct}%` }}
-              >
-                {d.count > 0 && (
-                  <div className="absolute -top-7 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded whitespace-nowrap pointer-events-none z-10">
-                    {d.count}
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="flex gap-1">
-        {data.map((d, i) => (
-          <div key={d.month} className="flex-1 text-center">
-            {i % 2 === 0 ? (
-              <span className="text-[9px] text-gray-400 leading-tight">{formatMonth(d.month)}</span>
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Ranked business list ──────────────────────────────────────────────────────
-
-function RankedList({
-  title,
-  items,
-  loading,
-  skeletonCount,
-  renderRight,
-  rowVariant,
-}: {
-  title: string;
-  items: ReviewBusinessEntry[];
-  loading: boolean;
-  skeletonCount?: number;
-  renderRight: (item: ReviewBusinessEntry) => React.ReactNode;
-  rowVariant?: "default" | "warning";
-}) {
-  const rowBase =
-    "flex items-center gap-3 px-3 py-2 rounded-xl border";
-  const rowStyle =
-    rowVariant === "warning"
-      ? `${rowBase} bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800`
-      : `${rowBase} bg-white dark:bg-surface-dark border-[#e7edf3] dark:border-gray-800`;
-
-  return (
-    <div className="space-y-2">
-      <p className="text-sm font-semibold text-[#111418] dark:text-white">{title}</p>
-      {loading ? (
-        <div className="space-y-1.5">
-          {Array.from({ length: skeletonCount ?? 5 }).map((_, i) => (
-            <div key={i} className="h-10 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700" />
-          ))}
-        </div>
-      ) : items.length === 0 ? (
-        <p className="text-xs text-gray-400 px-1">No data yet.</p>
-      ) : (
-        <div className="space-y-1.5">
-          {items.map((item, idx) => (
-            <div key={item.businessId} className={rowStyle}>
-              <span className="text-xs font-bold text-gray-400 w-5 text-center shrink-0">
-                {idx + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[#111418] dark:text-white truncate">
-                  {item.name}
-                </p>
-                <p className="text-xs text-gray-400 truncate">{item.slug}</p>
-              </div>
-              <div className="shrink-0">{renderRight(item)}</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+import { AdminReviewStatCard } from "../components/admin/reviews/AdminReviewStatCard";
+import { RatingDistributionChart } from "../components/admin/reviews/RatingDistributionChart";
+import { MonthlyBarChart } from "../components/admin/reviews/MonthlyBarChart";
+import { ReviewRankedList } from "../components/admin/reviews/ReviewRankedList";
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
@@ -308,7 +57,7 @@ export default function AdminReviewsPage() {
 
       {/* Summary stat cards */}
       <div className="grid grid-cols-2 gap-2">
-        <StatCard
+        <AdminReviewStatCard
           label="Total Reviews"
           value={data?.totalReviews ?? 0}
           icon="rate_review"
@@ -316,7 +65,7 @@ export default function AdminReviewsPage() {
           iconBg="bg-yellow-100 dark:bg-yellow-900/30"
           loading={loading}
         />
-        <StatCard
+        <AdminReviewStatCard
           label="Platform Average"
           value={data ? `${data.platformAverageRating.toFixed(1)} ★` : "—"}
           icon="star"
@@ -324,7 +73,7 @@ export default function AdminReviewsPage() {
           iconBg="bg-yellow-100 dark:bg-yellow-900/30"
           loading={loading}
         />
-        <StatCard
+        <AdminReviewStatCard
           label="Pending Flags"
           value={pendingFlags}
           icon="flag"
@@ -338,7 +87,7 @@ export default function AdminReviewsPage() {
           linkTo={pendingFlags > 0 ? "/admin/flagged-reviews" : undefined}
           alert={pendingFlags > 0}
         />
-        <StatCard
+        <AdminReviewStatCard
           label="Total Flagged"
           value={data?.flagStats.totalFlagged ?? 0}
           icon="outlined_flag"
@@ -391,7 +140,7 @@ export default function AdminReviewsPage() {
         <p className="text-sm font-semibold text-[#111418] dark:text-white">
           Rating Distribution
         </p>
-        <RatingDistribution
+        <RatingDistributionChart
           distribution={data?.ratingDistribution ?? {}}
           total={data?.totalReviews ?? 0}
           loading={loading}
@@ -408,7 +157,7 @@ export default function AdminReviewsPage() {
       </Card>
 
       {/* Top businesses by review count */}
-      <RankedList
+      <ReviewRankedList
         title="Top Businesses by Review Count"
         items={data?.topBusinessesByReviewCount ?? []}
         loading={loading}
@@ -424,7 +173,7 @@ export default function AdminReviewsPage() {
       />
 
       {/* Top rated businesses */}
-      <RankedList
+      <ReviewRankedList
         title="Top Rated Businesses"
         items={data?.topRatedBusinesses ?? []}
         loading={loading}
@@ -439,7 +188,7 @@ export default function AdminReviewsPage() {
       />
 
       {/* Lowest rated businesses */}
-      <RankedList
+      <ReviewRankedList
         title="Lowest Rated Businesses"
         items={data?.lowestRatedBusinesses ?? []}
         loading={loading}

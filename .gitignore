@@ -1,6 +1,9 @@
 # MCP configuration (may contain API tokens)
 .mcp.json
 
+# Playwright MCP testing artifacts (snapshots, screenshots, console logs)
+.playwright-mcp/
+
 # Local secrets — never commit
 Backend/WebAPI/appsettings.Development.json
 

@@ -11,212 +11,9 @@ import {
 import type { ServiceProfile } from "../types/business";
 import { Card } from "../components/UI/Card";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-// ─── Flag Modal ───────────────────────────────────────────────────────────────
-
-function FlagModal({
-  onSubmit,
-  onClose,
-  submitting,
-  error,
-}: {
-  onSubmit: (reason: string) => void;
-  onClose: () => void;
-  submitting: boolean;
-  error: string | null;
-}) {
-  const { t } = useTranslation();
-  const [reason, setReason] = useState("");
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-sm rounded-2xl bg-white dark:bg-surface-dark shadow-xl p-6 space-y-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h2 className="font-bold text-[#111418] dark:text-white text-base">{t("reviews.flag.title")}</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{t("reviews.flag.subtitle")}</p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-          >
-            <MaterialIcon name="close" className="text-xl text-gray-500" />
-          </button>
-        </div>
-
-        <textarea
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder={t("reviews.flag.placeholder")}
-          rows={4}
-          maxLength={500}
-          className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-3 text-sm text-[#111418] dark:text-white outline-none resize-none focus:ring-2 focus:ring-primary"
-        />
-        <p className="text-xs text-gray-400 text-right">{reason.length}/500</p>
-
-        {error && <p className="text-xs text-red-500">{error}</p>}
-
-        <div className="flex gap-2 pt-1">
-          <button
-            type="button"
-            onClick={() => onSubmit(reason)}
-            disabled={!reason.trim() || submitting}
-            className="flex-1 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-sm font-semibold py-2.5 transition-colors flex items-center justify-center gap-2"
-          >
-            {submitting ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            ) : (
-              <MaterialIcon name="flag" className="text-base" />
-            )}
-            {submitting ? t("reviews.flag.submitting") : t("reviews.flag.submitButton")}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={submitting}
-            className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm font-semibold py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
-          >
-            {t("reviews.flag.cancel")}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Review Card ──────────────────────────────────────────────────────────────
-
-function ReviewCard({
-  review,
-  onFlag,
-}: {
-  review: ReviewDTO;
-  onFlag: (id: string) => void;
-}) {
-  const { t } = useTranslation();
-
-  const cardBorder = review.isFlagged
-    ? "border-orange-200 dark:border-orange-800"
-    : review.isFlagDismissed
-    ? "border-blue-100 dark:border-blue-900/40"
-    : "";
-
-  const flagButtonDisabled = review.isFlagged || review.isFlagDismissed;
-  const flagButtonTitle = review.isFlagged
-    ? t("reviews.flag.alreadyFlagged")
-    : review.isFlagDismissed
-    ? t("reviews.flag.dismissedNote")
-    : t("reviews.flag.flagAsInappropriate");
-
-  return (
-    <Card className={`p-5 space-y-3 ${cardBorder}`}>
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex flex-col gap-0.5 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-sm text-[#111418] dark:text-white">
-              {review.customerName}
-            </span>
-            {review.isFlagged && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-orange-500 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-full px-2 py-0.5 shrink-0">
-                <MaterialIcon name="flag" className="text-xs leading-none" />
-                {t("reviews.badge.flagged")}
-              </span>
-            )}
-            {review.isFlagDismissed && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-blue-500 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-full px-2 py-0.5 shrink-0">
-                <MaterialIcon name="verified_user" className="text-xs leading-none" />
-                {t("reviews.badge.flagDismissed")}
-              </span>
-            )}
-          </div>
-
-          {/* Service + date */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
-            {review.serviceName && (
-              <span className="flex items-center gap-1 text-xs text-primary font-medium">
-                <MaterialIcon name="content_cut" className="text-xs leading-none" />
-                {review.serviceName}
-              </span>
-            )}
-            <span className="text-xs text-gray-400">{formatDate(review.createdAt)}</span>
-          </div>
-        </div>
-
-        {/* Stars + flag button */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <MaterialIcon
-                key={s}
-                name={review.rating >= s ? "star" : "star_border"}
-                className={`text-base leading-none ${review.rating >= s ? "text-yellow-400" : "text-gray-300"}`}
-              />
-            ))}
-          </div>
-          <button
-            type="button"
-            disabled={flagButtonDisabled}
-            onClick={() => !flagButtonDisabled && onFlag(review.id)}
-            title={flagButtonTitle}
-            className={`p-1.5 rounded-lg transition-colors ${
-              review.isFlagged
-                ? "text-orange-400 cursor-not-allowed"
-                : review.isFlagDismissed
-                ? "text-blue-300 dark:text-blue-700 cursor-not-allowed"
-                : "text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-            }`}
-          >
-            <MaterialIcon
-              name={review.isFlagged ? "flag" : review.isFlagDismissed ? "verified_user" : "outlined_flag"}
-              className="text-base leading-none"
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Comment */}
-      {review.comment && (
-        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-          "{review.comment}"
-        </p>
-      )}
-
-      {/* Status notes */}
-      {review.isFlagged && (
-        <p className="text-xs text-orange-500 flex items-center gap-1 pt-2 border-t border-orange-100 dark:border-orange-900/30">
-          <MaterialIcon name="info" className="text-sm leading-none" />
-          {t("reviews.flag.pendingNote")}
-        </p>
-      )}
-      {review.isFlagDismissed && (
-        <p className="text-xs text-blue-500 dark:text-blue-400 flex items-center gap-1 pt-2 border-t border-blue-100 dark:border-blue-900/30">
-          <MaterialIcon name="verified_user" className="text-sm leading-none" />
-          {t("reviews.flag.dismissedNote")}
-        </p>
-      )}
-    </Card>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
+import { ReviewFlagModal } from "../components/reviews/ReviewFlagModal";
+import { ReviewCard } from "../components/reviews/ReviewCard";
+import { ReviewFiltersCard } from "../components/reviews/ReviewFiltersCard";
 
 const PAGE_SIZE = 20;
 
@@ -225,10 +22,7 @@ export default function BusinessReviewsPage() {
   const navigate = useNavigate();
   const { businessSlug: paramBusinessSlug } = useParams<{ businessSlug?: string }>();
 
-  // Business id resolved from param or owner's first business
   const [businessId, setBusinessId] = useState<string | null>(null);
-
-  // Data
   const [reviews, setReviews] = useState<ReviewDTO[]>([]);
   const [services, setServices] = useState<ServiceProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,7 +33,7 @@ export default function BusinessReviewsPage() {
 
   // Filters
   const [filterService, setFilterService] = useState<string>("all");
-  const [filterRating, setFilterRating] = useState<number>(0); // 0 = all
+  const [filterRating, setFilterRating] = useState<number>(0);
   const [filterFrom, setFilterFrom] = useState<string>("");
   const [filterTo, setFilterTo] = useState<string>("");
 
@@ -312,31 +106,18 @@ export default function BusinessReviewsPage() {
     }
   }
 
-  // ── Client-side filtering ─────────────────────────────────────────────────
   const filtered = useMemo(() => {
     return reviews.filter((r) => {
       if (filterService !== "all" && r.serviceId !== filterService) return false;
       if (filterRating > 0 && r.rating !== filterRating) return false;
-      if (filterFrom) {
-        const from = new Date(filterFrom);
-        if (new Date(r.createdAt) < from) return false;
-      }
-      if (filterTo) {
-        const to = new Date(filterTo + "T23:59:59");
-        if (new Date(r.createdAt) > to) return false;
-      }
+      if (filterFrom && new Date(r.createdAt) < new Date(filterFrom)) return false;
+      if (filterTo && new Date(r.createdAt) > new Date(filterTo + "T23:59:59")) return false;
       return true;
     });
   }, [reviews, filterService, filterRating, filterFrom, filterTo]);
 
-  const hasActiveFilters =
-    filterService !== "all" || filterRating > 0 || filterFrom !== "" || filterTo !== "";
-
-  // ── Summary stats for filtered set ───────────────────────────────────────
-  const avgRating =
-    filtered.length > 0
-      ? filtered.reduce((s, r) => s + r.rating, 0) / filtered.length
-      : 0;
+  const hasActiveFilters = filterService !== "all" || filterRating > 0 || filterFrom !== "" || filterTo !== "";
+  const avgRating = filtered.length > 0 ? filtered.reduce((s, r) => s + r.rating, 0) / filtered.length : 0;
 
   function clearFilters() {
     setFilterService("all");
@@ -345,12 +126,10 @@ export default function BusinessReviewsPage() {
     setFilterTo("");
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
-
   return (
     <>
       {flaggingId && (
-        <FlagModal
+        <ReviewFlagModal
           onSubmit={handleFlag}
           onClose={() => { setFlaggingId(null); setFlagError(null); }}
           submitting={flagSubmitting}
@@ -384,96 +163,20 @@ export default function BusinessReviewsPage() {
         </div>
 
         <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+          <ReviewFiltersCard
+            services={services}
+            filterService={filterService}
+            filterRating={filterRating}
+            filterFrom={filterFrom}
+            filterTo={filterTo}
+            hasActiveFilters={hasActiveFilters}
+            onServiceChange={setFilterService}
+            onRatingChange={setFilterRating}
+            onFromChange={setFilterFrom}
+            onToChange={setFilterTo}
+            onClear={clearFilters}
+          />
 
-          {/* ── Filters ── */}
-          <Card className="p-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <MaterialIcon name="filter_list" className="text-base text-gray-500" />
-              <span className="text-sm font-semibold text-[#111418] dark:text-white">{t("reviews.filters.title")}</span>
-              {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="ml-auto text-xs text-primary hover:underline"
-                >
-                  {t("reviews.filters.clearAll")}
-                </button>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Service filter */}
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {t("reviews.filters.service")}
-                </label>
-                <select
-                  value={filterService}
-                  onChange={(e) => setFilterService(e.target.value)}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="all">{t("reviews.filters.allServices")}</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Rating filter */}
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {t("reviews.filters.rating")}
-                </label>
-                <div className="flex gap-1.5">
-                  {[0, 1, 2, 3, 4, 5].map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setFilterRating(r)}
-                      className={[
-                        "flex-1 rounded-lg border text-xs font-semibold py-2 transition-all",
-                        filterRating === r
-                          ? "bg-primary text-white border-primary"
-                          : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500 hover:border-primary hover:text-primary",
-                      ].join(" ")}
-                    >
-                      {r === 0 ? t("reviews.filters.all") : `${r}★`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Date from */}
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {t("reviews.filters.from")}
-                </label>
-                <input
-                  type="date"
-                  value={filterFrom}
-                  onChange={(e) => setFilterFrom(e.target.value)}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-
-              {/* Date to */}
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  {t("reviews.filters.to")}
-                </label>
-                <input
-                  type="date"
-                  value={filterTo}
-                  onChange={(e) => setFilterTo(e.target.value)}
-                  className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-[#111418] dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-              </div>
-            </div>
-          </Card>
-
-          {/* ── Reviews list ── */}
           {loading ? (
             <div className="space-y-3">
               {[0, 1, 2, 3].map((i) => (
@@ -492,11 +195,7 @@ export default function BusinessReviewsPage() {
                 {hasActiveFilters ? t("reviews.empty.noMatch") : t("reviews.empty.noReviews")}
               </p>
               {hasActiveFilters && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="text-xs text-primary hover:underline"
-                >
+                <button type="button" onClick={clearFilters} className="text-xs text-primary hover:underline">
                   {t("reviews.clearFilters")}
                 </button>
               )}
@@ -507,7 +206,6 @@ export default function BusinessReviewsPage() {
                 <ReviewCard key={review.id} review={review} onFlag={setFlaggingId} />
               ))}
 
-              {/* Load more — only if no filters active (since we filter client-side over loaded pages) */}
               {hasMore && !hasActiveFilters && (
                 <button
                   type="button"

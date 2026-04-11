@@ -9,9 +9,12 @@ import { logout } from "../../api/auth";
 import { clearSession } from "../../redux/authSlice";
 import { Role } from "../../constants/roles";
 import { getMyBusinesses } from "../../services/businessManagementService";
-import { getFollowedBusinesses } from "../../services/followService";
 import { setOwnedBusinesses } from "../../features/business/businessSlice";
-import type { BusinessProfile } from "../../types/business";
+import { SidebarIcon } from "./sidebar/SidebarIcon";
+import { SidebarBusinessSection } from "./sidebar/SidebarBusinessSection";
+import { SidebarPartnerSection } from "./sidebar/SidebarPartnerSection";
+import { SidebarFavoritesSection } from "./sidebar/SidebarFavoritesSection";
+import { SidebarAdminSection } from "./sidebar/SidebarAdminSection";
 
 type SidebarItem = {
   key: string;
@@ -78,28 +81,28 @@ export function RoleSidebar({
               label: t("common.home"),
               to: "/",
               minRole: Role.Guest,
-              icon: <Icon name="home" />,
+              icon: <SidebarIcon name="home" />,
             },
             {
               key: "search",
               label: t("sidebar.search"),
               to: "/search",
               minRole: Role.Guest,
-              icon: <Icon name="search" />,
+              icon: <SidebarIcon name="search" />,
             },
             {
               key: "customer-dashboard",
               label: t("sidebar.dashboard"),
               to: "/customer-dashboard",
               minRole: Role.Client,
-              icon: <Icon name="dashboard" />,
+              icon: <SidebarIcon name="dashboard" />,
             },
             {
               key: "appointments",
               label: t("customerAppointments.title"),
               to: "/dashboard/customer",
               minRole: Role.Client,
-              icon: <Icon name="event_upcoming" />,
+              icon: <SidebarIcon name="event_upcoming" />,
             },
           ],
         },
@@ -112,14 +115,14 @@ export function RoleSidebar({
               label: t("profile.title"),
               to: "/profile",
               minRole: Role.Client,
-              icon: <Icon name="person" />,
+              icon: <SidebarIcon name="person" />,
             },
             {
               key: "settings",
               label: t("settings.title"),
               to: "/settings",
               minRole: Role.Client,
-              icon: <Icon name="settings" />,
+              icon: <SidebarIcon name="settings" />,
             },
           ],
         },
@@ -161,7 +164,7 @@ export function RoleSidebar({
       <div className="flex items-center justify-between gap-2 p-4 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-2 min-w-0">
           <div className="size-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-            <Icon name="calendar_clock" className="text-primary" />
+            <SidebarIcon name="calendar_clock" className="text-primary" />
           </div>
           <div className="min-w-0">
             <div className="truncate">{brand}</div>
@@ -199,7 +202,7 @@ export function RoleSidebar({
                   title={item.label}
                 >
                   <span className="shrink-0">
-                    {item.icon ?? <Icon name="circle" />}
+                    {item.icon ?? <SidebarIcon name="circle" />}
                   </span>
                   <span className="truncate font-medium">{item.label}</span>
                 </NavLink>
@@ -209,16 +212,16 @@ export function RoleSidebar({
         ))}
 
         {/* Admin section */}
-        {role === Role.Admin && <AdminSection onClose={onClose} />}
+        {role === Role.Admin && <SidebarAdminSection onClose={onClose} />}
 
         {/* Partner section — only visible when user is a partner */}
         {role === Role.Partner && user?.businessId && (
-          <PartnerSection businessId={user.businessId} onClose={onClose} />
+          <SidebarPartnerSection businessId={user.businessId} onClose={onClose} />
         )}
 
         {/* Favorites — inline collapsible list for Client+ */}
         {role >= Role.Client && (
-          <FavoritesSection
+          <SidebarFavoritesSection
             expanded={favoritesExpanded}
             onToggle={() => setFavoritesExpanded((v) => !v)}
             onClose={onClose}
@@ -226,7 +229,7 @@ export function RoleSidebar({
         )}
 
         {/* Business section — Client: "Create your business" / Owner: collapsible list */}
-        <BusinessSection
+        <SidebarBusinessSection
           role={role}
           ownedBusinesses={ownedBusinesses}
           expanded={businessesExpanded}
@@ -239,7 +242,7 @@ export function RoleSidebar({
       <div className="p-3 border-t border-gray-200 dark:border-gray-800 space-y-2">
         <div className="flex items-center gap-3 rounded-xl px-3 py-2 bg-gray-50 dark:bg-gray-900/40">
           <div className="size-9 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-center shrink-0">
-            <Icon
+            <SidebarIcon
               name="account_circle"
               className="text-gray-600 dark:text-gray-300"
             />
@@ -282,397 +285,5 @@ export function RoleSidebar({
         </div>
       </div>
     </aside>
-  );
-}
-
-// ── Business section ──────────────────────────────────────────────────────────
-
-function BusinessSection({
-  role,
-  ownedBusinesses,
-  expanded,
-  onToggle,
-  onClose,
-}: {
-  role: Role;
-  ownedBusinesses: BusinessProfile[];
-  expanded: boolean;
-  onToggle: () => void;
-  onClose?: () => void;
-}) {
-  const { t } = useTranslation();
-
-  if (role === Role.Client) {
-    return (
-      <div className="mb-3">
-        <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          {t("sidebar.businessSection")}
-        </div>
-        <NavLink
-          to="/onboarding"
-          onClick={() => onClose?.()}
-          className={({ isActive }) =>
-            [
-              "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors",
-              isActive
-                ? "bg-primary/10 text-primary"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
-            ].join(" ")
-          }
-        >
-          <Icon name="add_business" />
-          <span className="truncate font-medium">
-            {t("sidebar.createBusiness")}
-          </span>
-        </NavLink>
-      </div>
-    );
-  }
-
-  if (role < Role.Owner) return null;
-
-  return (
-    <div className="mb-3">
-      {/* Collapsible header */}
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center justify-between px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-      >
-        <span>{t("sidebar.myBusinesses")}</span>
-        <Icon
-          name={expanded ? "expand_less" : "expand_more"}
-          className="text-[16px]! text-gray-400"
-        />
-      </button>
-
-      {expanded && (
-        <div className="space-y-1">
-          {ownedBusinesses.length === 0 ? (
-            <p className="px-3 py-2 text-xs text-gray-400 dark:text-gray-500">
-              {t("sidebar.noBusinesses")}
-            </p>
-          ) : (
-            ownedBusinesses.map((b) => (
-              <BusinessNavItem key={b.id} business={b} onClose={onClose} />
-            ))
-          )}
-
-          {/* Always show a link to add another business */}
-          <NavLink
-            to="/onboarding"
-            onClick={() => onClose?.()}
-            className={({ isActive }) =>
-              [
-                "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors text-[13px]",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800",
-              ].join(" ")
-            }
-          >
-            <Icon name="add" className="text-[18px]!" />
-            <span className="font-medium">
-              {t("sidebar.addAnotherBusiness")}
-            </span>
-          </NavLink>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function BusinessNavItem({
-  business,
-  onClose,
-}: {
-  business: BusinessProfile;
-  onClose?: () => void;
-}) {
-  const { t } = useTranslation();
-  const suspended = business.isSuspended === true;
-  const [subExpanded, setSubExpanded] = useState(suspended); // auto-expand if suspended
-
-  const slug = business.slug ?? business.id;
-
-  const allLinks = [
-    {
-      label: t("sidebar.businessPage"),
-      icon: "storefront",
-      to: `/business/${slug}`,
-      suspendedOnly: true,
-    },
-    {
-      label: t("sidebar.dashboard"),
-      icon: "dashboard",
-      to: `/dashboard/${slug}`,
-      suspendedOnly: true,
-    },
-    {
-      label: t("sidebar.services"),
-      icon: "content_cut",
-      to: `/dashboard/${slug}/services`,
-      suspendedOnly: false,
-    },
-    {
-      label: t("sidebar.schedule"),
-      icon: "calendar_month",
-      to: `/business/${slug}/schedule`,
-      suspendedOnly: false,
-    },
-    {
-      label: t("sidebar.staffPartners"),
-      icon: "group",
-      to: `/dashboard/${slug}/staff`,
-      suspendedOnly: false,
-    },
-  ];
-
-  const visibleLinks = suspended
-    ? allLinks.filter((l) => l.suspendedOnly)
-    : allLinks;
-
-  return (
-    <div>
-      {/* Business name row */}
-      <button
-        onClick={() => setSubExpanded((v) => !v)}
-        className={[
-          "flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-colors",
-          suspended
-            ? "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
-            : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
-        ].join(" ")}
-      >
-        <Icon
-          name={suspended ? "block" : "store"}
-          className={suspended ? "text-red-500 dark:text-red-400" : undefined}
-        />
-        <span className="flex-1 truncate text-left font-medium text-sm">
-          {business.name}
-        </span>
-        <Icon
-          name={subExpanded ? "expand_less" : "expand_more"}
-          className="text-[16px]! text-gray-400 shrink-0"
-        />
-      </button>
-
-      {subExpanded && (
-        <div className="ltr:ml-4 rtl:mr-4 space-y-0.5 ltr:border-l rtl:border-r border-gray-200 dark:border-gray-700 ltr:pl-3 rtl:pr-3">
-          {suspended && (
-            <p className="px-2 py-1 text-xs text-red-500 dark:text-red-400 font-medium">
-              Suspended
-            </p>
-          )}
-          {visibleLinks.map((link) => (
-            <NavLink
-              key={link.label}
-              to={link.to}
-              onClick={() => onClose?.()}
-              className={({ isActive }) =>
-                [
-                  "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors",
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
-                ].join(" ")
-              }
-            >
-              <Icon name={link.icon} className="text-[18px]!" />
-              <span>{link.label}</span>
-            </NavLink>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Partner section ───────────────────────────────────────────────────────────
-
-function PartnerSection({
-  businessId,
-  onClose,
-}: {
-  businessId: string;
-  onClose?: () => void;
-}) {
-  const { t } = useTranslation();
-  const [businessName, setBusinessName] = useState<string | null>(null);
-
-  useEffect(() => {
-    import("../../services/businessManagementService")
-      .then(({ getPublicBusinessById }) => getPublicBusinessById(businessId))
-      .then((b) => setBusinessName(b.name))
-      .catch(() => setBusinessName(null));
-  }, [businessId]);
-
-  return (
-    <div className="mb-3">
-      <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-        {t("sidebar.myWorkplace")}
-      </div>
-      <div className="space-y-1">
-        <NavLink
-          to={`/staff-dashboard/${businessId}`}
-          onClick={() => onClose?.()}
-          className={({ isActive }) =>
-            [
-              "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors",
-              isActive
-                ? "bg-primary/10 text-primary"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
-            ].join(" ")
-          }
-        >
-          <Icon name="store" />
-          <span className="truncate font-medium text-sm">
-            {businessName ?? t("sidebar.loading")}
-          </span>
-        </NavLink>
-      </div>
-    </div>
-  );
-}
-
-// ── Favorites section ─────────────────────────────────────────────────────────
-
-function FavoritesSection({
-  expanded,
-  onToggle,
-  onClose,
-}: {
-  expanded: boolean;
-  onToggle: () => void;
-  onClose?: () => void;
-}) {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  // Reload every time the section is opened so it stays fresh
-  useEffect(() => {
-    if (!expanded) return;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const result = await getFollowedBusinesses();
-        setBusinesses(result);
-      } catch {
-        // silently ignore
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [expanded]);
-
-  return (
-    <div className="mb-1">
-      <button
-        onClick={onToggle}
-        className={[
-          "group flex w-full items-center gap-3 rounded-xl px-3 py-2 transition-colors",
-          expanded
-            ? "bg-primary/10 text-primary"
-            : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
-        ].join(" ")}
-      >
-        <Icon name="favorite" className={expanded ? "icon-filled" : ""} />
-        <span className="flex-1 truncate font-medium text-left">
-          {t("sidebar.favorites")}
-        </span>
-        <Icon
-          name={expanded ? "expand_less" : "expand_more"}
-          className="text-[16px]! text-gray-400 shrink-0"
-        />
-      </button>
-
-      {expanded && (
-        <div className="ltr:ml-4 rtl:mr-4 ltr:border-l rtl:border-r border-gray-200 dark:border-gray-700 ltr:pl-3 rtl:pr-3 space-y-0.5 py-1">
-          {loading ? (
-            <div className="flex justify-center py-3">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            </div>
-          ) : businesses.length === 0 ? (
-            <p className="px-2 py-2 text-xs text-gray-400 dark:text-gray-500">
-              {t("sidebar.noFollowed")}
-            </p>
-          ) : (
-            businesses.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                onClick={() => {
-                  navigate(`/business/${b.slug ?? b.id}`);
-                  onClose?.();
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
-              >
-                <Icon name="storefront" className="text-[18px]! shrink-0" />
-                <span className="truncate">{b.name}</span>
-              </button>
-            ))
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Admin section ─────────────────────────────────────────────────────────────
-
-function AdminSection({ onClose }: { onClose?: () => void }) {
-  const { t } = useTranslation();
-  const adminLinks = [
-    { to: "/admin", label: t("sidebar.adminDashboard"), icon: "admin_panel_settings", end: true },
-    { to: "/admin/categories", label: t("sidebar.categoryRequests"), icon: "category", end: false },
-  ];
-  return (
-    <div className="mb-3">
-      <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-        {t("sidebar.adminSection")}
-      </div>
-      <div className="space-y-1">
-        {adminLinks.map(({ to, label, icon, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            onClick={() => onClose?.()}
-            className={({ isActive }) =>
-              [
-                "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors",
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
-              ].join(" ")
-            }
-          >
-            <Icon name={icon} />
-            <span className="truncate font-medium">{label}</span>
-          </NavLink>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/** Minimal Material Symbol icon helper */
-function Icon({ name, className }: { name: string; className?: string }) {
-  return (
-    <span
-      className={[
-        "material-symbols-outlined",
-        "text-[22px] leading-none",
-        "pointer-events-none select-none",
-        className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      aria-hidden="true"
-    >
-      {name}
-    </span>
   );
 }
