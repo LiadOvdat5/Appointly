@@ -115,8 +115,11 @@ namespace WebAPI.Controllers
             if (Guid.TryParse(userIdStr, out var userId))
                 await _authRepository.RevokeRefreshTokenAsync(userId);
 
-            Response.Cookies.Delete("access_token");
-            Response.Cookies.Delete("refresh_token");
+            // Must use the same options as when the cookies were set —
+            // browsers reject deletions that don't match the original SameSite/Secure/Path.
+            var expiredOptions = BuildAuthCookieOptions(DateTime.UtcNow.AddDays(-1));
+            Response.Cookies.Append("access_token", "", expiredOptions);
+            Response.Cookies.Append("refresh_token", "", expiredOptions);
 
             return Ok(new { success = true });
         }
