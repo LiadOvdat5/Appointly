@@ -41,8 +41,8 @@ export default function ResetPasswordPage() {
     setFieldError("");
     setError("");
 
-    if (newPassword.length < 8) {
-      setFieldError("Password must be at least 8 characters.");
+    if (newPassword.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newPassword)) {
+      setFieldError("Password must be at least 8 characters and contain an uppercase letter, a lowercase letter, and a digit.");
       return;
     }
     if (newPassword !== confirmPassword) {

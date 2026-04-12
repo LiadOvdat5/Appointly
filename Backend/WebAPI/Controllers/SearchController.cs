@@ -60,6 +60,9 @@ namespace WebAPI.Controllers
         [HttpGet("by-name")]
         public async Task<IActionResult> GetByName([FromQuery] string text)
         {
+            if (string.IsNullOrWhiteSpace(text) || text.Length > 100)
+                return BadRequest(new { error = "Search text must be between 1 and 100 characters." });
+
             try
             {
                 var results = await _searchRepository.SearchByNameAsync(text);

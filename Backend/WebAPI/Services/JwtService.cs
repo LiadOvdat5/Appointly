@@ -39,7 +39,8 @@ namespace WebAPI.Services
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddDays(7);
+            var expiryHours = int.TryParse(_configuration["Jwt:ExpiryHours"], out var h) ? h : 2;
+            var expires = DateTime.UtcNow.AddHours(expiryHours);
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],

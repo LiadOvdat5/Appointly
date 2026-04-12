@@ -57,7 +57,7 @@ export default function RegisterPage() {
     if (!name.trim()) errors.name = t("register.validation.nameRequired");
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       errors.email = t("register.validation.emailInvalid");
-    if (password.length < 6)
+    if (password.length < 8 || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password))
       errors.password = t("register.validation.passwordTooShort");
     if (password !== confirmPassword)
       errors.confirmPassword = t("register.validation.passwordMismatch");

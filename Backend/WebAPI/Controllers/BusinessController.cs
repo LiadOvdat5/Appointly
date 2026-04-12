@@ -162,7 +162,7 @@ namespace WebAPI.Controllers
             }
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         [EndpointSummary("List All Businesses")]
         [EndpointDescription("Retrieve a list of all businesses in the system. Returns business summary information for each business. " +

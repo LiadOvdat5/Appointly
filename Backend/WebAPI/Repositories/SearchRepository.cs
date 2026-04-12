@@ -17,10 +17,10 @@ namespace WebAPI.Repositories
         private readonly IBusinessRepository _businessRepository;
         public async Task<IEnumerable<BusinessDTO>> SearchByNameAsync(string searchText)
         {
+            var normalized = searchText.Trim().ToLower();
+            if (string.IsNullOrEmpty(normalized)) return [];
+
             var allBusinesses = await _businessRepository.GetAllBusinessesAsync(null);
-            var normalized = searchText?.Trim().ToLower() ?? string.Empty;
-            if (string.IsNullOrEmpty(normalized)) return new List<BusinessDTO>();
-            // Load business DTOs (with categories) and filter by name (case-insensitive partial match)
             return allBusinesses.Where(b => b.Name != null && b.Name.ToLower().Contains(normalized)).ToList();
         }
 

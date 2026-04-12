@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.AspNetCore.RateLimiting;
 using WebAPI.DTOs;
 using WebAPI.Exceptions;
 using WebAPI.Interfaces;
@@ -31,6 +32,7 @@ namespace WebAPI.Controllers
 
 
         [HttpPost("register")]
+        [EnableRateLimiting("auth")]
         [EndpointSummary("User Registration")]
         [EndpointDescription("Create a new user account. Email must be unique. Password will be securely hashed. " +
             "Returns the created user with ID. Example: { \"name\": \"John Doe\", \"email\": \"john@example.com\", \"password\": \"SecurePass123!\" }")]
@@ -48,7 +50,23 @@ namespace WebAPI.Controllers
         }
 
 
+        private CookieOptions BuildAuthCookieOptions(DateTime expiresAt) => new()
+        {
+            HttpOnly = true,
+            Secure = HttpContext.Request.IsHttps,
+            SameSite = SameSiteMode.Lax,
+            Expires = expiresAt,
+            Path = "/"
+        };
+
+        private void SetAuthCookies(LoginResponseDTO result)
+        {
+            Response.Cookies.Append("access_token", result.Token, BuildAuthCookieOptions(result.ExpiresAt));
+            Response.Cookies.Append("refresh_token", result.RefreshToken, BuildAuthCookieOptions(result.RefreshTokenExpiry));
+        }
+
         [HttpPost("login")]
+        [EnableRateLimiting("auth")]
         [EndpointSummary("User Login")]
         [EndpointDescription("Authenticate user with email and password. Returns user data and sets JWT token in HttpOnly cookie. " +
             "The token will be automatically included in subsequent requests. Example: { \"email\": \"john@example.com\", \"password\": \"SecurePass123!\" }")]
@@ -58,15 +76,7 @@ namespace WebAPI.Controllers
             {
                 var loginResult = await _authRepository.LoginAsync(loginDto);
 
-                // Set token in HttpOnly cookie
-                Response.Cookies.Append("access_token", loginResult.Token, new CookieOptions
-                {
-                    HttpOnly = true,        // Cannot be accessed by JavaScript
-                    Secure = false,         // Set to true in production (HTTPS)
-                    SameSite = SameSiteMode.Lax,
-                    Expires = loginResult.ExpiresAt,
-                    Path = "/"              // Available for all endpoints
-                });
+                SetAuthCookies(loginResult);
 
                 // Return only non-sensitive data in response body
                 return Ok(new
@@ -88,14 +98,48 @@ namespace WebAPI.Controllers
         [HttpPost("logout")]
         [Authorize]
         [EndpointSummary("User Logout")]
-        [EndpointDescription("Log out the current user. Clears the JWT token cookie. " +
-            "For added security, consider implementing a token blacklist on the server.")]
+        [EndpointDescription("Log out the current user. Clears both JWT and refresh token cookies and revokes the refresh token in the database.")]
         public async Task<IActionResult> Logout()
         {
-            // Clear the access token cookie
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(userIdStr, out var userId))
+                await _authRepository.RevokeRefreshTokenAsync(userId);
+
             Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete("refresh_token");
 
             return Ok(new { success = true });
+        }
+
+        [HttpPost("refresh")]
+        [EndpointSummary("Refresh Access Token")]
+        [EndpointDescription("Uses the refresh_token cookie to issue a new access_token + rotated refresh_token. Returns 401 if the refresh token is missing, invalid, or expired.")]
+        public async Task<IActionResult> Refresh()
+        {
+            if (!Request.Cookies.TryGetValue("refresh_token", out var refreshToken) || string.IsNullOrWhiteSpace(refreshToken))
+                return Unauthorized(new { error = "Refresh token missing." });
+
+            try
+            {
+                var loginResult = await _authRepository.RefreshAsync(refreshToken);
+                SetAuthCookies(loginResult);
+
+                return Ok(new
+                {
+                    user = loginResult.User,
+                    expiresAt = loginResult.ExpiresAt
+                });
+            }
+            catch (SuspendedAccountException ex)
+            {
+                return StatusCode(403, new { error = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Response.Cookies.Delete("access_token");
+                Response.Cookies.Delete("refresh_token");
+                return Unauthorized(new { error = "Session expired. Please log in again." });
+            }
         }
 
         [HttpPost("google")]
@@ -108,14 +152,7 @@ namespace WebAPI.Controllers
             {
                 var loginResult = await _authRepository.GoogleAuthAsync(dto, _googleClientId);
 
-                Response.Cookies.Append("access_token", loginResult.Token, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = false,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = loginResult.ExpiresAt,
-                    Path = "/"
-                });
+                SetAuthCookies(loginResult);
 
                 return Ok(new
                 {
@@ -134,6 +171,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [EnableRateLimiting("auth")]
         [EndpointSummary("Request Password Reset")]
         [EndpointDescription("Sends a password-reset email to the given address. Always returns 200 OK — does not reveal whether the email exists.")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO dto)
@@ -150,6 +188,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("reset-password")]
+        [EnableRateLimiting("auth")]
         [EndpointSummary("Reset Password")]
         [EndpointDescription("Validates the reset token and updates the user's password. Token is valid for 1 hour.")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)

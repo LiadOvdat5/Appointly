@@ -74,7 +74,7 @@ i18n.use(initReactI18next).init({
           validation: {
             nameRequired: "Full name is required",
             emailInvalid: "Please enter a valid email address",
-            passwordTooShort: "Password must be at least 6 characters",
+            passwordTooShort: "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit",
             passwordMismatch: "Passwords do not match",
           },
         },
@@ -380,7 +380,7 @@ i18n.use(initReactI18next).init({
         forms: {
           required: "This field is required",
           invalidEmail: "Please enter a valid email",
-          passwordTooShort: "Password must be at least 6 characters",
+          passwordTooShort: "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit",
           passwordMismatch: "Passwords do not match",
           confirmPassword: "Confirm Password",
           selectOption: "Select an option",
@@ -476,7 +476,7 @@ i18n.use(initReactI18next).init({
             emailRequired: "Email is required.",
             currentPasswordRequired: "Current password is required.",
             newPasswordRequired: "New password is required.",
-            passwordTooShort: "Password must be at least 6 characters.",
+            passwordTooShort: "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit.",
             passwordMismatch: "Passwords do not match.",
           },
           success: {
@@ -1499,7 +1499,7 @@ i18n.use(initReactI18next).init({
           validation: {
             nameRequired: "שם מלא הוא שדה חובה",
             emailInvalid: "יש להזין כתובת דוא״ל תקינה",
-            passwordTooShort: "הסיסמה חייבת להכיל לפחות 6 תווים",
+            passwordTooShort: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה",
             passwordMismatch: "הסיסמאות אינן תואמות",
           },
         },
@@ -1803,7 +1803,7 @@ i18n.use(initReactI18next).init({
         forms: {
           required: "שדה זה חובה",
           invalidEmail: "אנא הזן דוא״ל תקף",
-          passwordTooShort: "הסיסמה חייבת להיות לפחות 6 תווים",
+          passwordTooShort: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה",
           passwordMismatch: "הסיסמאות לא תואמות",
           confirmPassword: "אשר סיסמה",
           selectOption: "בחר אפשרות",
@@ -1899,7 +1899,7 @@ i18n.use(initReactI18next).init({
             emailRequired: "דוא״ל חובה.",
             currentPasswordRequired: "סיסמה נוכחית חובה.",
             newPasswordRequired: "סיסמה חדשה חובה.",
-            passwordTooShort: "הסיסמה חייבת להיות לפחות 6 תווים.",
+            passwordTooShort: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה.",
             passwordMismatch: "הסיסמאות לא תואמות.",
           },
           success: {

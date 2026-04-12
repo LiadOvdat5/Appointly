@@ -76,14 +76,78 @@ namespace WebAPI.Repositories
                 partnerBusinessId = partnerRecord?.BusinessId;
             }
 
-            var tokenResult = _jwtService.GenerateToken(user, partnerBusinessId);
+            var response = BuildLoginResponse(user, _jwtService, partnerBusinessId);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return response;
+        }
+
+        // ── Refresh token helpers ──────────────────────────────────────────────
+
+        private static (string raw, string hash) GenerateRefreshToken()
+        {
+            var bytes = RandomNumberGenerator.GetBytes(64);
+            var raw = Convert.ToBase64String(bytes)
+                .Replace("+", "-").Replace("/", "_").Replace("=", "");
+            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
+            var hash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+            return (raw, hash);
+        }
+
+        private static LoginResponseDTO BuildLoginResponse(User user, IJwtService jwtService, Guid? partnerBusinessId)
+        {
+            var tokenResult = jwtService.GenerateToken(user, partnerBusinessId);
+            var (rawRefresh, hashRefresh) = GenerateRefreshToken();
+            var refreshExpiry = DateTime.UtcNow.AddDays(30);
+
+            user.RefreshTokenHash = hashRefresh;
+            user.RefreshTokenExpiry = refreshExpiry;
 
             return new LoginResponseDTO
             {
                 Token = tokenResult.Token,
                 ExpiresAt = tokenResult.ExpiresAt,
-                User = user.ToUserDTO()
+                User = user.ToUserDTO(),
+                RefreshToken = rawRefresh,
+                RefreshTokenExpiry = refreshExpiry
             };
+        }
+
+        public async Task<LoginResponseDTO> RefreshAsync(string refreshToken)
+        {
+            var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+            var tokenHash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.RefreshTokenHash == tokenHash);
+            if (user == null || user.RefreshTokenExpiry == null || user.RefreshTokenExpiry < DateTime.UtcNow)
+                throw new UnauthorizedAccessException("Refresh token is invalid or expired.");
+
+            if (user.IsSuspended)
+                throw new SuspendedAccountException(user.SuspendedReason);
+
+            Guid? partnerBusinessId = null;
+            if (user.Role == UserRole.partner)
+            {
+                var partnerRecord = await _context.BusinessPartners
+                    .FirstOrDefaultAsync(p => p.UserId == user.Id && p.Status == InvitationStatus.Accepted);
+                partnerBusinessId = partnerRecord?.BusinessId;
+            }
+
+            var response = BuildLoginResponse(user, _jwtService, partnerBusinessId);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return response;
+        }
+
+        public async Task RevokeRefreshTokenAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return;
+
+            user.RefreshTokenHash = null;
+            user.RefreshTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> LogoutAsync(string userId)
@@ -165,7 +229,7 @@ namespace WebAPI.Repositories
                 await _context.SaveChangesAsync();
             }
 
-            // 3. Issue JWT (same as credential login)
+            // 3. Issue JWT + refresh token (same as credential login)
             Guid? partnerBusinessId = null;
             if (user.Role == UserRole.partner)
             {
@@ -174,14 +238,10 @@ namespace WebAPI.Repositories
                 partnerBusinessId = partnerRecord?.BusinessId;
             }
 
-            var tokenResult = _jwtService.GenerateToken(user, partnerBusinessId);
-
-            return new LoginResponseDTO
-            {
-                Token = tokenResult.Token,
-                ExpiresAt = tokenResult.ExpiresAt,
-                User = user.ToUserDTO()
-            };
+            var loginResponse = BuildLoginResponse(user, _jwtService, partnerBusinessId);
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            return loginResponse;
         }
 
         public async Task ForgotPasswordAsync(string email, string frontendBaseUrl)

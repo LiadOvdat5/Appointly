@@ -53,5 +53,10 @@ namespace WebAPI.Models
         public string? PasswordResetToken { get; set; }
 
         public DateTime? PasswordResetTokenExpiry { get; set; }
+
+        [MaxLength(512)]
+        public string? RefreshTokenHash { get; set; }
+
+        public DateTime? RefreshTokenExpiry { get; set; }
     }
 }

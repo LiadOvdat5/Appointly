@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -44,6 +45,10 @@ namespace WebAPI.Controllers
             "Example: { \"name\": \"Jane Doe\", \"email\": \"jane@example.com\" }. Authorization: Users can only update their own profile.")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDTO updateUserDTO)
         {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId) || currentUserId != id)
+                return Forbid();
+
             try
             {
                 var updatedUser = await _userRepository.UpdateUserAsync(id, updateUserDTO);

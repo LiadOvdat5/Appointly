@@ -1,4 +1,7 @@
 import axios from "axios";
+import type { AxiosError, InternalAxiosRequestConfig } from "axios";
+import { store } from "../redux/store";
+import { clearSession, setSession } from "../redux/authSlice";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -6,8 +9,81 @@ export const http = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-http.interceptors.request.use((config) => {
-  // Token is derived from user session stored in expiresAt
-  // Credentials already handled via withCredentials: true
-  return config;
-});
+// ── Silent refresh interceptor ────────────────────────────────────────────────
+// When any request returns 401 we attempt one silent POST /auth/refresh.
+// If that succeeds the server sets new HttpOnly cookies and we retry the
+// original request transparently.  If the refresh itself fails (expired /
+// revoked refresh token) we clear the Redux session and redirect to /login.
+//
+// Concurrent 401s are queued: only one refresh call is ever in-flight at a
+// time and all waiting requests are retried (or rejected) once it resolves.
+
+let isRefreshing = false;
+
+type QueueEntry = {
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+};
+let refreshQueue: QueueEntry[] = [];
+
+function drainQueue(error: unknown) {
+  refreshQueue.forEach((entry) =>
+    error ? entry.reject(error) : entry.resolve(undefined),
+  );
+  refreshQueue = [];
+}
+
+http.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retried?: boolean;
+    };
+
+    const is401 = error.response?.status === 401;
+    const isRefreshEndpoint = originalRequest?.url?.includes("/auth/refresh");
+    const alreadyRetried = originalRequest?._retried;
+
+    // Don't attempt refresh if: not a 401, already retried, or it IS the
+    // refresh endpoint (avoids infinite loop)
+    if (!is401 || isRefreshEndpoint || alreadyRetried) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retried = true;
+
+    if (isRefreshing) {
+      // Another refresh is already in flight — queue this request
+      return new Promise((resolve, reject) => {
+        refreshQueue.push({ resolve, reject });
+      }).then(() => http(originalRequest));
+    }
+
+    isRefreshing = true;
+
+    try {
+      const res = await http.post<{
+        user: { id: string; name: string; role: number; businessId?: string };
+        expiresAt: string;
+      }>("/auth/refresh", null);
+
+      const { user, expiresAt } = res.data;
+      store.dispatch(
+        setSession({
+          user,
+          expiresAt: new Date(expiresAt).getTime(),
+        }),
+      );
+
+      drainQueue(null);
+      return http(originalRequest);
+    } catch (refreshError) {
+      drainQueue(refreshError);
+      store.dispatch(clearSession());
+      window.location.href = "/login";
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
+  },
+);

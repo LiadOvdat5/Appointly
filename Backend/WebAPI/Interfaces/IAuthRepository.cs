@@ -14,5 +14,7 @@ namespace WebAPI.Interfaces
         Task<LoginResponseDTO> GoogleAuthAsync(GoogleAuthDTO dto, string googleClientId);
         Task ForgotPasswordAsync(string email, string frontendBaseUrl);
         Task ResetPasswordAsync(string token, string newPassword);
+        Task<LoginResponseDTO> RefreshAsync(string refreshToken);
+        Task RevokeRefreshTokenAsync(Guid userId);
     }
 }

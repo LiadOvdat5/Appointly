@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,20 +28,38 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // CORS Policy
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
         policy
-            .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // For using cookies auth
+            .WithOrigins(allowedOrigins)
+            .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
+            .AllowCredentials();
     });
-
 });
 
 
+
+// Rate limiting — auth endpoints: 10 requests per IP per minute
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("auth", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0
+            }));
+
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+});
 
 // Register AdminRepository
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
@@ -140,6 +160,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (!db.Users.Any(u => u.Role == WebAPI.Models.UserRole.admin))
     {
+        var adminPassword = app.Configuration["Admin:SeedPassword"]
+            ?? throw new InvalidOperationException("Admin:SeedPassword is not configured. Set it in appsettings.Development.json or via environment variable.");
+
         var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<WebAPI.Models.User>();
         var admin = new WebAPI.Models.User
         {
@@ -150,7 +173,7 @@ using (var scope = app.Services.CreateScope())
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
         };
-        admin.Password = passwordHasher.HashPassword(admin, "Admin@BizSlot1!");
+        admin.Password = passwordHasher.HashPassword(admin, adminPassword);
         db.Users.Add(admin);
         db.SaveChanges();
     }
@@ -170,8 +193,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Security response headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.UseCors("Frontend");
 app.MapControllers();
