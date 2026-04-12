@@ -302,7 +302,7 @@ export default function AdminAppointmentsPage() {
         loading={loading}
         renderRight={(item) => (
           <span className="text-xs font-bold px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
-            {(item as { count: number }).count.toLocaleString()} appts
+            {(item as unknown as { count: number }).count.toLocaleString()} appts
           </span>
         )}
       />
@@ -314,7 +314,7 @@ export default function AdminAppointmentsPage() {
         loading={loading}
         renderRight={(item) => (
           <span className="text-xs font-bold px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-            {(item as { rate: number }).rate.toFixed(1)}%
+            {(item as unknown as { rate: number }).rate.toFixed(1)}%
           </span>
         )}
       />

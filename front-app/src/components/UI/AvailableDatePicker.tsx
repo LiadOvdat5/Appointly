@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { useTranslation } from "react-i18next";
 import { MaterialIcon } from "./MaterialIcon";
 import { getAvailableDatesForMonth } from "../../services/scheduleService";
@@ -98,7 +98,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
   const [state, dispatch] = useReducer(calendarReducer, {
     year: today.getFullYear(),
     month: today.getMonth(),
-    availableDates: new Set(),
+    availableDates: new Set<string>(),
     loading: true,
     error: null,
   });

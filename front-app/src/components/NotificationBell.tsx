@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import {
   getNotifications,
   getUnreadCount,
@@ -44,7 +45,7 @@ function fallbackNavTarget(type: NotificationType): string | null {
 }
 
 // ── Time-ago helper ───────────────────────────────────────────────────────────
-function timeAgo(isoString: string, t: (k: string, opts?: object) => string): string {
+function timeAgo(isoString: string, t: TFunction): string {
   const diffMs = Date.now() - new Date(isoString).getTime();
   const diffMin = Math.floor(diffMs / 60_000);
   if (diffMin < 1) return t("notifications.timeAgo.justNow");

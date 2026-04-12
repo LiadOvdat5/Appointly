@@ -1,6 +1,6 @@
 import React from "react";
 
-type Variant = "primary" | "secondary" | "outline";
+type Variant = "primary" | "secondary" | "outline" | "ghost";
 type Size = "md" | "sm";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -38,6 +38,9 @@ export function Button({
     outline:
       "border border-gray-300 text-[#111418] hover:bg-gray-50 active:bg-gray-100 active:scale-[0.99] " +
       "dark:text-white dark:border-gray-700 dark:hover:bg-gray-800 dark:active:bg-gray-700",
+    ghost:
+      "text-gray-600 hover:bg-gray-100 active:bg-gray-200 active:scale-[0.99] " +
+      "dark:text-gray-300 dark:hover:bg-gray-800 dark:active:bg-gray-700",
   };
 
   const disabledCls =

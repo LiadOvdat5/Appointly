@@ -1,12 +1,14 @@
 import { apiClient } from "./apiClient";
 
-export enum NotificationType {
-  AppointmentBooked = 0,
-  AppointmentCancelled = 1,
-  AppointmentReminder = 2,
-  ReviewPrompt = 3,
-  InvitationReceived = 4,
-}
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export const NotificationType = {
+  AppointmentBooked: 0,
+  AppointmentCancelled: 1,
+  AppointmentReminder: 2,
+  ReviewPrompt: 3,
+  InvitationReceived: 4,
+} as const;
+export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
 
 export interface NotificationDTO {
   id: string;
