@@ -20,14 +20,16 @@ namespace WebAPI.Controllers
         private readonly IJwtService _jwtService;
         private readonly string _googleClientId;
         private readonly string _frontendBaseUrl;
+        private readonly IHostEnvironment _env;
 
-        public AuthController(IAuthRepository authRepository, IJwtService jwtService, IConfiguration configuration)
+        public AuthController(IAuthRepository authRepository, IJwtService jwtService, IConfiguration configuration, IHostEnvironment env)
         {
             _authRepository = authRepository;
             _jwtService = jwtService;
             _googleClientId = configuration["Google:ClientId"]
                 ?? throw new InvalidOperationException("Google:ClientId is not configured.");
             _frontendBaseUrl = configuration["FrontendBaseUrl"] ?? "http://localhost:5173";
+            _env = env;
         }
 
 
@@ -50,14 +52,22 @@ namespace WebAPI.Controllers
         }
 
 
-        private CookieOptions BuildAuthCookieOptions(DateTime expiresAt) => new()
+        private CookieOptions BuildAuthCookieOptions(DateTime expiresAt)
         {
-            HttpOnly = true,
-            Secure = HttpContext.Request.IsHttps,
-            SameSite = SameSiteMode.Lax,
-            Expires = expiresAt,
-            Path = "/"
-        };
+            // In development: SameSite=Lax works fine on localhost (same-origin, no HTTPS needed).
+            // In all other environments (demo, prod): frontend and backend are on different domains,
+            // so SameSite must be None + Secure=true or browsers silently drop the cookie on
+            // cross-site requests, causing every authenticated call to return 401.
+            var crossDomain = !_env.IsDevelopment();
+            return new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = crossDomain,
+                SameSite = crossDomain ? SameSiteMode.None : SameSiteMode.Lax,
+                Expires = expiresAt,
+                Path = "/"
+            };
+        }
 
         private void SetAuthCookies(LoginResponseDTO result)
         {
