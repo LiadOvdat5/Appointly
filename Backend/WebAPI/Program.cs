@@ -155,13 +155,16 @@ builder.Services.AddAuthentication(options =>
 var app = builder.Build();
 
 // Seed admin user on startup (idempotent — skipped if admin already exists)
-using (var scope = app.Services.CreateScope())
+// Wrapped in try/catch so a slow DB wake-up (serverless auto-pause) doesn't crash the app.
+// The seed will be retried on the next restart if it fails here.
+try
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     if (!db.Users.Any(u => u.Role == WebAPI.Models.UserRole.admin))
     {
         var adminPassword = app.Configuration["Admin:SeedPassword"]
-            ?? throw new InvalidOperationException("Admin:SeedPassword is not configured. Set it in appsettings.Development.json or via environment variable.");
+            ?? throw new InvalidOperationException("Admin:SeedPassword is not configured.");
 
         var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<WebAPI.Models.User>();
         var admin = new WebAPI.Models.User
@@ -177,6 +180,13 @@ using (var scope = app.Services.CreateScope())
         db.Users.Add(admin);
         db.SaveChanges();
     }
+}
+catch (Exception ex)
+{
+    // Log and continue — app starts without admin seed rather than crashing entirely.
+    // This happens when the serverless DB is waking up from auto-pause on first deploy.
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogWarning(ex, "Admin seed skipped — DB may still be waking up. Will retry on next restart.");
 }
 
 // Configure the HTTP request pipeline.
