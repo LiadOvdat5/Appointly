@@ -6,7 +6,7 @@ name: Build and deploy ASP.Net Core app to Azure Web App - bizslot-api-demo
 on:
   push:
     branches:
-      - main
+      - demo
   workflow_dispatch:
 
 jobs:
