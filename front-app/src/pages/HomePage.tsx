@@ -11,6 +11,7 @@ import { HowItWorks } from "../components/UI/HowItWorks";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import CustomerHomePage from "./CustomerHomePage";
 import OwnerHomePage from "./OwnerHomePage";
+import PartnerHomePage from "./PartnerHomePage";
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -47,7 +48,7 @@ const HomePage = () => {
   if (isAuthenticated && user) {
     if (user.role === Role.Owner) return <OwnerHomePage />;
     if (user.role === Role.Partner)
-      return <Navigate to={user.businessId ? `/staff-dashboard/${user.businessId}` : "/customer-dashboard"} replace />;
+      return user.businessId ? <PartnerHomePage /> : <Navigate to="/customer-dashboard" replace />;
     if (user.role === Role.Admin) return <Navigate to="/admin" replace />;
     // Customer: render the personalised home screen inline
     return <CustomerHomePage />;
