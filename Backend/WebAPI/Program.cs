@@ -64,6 +64,9 @@ builder.Services.AddRateLimiter(options =>
 // Register AdminRepository
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
+// Register DemoDataSeeder
+builder.Services.AddScoped<WebAPI.Data.DemoDataSeeder>();
+
 // Register AuthRepository and JwtService
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
