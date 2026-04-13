@@ -32,7 +32,7 @@ export default function LoginPage() {
     if (role === Role.Admin) {
       navigate("/admin");
     } else if (role === Role.Partner) {
-      navigate(businessId ? `/staff-dashboard/${businessId}` : "/customer-dashboard");
+      navigate(businessId ? "/" : "/customer-dashboard");
     } else if (role === Role.Owner) {
       navigate("/dashboard");
     } else {

@@ -266,6 +266,22 @@ i18n.use(initReactI18next).init({
           },
         },
 
+        // ============ PARTNER HOME ============
+        partnerHome: {
+          greeting: "Hello, {{name}}!",
+          workingAt: "Working at {{name}}",
+          todaySchedule: {
+            label: "Today's Appointments",
+            viewAll: "View all shifts",
+            empty: "No appointments today.",
+            more: "+{{count}} more",
+          },
+          quickActions: {
+            label: "Quick Actions",
+            dashboard: "Staff Dashboard",
+          },
+        },
+
         // ============ OWNER HOME ============
         ownerHome: {
           greeting: "Hello, {{name}}!",
@@ -1687,6 +1703,22 @@ i18n.use(initReactI18next).init({
           },
           pendingReviews: {
             label: "השאר ביקורת",
+          },
+        },
+
+        // ============ PARTNER HOME ============
+        partnerHome: {
+          greeting: "שלום, {{name}}!",
+          workingAt: "עובד ב{{name}}",
+          todaySchedule: {
+            label: "פגישות היום",
+            viewAll: "צפה בכל המשמרות",
+            empty: "אין פגישות היום.",
+            more: "+{{count}} נוספים",
+          },
+          quickActions: {
+            label: "פעולות מהירות",
+            dashboard: "לוח בקרה לצוות",
           },
         },
 
