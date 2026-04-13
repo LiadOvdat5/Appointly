@@ -22,6 +22,14 @@ export function SidebarPartnerSection({
       .catch(() => setBusinessName(null));
   }, [businessId]);
 
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    [
+      "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors",
+      isActive
+        ? "bg-primary/10 text-primary"
+        : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
+    ].join(" ");
+
   return (
     <div className="mb-3">
       <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
@@ -30,19 +38,24 @@ export function SidebarPartnerSection({
       <div className="space-y-1">
         <NavLink
           to={`/staff-dashboard/${businessId}`}
+          end
           onClick={() => onClose?.()}
-          className={({ isActive }) =>
-            [
-              "group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors",
-              isActive
-                ? "bg-primary/10 text-primary"
-                : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800",
-            ].join(" ")
-          }
+          className={linkClass}
         >
           <SidebarIcon name="store" />
           <span className="truncate font-medium text-sm">
             {businessName ?? t("sidebar.loading")}
+          </span>
+        </NavLink>
+
+        <NavLink
+          to={`/staff-dashboard/${businessId}/appointments`}
+          onClick={() => onClose?.()}
+          className={linkClass}
+        >
+          <SidebarIcon name="event_upcoming" />
+          <span className="truncate font-medium text-sm">
+            {t("sidebar.myShifts")}
           </span>
         </NavLink>
       </div>

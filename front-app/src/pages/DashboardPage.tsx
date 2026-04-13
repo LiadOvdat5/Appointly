@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "../redux/store";
+import { Role } from "../constants/roles";
 import {
   getBusinessAppointments,
   cancelAppointment,
@@ -51,6 +52,11 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const { businessSlug: paramBusinessSlug } = useParams<{ businessSlug?: string }>();
   const authUser = useSelector((s: RootState) => s.auth.user);
+
+  // Partners should never land on the owner dashboard
+  if (authUser?.role === Role.Partner) {
+    return <Navigate to={authUser.businessId ? `/staff-dashboard/${authUser.businessId}` : "/customer-dashboard"} replace />;
+  }
 
   // Business
   const [business, setBusiness] = useState<BusinessProfile | null>(null);

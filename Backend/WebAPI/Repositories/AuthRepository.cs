@@ -103,11 +103,14 @@ namespace WebAPI.Repositories
             user.RefreshTokenHash = hashRefresh;
             user.RefreshTokenExpiry = refreshExpiry;
 
+            var userDto = user.ToUserDTO();
+            userDto.BusinessId = partnerBusinessId;
+
             return new LoginResponseDTO
             {
                 Token = tokenResult.Token,
                 ExpiresAt = tokenResult.ExpiresAt,
-                User = user.ToUserDTO(),
+                User = userDto,
                 RefreshToken = rawRefresh,
                 RefreshTokenExpiry = refreshExpiry
             };
