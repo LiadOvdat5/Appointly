@@ -153,6 +153,16 @@ const HomePage = () => {
             {t("homePage.hero.logIn")}
           </button>
         </p>
+
+        <p className="text-xs text-[#4e7397] dark:text-gray-500 max-w-xs pt-1">
+          {t("login.noAccount")}{" "}
+          <button
+            onClick={() => navigate("/register")}
+            className="text-[#1980e6] font-semibold hover:underline"
+          >
+            {t("login.signUp")}
+          </button>
+        </p>
       </section>
 
       {/* ── For Customers ────────────────────────────────────────────────────── */}
