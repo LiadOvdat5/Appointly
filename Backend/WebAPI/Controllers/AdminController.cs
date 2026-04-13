@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Data;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 
@@ -11,10 +12,12 @@ namespace WebAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IAdminRepository _adminRepository;
+        private readonly DemoDataSeeder _demoDataSeeder;
 
-        public AdminController(IAdminRepository adminRepository)
+        public AdminController(IAdminRepository adminRepository, DemoDataSeeder demoDataSeeder)
         {
             _adminRepository = adminRepository;
+            _demoDataSeeder = demoDataSeeder;
         }
 
         /// <summary>GET /admin/users — paginated list of all users, filterable by name/email and role.</summary>
@@ -209,6 +212,21 @@ namespace WebAPI.Controllers
             catch (ArgumentException ex)
             {
                 return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>POST /admin/seed-demo — seed realistic demo data (idempotent). Requires admin role.</summary>
+        [HttpPost("seed-demo")]
+        public async Task<IActionResult> SeedDemo()
+        {
+            try
+            {
+                await _demoDataSeeder.SeedAsync();
+                return Ok(new { message = "Demo data seeded successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
             }
         }
 

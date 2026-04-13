@@ -4,6 +4,9 @@
 # Playwright MCP testing artifacts (snapshots, screenshots, console logs)
 .playwright-mcp/
 
+# Claude Code local memory (machine-specific, not for version control)
+memory/
+
 # Local secrets — never commit
 Backend/WebAPI/appsettings.Development.json
 Backend/WebAPI/appsettings.Production.json
