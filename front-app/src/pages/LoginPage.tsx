@@ -31,8 +31,8 @@ export default function LoginPage() {
   function redirectAfterAuth(role: number, businessId?: string) {
     if (role === Role.Admin) {
       navigate("/admin");
-    } else if (role === Role.Partner && businessId) {
-      navigate(`/staff-dashboard/${businessId}`);
+    } else if (role === Role.Partner) {
+      navigate(businessId ? `/staff-dashboard/${businessId}` : "/customer-dashboard");
     } else if (role === Role.Owner) {
       navigate("/dashboard");
     } else {
