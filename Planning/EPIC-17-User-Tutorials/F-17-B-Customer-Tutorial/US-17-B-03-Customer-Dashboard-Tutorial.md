@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-B-Customer-Tutorial|F-17-B: Customer Tutorials]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -20,5 +20,5 @@ As a **new customer**, I want **a tutorial the first time I open my dashboard** 
 - `[FE]` Add i18n keys: `tutorials.customerDashboard.*`
 
 ## Acceptance Criteria
-- [ ] Tutorial shows on first visit to the customer dashboard
-- [ ] Steps highlight the correct dashboard sections
+- [x] Tutorial shows on first visit to the customer dashboard
+- [x] Steps highlight the correct dashboard sections

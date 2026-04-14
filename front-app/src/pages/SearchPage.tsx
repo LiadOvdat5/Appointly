@@ -4,9 +4,33 @@ import { SearchListView } from "../components/search/SearchListView";
 import { SearchMapView } from "../components/search/SearchMapView";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { useTranslation } from "react-i18next";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
+
+const SEARCH_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='search-input']",
+    titleKey: "tutorials.search.step1.title",
+    bodyKey: "tutorials.search.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='category-filter']",
+    titleKey: "tutorials.search.step2.title",
+    bodyKey: "tutorials.search.step2.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='view-toggle']",
+    titleKey: "tutorials.search.step3.title",
+    bodyKey: "tutorials.search.step3.body",
+    placement: "bottom",
+  },
+];
 
 export function SearchPage() {
   const { t } = useTranslation();
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("search");
   const {
     searchQuery,
     results,
@@ -42,6 +66,14 @@ export function SearchPage() {
 
   return (
     <div className="flex flex-col h-dvh w-full bg-white dark:bg-gray-900">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="search"
+          steps={SEARCH_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
       <SearchHeader
         searchQuery={searchQuery}
         onSearchChange={handleSearch}

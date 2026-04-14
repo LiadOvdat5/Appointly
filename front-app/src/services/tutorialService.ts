@@ -6,6 +6,7 @@ export type SeenTutorialsMap = Record<string, boolean>;
 export const TUTORIAL_KEYS = [
   "search",
   "booking",
+  "customer-dashboard",
   "owner-dashboard",
   "business-edit",
   "schedule-editor",

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-B-Customer-Tutorial|F-17-B: Customer Tutorials]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -21,5 +21,5 @@ As a **new customer**, I want **a guided tutorial the first time I enter the boo
 - `[FE]` Add i18n keys: `tutorials.booking.*` in all language files
 
 ## Acceptance Criteria
-- [ ] Tutorial shows the first time a customer enters the booking flow
-- [ ] Steps match the actual booking flow UI
+- [x] Tutorial shows the first time a customer enters the booking flow
+- [x] Steps match the actual booking flow UI

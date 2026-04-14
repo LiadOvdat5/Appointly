@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-B-Customer-Tutorial|F-17-B: Customer Tutorials]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -23,6 +23,6 @@ As a **new customer**, I want **a guided tutorial the first time I open the sear
 - `[FE]` Target selectors: search input, category filter bar, first business card, view toggle, location button
 
 ## Acceptance Criteria
-- [ ] Tutorial shows on first visit to `/search` by a customer
-- [ ] Does not show again after completion or skip
-- [ ] Steps correctly highlight the intended elements
+- [x] Tutorial shows on first visit to `/search` by a customer
+- [x] Does not show again after completion or skip
+- [x] Steps correctly highlight the intended elements

@@ -1586,6 +1586,20 @@ i18n.use(initReactI18next).init({
               body: "Override your weekly hours for a date range — handy for seasonal schedule changes.",
             },
           },
+          "customer-dashboard": {
+            step1: {
+              title: "Your upcoming appointments",
+              body: "Your next bookings are shown here so you always know what's coming up.",
+            },
+            step2: {
+              title: "Followed businesses",
+              body: "Businesses you follow appear here for quick access — tap one to view their page or book again.",
+            },
+            step3: {
+              title: "Quick links",
+              body: "Jump straight to your full appointment history, invitations, or the search page from here.",
+            },
+          },
         },
       },
     },
@@ -3151,6 +3165,20 @@ i18n.use(initReactI18next).init({
             step3: {
               title: "כללים חוזרים",
               body: "עקוף את שעות השבועיות הרגילות לטווח תאריכים — נוח לשינויי לוח זמנים עונתיים.",
+            },
+          },
+          "customer-dashboard": {
+            step1: {
+              title: "הפגישות הקרובות שלך",
+              body: "ההזמנות הבאות שלך מוצגות כאן כדי שתמיד תדע מה בפתח.",
+            },
+            step2: {
+              title: "עסקים שעוקב אחריהם",
+              body: "עסקים שאתה עוקב אחריהם מופיעים כאן לגישה מהירה — הקש על אחד כדי לראות את הדף שלו או להזמין שוב.",
+            },
+            step3: {
+              title: "קישורים מהירים",
+              body: "קפוץ ישירות להיסטוריית הפגישות המלאה, הזמנות, או לדף החיפוש מכאן.",
             },
           },
         },

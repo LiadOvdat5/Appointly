@@ -116,7 +116,7 @@ export const Tutorial: React.FC<Props> = ({
   onComplete,
   onSkip,
 }) => {
-  const { t, i18n } = useTranslation("tutorials");
+  const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === "rtl";
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -260,7 +260,7 @@ export const Tutorial: React.FC<Props> = ({
       disabled={isFirst}
       className="px-3 py-1.5 text-sm rounded border border-gray-300 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-black"
     >
-      {t("common.back")}
+      {t("tutorials.common.back")}
     </button>
   );
 
@@ -271,7 +271,7 @@ export const Tutorial: React.FC<Props> = ({
       onClick={handleNext}
       className="px-4 py-1.5 text-sm rounded bg-black text-white hover:bg-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-black"
     >
-      {isLast ? t("common.finish") : t("common.next")}
+      {isLast ? t("tutorials.common.finish") : t("tutorials.common.next")}
     </button>
   );
 
@@ -316,7 +316,7 @@ export const Tutorial: React.FC<Props> = ({
               aria-live="polite"
               aria-atomic="true"
             >
-              {t("common.stepOf", {
+              {t("tutorials.common.stepOf", {
                 current: currentIndex + 1,
                 total: totalSteps,
               })}
@@ -329,7 +329,7 @@ export const Tutorial: React.FC<Props> = ({
           <button
             ref={isFirst ? undefined : firstFocusableRef}
             onClick={onSkip}
-            aria-label={t("common.skip")}
+            aria-label={t("tutorials.common.skip")}
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-black rounded p-0.5 flex-shrink-0"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
