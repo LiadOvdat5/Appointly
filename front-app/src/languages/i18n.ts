@@ -1516,46 +1516,110 @@ i18n.use(initReactI18next).init({
               body: "Review the summary and tap Confirm Booking. You'll receive a confirmation right away.",
             },
           },
+          onboarding: {
+            step1: {
+              title: "Welcome! Let's set up your business",
+              body: "Let's set up your business profile. It only takes a few minutes.",
+            },
+            step2: {
+              title: "Business name & category",
+              body: "Give your business a name and pick the category that fits best.",
+            },
+            step3: {
+              title: "Location",
+              body: "Add your address so customers can find you on the map.",
+            },
+            step4: {
+              title: "Services",
+              body: "Add the services you offer — name, duration, and price.",
+            },
+            step5: {
+              title: "All done!",
+              body: "That's it! You can always update these details later from your dashboard.",
+            },
+          },
           "owner-dashboard": {
             step1: {
-              title: "Welcome to your dashboard",
-              body: "This is your business control centre. View upcoming appointments, analytics, and quick actions.",
+              title: "Your business at a glance",
+              body: "Here's a snapshot of your business — total appointments, revenue, and more.",
             },
             step2: {
               title: "Upcoming appointments",
-              body: "All confirmed bookings appear here. Mark them as completed or cancel them if needed.",
+              body: "Manage today's and upcoming appointments from here.",
             },
             step3: {
-              title: "Analytics",
-              body: "Track revenue, bookings, and your top service at a glance.",
+              title: "Edit your business page",
+              body: "Go to your public business page to update services, photos, and info.",
+            },
+            step4: {
+              title: "Manage schedule",
+              body: "Set your working hours and availability rules here.",
+            },
+            step5: {
+              title: "Staff section",
+              body: "Invite and manage your team members from the Staff tab.",
             },
           },
           "business-edit": {
             step1: {
-              title: "Your public business page",
-              body: "This is what customers see when they find your business. Keep it up to date!",
+              title: "You're in edit mode",
+              body: "You're now editing your public business page. Changes are saved as you go.",
             },
             step2: {
-              title: "Add or edit services",
-              body: "Tap the pencil icon on a service to update its name, price, or duration.",
+              title: "Logo & banner",
+              body: "Upload your logo and a banner image to make your page stand out.",
             },
             step3: {
-              title: "Upload a logo & banner",
-              body: "A great photo makes your page stand out in search results.",
+              title: "Theme color",
+              body: "Pick a color to personalize your business page.",
+            },
+            step4: {
+              title: "Services list",
+              body: "Add, edit, or remove the services you offer here.",
+            },
+            step5: {
+              title: "Preview your page",
+              body: "Exit edit mode to see how customers will see your page.",
             },
           },
           "schedule-editor": {
             step1: {
-              title: "Set your working hours",
-              body: "Toggle each day open or closed and set your start and end times.",
+              title: "Weekly working hours",
+              body: "Set your regular working hours for each day of the week.",
             },
             step2: {
-              title: "Add breaks",
-              body: "Add break windows for lunch or any gap during the day — no slots will be generated during breaks.",
+              title: "Break times",
+              body: "Add breaks (e.g., lunch) within your working hours — no slots are generated during breaks.",
             },
             step3: {
-              title: "Generate available slots",
-              body: "After saving your hours, generate bookable slots for a date range so customers can book.",
+              title: "Date exceptions",
+              body: "Block specific dates — holidays, vacations, or days off.",
+            },
+            step4: {
+              title: "Save your schedule",
+              body: "Don't forget to save your schedule so customers see accurate availability.",
+            },
+          },
+          "staff-management": {
+            step1: {
+              title: "Your team",
+              body: "Your current team members are listed here.",
+            },
+            step2: {
+              title: "Invite staff",
+              body: "Invite a new staff member by email. They'll receive a link to join.",
+            },
+            step3: {
+              title: "Pending invitations",
+              body: "Invitations you've sent appear here until accepted or expired.",
+            },
+            step4: {
+              title: "Service assignment",
+              body: "Assign staff members to the services they perform.",
+            },
+            step5: {
+              title: "Remove a member",
+              body: "You can remove a staff member at any time from their profile.",
             },
           },
           "staff-home": {
@@ -3097,46 +3161,110 @@ i18n.use(initReactI18next).init({
               body: "עיין בסיכום והקש על אשר הזמנה. תקבל אישור מיד.",
             },
           },
+          onboarding: {
+            step1: {
+              title: "ברוך הבא! בואו נקים את העסק שלך",
+              body: "בואו נגדיר את פרופיל העסק שלך. זה לוקח רק כמה דקות.",
+            },
+            step2: {
+              title: "שם העסק וקטגוריה",
+              body: "תן שם לעסק שלך ובחר את הקטגוריה המתאימה ביותר.",
+            },
+            step3: {
+              title: "מיקום",
+              body: "הוסף את הכתובת שלך כדי שלקוחות יוכלו למצוא אותך במפה.",
+            },
+            step4: {
+              title: "שירותים",
+              body: "הוסף את השירותים שאתה מציע — שם, משך זמן ומחיר.",
+            },
+            step5: {
+              title: "סיימנו!",
+              body: "זהו! תמיד תוכל לעדכן את הפרטים האלה מלוח הבקרה שלך.",
+            },
+          },
           "owner-dashboard": {
             step1: {
-              title: "ברוך הבא ללוח הבקרה שלך",
-              body: "כאן מרכז הפיקוד של העסק שלך. צפה בפגישות קרובות, נתונים סטטיסטיים ופעולות מהירות.",
+              title: "העסק שלך במבט אחד",
+              body: "כאן סיכום של העסק שלך — פגישות כוללות, הכנסות ועוד.",
             },
             step2: {
               title: "פגישות קרובות",
-              body: "כל ההזמנות המאושרות מופיעות כאן. סמן אותן כהושלמו או בטל אותן במידת הצורך.",
+              body: "נהל את הפגישות של היום והפגישות הקרובות מכאן.",
             },
             step3: {
-              title: "ניתוח נתונים",
-              body: "עקוב אחר הכנסות, הזמנות והשירות המוביל שלך במבט אחד.",
+              title: "ערוך את דף העסק",
+              body: "עבור לדף העסק הציבורי שלך כדי לעדכן שירותים, תמונות ומידע.",
+            },
+            step4: {
+              title: "ניהול לוח זמנים",
+              body: "הגדר את שעות העבודה וכללי הזמינות שלך כאן.",
+            },
+            step5: {
+              title: "מדור הצוות",
+              body: "הזמן ונהל את חברי הצוות שלך מהכרטיסייה 'צוות'.",
             },
           },
           "business-edit": {
             step1: {
-              title: "דף העסק הציבורי שלך",
-              body: "זה מה שלקוחות רואים כשהם מוצאים את העסק שלך. שמור אותו מעודכן!",
+              title: "אתה במצב עריכה",
+              body: "אתה עורך כעת את דף העסק הציבורי שלך. השינויים נשמרים תוך כדי.",
             },
             step2: {
-              title: "הוסף או ערוך שירותים",
-              body: "הקש על סמל העיפרון על שירות כדי לעדכן את שמו, מחירו או משכו.",
+              title: "לוגו ובאנר",
+              body: "העלה לוגו ותמונת באנר כדי שהדף שלך יבלוט.",
             },
             step3: {
-              title: "העלה לוגו ובאנר",
-              body: "תמונה מושכת גורמת לדף שלך לבלוט בתוצאות החיפוש.",
+              title: "צבע הנושא",
+              body: "בחר צבע כדי להתאים אישית את דף העסק שלך.",
+            },
+            step4: {
+              title: "רשימת שירותים",
+              body: "הוסף, ערוך או הסר את השירותים שאתה מציע כאן.",
+            },
+            step5: {
+              title: "תצוגה מקדימה",
+              body: "צא ממצב עריכה כדי לראות איך לקוחות יראו את הדף שלך.",
             },
           },
           "schedule-editor": {
             step1: {
-              title: "הגדר את שעות העבודה שלך",
-              body: "הפעל או כבה כל יום והגדר שעות פתיחה וסגירה.",
+              title: "שעות עבודה שבועיות",
+              body: "הגדר את שעות העבודה הרגילות שלך לכל יום בשבוע.",
             },
             step2: {
-              title: "הוסף הפסקות",
-              body: "הוסף הפסקות לצהריים או לכל הפסקה במהלך היום — לא ייווצרו משבצות בזמן הפסקות.",
+              title: "הפסקות",
+              body: "הוסף הפסקות (למשל, צהריים) בתוך שעות העבודה — לא ייווצרו משבצות בזמן הפסקות.",
             },
             step3: {
-              title: "צור משבצות זמינות",
-              body: "לאחר שמירת השעות, צור משבצות להזמנה לטווח תאריכים כדי שלקוחות יוכלו להזמין.",
+              title: "חריגות תאריך",
+              body: "חסום תאריכים ספציפיים — חגים, חופשות, או ימי חופש.",
+            },
+            step4: {
+              title: "שמור את הלוח",
+              body: "אל תשכח לשמור את הלוח כדי שלקוחות יראו זמינות מדויקת.",
+            },
+          },
+          "staff-management": {
+            step1: {
+              title: "הצוות שלך",
+              body: "חברי הצוות הנוכחיים שלך מופיעים כאן.",
+            },
+            step2: {
+              title: "הזמן עובד",
+              body: "הזמן עובד חדש בדוא״ל. הם יקבלו קישור להצטרף.",
+            },
+            step3: {
+              title: "הזמנות ממתינות",
+              body: "הזמנות שנשלחו מופיעות כאן עד שהתקבלו או פגו.",
+            },
+            step4: {
+              title: "הקצאת שירותים",
+              body: "הקצה חברי צוות לשירותים שהם מבצעים.",
+            },
+            step5: {
+              title: "הסרת חבר",
+              body: "תוכל להסיר חבר צוות בכל עת מהפרופיל שלו.",
             },
           },
           "staff-home": {

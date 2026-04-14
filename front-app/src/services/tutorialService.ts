@@ -7,9 +7,11 @@ export const TUTORIAL_KEYS = [
   "search",
   "booking",
   "customer-dashboard",
+  "onboarding",
   "owner-dashboard",
   "business-edit",
   "schedule-editor",
+  "staff-management",
   "staff-home",
   "date-exceptions",
 ] as const;

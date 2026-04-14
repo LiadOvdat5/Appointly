@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-C-Owner-Tutorial|F-17-C: Business Owner Tutorials]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 

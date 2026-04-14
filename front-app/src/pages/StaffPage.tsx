@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
 import {
   getStaff,
   getPendingInvitations,
@@ -44,6 +46,41 @@ function formatDate(iso: string): string {
   });
 }
 
+// ─── Tutorial steps ────────────────────────────────────────────────────────────
+
+const STAFF_MANAGEMENT_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='staff-list']",
+    titleKey: "tutorials.staff-management.step1.title",
+    bodyKey: "tutorials.staff-management.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='staff-invite-btn']",
+    titleKey: "tutorials.staff-management.step2.title",
+    bodyKey: "tutorials.staff-management.step2.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='staff-pending']",
+    titleKey: "tutorials.staff-management.step3.title",
+    bodyKey: "tutorials.staff-management.step3.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='staff-list']",
+    titleKey: "tutorials.staff-management.step4.title",
+    bodyKey: "tutorials.staff-management.step4.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='staff-list']",
+    titleKey: "tutorials.staff-management.step5.title",
+    bodyKey: "tutorials.staff-management.step5.body",
+    placement: "bottom",
+  },
+];
+
 // ─── StaffPage ────────────────────────────────────────────────────────────────
 
 export default function StaffPage() {
@@ -59,6 +96,8 @@ export default function StaffPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [inactiveExpanded, setInactiveExpanded] = useState(false);
+
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("staff-management");
 
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<StaffMember | null>(
@@ -158,6 +197,14 @@ export default function StaffPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="staff-management"
+          steps={STAFF_MANAGEMENT_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
       {/* ── Header ── */}
       <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between gap-3">
@@ -180,6 +227,7 @@ export default function StaffPage() {
             </div>
           </div>
           <Button
+            data-tutorial="staff-invite-btn"
             variant="primary"
             size="sm"
             className="w-auto! px-4"
@@ -193,7 +241,7 @@ export default function StaffPage() {
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
         {/* ── Active Staff (US-02-E-01) ── */}
-        <section>
+        <section data-tutorial="staff-list">
           <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
             {t("staff.teamMembers")}
           </h2>
@@ -277,7 +325,7 @@ export default function StaffPage() {
 
         {/* ── Pending Invitations (US-02-E-02) ── */}
         {invitations.length > 0 && (
-          <section>
+          <section data-tutorial="staff-pending">
             <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
               {t("staff.pendingInvitations")}
             </h2>
