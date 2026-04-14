@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Models;
+using System.Text.RegularExpressions;
 
 namespace WebAPI.Controllers
 {
@@ -62,6 +63,58 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("me/tutorials")]
+        [EndpointSummary("Get Seen Tutorials")]
+        [EndpointDescription("Returns a map of tutorial keys the authenticated user has already seen. " +
+            "Example response: { \"search\": true, \"booking\": true }")]
+        public async Task<IActionResult> GetSeenTutorials()
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                var seen = await _userRepository.GetSeenTutorialsAsync(currentUserId);
+                return Ok(seen);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPatch("me/tutorials")]
+        [EndpointSummary("Mark Tutorial Seen")]
+        [EndpointDescription("Marks a tutorial as seen for the authenticated user. " +
+            "Body: { \"tutorialKey\": \"search\" }. " +
+            "Valid keys: search, booking, owner-dashboard, business-edit, schedule-editor, staff-home, date-exceptions")]
+        public async Task<IActionResult> MarkTutorialSeen([FromBody] TutorialKeyDTO dto)
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            if (string.IsNullOrWhiteSpace(dto.TutorialKey))
+                return BadRequest(new { error = "tutorialKey is required." });
+
+            // Allow only safe key characters (alphanumeric + hyphens)
+            if (!Regex.IsMatch(dto.TutorialKey, @"^[a-z0-9\-]+$"))
+                return BadRequest(new { error = "Invalid tutorialKey format." });
+
+            try
+            {
+                await _userRepository.MarkTutorialSeenAsync(currentUserId, dto.TutorialKey);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { error = ex.Message });
             }
         }
 

@@ -35,5 +35,5 @@
 | 14 | [[EPIC-14-Admin-Panel\|Admin Panel]] | 🔄 In Progress (F-14-A ✅, F-14-B ✅, F-14-C ✅, F-14-D ✅, F-14-E ✅, F-14-F ✅, F-14-G 🔲) |
 | 15 | [[EPIC-15-Home-Screen\|Home Screen Experience]] | 🔲 Not Started |
 | 16 | [[EPIC-16-Accessibility\|Accessibility]] | 🔲 Not Started |
-| 17 | [[EPIC-17-User-Tutorials\|User Onboarding Tutorials]] | 🔲 Not Started |
+| 17 | [[EPIC-17-User-Tutorials\|User Onboarding Tutorials]] | 🔄 In Progress (F-17-A ✅) |
 | 18 | [[EPIC-18-Calendar-Integration\|Calendar Integration]] | 🔲 Not Started |

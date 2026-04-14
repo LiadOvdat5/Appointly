@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-A-Tutorial-Framework|F-17-A: Tutorial Framework]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 

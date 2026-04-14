@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
@@ -89,6 +91,38 @@ namespace WebAPI.Repositories
                 throw new Exception("User not found.");
 
             user.Role = UserRole.owner;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Dictionary<string, bool>> GetSeenTutorialsAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            if (string.IsNullOrEmpty(user.SeenTutorials))
+                return new Dictionary<string, bool>();
+
+            return JsonSerializer.Deserialize<Dictionary<string, bool>>(user.SeenTutorials)
+                   ?? new Dictionary<string, bool>();
+        }
+
+        public async Task MarkTutorialSeenAsync(Guid userId, string tutorialKey)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var seen = string.IsNullOrEmpty(user.SeenTutorials)
+                ? new Dictionary<string, bool>()
+                : JsonSerializer.Deserialize<Dictionary<string, bool>>(user.SeenTutorials)
+                  ?? new Dictionary<string, bool>();
+
+            seen[tutorialKey] = true;
+            user.SeenTutorials = JsonSerializer.Serialize(seen);
             user.UpdatedAt = DateTime.UtcNow;
 
             _context.Users.Update(user);

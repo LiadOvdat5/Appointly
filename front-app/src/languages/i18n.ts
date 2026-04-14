@@ -1478,6 +1478,115 @@ i18n.use(initReactI18next).init({
           completed: "Completed",
           scheduled: "Scheduled",
         },
+
+        // ============ TUTORIALS ============
+        tutorials: {
+          common: {
+            back: "Back",
+            next: "Next",
+            skip: "Skip",
+            finish: "Got it!",
+            stepOf: "Step {{current}} of {{total}}",
+          },
+          search: {
+            step1: {
+              title: "Search for a business",
+              body: "Type a business name or keyword into the search bar to find what you're looking for.",
+            },
+            step2: {
+              title: "Filter by category",
+              body: "Use the category chips to narrow results by service type — barber, nail artist, and more.",
+            },
+            step3: {
+              title: "Switch views",
+              body: "Toggle between list view and map view to explore businesses near your location.",
+            },
+          },
+          booking: {
+            step1: {
+              title: "Pick a date",
+              body: "Choose a date from the calendar to see available time slots for this service.",
+            },
+            step2: {
+              title: "Select a time slot",
+              body: "Tap any available time to select it. It will be reserved for a short time while you confirm.",
+            },
+            step3: {
+              title: "Confirm your booking",
+              body: "Review the summary and tap Confirm Booking. You'll receive a confirmation right away.",
+            },
+          },
+          "owner-dashboard": {
+            step1: {
+              title: "Welcome to your dashboard",
+              body: "This is your business control centre. View upcoming appointments, analytics, and quick actions.",
+            },
+            step2: {
+              title: "Upcoming appointments",
+              body: "All confirmed bookings appear here. Mark them as completed or cancel them if needed.",
+            },
+            step3: {
+              title: "Analytics",
+              body: "Track revenue, bookings, and your top service at a glance.",
+            },
+          },
+          "business-edit": {
+            step1: {
+              title: "Your public business page",
+              body: "This is what customers see when they find your business. Keep it up to date!",
+            },
+            step2: {
+              title: "Add or edit services",
+              body: "Tap the pencil icon on a service to update its name, price, or duration.",
+            },
+            step3: {
+              title: "Upload a logo & banner",
+              body: "A great photo makes your page stand out in search results.",
+            },
+          },
+          "schedule-editor": {
+            step1: {
+              title: "Set your working hours",
+              body: "Toggle each day open or closed and set your start and end times.",
+            },
+            step2: {
+              title: "Add breaks",
+              body: "Add break windows for lunch or any gap during the day — no slots will be generated during breaks.",
+            },
+            step3: {
+              title: "Generate available slots",
+              body: "After saving your hours, generate bookable slots for a date range so customers can book.",
+            },
+          },
+          "staff-home": {
+            step1: {
+              title: "Welcome, team member!",
+              body: "This is your home page as a staff member. See your upcoming appointments and assigned services here.",
+            },
+            step2: {
+              title: "Your assigned services",
+              body: "Your business owner assigns services to you. Customers can book you for these services.",
+            },
+            step3: {
+              title: "Upgrade to owner",
+              body: "Want to list your own business? Use the 'Become a Business Owner' option to upgrade your account.",
+            },
+          },
+          "date-exceptions": {
+            step1: {
+              title: "Block dates",
+              body: "Tap a date to mark it as unavailable — e.g. public holidays or vacations. No slots will be generated on blocked dates.",
+            },
+            step2: {
+              title: "Date exceptions",
+              body: "Set custom working hours for a single day — useful for shorter or longer days on specific dates.",
+            },
+            step3: {
+              title: "Recurring rules",
+              body: "Override your weekly hours for a date range — handy for seasonal schedule changes.",
+            },
+          },
+        },
       },
     },
 
@@ -2935,6 +3044,115 @@ i18n.use(initReactI18next).init({
           canceled: "בוטל",
           completed: "הושלם",
           scheduled: "מתוכנן",
+        },
+
+        // ============ TUTORIALS ============
+        tutorials: {
+          common: {
+            back: "חזור",
+            next: "הבא",
+            skip: "דלג",
+            finish: "הבנתי!",
+            stepOf: "שלב {{current}} מתוך {{total}}",
+          },
+          search: {
+            step1: {
+              title: "חפש עסק",
+              body: "הקלד שם עסק או מילת מפתח בשורת החיפוש כדי למצוא את מה שאתה מחפש.",
+            },
+            step2: {
+              title: "סנן לפי קטגוריה",
+              body: "השתמש בצ'יפים של הקטגוריות כדי לצמצם את התוצאות לפי סוג שירות.",
+            },
+            step3: {
+              title: "החלף תצוגה",
+              body: "עבור בין תצוגת רשימה לתצוגת מפה כדי לגלות עסקים ליד מיקומך.",
+            },
+          },
+          booking: {
+            step1: {
+              title: "בחר תאריך",
+              body: "בחר תאריך מהלוח כדי לראות את המשבצות הפנויות לשירות זה.",
+            },
+            step2: {
+              title: "בחר משבצת זמן",
+              body: "הקש על כל זמן פנוי כדי לבחור אותו. הוא ישמר לזמן קצר בזמן שתאשר.",
+            },
+            step3: {
+              title: "אשר את ההזמנה",
+              body: "עיין בסיכום והקש על אשר הזמנה. תקבל אישור מיד.",
+            },
+          },
+          "owner-dashboard": {
+            step1: {
+              title: "ברוך הבא ללוח הבקרה שלך",
+              body: "כאן מרכז הפיקוד של העסק שלך. צפה בפגישות קרובות, נתונים סטטיסטיים ופעולות מהירות.",
+            },
+            step2: {
+              title: "פגישות קרובות",
+              body: "כל ההזמנות המאושרות מופיעות כאן. סמן אותן כהושלמו או בטל אותן במידת הצורך.",
+            },
+            step3: {
+              title: "ניתוח נתונים",
+              body: "עקוב אחר הכנסות, הזמנות והשירות המוביל שלך במבט אחד.",
+            },
+          },
+          "business-edit": {
+            step1: {
+              title: "דף העסק הציבורי שלך",
+              body: "זה מה שלקוחות רואים כשהם מוצאים את העסק שלך. שמור אותו מעודכן!",
+            },
+            step2: {
+              title: "הוסף או ערוך שירותים",
+              body: "הקש על סמל העיפרון על שירות כדי לעדכן את שמו, מחירו או משכו.",
+            },
+            step3: {
+              title: "העלה לוגו ובאנר",
+              body: "תמונה מושכת גורמת לדף שלך לבלוט בתוצאות החיפוש.",
+            },
+          },
+          "schedule-editor": {
+            step1: {
+              title: "הגדר את שעות העבודה שלך",
+              body: "הפעל או כבה כל יום והגדר שעות פתיחה וסגירה.",
+            },
+            step2: {
+              title: "הוסף הפסקות",
+              body: "הוסף הפסקות לצהריים או לכל הפסקה במהלך היום — לא ייווצרו משבצות בזמן הפסקות.",
+            },
+            step3: {
+              title: "צור משבצות זמינות",
+              body: "לאחר שמירת השעות, צור משבצות להזמנה לטווח תאריכים כדי שלקוחות יוכלו להזמין.",
+            },
+          },
+          "staff-home": {
+            step1: {
+              title: "ברוך הבא, חבר צוות!",
+              body: "זוהי דף הבית שלך כחבר צוות. ראה כאן את הפגישות הקרובות והשירותים המוקצים לך.",
+            },
+            step2: {
+              title: "השירותים המוקצים לך",
+              body: "בעל העסק מקצה לך שירותים. לקוחות יכולים להזמין אצלך שירותים אלה.",
+            },
+            step3: {
+              title: "שדרג לבעל עסק",
+              body: "רוצה לרשום עסק משלך? השתמש באפשרות 'הפוך לבעל עסק' כדי לשדרג את חשבונך.",
+            },
+          },
+          "date-exceptions": {
+            step1: {
+              title: "חסום תאריכים",
+              body: "הקש על תאריך כדי לסמן אותו כלא זמין — למשל, חגים או חופשות. לא ייווצרו משבצות בתאריכים חסומים.",
+            },
+            step2: {
+              title: "חריגות תאריך",
+              body: "הגדר שעות עבודה מותאמות אישית ליום בודד — שימושי לימים קצרים או ארוכים יותר בתאריכים ספציפיים.",
+            },
+            step3: {
+              title: "כללים חוזרים",
+              body: "עקוף את שעות השבועיות הרגילות לטווח תאריכים — נוח לשינויי לוח זמנים עונתיים.",
+            },
+          },
         },
       },
     },
