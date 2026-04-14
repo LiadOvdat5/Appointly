@@ -3,17 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../redux/hooks";
 import { selectUser } from "../redux/authSelectors";
-import {
-  getBusinessAppointmentsByRange,
-  AppointmentStatus,
-  type AppointmentDTO,
-} from "../services/appointmentService";
-import { getPublicBusinessById } from "../services/businessManagementService";
-import { getStaffServices } from "../services/staffService";
-import type { BusinessProfile } from "../types/business";
+import { getPartnerStats, type PartnerStats } from "../services/staffService";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { Card } from "../components/UI/Card";
-import { formatTime } from "../utils/formatTime";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -21,12 +13,19 @@ function getFirstName(fullName: string): string {
   return fullName.split(" ")[0] ?? fullName;
 }
 
-function todayRange(): { start: Date; end: Date } {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date();
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  if (d.toDateString() === today.toDateString()) return "Today";
+  if (d.toDateString() === tomorrow.toDateString()) return "Tomorrow";
+  return d.toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -39,92 +38,74 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function WidgetSkeleton({ rows = 1 }: { rows?: number }) {
+function WidgetSkeleton({ rows = 1, tall = false }: { rows?: number; tall?: boolean }) {
   return (
     <div className="flex flex-col gap-3">
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className="mx-4 h-20 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse"
+          className={`mx-4 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse ${tall ? "h-32" : "h-20"}`}
         />
       ))}
     </div>
   );
 }
 
-// ─── Today's Schedule Widget ──────────────────────────────────────────────────
+// ─── Next Appointment Card ─────────────────────────────────────────────────────
 
-const MAX_VISIBLE = 5;
-
-function TodayScheduleWidget({
+function NextAppointmentCard({
   loading,
-  appointments,
+  stats,
   businessId,
 }: {
   loading: boolean;
-  appointments: AppointmentDTO[];
+  stats: PartnerStats | null;
   businessId: string;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  const upcoming = appointments.filter(
-    (a) => a.status === AppointmentStatus.Scheduled,
-  );
-  const visible = upcoming.slice(0, MAX_VISIBLE);
-  const overflow = upcoming.length - visible.length;
+  const next = stats?.nextAppointment;
 
   return (
     <section className="pt-6">
-      <SectionLabel>{t("partnerHome.todaySchedule.label")}</SectionLabel>
+      <SectionLabel>{t("partnerHome.nextAppointment.label")}</SectionLabel>
 
       {loading ? (
-        <WidgetSkeleton rows={3} />
-      ) : visible.length > 0 ? (
-        <Card className="mx-4 divide-y divide-gray-100 dark:divide-gray-800 p-0 overflow-hidden">
-          {visible.map((appt) => (
-            <div key={appt.id} className="flex items-center gap-3 px-4 py-3">
-              <div className="h-9 w-9 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center shrink-0">
-                <MaterialIcon name="person" className="text-purple-600 text-base!" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
-                  {appt.clientName}
-                </p>
-                <p className="text-xs text-[#4e7397] dark:text-gray-400 truncate mt-0.5">
-                  {appt.serviceName}
-                </p>
-              </div>
-              <span className="text-xs font-semibold text-[#111418] dark:text-white shrink-0 tabular-nums">
-                {formatTime(appt.startDateTime)}
-              </span>
+        <WidgetSkeleton tall />
+      ) : next ? (
+        <Card className="mx-4 bg-linear-to-br from-purple-600 to-purple-800 text-white border-0 p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-purple-200 text-xs font-semibold uppercase tracking-widest mb-1">
+                {formatDate(next.startDateTime)}
+              </p>
+              <p className="text-3xl font-black tracking-tight mb-1">
+                {formatTime(next.startDateTime)}
+              </p>
+              <p className="font-semibold text-base truncate">{next.customerName}</p>
+              <p className="text-purple-200 text-sm truncate mt-0.5">
+                {next.serviceName} · {next.durationMinutes} min
+              </p>
             </div>
-          ))}
-
-          {overflow > 0 && (
-            <div className="px-4 py-2 text-center">
-              <span className="text-xs text-[#4e7397] dark:text-gray-400">
-                {t("partnerHome.todaySchedule.more", { count: overflow })}
-              </span>
+            <div className="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+              <MaterialIcon name="schedule" className="text-white text-2xl!" />
             </div>
-          )}
-
-          <div className="px-4 py-3 flex justify-end border-t border-gray-100 dark:border-gray-800">
-            <button
-              type="button"
-              onClick={() => navigate(`/staff-dashboard/${businessId}/appointments`)}
-              className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
-            >
-              {t("partnerHome.todaySchedule.viewAll")}
-              <MaterialIcon name="arrow_forward" className="text-sm" />
-            </button>
           </div>
+
+          <button
+            type="button"
+            onClick={() => navigate(`/staff-dashboard/${businessId}/appointments`)}
+            className="mt-4 text-xs text-purple-200 font-semibold hover:text-white flex items-center gap-1 transition-colors"
+          >
+            {t("partnerHome.nextAppointment.viewAll")}
+            <MaterialIcon name="arrow_forward" className="text-sm" />
+          </button>
         </Card>
       ) : (
         <div className="mx-4 rounded-2xl border border-dashed border-[#d0dce8] dark:border-gray-700 bg-white dark:bg-surface-dark px-4 py-6 flex flex-col items-center gap-3 text-center">
           <MaterialIcon name="event_available" className="text-3xl text-gray-300 dark:text-gray-600" />
           <p className="text-sm text-[#4e7397] dark:text-gray-400">
-            {t("partnerHome.todaySchedule.empty")}
+            {t("partnerHome.nextAppointment.empty")}
           </p>
         </div>
       )}
@@ -132,40 +113,154 @@ function TodayScheduleWidget({
   );
 }
 
-// ─── Quick Actions ─────────────────────────────────────────────────────────────
+// ─── Stats Row ────────────────────────────────────────────────────────────────
 
-function QuickActionsSection({ businessId }: { businessId: string }) {
+function StatsRow({ loading, stats }: { loading: boolean; stats: PartnerStats | null }) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const actions = [
+  if (loading) {
+    return (
+      <section className="pt-6 px-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-24 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+          <div className="h-24 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        </div>
+      </section>
+    );
+  }
+
+  const items = [
     {
-      icon: "store",
-      labelKey: "partnerHome.quickActions.dashboard",
-      onClick: () => navigate(`/staff-dashboard/${businessId}`),
+      label: t("partnerHome.stats.today"),
+      value: stats?.todayCount ?? 0,
+      icon: "today",
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-50 dark:bg-blue-900/20",
+    },
+    {
+      label: t("partnerHome.stats.thisWeek"),
+      value: stats?.weekCount ?? 0,
+      icon: "calendar_month",
+      color: "text-teal-600 dark:text-teal-400",
+      bg: "bg-teal-50 dark:bg-teal-900/20",
     },
   ];
 
   return (
-    <section className="pt-6">
-      <SectionLabel>{t("partnerHome.quickActions.label")}</SectionLabel>
-      <div className="px-4 grid grid-cols-2 gap-3">
-        {actions.map((action) => (
-          <button
-            key={action.labelKey}
-            type="button"
-            onClick={action.onClick}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-[#e7edf3] dark:border-gray-800 bg-white dark:bg-surface-dark px-3 py-4 hover:border-primary hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors text-center"
-          >
-            <div className="h-11 w-11 rounded-xl bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
-              <MaterialIcon name={action.icon} className="text-purple-600 text-xl!" />
+    <section className="pt-6 px-4">
+      <div className="grid grid-cols-2 gap-3">
+        {items.map((item) => (
+          <Card key={item.label} className="flex flex-col items-center gap-2 py-5 text-center">
+            <div className={`h-10 w-10 rounded-xl ${item.bg} flex items-center justify-center`}>
+              <MaterialIcon name={item.icon} className={`${item.color} text-xl!`} />
             </div>
-            <span className="text-xs font-semibold text-[#111418] dark:text-white leading-tight">
-              {t(action.labelKey)}
-            </span>
-          </button>
+            <p className="text-2xl font-black text-[#111418] dark:text-white">{item.value}</p>
+            <p className="text-xs text-[#4e7397] dark:text-gray-400 font-medium">{item.label}</p>
+          </Card>
         ))}
       </div>
+    </section>
+  );
+}
+
+// ─── Assigned Services ────────────────────────────────────────────────────────
+
+function AssignedServicesSection({
+  loading,
+  stats,
+}: {
+  loading: boolean;
+  stats: PartnerStats | null;
+}) {
+  const { t } = useTranslation();
+  const services = stats?.assignedServices ?? [];
+
+  return (
+    <section className="pt-6">
+      <SectionLabel>{t("partnerHome.assignedServices.label")}</SectionLabel>
+
+      {loading ? (
+        <WidgetSkeleton rows={2} />
+      ) : services.length > 0 ? (
+        <div className="px-4 flex flex-col gap-3">
+          {services.map((svc) => (
+            <Card key={svc.serviceId} className="flex items-center gap-3 p-4">
+              <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center shrink-0">
+                <MaterialIcon name="content_cut" className="text-purple-600 text-base!" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                  {svc.name}
+                </p>
+                <p className="text-xs text-[#4e7397] dark:text-gray-400 mt-0.5">
+                  {svc.durationMinutes} min
+                  {svc.price != null ? ` · ₪${svc.price}` : ""}
+                </p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="mx-4 rounded-2xl border border-dashed border-[#d0dce8] dark:border-gray-700 bg-white dark:bg-surface-dark px-4 py-5 text-center">
+          <p className="text-sm text-[#4e7397] dark:text-gray-400">
+            {t("partnerHome.assignedServices.empty")}
+          </p>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Workplace Card ───────────────────────────────────────────────────────────
+
+function WorkplaceCard({
+  loading,
+  stats,
+}: {
+  loading: boolean;
+  stats: PartnerStats | null;
+}) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const biz = stats?.business;
+
+  return (
+    <section className="pt-6 pb-8">
+      <SectionLabel>{t("partnerHome.workplace.label")}</SectionLabel>
+
+      {loading ? (
+        <WidgetSkeleton />
+      ) : biz ? (
+        <Card className="mx-4 flex items-center gap-4 p-4">
+          {biz.logoUrl ? (
+            <img
+              src={biz.logoUrl}
+              alt={biz.name}
+              className="h-12 w-12 rounded-xl object-cover shrink-0"
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+              <MaterialIcon name="store" className="text-gray-400 text-xl!" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-[#111418] dark:text-white truncate">{biz.name}</p>
+            {biz.slug && (
+              <p className="text-xs text-[#4e7397] dark:text-gray-400 mt-0.5 truncate">
+                bizslot.co/{biz.slug}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => biz.slug && navigate(`/business/${biz.slug}`)}
+            className="text-primary shrink-0"
+            aria-label={t("partnerHome.workplace.viewPage")}
+          >
+            <MaterialIcon name="open_in_new" className="text-xl!" />
+          </button>
+        </Card>
+      ) : null}
     </section>
   );
 }
@@ -178,43 +273,15 @@ export default function PartnerHomePage() {
   const firstName = getFirstName(user?.name ?? "");
   const businessId = user?.businessId ?? "";
 
-  const [business, setBusiness] = useState<BusinessProfile | null>(null);
-  const [loadingBusiness, setLoadingBusiness] = useState(true);
+  const [stats, setStats] = useState<PartnerStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [loadingAppointments, setLoadingAppointments] = useState(false);
-  const [todaysAppointments, setTodaysAppointments] = useState<AppointmentDTO[]>([]);
-
-  // Load business info
   useEffect(() => {
-    if (!businessId) {
-      setLoadingBusiness(false);
-      return;
-    }
-    getPublicBusinessById(businessId)
-      .then(setBusiness)
-      .catch(() => setBusiness(null))
-      .finally(() => setLoadingBusiness(false));
-  }, [businessId]);
-
-  // Load today's appointments, filtered to this staff member's services
-  useEffect(() => {
-    if (!businessId || !user) return;
-    const { start, end } = todayRange();
-    setLoadingAppointments(true);
-
-    Promise.all([
-      getBusinessAppointmentsByRange(businessId, start, end),
-      getStaffServices(businessId, user.id).catch(() => [] as string[]),
-    ])
-      .then(([appts, assignedIds]) => {
-        const myAppts = assignedIds.length > 0
-          ? appts.filter((a) => assignedIds.includes(a.serviceId))
-          : appts;
-        setTodaysAppointments(myAppts);
-      })
-      .catch(() => setTodaysAppointments([]))
-      .finally(() => setLoadingAppointments(false));
-  }, [businessId, user]);
+    getPartnerStats()
+      .then(setStats)
+      .catch(() => setStats(null))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-background-dark pb-16">
@@ -223,25 +290,27 @@ export default function PartnerHomePage() {
         <h1 className="text-2xl font-black text-[#0e141b] dark:text-white tracking-tight">
           {t("partnerHome.greeting", { name: firstName })}
         </h1>
-
-        {loadingBusiness ? (
-          <div className="h-4 w-40 mt-2 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" />
-        ) : business ? (
+        {!loading && stats?.business && (
           <p className="text-sm text-[#4e7397] dark:text-gray-400 mt-1">
-            {t("partnerHome.workingAt", { name: business.name })}
+            {t("partnerHome.workingAt", { name: stats.business.name })}
           </p>
-        ) : null}
+        )}
+        {loading && (
+          <div className="h-4 w-40 mt-2 rounded bg-gray-100 dark:bg-gray-800 animate-pulse" />
+        )}
       </section>
 
-      {/* ── Today's Schedule ── */}
-      <TodayScheduleWidget
-        loading={loadingAppointments}
-        appointments={todaysAppointments}
-        businessId={businessId}
-      />
+      {/* ── Next Appointment ── */}
+      <NextAppointmentCard loading={loading} stats={stats} businessId={businessId} />
 
-      {/* ── Quick Actions ── */}
-      {businessId && <QuickActionsSection businessId={businessId} />}
+      {/* ── Stats Row (Today / This Week) ── */}
+      <StatsRow loading={loading} stats={stats} />
+
+      {/* ── Assigned Services ── */}
+      <AssignedServicesSection loading={loading} stats={stats} />
+
+      {/* ── Workplace Card ── */}
+      <WorkplaceCard loading={loading} stats={stats} />
     </div>
   );
 }

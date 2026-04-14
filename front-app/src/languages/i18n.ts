@@ -71,6 +71,9 @@ i18n.use(initReactI18next).init({
           error: "Registration failed",
           networkError: "Network error. Please try again.",
           orContinueWith: "Or continue with",
+          inviteBanner: "You've been invited to join a business team! Create your account below and your invitation will be accepted automatically.",
+          inviteExpired: "This invitation link has expired. Please ask the business owner to send a new one.",
+          inviteInvalid: "This invitation link is invalid. Please ask the business owner for a new invitation.",
           validation: {
             nameRequired: "Full name is required",
             emailInvalid: "Please enter a valid email address",
@@ -270,15 +273,28 @@ i18n.use(initReactI18next).init({
         partnerHome: {
           greeting: "Hello, {{name}}!",
           workingAt: "Working at {{name}}",
-          todaySchedule: {
-            label: "Today's Appointments",
-            viewAll: "View all shifts",
-            empty: "No appointments today.",
-            more: "+{{count}} more",
+          nextAppointment: {
+            label: "Next Appointment",
+            viewAll: "View all appointments",
+            empty: "No upcoming appointments. Enjoy your free time!",
           },
-          quickActions: {
-            label: "Quick Actions",
-            dashboard: "Staff Dashboard",
+          stats: {
+            today: "Today",
+            thisWeek: "This Week",
+          },
+          assignedServices: {
+            label: "My Services",
+            empty: "No services assigned yet.",
+          },
+          workplace: {
+            label: "My Workplace",
+            viewPage: "View business page",
+          },
+          becomeOwner: {
+            title: "Start your own business",
+            subtitle: "Upgrade your account to Business Owner and list your own services on BizSlot.",
+            cta: "Become a Business Owner",
+            error: "Something went wrong. Please try again.",
           },
         },
 
@@ -545,6 +561,10 @@ i18n.use(initReactI18next).init({
             title: "How was your visit?",
             body: "How was your appointment at {{businessName}}? Leave a review!",
           },
+          invitationReceived: {
+            title: "You've been invited!",
+            body: "{{businessName}} has invited you to join their team. Tap to view.",
+          },
         },
 
         // ============ COMMON ============
@@ -703,6 +723,12 @@ i18n.use(initReactI18next).init({
             message:
               "Remove {{name}} from your business? They will lose access immediately.",
             confirmLabel: "Remove",
+          },
+          inactiveSection: "Past Members",
+          inactive: {
+            removed: "Removed",
+            declined: "Declined invitation",
+            expired: "Invitation expired",
           },
         },
 
@@ -1521,6 +1547,9 @@ i18n.use(initReactI18next).init({
           error: "ההרשמה נכשלה",
           networkError: "שגיאת רשת. בחזור שוב.",
           orContinueWith: "או המשך עם",
+          inviteBanner: "הוזמנת להצטרף לצוות עסק! צור חשבון למטה וההזמנה תאושר אוטומטית.",
+          inviteExpired: "קישור ההזמנה פג תוקף. בקש מבעל העסק לשלוח הזמנה חדשה.",
+          inviteInvalid: "קישור ההזמנה אינו תקין. בקש מבעל העסק הזמנה חדשה.",
           validation: {
             nameRequired: "שם מלא הוא שדה חובה",
             emailInvalid: "יש להזין כתובת דוא״ל תקינה",
@@ -1718,15 +1747,28 @@ i18n.use(initReactI18next).init({
         partnerHome: {
           greeting: "שלום, {{name}}!",
           workingAt: "עובד ב{{name}}",
-          todaySchedule: {
-            label: "פגישות היום",
-            viewAll: "צפה בכל המשמרות",
-            empty: "אין פגישות היום.",
-            more: "+{{count}} נוספים",
+          nextAppointment: {
+            label: "הפגישה הקרובה",
+            viewAll: "צפה בכל הפגישות",
+            empty: "אין פגישות קרובות. תהנה מהזמן החופשי!",
           },
-          quickActions: {
-            label: "פעולות מהירות",
-            dashboard: "לוח בקרה לצוות",
+          stats: {
+            today: "היום",
+            thisWeek: "השבוע",
+          },
+          assignedServices: {
+            label: "השירותים שלי",
+            empty: "לא הוקצו שירותים עדיין.",
+          },
+          workplace: {
+            label: "מקום העבודה שלי",
+            viewPage: "צפה בדף העסק",
+          },
+          becomeOwner: {
+            title: "פתח עסק משלך",
+            subtitle: "שדרג את חשבונך לבעל עסק והוסף את השירותים שלך ל-BizSlot.",
+            cta: "הפוך לבעל עסק",
+            error: "אירעה שגיאה. נסה שוב.",
           },
         },
 
@@ -1993,6 +2035,10 @@ i18n.use(initReactI18next).init({
             title: "איך היה הביקור?",
             body: "איך היה התור שלך אצל {{businessName}}? השאר ביקורת!",
           },
+          invitationReceived: {
+            title: "קיבלת הזמנה!",
+            body: "{{businessName}} הזמינו אותך להצטרף לצוות שלהם. לחץ לצפייה.",
+          },
         },
 
         // ============ COMMON ============
@@ -2150,6 +2196,12 @@ i18n.use(initReactI18next).init({
             title: "הסר חבר צוות",
             message: "להסיר את {{name}} מהעסק שלך? הם יאבדו גישה מיידית.",
             confirmLabel: "הסר",
+          },
+          inactiveSection: "חברים לשעבר",
+          inactive: {
+            removed: "הוסר",
+            declined: "דחה הזמנה",
+            expired: "ההזמנה פגה",
           },
         },
 

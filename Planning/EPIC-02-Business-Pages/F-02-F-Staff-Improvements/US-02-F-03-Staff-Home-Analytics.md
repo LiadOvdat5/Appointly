@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-F-Staff-Improvements|F-02-F: Staff Improvements]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -27,8 +27,8 @@ As a **staff member**, I want **my home page to show a quick snapshot of my upco
 - `[FE]` Empty state if no upcoming appointments: "You have no upcoming appointments. Enjoy your free time!"
 
 ## Acceptance Criteria
-- [ ] Staff home page shows next appointment, today's count, and week's count
-- [ ] Assigned services list is accurate and reflects current assignments
-- [ ] Workplace card links to the correct business page
-- [ ] Empty states are handled gracefully for each widget
-- [ ] Page loads efficiently — single API call preferred over multiple
+- [x] Staff home page shows next appointment, today's count, and week's count
+- [x] Assigned services list is accurate and reflects current assignments
+- [x] Workplace card links to the correct business page
+- [x] Empty states are handled gracefully for each widget
+- [x] Page loads efficiently — single API call preferred over multiple

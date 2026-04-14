@@ -8,7 +8,9 @@ namespace WebAPI.DTOs
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public UserRole Role { get; set; }
-        // Only populated for partner role — the business they belong to
+        // Owned business — only populated for partner and owner roles
         public Guid? BusinessId { get; set; }
+        // Partner workplace — populated when an owner is also a staff member at another business
+        public Guid? WorkplaceBusinessId { get; set; }
     }
 }

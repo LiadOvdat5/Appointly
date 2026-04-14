@@ -257,9 +257,16 @@ namespace WebAPI.Controllers
                     businessId = await _authRepository.GetPartnerBusinessIdAsync(user.Id);
                 }
 
+                // For owners who are also staff members at another business, include their workplace
+                Guid? workplaceBusinessId = null;
+                if (user.Role == UserRole.owner)
+                {
+                    workplaceBusinessId = await _authRepository.GetPartnerBusinessIdAsync(user.Id);
+                }
+
                 return Ok(new
                 {
-                    user = new { id = user.Id, name = user.Name, role = user.Role, businessId },
+                    user = new { id = user.Id, name = user.Name, role = user.Role, businessId, workplaceBusinessId },
                     expiresAt
                 });
             }

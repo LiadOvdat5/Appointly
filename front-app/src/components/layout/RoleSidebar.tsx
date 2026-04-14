@@ -207,9 +207,12 @@ export function RoleSidebar({
         {/* Admin section */}
         {role === Role.Admin && <SidebarAdminSection onClose={onClose} />}
 
-        {/* Partner section — only visible when user is a partner */}
+        {/* Partner section — visible for partners and for owners who are also staff */}
         {role === Role.Partner && user?.businessId && (
           <SidebarPartnerSection businessId={user.businessId} onClose={onClose} />
+        )}
+        {role === Role.Owner && user?.workplaceBusinessId && (
+          <SidebarPartnerSection businessId={user.workplaceBusinessId} onClose={onClose} />
         )}
 
         {/* Favorites — inline collapsible list for Client+ */}

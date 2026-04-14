@@ -11,5 +11,7 @@ namespace WebAPI.Interfaces
         Task<IEnumerable<Guid>> GetStaffServicesAsync(Guid businessId, Guid userId, Guid callerId);
         Task UpdateStaffServicesAsync(Guid businessId, Guid userId, Guid callerId, List<Guid> serviceIds);
         Task<StaffReportDTO> GetStaffReportAsync(Guid businessId, Guid userId, Guid callerId, DateTime? startDate, DateTime? endDate);
+        Task<PartnerStatsDTO> GetPartnerStatsAsync(Guid partnerId);
+        Task<IEnumerable<InactiveStaffEntryDTO>> GetInactiveStaffAsync(Guid businessId, Guid callerId);
     }
 }

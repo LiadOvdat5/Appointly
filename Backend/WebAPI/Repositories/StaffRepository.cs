@@ -200,6 +200,178 @@ namespace WebAPI.Repositories
             await _context.SaveChangesAsync();
         }
 
+        // ── US-02-F-03: Partner Stats ─────────────────────────────────────────
+
+        public async Task<PartnerStatsDTO> GetPartnerStatsAsync(Guid partnerId)
+        {
+            var now = DateTime.UtcNow;
+
+            // Find this partner's accepted business association
+            var partnerRecord = await _context.BusinessPartners
+                .FirstOrDefaultAsync(p => p.UserId == partnerId && p.Status == InvitationStatus.Accepted)
+                ?? throw new KeyNotFoundException("No active business association found for this partner.");
+
+            var businessId = partnerRecord.BusinessId;
+
+            // Business info
+            var business = await _context.Businesses.FindAsync(businessId);
+
+            // Assigned services
+            var assignedServiceIds = partnerRecord.Services;
+            var assignedServices = assignedServiceIds.Any()
+                ? await _context.Services
+                    .Where(s => assignedServiceIds.Contains(s.Id))
+                    .Select(s => new PartnerAssignedServiceDTO
+                    {
+                        ServiceId = s.Id,
+                        Name = s.Name,
+                        DurationMinutes = s.Duration,
+                        Price = s.Price
+                    })
+                    .ToListAsync()
+                : new List<PartnerAssignedServiceDTO>();
+
+            // Today range (UTC)
+            var todayStart = now.Date;
+            var todayEnd = todayStart.AddDays(1);
+
+            // This week range (Monday → Sunday, UTC)
+            var weekStart = todayStart.AddDays(-(int)now.DayOfWeek == 0 ? 6 : (int)now.DayOfWeek - 1);
+            var weekEnd = weekStart.AddDays(7);
+
+            // All future appointments for this partner
+            var futureAppointments = await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Client)
+                .Where(a => a.PartnerId == partnerId
+                         && a.BusinessId == businessId
+                         && a.Status == AppointmentStatus.scheduled
+                         && a.StartDateTime >= now)
+                .OrderBy(a => a.StartDateTime)
+                .ToListAsync();
+
+            // Next appointment
+            var next = futureAppointments.FirstOrDefault();
+            PartnerNextAppointmentDTO? nextDto = null;
+            if (next != null)
+            {
+                nextDto = new PartnerNextAppointmentDTO
+                {
+                    AppointmentId = next.Id,
+                    StartDateTime = next.StartDateTime,
+                    CustomerName = next.Client?.Name ?? "Customer",
+                    ServiceName = next.Service?.Name ?? "Service",
+                    DurationMinutes = next.Service?.Duration ?? 0
+                };
+            }
+
+            // Today count (all scheduled appointments today)
+            var todayAppointments = await _context.Appointments
+                .Where(a => a.PartnerId == partnerId
+                         && a.BusinessId == businessId
+                         && a.Status == AppointmentStatus.scheduled
+                         && a.StartDateTime >= todayStart
+                         && a.StartDateTime < todayEnd)
+                .CountAsync();
+
+            // Week count
+            var weekAppointments = await _context.Appointments
+                .Where(a => a.PartnerId == partnerId
+                         && a.BusinessId == businessId
+                         && a.Status == AppointmentStatus.scheduled
+                         && a.StartDateTime >= weekStart
+                         && a.StartDateTime < weekEnd)
+                .CountAsync();
+
+            return new PartnerStatsDTO
+            {
+                NextAppointment = nextDto,
+                TodayCount = todayAppointments,
+                WeekCount = weekAppointments,
+                AssignedServices = assignedServices,
+                Business = business == null ? null : new PartnerWorkplaceDTO
+                {
+                    BusinessId = business.Id,
+                    Name = business.Name,
+                    LogoUrl = business.LogoUrl,
+                    Slug = business.Slug
+                }
+            };
+        }
+
+        // ── Inactive Staff (removed / declined / expired) ────────────────────
+
+        public async Task<IEnumerable<InactiveStaffEntryDTO>> GetInactiveStaffAsync(Guid businessId, Guid callerId)
+        {
+            await GetBusinessAndVerifyOwnerAsync(businessId, callerId);
+
+            var results = new List<InactiveStaffEntryDTO>();
+
+            // 1. Removed staff — BusinessPartner records with status Removed
+            var removedPartners = await _context.BusinessPartners
+                .Where(p => p.BusinessId == businessId && p.Status == InvitationStatus.Removed)
+                .ToListAsync();
+
+            if (removedPartners.Any())
+            {
+                var userIds = removedPartners.Select(p => p.UserId).ToList();
+                var users = await _context.Users
+                    .Where(u => userIds.Contains(u.Id))
+                    .ToDictionaryAsync(u => u.Id);
+
+                foreach (var partner in removedPartners)
+                {
+                    users.TryGetValue(partner.UserId, out var user);
+                    results.Add(new InactiveStaffEntryDTO
+                    {
+                        EntryType = InactiveStaffEntryType.RemovedStaff,
+                        UserId = partner.UserId,
+                        Name = user?.Name,
+                        Email = user?.Email ?? string.Empty,
+                        StatusChangedAt = partner.UpdatedAt
+                    });
+                }
+            }
+
+            // 2. Declined invitations
+            var declinedInvitations = await _context.BusinessInvitations
+                .Where(i => i.BusinessId == businessId && i.Status == InvitationStatus.Declined)
+                .ToListAsync();
+
+            foreach (var inv in declinedInvitations)
+            {
+                results.Add(new InactiveStaffEntryDTO
+                {
+                    EntryType = InactiveStaffEntryType.DeclinedInvitation,
+                    UserId = inv.WorkerId,
+                    Name = inv.WorkerId.HasValue
+                        ? (await _context.Users.FindAsync(inv.WorkerId.Value))?.Name
+                        : null,
+                    Email = inv.WorkerEmail,
+                    StatusChangedAt = inv.RespondedAt ?? inv.UpdatedAt
+                });
+            }
+
+            // 3. Expired invitations (no response before deadline)
+            var expiredInvitations = await _context.BusinessInvitations
+                .Where(i => i.BusinessId == businessId && i.Status == InvitationStatus.Expired)
+                .ToListAsync();
+
+            foreach (var inv in expiredInvitations)
+            {
+                results.Add(new InactiveStaffEntryDTO
+                {
+                    EntryType = InactiveStaffEntryType.ExpiredInvitation,
+                    UserId = inv.WorkerId,
+                    Name = null, // no need to look up name for expired
+                    Email = inv.WorkerEmail,
+                    StatusChangedAt = inv.ExpirationDate
+                });
+            }
+
+            return results.OrderByDescending(e => e.StatusChangedAt);
+        }
+
         // ── US-02-E-05: Staff Report ──────────────────────────────────────────
 
         public async Task<StaffReportDTO> GetStaffReportAsync(Guid businessId, Guid userId, Guid callerId, DateTime? startDate, DateTime? endDate)

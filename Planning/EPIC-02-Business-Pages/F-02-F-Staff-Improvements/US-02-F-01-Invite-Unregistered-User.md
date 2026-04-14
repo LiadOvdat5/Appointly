@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-F-Staff-Improvements|F-02-F: Staff Improvements]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -25,8 +25,8 @@ Current behavior: the invitation endpoint checks whether the email belongs to an
 - `[FE]` After registration with invite token, redirect user to their staff home page (not the generic home)
 
 ## Acceptance Criteria
-- [ ] Inviting an unregistered email sends them an email with a sign-up link
-- [ ] Following the link takes them to the registration page with the token preserved
-- [ ] After registering, their invitation is automatically accepted and they become staff
-- [ ] The invitation appears as "Pending" on the owner's staff page until the person registers
-- [ ] Expired tokens show a clear error message on the registration page
+- [x] Inviting an unregistered email sends them an email with a sign-up link
+- [x] Following the link takes them to the registration page with the token preserved
+- [x] After registering, their invitation is automatically accepted and they become staff
+- [x] The invitation appears as "Pending" on the owner's staff page until the person registers
+- [x] Expired tokens show a clear error message on the registration page

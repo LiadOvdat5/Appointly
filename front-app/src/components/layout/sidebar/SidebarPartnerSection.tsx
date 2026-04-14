@@ -47,17 +47,6 @@ export function SidebarPartnerSection({
             {businessName ?? t("sidebar.loading")}
           </span>
         </NavLink>
-
-        <NavLink
-          to={`/staff-dashboard/${businessId}/appointments`}
-          onClick={() => onClose?.()}
-          className={linkClass}
-        >
-          <SidebarIcon name="event_upcoming" />
-          <span className="truncate font-medium text-sm">
-            {t("sidebar.myShifts")}
-          </span>
-        </NavLink>
       </div>
     </div>
   );

@@ -5,7 +5,8 @@ export type AuthUser = {
   id: string;
   name: string;
   role: number;
-  businessId?: string; // only set for partner role
+  businessId?: string; // owned business — set for partner and owner roles
+  workplaceBusinessId?: string; // set when an owner is also a staff member at another business
 };
 
 type AuthStatus = "unknown" | "authenticated" | "guest";

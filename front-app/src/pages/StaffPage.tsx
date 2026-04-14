@@ -7,8 +7,11 @@ import {
   inviteStaff,
   cancelInvitation,
   removeStaff,
+  getInactiveStaff,
+  InactiveStaffEntryType,
   type StaffMember,
   type StaffInvitation,
+  type InactiveStaffEntry,
 } from "../services/staffService";
 import {
   getServicesForBusiness,
@@ -51,9 +54,11 @@ export default function StaffPage() {
   const [bid, setBid] = useState<string>("");
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<StaffInvitation[]>([]);
+  const [inactive, setInactive] = useState<InactiveStaffEntry[]>([]);
   const [allServices, setAllServices] = useState<ServiceProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [inactiveExpanded, setInactiveExpanded] = useState(false);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState<StaffMember | null>(
@@ -78,11 +83,13 @@ export default function StaffPage() {
       getStaff(bid),
       getPendingInvitations(bid),
       getServicesForBusiness(bid),
+      getInactiveStaff(bid),
     ])
-      .then(([s, inv, svc]) => {
+      .then(([s, inv, svc, inact]) => {
         setStaff(s);
         setInvitations(inv);
         setAllServices(svc);
+        setInactive(inact);
       })
       .catch(() => setError(t("staff.error.loadFailed")))
       .finally(() => setLoading(false));
@@ -107,9 +114,22 @@ export default function StaffPage() {
   async function handleRemoveMember(userId: string) {
     setRemovingId(userId);
     try {
+      const member = staff.find((m) => m.userId === userId);
       await removeStaff(bid, userId);
       setStaff((prev) => prev.filter((m) => m.userId !== userId));
       setSelectedMember(null);
+      if (member) {
+        setInactive((prev) => [
+          {
+            entryType: InactiveStaffEntryType.RemovedStaff,
+            userId: member.userId,
+            name: member.name,
+            email: member.email,
+            statusChangedAt: new Date().toISOString(),
+          },
+          ...prev,
+        ]);
+      }
     } finally {
       setRemovingId(null);
     }
@@ -291,6 +311,75 @@ export default function StaffPage() {
                 </Card>
               ))}
             </div>
+          </section>
+        )}
+
+        {/* ── Inactive / Past Members ── */}
+        {inactive.length > 0 && (
+          <section>
+            <button
+              type="button"
+              onClick={() => setInactiveExpanded((v) => !v)}
+              className="flex w-full items-center justify-between mb-4 group"
+            >
+              <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide flex items-center gap-2">
+                {t("staff.inactiveSection")}
+                <span className="inline-flex items-center justify-center h-5 min-w-5 rounded-full bg-gray-200 dark:bg-gray-700 text-[11px] font-bold text-gray-600 dark:text-gray-300 px-1.5">
+                  {inactive.length}
+                </span>
+              </h2>
+              <MaterialIcon
+                name={inactiveExpanded ? "expand_less" : "expand_more"}
+                className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 transition-colors"
+              />
+            </button>
+
+            {inactiveExpanded && (
+              <div className="space-y-3">
+                {inactive.map((entry, idx) => {
+                  const isRemoved = entry.entryType === InactiveStaffEntryType.RemovedStaff;
+                  const isDeclined = entry.entryType === InactiveStaffEntryType.DeclinedInvitation;
+
+                  const iconName = isRemoved ? "person_remove" : isDeclined ? "cancel" : "schedule";
+                  const iconBg = isRemoved
+                    ? "bg-red-100 dark:bg-red-900/20"
+                    : isDeclined
+                    ? "bg-amber-100 dark:bg-amber-900/20"
+                    : "bg-gray-100 dark:bg-gray-800";
+                  const iconColor = isRemoved
+                    ? "text-red-500"
+                    : isDeclined
+                    ? "text-amber-500"
+                    : "text-gray-400";
+                  const statusLabel = isRemoved
+                    ? t("staff.inactive.removed")
+                    : isDeclined
+                    ? t("staff.inactive.declined")
+                    : t("staff.inactive.expired");
+
+                  return (
+                    <Card key={`${entry.entryType}-${entry.email}-${idx}`} className="p-4 opacity-80">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-10 w-10 rounded-full ${iconBg} flex items-center justify-center shrink-0`}>
+                          <MaterialIcon name={iconName} className={`text-base ${iconColor}`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {entry.name && (
+                            <p className="text-sm font-semibold text-[#111418] dark:text-white truncate">
+                              {entry.name}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-500 truncate">{entry.email}</p>
+                          <p className="text-xs text-gray-400 mt-0.5">
+                            {statusLabel} · {formatDate(entry.statusChangedAt)}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </section>
         )}
       </div>

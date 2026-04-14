@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
+using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
@@ -34,6 +35,33 @@ namespace WebAPI.Controllers
             catch (Exception ex)
             {
                 return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPatch("me/role")]
+        [EndpointSummary("Upgrade Role to Business Owner")]
+        [EndpointDescription("Upgrades the authenticated user's role from partner/client to owner. " +
+            "Preserves any existing BusinessPartner associations. " +
+            "After this call, the client should call POST /auth/refresh to receive a new JWT with the updated role.")]
+        public async Task<IActionResult> UpgradeRoleToOwner()
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            var roleStr = User.FindFirstValue(ClaimTypes.Role);
+            if (roleStr == UserRole.owner.ToString())
+                return Conflict(new { error = "User is already a business owner." });
+
+            try
+            {
+                await _userRepository.UpdateUserRoleToOwnerAsync(currentUserId);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
             }
         }
 

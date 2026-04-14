@@ -2,7 +2,7 @@
 
 **Feature:** [[F-02-F-Staff-Improvements|F-02-F: Staff Improvements]]
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -26,8 +26,8 @@ Currently the `Role` field on `Users` is either `Customer` or `BusinessOwner`. A
 - `[FE]` After role upgrade, redirect user through the onboarding wizard to create their own business
 
 ## Acceptance Criteria
-- [ ] A staff member can upgrade their account to Business Owner
-- [ ] Their existing staff association at their workplace is preserved after upgrade
-- [ ] The sidebar shows both owner navigation and a "My Workplace" link
-- [ ] The new owner is guided through onboarding to create their own business
-- [ ] Auth token is refreshed to reflect the new role without requiring manual re-login
+- [x] A staff member can upgrade their account to Business Owner
+- [x] Their existing staff association at their workplace is preserved after upgrade
+- [x] The sidebar shows both owner navigation and a "My Workplace" link
+- [x] The new owner is guided through onboarding to create their own business
+- [x] Auth token is refreshed to reflect the new role without requiring manual re-login
