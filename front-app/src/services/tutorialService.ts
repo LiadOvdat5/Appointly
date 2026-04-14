@@ -13,6 +13,7 @@ export const TUTORIAL_KEYS = [
   "schedule-editor",
   "staff-management",
   "staff-home",
+  "staff-schedule-editor",
   "date-exceptions",
 ] as const;
 

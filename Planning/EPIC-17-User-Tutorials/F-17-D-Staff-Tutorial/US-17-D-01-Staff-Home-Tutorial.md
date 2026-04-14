@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-D-Staff-Tutorial|F-17-D: Staff Member Tutorials]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -22,5 +22,5 @@ As a **new staff member**, I want **a tutorial the first time I open my home pag
 - `[FE]` Add i18n keys: `tutorials.staffHome.*`
 
 ## Acceptance Criteria
-- [ ] Tutorial shows on first visit to the staff home page
-- [ ] Steps reference the actual sections of the staff home UI
+- [x] Tutorial shows on first visit to the staff home page
+- [x] Steps reference the actual sections of the staff home UI

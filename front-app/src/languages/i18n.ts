@@ -1624,16 +1624,46 @@ i18n.use(initReactI18next).init({
           },
           "staff-home": {
             step1: {
-              title: "Welcome, team member!",
-              body: "This is your home page as a staff member. See your upcoming appointments and assigned services here.",
+              title: "Welcome to your staff portal!",
+              body: "Here's a quick overview of your home page as a staff member.",
             },
             step2: {
-              title: "Your assigned services",
-              body: "Your business owner assigns services to you. Customers can book you for these services.",
+              title: "Your workplace",
+              body: "This is the business you work at. Tap the icon to view the public business page.",
             },
             step3: {
-              title: "Upgrade to owner",
-              body: "Want to list your own business? Use the 'Become a Business Owner' option to upgrade your account.",
+              title: "Assigned services",
+              body: "These are the services you're assigned to perform. Customers can book you for these.",
+            },
+            step4: {
+              title: "Next appointment",
+              body: "Your next upcoming appointment is shown here at a glance.",
+            },
+            step5: {
+              title: "Quick stats",
+              body: "A summary of your upcoming workload — appointments today and this week.",
+            },
+            step6: {
+              title: "Manage your schedule",
+              body: "Use the schedule editor to set your own availability so customers only see slots when you're truly available.",
+            },
+          },
+          "staff-schedule-editor": {
+            step1: {
+              title: "Weekly availability",
+              body: "Set the days and hours you're available to take appointments.",
+            },
+            step2: {
+              title: "Break times",
+              body: "Block out breaks so you're not booked during lunch or downtime.",
+            },
+            step3: {
+              title: "Date exceptions",
+              body: "Block specific dates when you're unavailable — holiday, day off, etc.",
+            },
+            step4: {
+              title: "Save your schedule",
+              body: "Save your schedule so customers only see slots when you're truly available.",
             },
           },
           "date-exceptions": {
@@ -3269,16 +3299,46 @@ i18n.use(initReactI18next).init({
           },
           "staff-home": {
             step1: {
-              title: "ברוך הבא, חבר צוות!",
-              body: "זוהי דף הבית שלך כחבר צוות. ראה כאן את הפגישות הקרובות והשירותים המוקצים לך.",
+              title: "ברוך הבא לפורטל הצוות שלך!",
+              body: "הנה סקירה מהירה של דף הבית שלך כחבר צוות.",
             },
             step2: {
-              title: "השירותים המוקצים לך",
-              body: "בעל העסק מקצה לך שירותים. לקוחות יכולים להזמין אצלך שירותים אלה.",
+              title: "מקום העבודה שלך",
+              body: "זהו העסק שאתה עובד בו. הקש על הסמל כדי לצפות בדף העסק הציבורי.",
             },
             step3: {
-              title: "שדרג לבעל עסק",
-              body: "רוצה לרשום עסק משלך? השתמש באפשרות 'הפוך לבעל עסק' כדי לשדרג את חשבונך.",
+              title: "שירותים מוקצים",
+              body: "אלה השירותים שהוקצו לך לביצוע. לקוחות יכולים להזמין אצלך שירותים אלה.",
+            },
+            step4: {
+              title: "הפגישה הבאה",
+              body: "הפגישה הקרובה הבאה שלך מוצגת כאן במבט מהיר.",
+            },
+            step5: {
+              title: "סטטיסטיקות מהירות",
+              body: "סיכום עומס העבודה הקרוב שלך — פגישות היום ובשבוע זה.",
+            },
+            step6: {
+              title: "נהל את הלוח שלך",
+              body: "השתמש בעורך הלוח כדי להגדיר את הזמינות שלך, כך שלקוחות יראו רק משבצות כשאתה באמת זמין.",
+            },
+          },
+          "staff-schedule-editor": {
+            step1: {
+              title: "זמינות שבועית",
+              body: "הגדר את הימים והשעות שבהם אתה זמין לקבל פגישות.",
+            },
+            step2: {
+              title: "הפסקות",
+              body: "חסום הפסקות כדי שלא יזמינו אותך בצהריים או בזמן מנוחה.",
+            },
+            step3: {
+              title: "חריגות תאריך",
+              body: "חסום תאריכים ספציפיים שבהם אינך זמין — חג, יום חופש וכדומה.",
+            },
+            step4: {
+              title: "שמור את הלוח",
+              body: "שמור את הלוח כדי שלקוחות יראו רק משבצות כשאתה באמת זמין.",
             },
           },
           "date-exceptions": {

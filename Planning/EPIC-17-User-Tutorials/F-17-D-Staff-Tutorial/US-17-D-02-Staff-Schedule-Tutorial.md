@@ -2,7 +2,7 @@
 
 **Feature:** [[F-17-D-Staff-Tutorial|F-17-D: Staff Member Tutorials]]
 **Epic:** [[EPIC-17-User-Tutorials|EPIC-17: User Onboarding Tutorials]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -20,5 +20,5 @@ As a **new staff member**, I want **a tutorial the first time I open the schedul
 - `[FE]` Add i18n keys: `tutorials.staffScheduleEditor.*`
 
 ## Acceptance Criteria
-- [ ] Tutorial shown on first visit to the schedule editor by a staff member
-- [ ] Distinct from the owner schedule editor tutorial (different key)
+- [x] Tutorial shown on first visit to the schedule editor by a staff member
+- [x] Distinct from the owner schedule editor tutorial (different key)

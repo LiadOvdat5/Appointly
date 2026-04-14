@@ -1,6 +1,6 @@
 # EPIC-17: User Onboarding Tutorials
 
-**Status:** 🔄 In Progress
+**Status:** ✅ Done
 
 ## Goal
 Guide new users through the app with contextual, per-page tutorials that appear the first time a user visits each page. Tutorials are skippable, role-specific, and available in every language supported by the app.
@@ -23,4 +23,4 @@ Each page a user encounters for the first time shows a guided tooltip/highlight 
 | [[F-17-A-Tutorial-Framework\|F-17-A]] | Tutorial framework (engine, storage, i18n) | ✅ Done |
 | [[F-17-B-Customer-Tutorial\|F-17-B]] | Customer tutorials | ✅ Done |
 | [[F-17-C-Owner-Tutorial\|F-17-C]] | Business owner tutorials | ✅ Done |
-| [[F-17-D-Staff-Tutorial\|F-17-D]] | Staff member tutorials | 🔲 Not Started |
+| [[F-17-D-Staff-Tutorial\|F-17-D]] | Staff member tutorials | ✅ Done |

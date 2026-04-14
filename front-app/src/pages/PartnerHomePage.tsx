@@ -6,6 +6,49 @@ import { selectUser } from "../redux/authSelectors";
 import { getPartnerStats, type PartnerStats } from "../services/staffService";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { Card } from "../components/UI/Card";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
+
+// ─── Tutorial ─────────────────────────────────────────────────────────────────
+
+const STAFF_HOME_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='partner-greeting']",
+    titleKey: "tutorials.staff-home.step1.title",
+    bodyKey: "tutorials.staff-home.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='partner-workplace']",
+    titleKey: "tutorials.staff-home.step2.title",
+    bodyKey: "tutorials.staff-home.step2.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='partner-assigned-services']",
+    titleKey: "tutorials.staff-home.step3.title",
+    bodyKey: "tutorials.staff-home.step3.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='partner-next-appointment']",
+    titleKey: "tutorials.staff-home.step4.title",
+    bodyKey: "tutorials.staff-home.step4.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='partner-stats']",
+    titleKey: "tutorials.staff-home.step5.title",
+    bodyKey: "tutorials.staff-home.step5.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='partner-schedule']",
+    titleKey: "tutorials.staff-home.step6.title",
+    bodyKey: "tutorials.staff-home.step6.body",
+    placement: "auto",
+  },
+];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -67,7 +110,7 @@ function NextAppointmentCard({
   const next = stats?.nextAppointment;
 
   return (
-    <section className="pt-6">
+    <section data-tutorial="partner-next-appointment" className="pt-6">
       <SectionLabel>{t("partnerHome.nextAppointment.label")}</SectionLabel>
 
       {loading ? (
@@ -147,7 +190,7 @@ function StatsRow({ loading, stats }: { loading: boolean; stats: PartnerStats | 
   ];
 
   return (
-    <section className="pt-6 px-4">
+    <section data-tutorial="partner-stats" className="pt-6 px-4">
       <div className="grid grid-cols-2 gap-3">
         {items.map((item) => (
           <Card key={item.label} className="flex flex-col items-center gap-2 py-5 text-center">
@@ -176,7 +219,7 @@ function AssignedServicesSection({
   const services = stats?.assignedServices ?? [];
 
   return (
-    <section className="pt-6">
+    <section data-tutorial="partner-assigned-services" className="pt-6">
       <SectionLabel>{t("partnerHome.assignedServices.label")}</SectionLabel>
 
       {loading ? (
@@ -225,7 +268,7 @@ function WorkplaceCard({
   const biz = stats?.business;
 
   return (
-    <section className="pt-6 pb-8">
+    <section data-tutorial="partner-workplace" className="pt-6 pb-8">
       <SectionLabel>{t("partnerHome.workplace.label")}</SectionLabel>
 
       {loading ? (
@@ -276,6 +319,8 @@ export default function PartnerHomePage() {
   const [stats, setStats] = useState<PartnerStats | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("staff-home");
+
   useEffect(() => {
     getPartnerStats()
       .then(setStats)
@@ -285,8 +330,17 @@ export default function PartnerHomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-background-dark pb-16">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="staff-home"
+          steps={STAFF_HOME_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
+
       {/* ── Greeting ── */}
-      <section className="px-4 pt-8 pb-6 bg-white dark:bg-gray-950 border-b border-[#e7edf3] dark:border-gray-800">
+      <section data-tutorial="partner-greeting" className="px-4 pt-8 pb-6 bg-white dark:bg-gray-950 border-b border-[#e7edf3] dark:border-gray-800">
         <h1 className="text-2xl font-black text-[#0e141b] dark:text-white tracking-tight">
           {t("partnerHome.greeting", { name: firstName })}
         </h1>

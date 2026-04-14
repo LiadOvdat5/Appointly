@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
+import { Role } from "../constants/roles";
 import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
 import { useTutorial } from "../hooks/useTutorial";
 import { Button } from "../components/UI/Button";
@@ -39,6 +42,33 @@ import {
   type AppointmentDTO,
 } from "../services/appointmentService";
 
+const STAFF_SCHEDULE_EDITOR_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='schedule-day-selector']",
+    titleKey: "tutorials.staff-schedule-editor.step1.title",
+    bodyKey: "tutorials.staff-schedule-editor.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='schedule-breaks']",
+    titleKey: "tutorials.staff-schedule-editor.step2.title",
+    bodyKey: "tutorials.staff-schedule-editor.step2.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='schedule-overrides']",
+    titleKey: "tutorials.staff-schedule-editor.step3.title",
+    bodyKey: "tutorials.staff-schedule-editor.step3.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='schedule-save']",
+    titleKey: "tutorials.staff-schedule-editor.step4.title",
+    bodyKey: "tutorials.staff-schedule-editor.step4.body",
+    placement: "top",
+  },
+];
+
 const SCHEDULE_EDITOR_TUTORIAL_STEPS: TutorialStep[] = [
   {
     target: "[data-tutorial='schedule-day-selector']",
@@ -72,7 +102,11 @@ export default function ScheduleEditorPage() {
   const navigate = useNavigate();
   const DAY_SHORT = t("calendar.daysShort", { returnObjects: true }) as string[];
   const DAY_FULL = t("calendar.daysFull", { returnObjects: true }) as string[];
-  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("schedule-editor");
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const isPartner = authUser?.role === Role.Partner;
+  const tutorialKey = isPartner ? "staff-schedule-editor" : "schedule-editor";
+  const tutorialSteps = isPartner ? STAFF_SCHEDULE_EDITOR_TUTORIAL_STEPS : SCHEDULE_EDITOR_TUTORIAL_STEPS;
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial(tutorialKey);
 
   // ── Page status ──────────────────────────────────────────────────────────
   const [pageStatus, setPageStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -400,8 +434,8 @@ export default function ScheduleEditorPage() {
     <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
       {tutorialActive && (
         <Tutorial
-          tutorialKey="schedule-editor"
-          steps={SCHEDULE_EDITOR_TUTORIAL_STEPS}
+          tutorialKey={tutorialKey}
+          steps={tutorialSteps}
           onComplete={markTutorialSeen}
           onSkip={markTutorialSeen}
         />
