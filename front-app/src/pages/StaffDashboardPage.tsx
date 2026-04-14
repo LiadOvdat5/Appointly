@@ -18,6 +18,7 @@ import { Button } from "../components/UI/Button";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { ConfirmDialog } from "../components/UI/ConfirmDialog";
 import { ReviewViewModal } from "../components/UI/ReviewViewModal";
+import { AddToCalendarButton } from "../components/UI/AddToCalendarButton";
 import { getBusinessReviews, type ReviewDTO } from "../services/reviewService";
 
 function formatDate(iso: string): string {
@@ -320,27 +321,40 @@ export default function StaffDashboardPage() {
               <div className="space-y-3">
                 {upcoming.map((appt) => (
                   <Card key={appt.id} className="p-4">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
-                        {appt.clientName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">
-                        {appt.serviceName}
-                      </p>
-                      <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
-                        <span className="flex items-center gap-1">
-                          <MaterialIcon
-                            name="calendar_today"
-                            className="text-xs"
-                          />
-                          {formatDate(appt.startDateTime)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MaterialIcon name="schedule" className="text-xs" />
-                          {formatTime(appt.startDateTime)} –{" "}
-                          {formatTime(appt.endDateTime)}
-                        </span>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                          {appt.clientName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                          {appt.serviceName}
+                        </p>
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-1">
+                          <span className="flex items-center gap-1">
+                            <MaterialIcon
+                              name="calendar_today"
+                              className="text-xs"
+                            />
+                            {formatDate(appt.startDateTime)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <MaterialIcon name="schedule" className="text-xs" />
+                            {formatTime(appt.startDateTime)} –{" "}
+                            {formatTime(appt.endDateTime)}
+                          </span>
+                        </div>
                       </div>
+                      <AddToCalendarButton
+                        appointment={{
+                          id: appt.id,
+                          title: `${appt.serviceName} at ${appt.businessName}`,
+                          startDateTime: appt.startDateTime,
+                          durationMinutes: appt.serviceDuration,
+                          businessName: appt.businessName,
+                          businessAddress: appt.businessAddress,
+                          serviceName: appt.serviceName,
+                        }}
+                      />
                     </div>
                   </Card>
                 ))}

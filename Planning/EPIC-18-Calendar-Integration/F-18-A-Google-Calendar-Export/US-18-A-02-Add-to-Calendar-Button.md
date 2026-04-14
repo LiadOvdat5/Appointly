@@ -2,7 +2,7 @@
 
 **Feature:** [[F-18-A-Google-Calendar-Export|F-18-A: Add to Google Calendar]]
 **Epic:** [[EPIC-18-Calendar-Integration|EPIC-18: Calendar Integration]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -30,7 +30,7 @@ As a **customer, business owner, or staff member**, I want **an "Add to Google C
   - Staff home upcoming appointment card
 
 ## Acceptance Criteria
-- [ ] "Add to Calendar" button is visible on all appointment surfaces listed above
-- [ ] Clicking "Google Calendar" opens the pre-filled Google Calendar page in a new tab
-- [ ] Clicking ".ics" downloads a valid calendar file
-- [ ] Button is accessible (keyboard, screen reader)
+- [x] "Add to Calendar" button is visible on all appointment surfaces listed above
+- [x] Clicking "Google Calendar" opens the pre-filled Google Calendar page in a new tab
+- [x] Clicking ".ics" downloads a valid calendar file
+- [x] Button is accessible (keyboard, screen reader)

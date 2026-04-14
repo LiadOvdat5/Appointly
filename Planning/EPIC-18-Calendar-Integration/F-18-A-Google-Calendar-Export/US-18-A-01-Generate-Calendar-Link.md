@@ -2,7 +2,7 @@
 
 **Feature:** [[F-18-A-Google-Calendar-Export|F-18-A: Add to Google Calendar]]
 **Epic:** [[EPIC-18-Calendar-Integration|EPIC-18: Calendar Integration]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -28,8 +28,8 @@ No API key or OAuth is needed — the user is redirected to their own Google Cal
 - `[BE]` Ensure appointment detail endpoints return `durationMinutes` and `businessAddress` (add to DTOs if missing)
 
 ## Acceptance Criteria
-- [ ] `buildGoogleCalendarUrl` returns a valid, openable Google Calendar URL
-- [ ] Event title format: `"[ServiceName] at [BusinessName]"`
-- [ ] Event duration matches the service duration
-- [ ] Business address populates the location field
-- [ ] Utility has no side effects (pure function)
+- [x] `buildGoogleCalendarUrl` returns a valid, openable Google Calendar URL
+- [x] Event title format: `"[ServiceName] at [BusinessName]"`
+- [x] Event duration matches the service duration
+- [x] Business address populates the location field
+- [x] Utility has no side effects (pure function)

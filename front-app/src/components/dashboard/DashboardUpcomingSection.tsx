@@ -4,6 +4,7 @@ import { formatTime } from "../../utils/formatTime";
 import { Card } from "../UI/Card";
 import { Badge } from "../UI/Badge";
 import { MaterialIcon } from "../UI/MaterialIcon";
+import { AddToCalendarButton } from "../UI/AddToCalendarButton";
 import type { AppointmentDTO } from "../../services/appointmentService";
 
 function formatDate(iso: string): string {
@@ -96,7 +97,20 @@ export function DashboardUpcomingSection({
                     )}
                   </div>
                 </div>
-                <Badge variant="confirmed">{t("dashboard.confirmed")}</Badge>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <Badge variant="confirmed">{t("dashboard.confirmed")}</Badge>
+                  <AddToCalendarButton
+                    appointment={{
+                      id: appt.id,
+                      title: `${appt.serviceName} at ${appt.businessName}`,
+                      startDateTime: appt.startDateTime,
+                      durationMinutes: appt.serviceDuration,
+                      businessName: appt.businessName,
+                      businessAddress: appt.businessAddress,
+                      serviceName: appt.serviceName,
+                    }}
+                  />
+                </div>
               </div>
             </Card>
           ))}

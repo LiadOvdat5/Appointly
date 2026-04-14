@@ -952,6 +952,14 @@ i18n.use(initReactI18next).init({
           },
         },
 
+        // ============ ADD TO CALENDAR ============
+        addToCalendar: {
+          button: "Add to Calendar",
+          ariaLabel: "Add appointment to calendar",
+          google: "Google Calendar",
+          ics: "Download .ics",
+        },
+
         // ============ STAFF DASHBOARD ============
         staffDashboard: {
           title: "Staff Dashboard",
@@ -2386,6 +2394,14 @@ i18n.use(initReactI18next).init({
             confirm: "כן, בטל",
             cancel: "השאר",
           },
+        },
+
+        // ============ ADD TO CALENDAR ============
+        addToCalendar: {
+          button: "הוסף ליומן",
+          ariaLabel: "הוסף תור ליומן",
+          google: "Google Calendar",
+          ics: "הורד .ics",
         },
 
         // ============ STAFF DASHBOARD ============
