@@ -1479,6 +1479,28 @@ i18n.use(initReactI18next).init({
           scheduled: "Scheduled",
         },
 
+        // ============ ACCESSIBILITY ============
+        accessibility: {
+          buttonLabel: "Accessibility settings",
+          panelTitle: "Accessibility",
+          fontSize: {
+            label: "Font Size",
+            sm: "Small",
+            default: "Default",
+            lg: "Large",
+            xl: "Extra Large",
+          },
+          highContrast: {
+            label: "High Contrast",
+            description: "Increases contrast for better readability",
+          },
+          reduceMotion: {
+            label: "Reduce Motion",
+            description: "Disables animations and transitions",
+          },
+          reset: "Reset to defaults",
+        },
+
         // ============ TUTORIALS ============
         tutorials: {
           common: {
@@ -3152,6 +3174,28 @@ i18n.use(initReactI18next).init({
           canceled: "בוטל",
           completed: "הושלם",
           scheduled: "מתוכנן",
+        },
+
+        // ============ ACCESSIBILITY ============
+        accessibility: {
+          buttonLabel: "הגדרות נגישות",
+          panelTitle: "נגישות",
+          fontSize: {
+            label: "גודל גופן",
+            sm: "קטן",
+            default: "רגיל",
+            lg: "גדול",
+            xl: "גדול מאוד",
+          },
+          highContrast: {
+            label: "ניגודיות גבוהה",
+            description: "מגביר ניגודיות לקריאות טובה יותר",
+          },
+          reduceMotion: {
+            label: "הפחתת תנועה",
+            description: "מבטל אנימציות ומעברים",
+          },
+          reset: "איפוס להגדרות ברירת מחדל",
         },
 
         // ============ TUTORIALS ============

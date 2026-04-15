@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-B-Accessibility-Menu|F-16-B: Accessibility Menu Widget]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -15,6 +15,6 @@ As a **user with a disability**, I want **my accessibility settings to be rememb
 - `[FE]` If user is logged in, optionally sync preferences to their user profile via `PATCH /users/me` (low priority — localStorage is sufficient for MVP)
 
 ## Acceptance Criteria
-- [ ] Preferences persist after page refresh
-- [ ] Preferences persist after closing and reopening the browser
-- [ ] Applied before first paint (no flash of unstyled content)
+- [x] Preferences persist after page refresh
+- [x] Preferences persist after closing and reopening the browser
+- [x] Applied before first paint (no flash of unstyled content)

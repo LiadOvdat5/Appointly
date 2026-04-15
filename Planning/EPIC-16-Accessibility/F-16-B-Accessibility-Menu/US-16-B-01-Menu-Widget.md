@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-B-Accessibility-Menu|F-16-B: Accessibility Menu Widget]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **user with a disability**, I want **a clearly visible accessibility button
 - `[FE]` Button has `aria-label="Accessibility settings"` and `aria-expanded` state
 
 ## Acceptance Criteria
-- [ ] Accessibility button is visible on every page in the header
-- [ ] Panel opens and lists all available options
-- [ ] Panel is fully operable by keyboard
-- [ ] Screen readers announce the panel correctly
+- [x] Accessibility button is visible on every page in the header
+- [x] Panel opens and lists all available options
+- [x] Panel is fully operable by keyboard
+- [x] Screen readers announce the panel correctly

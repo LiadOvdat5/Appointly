@@ -2,6 +2,7 @@ import { H1 } from "../UI/Typography";
 import { LanguageToggle } from "../LanguageToggle";
 import { DarkModeToggle } from "../DarkModeToggle";
 import { NotificationBell } from "../NotificationBell";
+import { AccessibilityMenuWidget } from "../AccessibilityMenu";
 import { useAppSelector } from "../../redux/hooks";
 import { selectIsAuthenticated } from "../../redux/authSelectors";
 
@@ -19,10 +20,11 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
       {/* Center */}
       <H1 className="flex-1 text-center">BizSlot</H1>
 
-      {/* Right: Dark mode toggle, language toggle, notification bell (auth only), menu */}
+      {/* Right: Dark mode toggle, language toggle, accessibility, notification bell (auth only), menu */}
       <div className="flex items-center gap-1 w-auto justify-end">
         <DarkModeToggle />
         <LanguageToggle compact={true} />
+        <AccessibilityMenuWidget />
         {isAuthenticated && <NotificationBell />}
         <button
           onClick={onOpenMenu}

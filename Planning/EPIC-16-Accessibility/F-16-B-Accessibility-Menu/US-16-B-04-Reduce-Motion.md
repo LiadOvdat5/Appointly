@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-B-Accessibility-Menu|F-16-B: Accessibility Menu Widget]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ As a **user with vestibular disorder or motion sensitivity**, I want to **disabl
 - `[FE]` Audit all CSS transitions and animations — ensure they are wrapped in motion-safe media queries or controlled by the class
 
 ## Acceptance Criteria
-- [ ] Reduce motion toggle is available in the accessibility menu
-- [ ] Enabling it removes all non-essential animations app-wide
-- [ ] OS `prefers-reduced-motion` preference is honored automatically
+- [x] Reduce motion toggle is available in the accessibility menu
+- [x] Enabling it removes all non-essential animations app-wide
+- [x] OS `prefers-reduced-motion` preference is honored automatically

@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-B-Accessibility-Menu|F-16-B: Accessibility Menu Widget]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **user with low vision or photosensitivity**, I want to **enable a high-con
 - `[FE]` Respect the OS-level `prefers-contrast: more` media query as a default
 
 ## Acceptance Criteria
-- [ ] High contrast mode is togglable from the accessibility menu
-- [ ] All text, backgrounds, and interactive elements switch to high-contrast palette
-- [ ] App is still visually coherent and usable in high-contrast mode
-- [ ] OS high-contrast preference is automatically respected on first load
+- [x] High contrast mode is togglable from the accessibility menu
+- [x] All text, backgrounds, and interactive elements switch to high-contrast palette
+- [x] App is still visually coherent and usable in high-contrast mode
+- [x] OS high-contrast preference is automatically respected on first load
