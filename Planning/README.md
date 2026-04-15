@@ -37,3 +37,4 @@
 | 16 | [[EPIC-16-Accessibility\|Accessibility]] | ✅ Done (F-16-A ✅, F-16-B ✅) |
 | 17 | [[EPIC-17-User-Tutorials\|User Onboarding Tutorials]] | 🔄 In Progress (F-17-A ✅, F-17-B ✅, F-17-C ✅, F-17-D 🔲) |
 | 18 | [[EPIC-18-Calendar-Integration\|Calendar Integration]] | 🔲 Not Started |
+| 19 | [[EPIC-19-App-Shell-and-Global-Layout\|App Shell & Global Layout]] | 🔲 Not Started (F-19-A 🔲) |
