@@ -41,6 +41,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
 import type { AddressResult } from "../components/UI/AddressAutocomplete";
 import { ShareModal } from "../components/UI/ShareModal";
+import { meetsAALarge } from "../utils/colorContrast";
 import { ServiceCard } from "../components/business/ServiceCard";
 import { ServiceFormFields, emptyServiceDraft, type DraftService } from "../components/business/ServiceFormFields";
 import { BusinessReviewsSection } from "../components/business/BusinessReviewsSection";
@@ -1451,6 +1452,7 @@ export default function PublicBusinessPage() {
                     })
                   }
                   className="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
+                  aria-label={t("publicBusiness.themeColorLabel")}
                 />
                 <span className="text-sm text-gray-500 font-mono">
                   {draft.themeColor}
@@ -1459,6 +1461,13 @@ export default function PublicBusinessPage() {
                   {t("publicBusiness.themeColorHint")}
                 </span>
               </div>
+              {/* Accessibility contrast warning */}
+              {!meetsAALarge(draft.themeColor, "#ffffff") && !meetsAALarge(draft.themeColor, "#111418") && (
+                <p role="alert" className="flex items-center gap-1.5 text-xs text-warning">
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">warning</span>
+                  {t("publicBusiness.themeColorContrastWarning")}
+                </p>
+              )}
             </div>
           )}
 

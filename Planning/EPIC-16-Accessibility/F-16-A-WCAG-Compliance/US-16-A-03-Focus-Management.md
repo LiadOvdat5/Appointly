@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-A-WCAG-Compliance|F-16-A: WCAG 2.1 AA Compliance]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **keyboard user**, I want **focus to move predictably when modals open/clos
 - `[FE]` Create a reusable `useFocusTrap` hook for modals
 
 ## Acceptance Criteria
-- [ ] Opening any modal moves focus inside it
-- [ ] Closing a modal returns focus to the trigger
-- [ ] Navigating to a new page moves focus to the page heading
-- [ ] Focus indicator is always visible and meets 3:1 contrast ratio
+- [x] Opening any modal moves focus inside it
+- [x] Closing a modal returns focus to the trigger
+- [x] Navigating to a new page moves focus to the page heading
+- [x] Focus indicator is always visible and meets 3:1 contrast ratio

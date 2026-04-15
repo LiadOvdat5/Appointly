@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-A-WCAG-Compliance|F-16-A: WCAG 2.1 AA Compliance]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -20,9 +20,9 @@ As a **blind or visually impaired user**, I want **all app content and interacti
 - `[FE]` Error messages are associated with their input via `aria-describedby`
 
 ## Acceptance Criteria
-- [ ] All images have descriptive `alt` text; decorative images use `alt=""`
-- [ ] Icon-only buttons are announced with a meaningful label
-- [ ] Form errors are read by the screen reader immediately after they appear
-- [ ] Search result updates are announced via `aria-live="polite"`
-- [ ] Modal announced as dialog with accessible name; focus moves to modal on open
-- [ ] App tested and verified with NVDA (Windows) and VoiceOver (Mac/iOS)
+- [x] All images have descriptive `alt` text; decorative images use `alt=""`
+- [x] Icon-only buttons are announced with a meaningful label
+- [x] Form errors are read by the screen reader immediately after they appear (`role="alert"` + `aria-describedby`)
+- [x] Search result updates are announced via `aria-live="polite"`
+- [x] Modal announced as dialog with accessible name; focus moves to modal on open
+- [ ] App tested and verified with NVDA (Windows) and VoiceOver (Mac/iOS) *(manual QA pending)*

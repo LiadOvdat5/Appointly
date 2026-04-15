@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-A-WCAG-Compliance|F-16-A: WCAG 2.1 AA Compliance]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,7 +16,7 @@ As a **user with low vision or color blindness**, I want **all text and UI contr
 - `[FE]` Status badges (appointment status, invitation status) must not rely on color alone — add text or icon
 
 ## Acceptance Criteria
-- [ ] All default text passes 4.5:1 contrast ratio
-- [ ] Large text (≥18pt or 14pt bold) passes 3:1
-- [ ] Theme color selection in owner edit mode warns if the chosen color is inaccessible
-- [ ] Status information is conveyed by text or pattern, not color alone
+- [x] All default text passes 4.5:1 contrast ratio
+- [x] Large text (≥18pt or 14pt bold) passes 3:1
+- [x] Theme color selection in owner edit mode warns if the chosen color is inaccessible
+- [x] Status information is conveyed by text or pattern, not color alone

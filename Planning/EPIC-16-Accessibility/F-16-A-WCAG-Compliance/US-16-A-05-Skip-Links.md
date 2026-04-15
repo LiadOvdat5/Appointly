@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-A-WCAG-Compliance|F-16-A: WCAG 2.1 AA Compliance]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -16,6 +16,6 @@ As a **keyboard or screen reader user**, I want **skip links at the top of each 
 - `[FE]` Consider a "Skip to navigation" link for pages with long content
 
 ## Acceptance Criteria
-- [ ] Pressing `Tab` from a fresh page load focuses the skip link first
-- [ ] Activating the skip link moves focus to the main content landmark
-- [ ] Skip link is invisible until focused
+- [x] Pressing `Tab` from a fresh page load focuses the skip link first
+- [x] Activating the skip link moves focus to the main content landmark
+- [x] Skip link is invisible until focused

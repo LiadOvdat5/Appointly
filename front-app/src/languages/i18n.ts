@@ -20,6 +20,12 @@ i18n.use(initReactI18next).init({
           switchToLight: "Switch to light mode",
         },
 
+        // ============ ACCESSIBILITY ============
+        a11y: {
+          skipToMain: "Skip to main content",
+          skipToNav: "Skip to navigation",
+        },
+
         // ============ NAVIGATION ============
         nav: {
           home: "Home",
@@ -661,6 +667,8 @@ i18n.use(initReactI18next).init({
             searchResults: "Search Results",
             loadingMore: "Loading more results...",
             noMoreResults: "No more results to load",
+            resultCount_one: "{{count}} result",
+            resultCount_other: "{{count}} results",
           },
           map: {
             loadFailed: "Map failed to load",
@@ -777,6 +785,8 @@ i18n.use(initReactI18next).init({
             errorSubmit: "Failed to submit review. Please try again.",
             starAriaLabel_one: "Rate {{count}} star",
             starAriaLabel_other: "Rate {{count}} stars",
+            ratingLabel: "Star rating",
+            commentLabel: "Comment (optional)",
           },
           viewModal: {
             title: "Customer Review",
@@ -1394,6 +1404,7 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} followers",
           themeColorLabel: "Theme Color",
           themeColorHint: "Live preview updates the page colors",
+          themeColorContrastWarning: "This color may not meet WCAG AA contrast requirements. Consider a darker or lighter shade.",
           saveChanges: "Save changes",
           servicesTitle: "Services",
           addServiceLink: "Add service",
@@ -1421,6 +1432,9 @@ i18n.use(initReactI18next).init({
           copyFallback: "Copy this link:",
           qrDescription: "Let customers scan this code to open your page.",
           downloadQR: "Download QR Code",
+          closeAriaLabel: "Close share dialog",
+          tabsLabel: "Share options",
+          qrAriaLabel: "QR code for {{name}}",
         },
 
         // ============ BUSINESS SCHEDULE PAGE ============
@@ -1733,6 +1747,12 @@ i18n.use(initReactI18next).init({
         theme: {
           switchToDark: "עבור למצב כהה",
           switchToLight: "עבור למצב בהיר",
+        },
+
+        // ============ ACCESSIBILITY ============
+        a11y: {
+          skipToMain: "דלג לתוכן הראשי",
+          skipToNav: "דלג לניווט",
         },
 
         // ============ NAVIGATION ============
@@ -2374,6 +2394,8 @@ i18n.use(initReactI18next).init({
             searchResults: "תוצאות חיפוש",
             loadingMore: "טוען תוצאות נוספות...",
             noMoreResults: "אין תוצאות נוספות",
+            resultCount_one: "{{count}} תוצאה",
+            resultCount_other: "{{count}} תוצאות",
           },
           map: {
             loadFailed: "הטעינה של המפה נכשלה",
@@ -2489,6 +2511,8 @@ i18n.use(initReactI18next).init({
             errorSubmit: "שליחת הביקורת נכשלה. אנא נסה שוב.",
             starAriaLabel_one: "דרג {{count}} כוכב",
             starAriaLabel_other: "דרג {{count}} כוכבים",
+            ratingLabel: "דירוג כוכבים",
+            commentLabel: "תגובה (אופציונלי)",
           },
           viewModal: {
             title: "ביקורת לקוח",
@@ -3091,6 +3115,7 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} עוקבים",
           themeColorLabel: "צבע ערכת נושא",
           themeColorHint: "תצוגה מקדימה חיה מעדכנת את צבעי הדף",
+          themeColorContrastWarning: "ייתכן שצבע זה אינו עומד בדרישות ניגודיות WCAG AA. שקול גוון כהה יותר או בהיר יותר.",
           saveChanges: "שמור שינויים",
           servicesTitle: "שירותים",
           addServiceLink: "הוסף שירות",
@@ -3118,6 +3143,9 @@ i18n.use(initReactI18next).init({
           copyFallback: "העתק קישור זה:",
           qrDescription: "תן ללקוחות לסרוק את הקוד כדי לפתוח את הדף שלך.",
           downloadQR: "הורד קוד QR",
+          closeAriaLabel: "סגור חלון שיתוף",
+          tabsLabel: "אפשרויות שיתוף",
+          qrAriaLabel: "קוד QR עבור {{name}}",
         },
 
         // ============ BUSINESS SCHEDULE PAGE ============

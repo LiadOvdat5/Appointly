@@ -6,7 +6,13 @@ import { AccessibilityMenuWidget } from "../AccessibilityMenu";
 import { useAppSelector } from "../../redux/hooks";
 import { selectIsAuthenticated } from "../../redux/authSelectors";
 
-export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
+export const Header = ({
+  onOpenMenu,
+  menuButtonRef,
+}: {
+  onOpenMenu?: () => void;
+  menuButtonRef?: React.RefObject<HTMLButtonElement | null>;
+}) => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   return (
@@ -27,13 +33,16 @@ export const Header = ({ onOpenMenu }: { onOpenMenu?: () => void }) => {
         <AccessibilityMenuWidget />
         {isAuthenticated && <NotificationBell />}
         <button
+          ref={menuButtonRef}
           onClick={onOpenMenu}
           className="flex size-11 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
           aria-label="Open menu"
+          aria-haspopup="true"
         >
           <span
             className="material-symbols-outlined text-slate-900 dark:text-white"
             style={{ fontSize: "24px" }}
+            aria-hidden="true"
           >
             menu
           </span>

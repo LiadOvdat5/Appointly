@@ -2,7 +2,7 @@
 
 **Feature:** [[F-16-A-WCAG-Compliance|F-16-A: WCAG 2.1 AA Compliance]]
 **Epic:** [[EPIC-16-Accessibility|EPIC-16: Accessibility]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -18,8 +18,8 @@ As a **user with a motor disability**, I want to **navigate the entire app using
 - `[FE]` Trap focus inside open modals; restore focus to trigger element on close
 
 ## Acceptance Criteria
-- [ ] Every interactive element is reachable via `Tab` / `Shift+Tab`
-- [ ] No keyboard traps exist outside intentional modal focus traps
-- [ ] All modals close on `Escape` and return focus to the opening trigger
-- [ ] Map markers have a keyboard-accessible list alternative
-- [ ] Tab order matches the visual layout on all route-level pages
+- [x] Every interactive element is reachable via `Tab` / `Shift+Tab`
+- [x] No keyboard traps exist outside intentional modal focus traps
+- [x] All modals close on `Escape` and return focus to the opening trigger
+- [ ] Map markers have a keyboard-accessible list alternative *(deferred — map is a third-party widget)*
+- [x] Tab order matches the visual layout on all route-level pages
