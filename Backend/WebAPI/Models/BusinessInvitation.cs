@@ -27,6 +27,13 @@ namespace WebAPI.Models
         [MaxLength(500, ErrorMessage = "Message cannot exceed 500 characters.")]
         public string? Message { get; set; }
 
+        /// <summary>
+        /// Unique token used in the email invite link for unregistered users.
+        /// Null when the invitee was already registered at invite time.
+        /// </summary>
+        [MaxLength(256)]
+        public string? InviteToken { get; set; }
+
         [Required]
         public DateTime InvitedAt { get; set; } = DateTime.UtcNow;
 

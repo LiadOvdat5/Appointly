@@ -35,6 +35,8 @@ import AdminReviewsPage from "../pages/AdminReviewsPage.tsx";
 import { AdminRoute } from "./AdminRoute.tsx";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage.tsx";
 import ResetPasswordPage from "../pages/ResetPasswordPage.tsx";
+import PrivacyPolicyPage from "../pages/PrivacyPolicyPage.tsx";
+import TermsOfServicePage from "../pages/TermsOfServicePage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -211,6 +213,8 @@ const router = createBrowserRouter([
       },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
       { path: "reset-password", element: <ResetPasswordPage /> },
+      { path: "privacy", element: <PrivacyPolicyPage /> },
+      { path: "terms", element: <TermsOfServicePage /> },
       // Admin pages — inside AppShell, no separate layout
       {
         path: "admin",

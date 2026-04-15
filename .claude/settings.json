@@ -65,7 +65,12 @@
       "Bash(kill 402 403 411)",
       "Bash(ls -la \"d:/Coding/.Net + React/BizSlot/\"*.png)",
       "Bash(cmd /c \"taskkill /PID 31360 /F\")",
-      "Bash(cmd /c \"taskkill /F /IM WebAPI.exe 2>&1\")"
+      "Bash(cmd /c \"taskkill /F /IM WebAPI.exe 2>&1\")",
+      "Bash(node ./node_modules/.bin/tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc.cmd --noEmit)"
+    ],
+    "additionalDirectories": [
+      "d:\\Coding\\.Net + React\\BizSlot\\Planning\\EPIC-19-App-Shell-and-Global-Layout"
     ]
   }
 }

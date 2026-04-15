@@ -58,5 +58,8 @@ namespace WebAPI.Models
         public string? RefreshTokenHash { get; set; }
 
         public DateTime? RefreshTokenExpiry { get; set; }
+
+        // Tutorial seen-state stored as JSON: { "search": true, "booking": true, ... }
+        public string? SeenTutorials { get; set; }
     }
 }

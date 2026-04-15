@@ -6,6 +6,7 @@ import type { BusinessProfile } from "../../types/business";
 import { Button } from "../UI/Button";
 import { Card } from "../UI/Card";
 import { MaterialIcon } from "../UI/MaterialIcon";
+import { AddToCalendarButton } from "../UI/AddToCalendarButton";
 
 interface BookingConfirmedScreenProps {
   appointment: AppointmentDTO;
@@ -83,6 +84,18 @@ export function BookingConfirmedScreen({ appointment, business }: BookingConfirm
           )}
         </Card>
         <div className="flex flex-col gap-3 w-full">
+          <AddToCalendarButton
+            appointment={{
+              id: appointment.id,
+              title: `${appointment.serviceName} at ${appointment.businessName}`,
+              startDateTime: appointment.startDateTime,
+              durationMinutes: appointment.serviceDuration,
+              businessName: appointment.businessName,
+              businessAddress: appointment.businessAddress,
+              serviceName: appointment.serviceName,
+            }}
+            className="self-center"
+          />
           <Button variant="primary" onClick={() => navigate("/dashboard/customer")}>
             {t("booking.confirmed.viewAppointments")}
           </Button>

@@ -474,6 +474,35 @@ namespace WebAPI.Controllers
         // ── Staff Management ─────────────────────────────────────────────────
 
         [Authorize]
+        [HttpGet("{businessId}/staff/inactive")]
+        [EndpointSummary("List Inactive Staff")]
+        [EndpointDescription("Returns removed staff members, declined invitations, and expired invitations for the business, ordered newest first. Authorization: Only the business owner.")]
+        public async Task<IActionResult> GetInactiveStaff(Guid businessId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var inactive = await _staffRepository.GetInactiveStaffAsync(businessId, userId);
+                return Ok(inactive);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
         [HttpGet("{businessId}/staff")]
         [EndpointSummary("List Staff Members")]
         [EndpointDescription("Returns all accepted staff members for the business with their assigned service names. Authorization: Only the business owner.")]

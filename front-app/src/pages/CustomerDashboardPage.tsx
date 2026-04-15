@@ -15,6 +15,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { Button } from "../components/UI/Button";
 import { ConfirmDialog } from "../components/UI/ConfirmDialog";
 import { ReviewModal } from "../components/UI/ReviewModal";
+import { AddToCalendarButton } from "../components/UI/AddToCalendarButton";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -319,6 +320,21 @@ export default function CustomerDashboardPage() {
                     </span>
 
                     <div className="flex items-center gap-2">
+                      {/* Add to calendar — upcoming scheduled only */}
+                      {appt.status === AppointmentStatus.Scheduled && (
+                        <AddToCalendarButton
+                          appointment={{
+                            id: appt.id,
+                            title: `${appt.serviceName} at ${appt.businessName}`,
+                            startDateTime: appt.startDateTime,
+                            durationMinutes: appt.serviceDuration,
+                            businessName: appt.businessName,
+                            businessAddress: appt.businessAddress,
+                            serviceName: appt.serviceName,
+                          }}
+                        />
+                      )}
+
                       {/* Cancel — upcoming scheduled only */}
                       {appt.status === AppointmentStatus.Scheduled && (
                         <button

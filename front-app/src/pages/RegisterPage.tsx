@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
@@ -16,6 +16,12 @@ export default function RegisterPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
+
+  // Invite token from URL: /register?inviteToken=xxx
+  const inviteToken = searchParams.get("inviteToken") ?? undefined;
+  // Invite error from URL: /register?inviteError=expired|invalid
+  const inviteError = searchParams.get("inviteError");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -77,7 +83,7 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      await register({ name, email, password });
+      await register({ name, email, password, inviteToken });
       const session = await login({ email, password });
 
       dispatch(
@@ -131,6 +137,23 @@ export default function RegisterPage() {
           <H1>{t("register.title")}</H1>
           <Paragraph>{t("register.subtitle")}</Paragraph>
         </div>
+
+        {/* ── Invite context banner ── */}
+        {inviteToken && !inviteError && (
+          <Alert variant="info" className="mb-4">
+            {t("register.inviteBanner")}
+          </Alert>
+        )}
+        {inviteError === "expired" && (
+          <Alert variant="error" className="mb-4">
+            {t("register.inviteExpired")}
+          </Alert>
+        )}
+        {inviteError === "invalid" && (
+          <Alert variant="error" className="mb-4">
+            {t("register.inviteInvalid")}
+          </Alert>
+        )}
 
         {error && (
           <Alert variant="error" className="mb-4">

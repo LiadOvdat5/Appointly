@@ -84,6 +84,7 @@ export function SearchHeader({
 
           {/* Search Input */}
           <input
+            data-tutorial="search-input"
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -119,6 +120,7 @@ export function SearchHeader({
       {/* Filter row: filter button + view toggle */}
       <div className="px-4 py-3 flex items-center justify-between">
         <button
+          data-tutorial="category-filter"
           onClick={() => setFilterOpen((o) => !o)}
           className="flex min-h-11 items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
           aria-label={t("search.filterAriaLabel")}
@@ -228,7 +230,9 @@ export function SearchHeader({
         )}
 
         {onViewChange && (
-          <SearchViewToggle currentView={currentView} onViewChange={onViewChange} />
+          <div data-tutorial="view-toggle">
+            <SearchViewToggle currentView={currentView} onViewChange={onViewChange} />
+          </div>
         )}
       </div>
     </header>

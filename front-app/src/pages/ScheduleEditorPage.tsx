@@ -1,6 +1,11 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
+import { Role } from "../constants/roles";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
 import { Button } from "../components/UI/Button";
 import { Card } from "../components/UI/Card";
 import { Alert } from "../components/UI/Alert";
@@ -37,12 +42,71 @@ import {
   type AppointmentDTO,
 } from "../services/appointmentService";
 
+const STAFF_SCHEDULE_EDITOR_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='schedule-day-selector']",
+    titleKey: "tutorials.staff-schedule-editor.step1.title",
+    bodyKey: "tutorials.staff-schedule-editor.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='schedule-breaks']",
+    titleKey: "tutorials.staff-schedule-editor.step2.title",
+    bodyKey: "tutorials.staff-schedule-editor.step2.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='schedule-overrides']",
+    titleKey: "tutorials.staff-schedule-editor.step3.title",
+    bodyKey: "tutorials.staff-schedule-editor.step3.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='schedule-save']",
+    titleKey: "tutorials.staff-schedule-editor.step4.title",
+    bodyKey: "tutorials.staff-schedule-editor.step4.body",
+    placement: "top",
+  },
+];
+
+const SCHEDULE_EDITOR_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='schedule-day-selector']",
+    titleKey: "tutorials.schedule-editor.step1.title",
+    bodyKey: "tutorials.schedule-editor.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='schedule-breaks']",
+    titleKey: "tutorials.schedule-editor.step2.title",
+    bodyKey: "tutorials.schedule-editor.step2.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='schedule-overrides']",
+    titleKey: "tutorials.schedule-editor.step3.title",
+    bodyKey: "tutorials.schedule-editor.step3.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='schedule-save']",
+    titleKey: "tutorials.schedule-editor.step4.title",
+    bodyKey: "tutorials.schedule-editor.step4.body",
+    placement: "top",
+  },
+];
+
 export default function ScheduleEditorPage() {
   const { t } = useTranslation();
   const { businessId, serviceId } = useParams<{ businessId: string; serviceId: string }>();
   const navigate = useNavigate();
   const DAY_SHORT = t("calendar.daysShort", { returnObjects: true }) as string[];
   const DAY_FULL = t("calendar.daysFull", { returnObjects: true }) as string[];
+  const authUser = useSelector((s: RootState) => s.auth.user);
+  const isPartner = authUser?.role === Role.Partner;
+  const tutorialKey = isPartner ? "staff-schedule-editor" : "schedule-editor";
+  const tutorialSteps = isPartner ? STAFF_SCHEDULE_EDITOR_TUTORIAL_STEPS : SCHEDULE_EDITOR_TUTORIAL_STEPS;
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial(tutorialKey);
 
   // ── Page status ──────────────────────────────────────────────────────────
   const [pageStatus, setPageStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -368,6 +432,14 @@ export default function ScheduleEditorPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey={tutorialKey}
+          steps={tutorialSteps}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
 
       {pendingImpact && (
         <ImpactDialog
@@ -398,7 +470,7 @@ export default function ScheduleEditorPage() {
       </div>
 
       {/* Day selector */}
-      <div className="flex gap-1.5">
+      <div data-tutorial="schedule-day-selector" className="flex gap-1.5">
         {DAY_SHORT.map((label, i) => {
           const ds = dayStates[i];
           const isActive = selectedDay === i;
@@ -494,7 +566,7 @@ export default function ScheduleEditorPage() {
 
             {/* Break times */}
             {activeDay.hasHours && (
-              <div className="flex flex-col gap-2 border-t border-gray-100 dark:border-gray-800 pt-4">
+              <div data-tutorial="schedule-breaks" className="flex flex-col gap-2 border-t border-gray-100 dark:border-gray-800 pt-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
                   {t("scheduleEditor.breaksLabel")}
                 </p>
@@ -561,12 +633,13 @@ export default function ScheduleEditorPage() {
       {saveSuccess && <Alert variant="success">{t("scheduleEditor.savedSuccess")}</Alert>}
       {saveError && <Alert variant="error">{saveError}</Alert>}
 
-      <Button variant="primary" onClick={handleSaveAll} disabled={isSaving} isLoading={isSaving}>
+      <Button data-tutorial="schedule-save" variant="primary" onClick={handleSaveAll} disabled={isSaving} isLoading={isSaving}>
         {t("scheduleEditor.saveAll")}
       </Button>
 
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
+      <div data-tutorial="schedule-overrides">
       <ScheduleOverridesSection
         serviceId={serviceId!}
         businessId={businessId!}
@@ -577,6 +650,7 @@ export default function ScheduleEditorPage() {
         upcomingSlots={upcomingSlots}
         upcomingAppts={upcomingAppts}
       />
+      </div>
 
       <div className="border-t border-gray-200 dark:border-gray-700" />
 

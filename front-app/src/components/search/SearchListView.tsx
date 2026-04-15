@@ -156,6 +156,12 @@ export function SearchListView({
         .filter(Boolean)
         .join(" ")}
     >
+      {/* Visually-hidden live region — announces result count to screen readers */}
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {loading
+          ? t("search.list.loadingMore")
+          : t("search.list.resultCount", { count: results.length + (featuredResults?.length ?? 0) })}
+      </p>
       {/* Featured Businesses Section */}
       {featuredResults && featuredResults.length > 0 && (
         <section className="flex flex-col">
@@ -219,10 +225,15 @@ export function SearchListView({
 
       {/* Loading State */}
       {loading && (
-        <div className="px-4 py-8 flex justify-center">
+        <div
+          role="status"
+          aria-busy="true"
+          aria-label={t("search.list.loadingMore")}
+          className="px-4 py-8 flex justify-center"
+        >
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+            <p className="text-sm text-gray-600 dark:text-gray-400" aria-hidden="true">
               {t("search.list.loadingMore")}
             </p>
           </div>
