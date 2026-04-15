@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
 import {
   getPublicBusinessById,
   getPublicBusinessBySlug,
@@ -33,10 +35,34 @@ function formatDuration(minutes: number, t: (key: string, opts?: Record<string, 
     : t("common.durationHour", { count: h });
 }
 
+// ─── Tutorial steps ───────────────────────────────────────────────────────────
+
+const BOOKING_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='service-summary']",
+    titleKey: "tutorials.booking.step1.title",
+    bodyKey: "tutorials.booking.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='date-picker']",
+    titleKey: "tutorials.booking.step2.title",
+    bodyKey: "tutorials.booking.step2.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='time-slots']",
+    titleKey: "tutorials.booking.step3.title",
+    bodyKey: "tutorials.booking.step3.body",
+    placement: "auto",
+  },
+];
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function BookingPage() {
   const { t, i18n } = useTranslation();
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("booking");
   const { businessSlug, serviceId } = useParams<{
     businessSlug: string;
     serviceId: string;
@@ -164,6 +190,14 @@ export default function BookingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="booking"
+          steps={BOOKING_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
       {/* Header */}
       <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-3 flex items-center gap-3">
         <button
@@ -184,6 +218,7 @@ export default function BookingPage() {
 
       <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
         {/* Service summary */}
+        <div data-tutorial="service-summary">
         <Card className="p-4 flex items-center gap-4">
           <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
             <MaterialIcon name="content_cut" className="text-primary" />
@@ -208,8 +243,10 @@ export default function BookingPage() {
             </p>
           </div>
         </Card>
+        </div>
 
         {/* Date picker */}
+        <div data-tutorial="date-picker">
         <Card className="p-5">
           <h2 className="font-semibold text-[#111418] dark:text-white text-sm mb-4">
             {t("booking.pickDate")}
@@ -223,17 +260,20 @@ export default function BookingPage() {
             }}
           />
         </Card>
+        </div>
 
         {/* Time slot picker */}
         {selectedDate && (
-          <BookingTimeSection
-            selectedDate={selectedDate}
-            slots={slots}
-            slotsLoading={slotsLoading}
-            selectedSlotId={selectedSlotId}
-            onSelectSlot={setSelectedSlotId}
-            locale={i18n.language}
-          />
+          <div data-tutorial="time-slots">
+            <BookingTimeSection
+              selectedDate={selectedDate}
+              slots={slots}
+              slotsLoading={slotsLoading}
+              selectedSlotId={selectedSlotId}
+              onSelectSlot={setSelectedSlotId}
+              locale={i18n.language}
+            />
+          </div>
         )}
 
         {/* Booking summary + CTA */}

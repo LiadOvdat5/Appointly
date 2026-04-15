@@ -22,7 +22,7 @@ export function SidebarBusinessSection({
 }: SidebarBusinessSectionProps) {
   const { t } = useTranslation();
 
-  if (role === Role.Client) {
+  if (role === Role.Client || role === Role.Partner) {
     return (
       <div className="mb-3">
         <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">

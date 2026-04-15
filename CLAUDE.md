@@ -202,9 +202,9 @@ Each user story file contains: story, tasks tagged `[BE]`/`[FE]`/`[DB]`, and acc
 
 The immediate next areas to implement (in order):
 
-1. **EPIC-02 F-02-D** — Worker/staff management on business page
-2. **EPIC-03 F-03-B FE** — Date exceptions UI (block dates / holidays)
-3. **EPIC-03 F-03-C FE** — Customer-facing date picker showing only available slot dates
-4. **EPIC-04 FE** — Full booking flow (`BookingPage.tsx` stub exists)
-5. **EPIC-06 FE** — Business + customer dashboards (`DashboardPage.tsx` stub exists)
-6. **EPIC-07** — Follow system (BE + FE both needed)
+1. **EPIC-11** — Sharing & URL Improvements
+2. **EPIC-13** — Progressive Web App (PWA)
+3. **EPIC-15** — Home Screen Experience
+4. **EPIC-16** — Accessibility
+5. **EPIC-17** — User Onboarding Tutorials
+6. **EPIC-18** — Calendar Integration

@@ -22,13 +22,15 @@ namespace WebAPI.Repositories
         private readonly AppDbContext _context;
         private readonly IJwtService _jwtService;
         private readonly IEmailService _emailService;
+        private readonly IBusinessInvitationRepository _invitationRepository;
         private static readonly HttpClient _httpClient = new();
 
-        public AuthRepository(AppDbContext context, IJwtService jwtService, IEmailService emailService)
+        public AuthRepository(AppDbContext context, IJwtService jwtService, IEmailService emailService, IBusinessInvitationRepository invitationRepository)
         {
             _context = context;
             _jwtService = jwtService;
             _emailService = emailService;
+            _invitationRepository = invitationRepository;
         }
 
         public async Task<UserDTO> RegisterAsync(RegisterUserDTO registerDto)
@@ -43,6 +45,22 @@ namespace WebAPI.Repositories
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            // If the user registered via an invite link, auto-accept the invitation
+            if (!string.IsNullOrWhiteSpace(registerDto.InviteToken))
+            {
+                try
+                {
+                    await _invitationRepository.AutoAcceptInvitationAsync(registerDto.InviteToken, user.Id);
+                    // Reload user so the updated role (partner) is reflected in the returned DTO
+                    await _context.Entry(user).ReloadAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Non-fatal — user is registered, invitation accept failed (e.g., expired or invalid token)
+                    Console.Error.WriteLine($"[AuthRepository] Auto-accept invitation failed: {ex.Message}");
+                }
+            }
 
             return user.ToUserDTO();
         }

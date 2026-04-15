@@ -301,6 +301,10 @@ namespace WebAPI.Migrations
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("InviteToken")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<DateTime>("InvitedAt")
                         .HasColumnType("datetime2");
 
@@ -822,6 +826,9 @@ namespace WebAPI.Migrations
 
                     b.Property<int>("Role")
                         .HasColumnType("int");
+
+                    b.Property<string>("SeenTutorials")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SuspendedReason")
                         .HasMaxLength(500)

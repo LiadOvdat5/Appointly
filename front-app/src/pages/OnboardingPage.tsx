@@ -13,12 +13,48 @@ import { StepIndicator } from "../components/onboarding/StepIndicator";
 import { Step1BusinessInfo } from "../components/onboarding/Step1BusinessInfo";
 import { Step2AddServices } from "../components/onboarding/Step2AddServices";
 import { Step3Complete } from "../components/onboarding/Step3Complete";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
+
+const ONBOARDING_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='onboarding-header']",
+    titleKey: "tutorials.onboarding.step1.title",
+    bodyKey: "tutorials.onboarding.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='onboarding-step-indicator']",
+    titleKey: "tutorials.onboarding.step2.title",
+    bodyKey: "tutorials.onboarding.step2.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='onboarding-step-indicator']",
+    titleKey: "tutorials.onboarding.step3.title",
+    bodyKey: "tutorials.onboarding.step3.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='onboarding-card']",
+    titleKey: "tutorials.onboarding.step4.title",
+    bodyKey: "tutorials.onboarding.step4.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='onboarding-card']",
+    titleKey: "tutorials.onboarding.step5.title",
+    bodyKey: "tutorials.onboarding.step5.body",
+    placement: "top",
+  },
+];
 
 export default function OnboardingPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((s: RootState) => s.auth.user);
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("onboarding");
 
   const [step, setStep] = useState<Step>(1);
   const [businessFields, setBusinessFields] = useState<BusinessFields>({
@@ -74,18 +110,28 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-background-dark flex flex-col items-center justify-start py-10 px-4">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="onboarding"
+          steps={ONBOARDING_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
       <div className="w-full max-w-lg">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div data-tutorial="onboarding-header" className="flex items-center gap-3 mb-6">
           <MaterialIcon name="store" className="text-primary text-[28px]!" />
           <h1 className="text-2xl font-black text-[#111418] dark:text-white">
             {t("onboarding.pageTitle")}
           </h1>
         </div>
 
-        <StepIndicator current={step} />
+        <div data-tutorial="onboarding-step-indicator">
+          <StepIndicator current={step} />
+        </div>
 
-        <div className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 p-6">
+        <div data-tutorial="onboarding-card" className="rounded-2xl bg-white dark:bg-gray-900 shadow-sm border border-gray-100 dark:border-gray-800 p-6">
           {step === 1 && (
             <Step1BusinessInfo
               fields={businessFields}

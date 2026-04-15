@@ -21,6 +21,7 @@ export type RegisterRequest = {
   name: string;
   email: string;
   password: string;
+  inviteToken?: string;
 };
 
 export async function register(data: RegisterRequest): Promise<UserDto> {
@@ -63,4 +64,8 @@ export async function resetPassword(token: string, newPassword: string): Promise
 export async function refresh(): Promise<SessionDto> {
   const res = await http.post<SessionDto>("/auth/refresh", null);
   return res.data;
+}
+
+export async function upgradeRoleToOwner(): Promise<void> {
+  await http.patch("/users/me/role", null);
 }

@@ -41,9 +41,45 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
 import type { AddressResult } from "../components/UI/AddressAutocomplete";
 import { ShareModal } from "../components/UI/ShareModal";
+import { meetsAALarge } from "../utils/colorContrast";
 import { ServiceCard } from "../components/business/ServiceCard";
 import { ServiceFormFields, emptyServiceDraft, type DraftService } from "../components/business/ServiceFormFields";
 import { BusinessReviewsSection } from "../components/business/BusinessReviewsSection";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
+
+const BUSINESS_EDIT_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='business-edit-header']",
+    titleKey: "tutorials.business-edit.step1.title",
+    bodyKey: "tutorials.business-edit.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='business-edit-images']",
+    titleKey: "tutorials.business-edit.step2.title",
+    bodyKey: "tutorials.business-edit.step2.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='business-edit-theme']",
+    titleKey: "tutorials.business-edit.step3.title",
+    bodyKey: "tutorials.business-edit.step3.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='business-edit-services']",
+    titleKey: "tutorials.business-edit.step4.title",
+    bodyKey: "tutorials.business-edit.step4.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='business-edit-header']",
+    titleKey: "tutorials.business-edit.step5.title",
+    bodyKey: "tutorials.business-edit.step5.body",
+    placement: "bottom",
+  },
+];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -430,6 +466,8 @@ export default function PublicBusinessPage() {
     page.status === "ready" &&
     authUser != null &&
     authUser.id === page.business.ownerId;
+
+  const { isActive: editTutorialActive, markSeen: markEditTutorialSeen } = useTutorial("business-edit");
 
   // ── Follow state ──────────────────────────────────────────────────────────
   const [isFollowing, setIsFollowing] = useState(false);
@@ -881,8 +919,16 @@ export default function PublicBusinessPage() {
       style={themeStyle}
       className="min-h-screen bg-gray-50 dark:bg-background-dark"
     >
+      {isEditing && editTutorialActive && (
+        <Tutorial
+          tutorialKey="business-edit"
+          steps={BUSINESS_EDIT_TUTORIAL_STEPS}
+          onComplete={markEditTutorialSeen}
+          onSkip={markEditTutorialSeen}
+        />
+      )}
       {/* ── Sticky top bar ── */}
-      <div className="sticky top-0 z-50 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-background-dark">
+      <div data-tutorial="business-edit-header" className="sticky top-0 z-50 flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-background-dark">
         <button
           type="button"
           onClick={() =>
@@ -940,7 +986,7 @@ export default function PublicBusinessPage() {
 
       {/* ── Banner ── */}
       {(displayBanner || isEditing) && (
-        <div className="relative w-full h-40 bg-primary/20 overflow-hidden">
+        <div data-tutorial="business-edit-images" className="relative w-full h-40 bg-primary/20 overflow-hidden">
           {displayBanner ? (
             <img
               src={displayBanner}
@@ -1390,7 +1436,7 @@ export default function PublicBusinessPage() {
 
           {/* Theme color picker (edit mode only) */}
           {isEditing && (
-            <div className="flex flex-col gap-1.5">
+            <div data-tutorial="business-edit-theme" className="flex flex-col gap-1.5">
               <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
                 {t("publicBusiness.themeColorLabel")}
               </label>
@@ -1406,6 +1452,7 @@ export default function PublicBusinessPage() {
                     })
                   }
                   className="h-10 w-16 cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
+                  aria-label={t("publicBusiness.themeColorLabel")}
                 />
                 <span className="text-sm text-gray-500 font-mono">
                   {draft.themeColor}
@@ -1414,6 +1461,13 @@ export default function PublicBusinessPage() {
                   {t("publicBusiness.themeColorHint")}
                 </span>
               </div>
+              {/* Accessibility contrast warning */}
+              {!meetsAALarge(draft.themeColor, "#ffffff") && !meetsAALarge(draft.themeColor, "#111418") && (
+                <p role="alert" className="flex items-center gap-1.5 text-xs text-warning">
+                  <span className="material-symbols-outlined text-sm" aria-hidden="true">warning</span>
+                  {t("publicBusiness.themeColorContrastWarning")}
+                </p>
+              )}
             </div>
           )}
 
@@ -1446,7 +1500,7 @@ export default function PublicBusinessPage() {
         </Card>
 
         {/* ── Services section ── */}
-        <section>
+        <section data-tutorial="business-edit-services">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-lg font-bold text-[#111418] dark:text-white">
               {t("publicBusiness.servicesTitle")}

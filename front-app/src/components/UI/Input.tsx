@@ -2,6 +2,7 @@
 import React, { useId, useMemo, useState } from "react";
 import { MaterialIcon } from "./MaterialIcon";
 
+
 export type InputType =
   | "text"
   | "email"
@@ -70,6 +71,7 @@ export function Input({
 }: InputProps) {
   const reactId = useId();
   const inputId = id ?? `input-${reactId}`;
+  const errorId = `${inputId}-error`;
 
   const isControlled = value !== undefined;
 
@@ -166,6 +168,8 @@ export function Input({
           placeholder={placeholder}
           disabled={disabled}
           autoComplete={autoComplete}
+          aria-describedby={error ? errorId : undefined}
+          aria-invalid={error ? true : undefined}
           className={[
             baseInput,
             errorCls,
@@ -189,7 +193,7 @@ export function Input({
               aria-label="Clear"
               tabIndex={-1}
             >
-              <MaterialIcon name="close" className="!text-[18px]" />
+              <MaterialIcon name="close" className="text-[18px]!" />
             </button>
           )}
 
@@ -203,7 +207,7 @@ export function Input({
             >
               <MaterialIcon
                 name={showPassword ? "visibility_off" : "visibility"}
-                className="!text-[18px]"
+                className="text-[18px]!"
               />
             </button>
           )}
@@ -217,7 +221,9 @@ export function Input({
       </div>
 
       {error ? (
-        <p className="text-xs text-danger">{error}</p>
+        <p id={errorId} role="alert" className="text-xs text-danger">
+          {error}
+        </p>
       ) : hint ? (
         <p className="text-xs text-gray-500 dark:text-gray-400">{hint}</p>
       ) : null}

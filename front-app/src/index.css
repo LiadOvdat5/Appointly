@@ -31,3 +31,91 @@ html, body, #root {
 .icon-filled {
   font-variation-settings: 'FILL' 1;
 }
+
+/* ============================================================
+   ACCESSIBILITY — font size overrides
+   Applied as classes on <html> by useA11yPrefs / initA11yPrefs
+   All Tailwind text-* utilities use rem, so scaling html font-size
+   cascades throughout the app automatically.
+   ============================================================ */
+html.font-size-sm  { font-size: 14px; }
+/* font-size-default = browser default 16px (no class needed) */
+html.font-size-lg  { font-size: 19px; }
+html.font-size-xl  { font-size: 22px; }
+
+/* ============================================================
+   ACCESSIBILITY — high-contrast mode
+   Overrides surface, text and interactive element colors.
+   Also auto-activated by OS prefers-contrast: more (see below).
+   ============================================================ */
+html.high-contrast,
+@media (prefers-contrast: more) {
+  html:not([data-contrast-override="off"]) {
+    --color-background-light: #ffffff;
+    --color-background-dark: #000000;
+    --color-surface-dark: #000000;
+    --color-primary: #0000cc;
+  }
+}
+
+html.high-contrast {
+  /* Force high-contrast regardless of OS setting */
+  background-color: #ffffff;
+  color: #000000;
+}
+
+html.high-contrast *,
+@media (prefers-contrast: more) {
+  html:not([data-contrast-override="off"]) * {
+    --tw-text-opacity: 1;
+  }
+}
+
+/* Targeted overrides for common Tailwind surface/text classes */
+html.high-contrast .bg-background-light,
+html.high-contrast .dark\:bg-background-dark {
+  background-color: #ffffff !important;
+}
+
+html.high-contrast .text-slate-500,
+html.high-contrast .text-slate-600,
+html.high-contrast .text-gray-400,
+html.high-contrast .text-gray-500 {
+  color: #000000 !important;
+}
+
+html.high-contrast .border-gray-200,
+html.high-contrast .dark\:border-gray-800 {
+  border-color: #000000 !important;
+}
+
+html.high-contrast button,
+html.high-contrast a {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   ACCESSIBILITY — reduce motion
+   Disables all CSS transitions and animations app-wide.
+   Also auto-activated by OS prefers-reduced-motion (see below).
+   ============================================================ */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion-override="on"]) *,
+  html:not([data-motion-override="on"]) *::before,
+  html:not([data-motion-override="on"]) *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

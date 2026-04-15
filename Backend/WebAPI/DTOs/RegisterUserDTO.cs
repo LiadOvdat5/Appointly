@@ -22,5 +22,8 @@ namespace WebAPI.DTOs
 
         // Optional — defaults to client when omitted
         public UserRole? Role { get; set; }
+
+        // Optional — when present, auto-accepts the matching business invitation after registration
+        public string? InviteToken { get; set; }
     }
 }

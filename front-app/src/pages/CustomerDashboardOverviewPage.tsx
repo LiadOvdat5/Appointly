@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
 import type { RootState } from "../redux/store";
 import {
   getClientAppointments,
@@ -43,12 +45,36 @@ function toInputDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+// ─── Tutorial steps ───────────────────────────────────────────────────────────
+
+const CUSTOMER_DASHBOARD_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='upcoming-section']",
+    titleKey: "tutorials.customer-dashboard.step1.title",
+    bodyKey: "tutorials.customer-dashboard.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='followed-section']",
+    titleKey: "tutorials.customer-dashboard.step2.title",
+    bodyKey: "tutorials.customer-dashboard.step2.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='quick-links']",
+    titleKey: "tutorials.customer-dashboard.step3.title",
+    bodyKey: "tutorials.customer-dashboard.step3.body",
+    placement: "top",
+  },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CustomerDashboardOverviewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const authUser = useSelector((s: RootState) => s.auth.user);
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("customer-dashboard");
 
   const [upcoming, setUpcoming] = useState<AppointmentDTO[]>([]);
   const [upcomingLoading, setUpcomingLoading] = useState(true);
@@ -134,6 +160,14 @@ export default function CustomerDashboardOverviewPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background-dark">
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="customer-dashboard"
+          steps={CUSTOMER_DASHBOARD_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
       {/* ── Header ── */}
       <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
@@ -168,19 +202,25 @@ export default function CustomerDashboardOverviewPage() {
           onToggleMetric={toggleMetric}
         />
 
-        <CustomerUpcomingSection
-          appointments={upcoming}
-          loading={upcomingLoading}
-        />
+        <div data-tutorial="upcoming-section">
+          <CustomerUpcomingSection
+            appointments={upcoming}
+            loading={upcomingLoading}
+          />
+        </div>
 
-        <CustomerQuickLinks pendingInvitationCount={pendingInvitationCount} />
+        <div data-tutorial="quick-links">
+          <CustomerQuickLinks pendingInvitationCount={pendingInvitationCount} />
+        </div>
 
-        <CustomerFollowedSection
-          businesses={followedBusinesses}
-          loading={followedLoading}
-          unfollowingId={unfollowingId}
-          onUnfollow={handleUnfollow}
-        />
+        <div data-tutorial="followed-section">
+          <CustomerFollowedSection
+            businesses={followedBusinesses}
+            loading={followedLoading}
+            unfollowingId={unfollowingId}
+            onUnfollow={handleUnfollow}
+          />
+        </div>
       </div>
     </div>
   );

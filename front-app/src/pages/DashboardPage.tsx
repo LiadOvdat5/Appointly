@@ -3,6 +3,8 @@ import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import type { RootState } from "../redux/store";
+import { Tutorial, type TutorialStep } from "../components/UI/Tutorial/Tutorial";
+import { useTutorial } from "../hooks/useTutorial";
 import { Role } from "../constants/roles";
 import {
   getBusinessAppointments,
@@ -45,6 +47,41 @@ function toInputDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
 
+// ─── Tutorial steps ───────────────────────────────────────────────────────────
+
+const OWNER_DASHBOARD_TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    target: "[data-tutorial='dashboard-stats']",
+    titleKey: "tutorials.owner-dashboard.step1.title",
+    bodyKey: "tutorials.owner-dashboard.step1.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='dashboard-upcoming']",
+    titleKey: "tutorials.owner-dashboard.step2.title",
+    bodyKey: "tutorials.owner-dashboard.step2.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='dashboard-edit-link']",
+    titleKey: "tutorials.owner-dashboard.step3.title",
+    bodyKey: "tutorials.owner-dashboard.step3.body",
+    placement: "bottom",
+  },
+  {
+    target: "[data-tutorial='dashboard-quick-links']",
+    titleKey: "tutorials.owner-dashboard.step4.title",
+    bodyKey: "tutorials.owner-dashboard.step4.body",
+    placement: "top",
+  },
+  {
+    target: "[data-tutorial='dashboard-quick-links']",
+    titleKey: "tutorials.owner-dashboard.step5.title",
+    bodyKey: "tutorials.owner-dashboard.step5.body",
+    placement: "top",
+  },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -57,6 +94,8 @@ export default function DashboardPage() {
   if (authUser?.role === Role.Partner) {
     return <Navigate to={authUser.businessId ? `/staff-dashboard/${authUser.businessId}` : "/customer-dashboard"} replace />;
   }
+
+  const { isActive: tutorialActive, markSeen: markTutorialSeen } = useTutorial("owner-dashboard");
 
   // Business
   const [business, setBusiness] = useState<BusinessProfile | null>(null);
@@ -280,6 +319,14 @@ export default function DashboardPage() {
 
   return (
     <>
+      {tutorialActive && (
+        <Tutorial
+          tutorialKey="owner-dashboard"
+          steps={OWNER_DASHBOARD_TUTORIAL_STEPS}
+          onComplete={markTutorialSeen}
+          onSkip={markTutorialSeen}
+        />
+      )}
       <ConfirmDialog
         open={confirmCancelId !== null}
         title={t("dashboard.cancelAppt.title")}
@@ -350,6 +397,7 @@ export default function DashboardPage() {
                 {t("share.button")}
               </button>
               <button
+                data-tutorial="dashboard-edit-link"
                 type="button"
                 onClick={() => navigate(`/business/${business.slug}?edit=true`)}
                 className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
@@ -381,22 +429,26 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <DashboardStatsSection
-            report={report}
-            reportLoading={reportLoading}
-            activeMetrics={activeMetrics}
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-            onToggleMetric={toggleMetric}
-          />
+          <div data-tutorial="dashboard-stats">
+            <DashboardStatsSection
+              report={report}
+              reportLoading={reportLoading}
+              activeMetrics={activeMetrics}
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+              onToggleMetric={toggleMetric}
+            />
+          </div>
 
-          <DashboardUpcomingSection
-            appointments={appointments}
-            loading={apptLoading}
-            businessSlug={business.slug}
-          />
+          <div data-tutorial="dashboard-upcoming">
+            <DashboardUpcomingSection
+              appointments={appointments}
+              loading={apptLoading}
+              businessSlug={business.slug}
+            />
+          </div>
 
           <DashboardCompletedSection
             appointments={completedAppointments}
@@ -408,11 +460,13 @@ export default function DashboardPage() {
             viewAllHref={`/business/${business.slug}/schedule`}
           />
 
-          <DashboardQuickLinks
-            businessSlug={business.slug}
-            reviewCount={business.reviewCount}
-            averageRating={business.averageRating}
-          />
+          <div data-tutorial="dashboard-quick-links">
+            <DashboardQuickLinks
+              businessSlug={business.slug}
+              reviewCount={business.reviewCount}
+              averageRating={business.averageRating}
+            />
+          </div>
         </div>
       </div>
 

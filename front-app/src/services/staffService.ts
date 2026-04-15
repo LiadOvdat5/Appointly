@@ -76,6 +76,62 @@ export const updateStaffServices = async (
   await apiClient.put(`/businesses/${businessId}/staff/${userId}/services`, serviceIds);
 };
 
+export interface PartnerNextAppointment {
+  appointmentId: string;
+  startDateTime: string;
+  customerName: string;
+  serviceName: string;
+  durationMinutes: number;
+}
+
+export interface PartnerAssignedService {
+  serviceId: string;
+  name: string;
+  durationMinutes: number;
+  price?: number;
+}
+
+export interface PartnerWorkplace {
+  businessId: string;
+  name: string;
+  logoUrl?: string;
+  slug?: string;
+}
+
+export interface PartnerStats {
+  nextAppointment?: PartnerNextAppointment;
+  todayCount: number;
+  weekCount: number;
+  assignedServices: PartnerAssignedService[];
+  business?: PartnerWorkplace;
+}
+
+export const getPartnerStats = async (): Promise<PartnerStats> => {
+  const res = await apiClient.get<PartnerStats>("/partners/me/stats");
+  return res.data;
+};
+
+export const InactiveStaffEntryType = {
+  RemovedStaff: 0,
+  DeclinedInvitation: 1,
+  ExpiredInvitation: 2,
+} as const;
+
+export type InactiveStaffEntryType = typeof InactiveStaffEntryType[keyof typeof InactiveStaffEntryType];
+
+export interface InactiveStaffEntry {
+  entryType: InactiveStaffEntryType;
+  userId?: string;
+  name?: string;
+  email: string;
+  statusChangedAt: string;
+}
+
+export const getInactiveStaff = async (businessId: string): Promise<InactiveStaffEntry[]> => {
+  const res = await apiClient.get<InactiveStaffEntry[]>(`/businesses/${businessId}/staff/inactive`);
+  return res.data;
+};
+
 export const getStaffReport = async (
   businessId: string,
   userId: string,

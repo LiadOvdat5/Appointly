@@ -20,6 +20,12 @@ i18n.use(initReactI18next).init({
           switchToLight: "Switch to light mode",
         },
 
+        // ============ ACCESSIBILITY ============
+        a11y: {
+          skipToMain: "Skip to main content",
+          skipToNav: "Skip to navigation",
+        },
+
         // ============ NAVIGATION ============
         nav: {
           home: "Home",
@@ -71,6 +77,9 @@ i18n.use(initReactI18next).init({
           error: "Registration failed",
           networkError: "Network error. Please try again.",
           orContinueWith: "Or continue with",
+          inviteBanner: "You've been invited to join a business team! Create your account below and your invitation will be accepted automatically.",
+          inviteExpired: "This invitation link has expired. Please ask the business owner to send a new one.",
+          inviteInvalid: "This invitation link is invalid. Please ask the business owner for a new invitation.",
           validation: {
             nameRequired: "Full name is required",
             emailInvalid: "Please enter a valid email address",
@@ -270,15 +279,28 @@ i18n.use(initReactI18next).init({
         partnerHome: {
           greeting: "Hello, {{name}}!",
           workingAt: "Working at {{name}}",
-          todaySchedule: {
-            label: "Today's Appointments",
-            viewAll: "View all shifts",
-            empty: "No appointments today.",
-            more: "+{{count}} more",
+          nextAppointment: {
+            label: "Next Appointment",
+            viewAll: "View all appointments",
+            empty: "No upcoming appointments. Enjoy your free time!",
           },
-          quickActions: {
-            label: "Quick Actions",
-            dashboard: "Staff Dashboard",
+          stats: {
+            today: "Today",
+            thisWeek: "This Week",
+          },
+          assignedServices: {
+            label: "My Services",
+            empty: "No services assigned yet.",
+          },
+          workplace: {
+            label: "My Workplace",
+            viewPage: "View business page",
+          },
+          becomeOwner: {
+            title: "Start your own business",
+            subtitle: "Upgrade your account to Business Owner and list your own services on BizSlot.",
+            cta: "Become a Business Owner",
+            error: "Something went wrong. Please try again.",
           },
         },
 
@@ -545,6 +567,10 @@ i18n.use(initReactI18next).init({
             title: "How was your visit?",
             body: "How was your appointment at {{businessName}}? Leave a review!",
           },
+          invitationReceived: {
+            title: "You've been invited!",
+            body: "{{businessName}} has invited you to join their team. Tap to view.",
+          },
         },
 
         // ============ COMMON ============
@@ -641,6 +667,8 @@ i18n.use(initReactI18next).init({
             searchResults: "Search Results",
             loadingMore: "Loading more results...",
             noMoreResults: "No more results to load",
+            resultCount_one: "{{count}} result",
+            resultCount_other: "{{count}} results",
           },
           map: {
             loadFailed: "Map failed to load",
@@ -704,6 +732,12 @@ i18n.use(initReactI18next).init({
               "Remove {{name}} from your business? They will lose access immediately.",
             confirmLabel: "Remove",
           },
+          inactiveSection: "Past Members",
+          inactive: {
+            removed: "Removed",
+            declined: "Declined invitation",
+            expired: "Invitation expired",
+          },
         },
 
         // ============ INVITATIONS ============
@@ -751,6 +785,8 @@ i18n.use(initReactI18next).init({
             errorSubmit: "Failed to submit review. Please try again.",
             starAriaLabel_one: "Rate {{count}} star",
             starAriaLabel_other: "Rate {{count}} stars",
+            ratingLabel: "Star rating",
+            commentLabel: "Comment (optional)",
           },
           viewModal: {
             title: "Customer Review",
@@ -950,6 +986,14 @@ i18n.use(initReactI18next).init({
             confirm: "Yes, cancel it",
             cancel: "Keep it",
           },
+        },
+
+        // ============ ADD TO CALENDAR ============
+        addToCalendar: {
+          button: "Add to Calendar",
+          ariaLabel: "Add appointment to calendar",
+          google: "Google Calendar",
+          ics: "Download .ics",
         },
 
         // ============ STAFF DASHBOARD ============
@@ -1360,6 +1404,7 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} followers",
           themeColorLabel: "Theme Color",
           themeColorHint: "Live preview updates the page colors",
+          themeColorContrastWarning: "This color may not meet WCAG AA contrast requirements. Consider a darker or lighter shade.",
           saveChanges: "Save changes",
           servicesTitle: "Services",
           addServiceLink: "Add service",
@@ -1387,6 +1432,9 @@ i18n.use(initReactI18next).init({
           copyFallback: "Copy this link:",
           qrDescription: "Let customers scan this code to open your page.",
           downloadQR: "Download QR Code",
+          closeAriaLabel: "Close share dialog",
+          tabsLabel: "Share options",
+          qrAriaLabel: "QR code for {{name}}",
         },
 
         // ============ BUSINESS SCHEDULE PAGE ============
@@ -1444,6 +1492,351 @@ i18n.use(initReactI18next).init({
           completed: "Completed",
           scheduled: "Scheduled",
         },
+
+        // ============ ACCESSIBILITY ============
+        accessibility: {
+          buttonLabel: "Accessibility settings",
+          panelTitle: "Accessibility",
+          fontSize: {
+            label: "Font Size",
+            sm: "Small",
+            default: "Default",
+            lg: "Large",
+            xl: "Extra Large",
+          },
+          highContrast: {
+            label: "High Contrast",
+            description: "Increases contrast for better readability",
+          },
+          reduceMotion: {
+            label: "Reduce Motion",
+            description: "Disables animations and transitions",
+          },
+          reset: "Reset to defaults",
+        },
+
+        // ============ TUTORIALS ============
+        tutorials: {
+          common: {
+            back: "Back",
+            next: "Next",
+            skip: "Skip",
+            finish: "Got it!",
+            stepOf: "Step {{current}} of {{total}}",
+          },
+          search: {
+            step1: {
+              title: "Search for a business",
+              body: "Type a business name or keyword into the search bar to find what you're looking for.",
+            },
+            step2: {
+              title: "Filter by category",
+              body: "Use the category chips to narrow results by service type — barber, nail artist, and more.",
+            },
+            step3: {
+              title: "Switch views",
+              body: "Toggle between list view and map view to explore businesses near your location.",
+            },
+          },
+          booking: {
+            step1: {
+              title: "Pick a date",
+              body: "Choose a date from the calendar to see available time slots for this service.",
+            },
+            step2: {
+              title: "Select a time slot",
+              body: "Tap any available time to select it. It will be reserved for a short time while you confirm.",
+            },
+            step3: {
+              title: "Confirm your booking",
+              body: "Review the summary and tap Confirm Booking. You'll receive a confirmation right away.",
+            },
+          },
+          onboarding: {
+            step1: {
+              title: "Welcome! Let's set up your business",
+              body: "Let's set up your business profile. It only takes a few minutes.",
+            },
+            step2: {
+              title: "Business name & category",
+              body: "Give your business a name and pick the category that fits best.",
+            },
+            step3: {
+              title: "Location",
+              body: "Add your address so customers can find you on the map.",
+            },
+            step4: {
+              title: "Services",
+              body: "Add the services you offer — name, duration, and price.",
+            },
+            step5: {
+              title: "All done!",
+              body: "That's it! You can always update these details later from your dashboard.",
+            },
+          },
+          "owner-dashboard": {
+            step1: {
+              title: "Your business at a glance",
+              body: "Here's a snapshot of your business — total appointments, revenue, and more.",
+            },
+            step2: {
+              title: "Upcoming appointments",
+              body: "Manage today's and upcoming appointments from here.",
+            },
+            step3: {
+              title: "Edit your business page",
+              body: "Go to your public business page to update services, photos, and info.",
+            },
+            step4: {
+              title: "Manage schedule",
+              body: "Set your working hours and availability rules here.",
+            },
+            step5: {
+              title: "Staff section",
+              body: "Invite and manage your team members from the Staff tab.",
+            },
+          },
+          "business-edit": {
+            step1: {
+              title: "You're in edit mode",
+              body: "You're now editing your public business page. Changes are saved as you go.",
+            },
+            step2: {
+              title: "Logo & banner",
+              body: "Upload your logo and a banner image to make your page stand out.",
+            },
+            step3: {
+              title: "Theme color",
+              body: "Pick a color to personalize your business page.",
+            },
+            step4: {
+              title: "Services list",
+              body: "Add, edit, or remove the services you offer here.",
+            },
+            step5: {
+              title: "Preview your page",
+              body: "Exit edit mode to see how customers will see your page.",
+            },
+          },
+          "schedule-editor": {
+            step1: {
+              title: "Weekly working hours",
+              body: "Set your regular working hours for each day of the week.",
+            },
+            step2: {
+              title: "Break times",
+              body: "Add breaks (e.g., lunch) within your working hours — no slots are generated during breaks.",
+            },
+            step3: {
+              title: "Date exceptions",
+              body: "Block specific dates — holidays, vacations, or days off.",
+            },
+            step4: {
+              title: "Save your schedule",
+              body: "Don't forget to save your schedule so customers see accurate availability.",
+            },
+          },
+          "staff-management": {
+            step1: {
+              title: "Your team",
+              body: "Your current team members are listed here.",
+            },
+            step2: {
+              title: "Invite staff",
+              body: "Invite a new staff member by email. They'll receive a link to join.",
+            },
+            step3: {
+              title: "Pending invitations",
+              body: "Invitations you've sent appear here until accepted or expired.",
+            },
+            step4: {
+              title: "Service assignment",
+              body: "Assign staff members to the services they perform.",
+            },
+            step5: {
+              title: "Remove a member",
+              body: "You can remove a staff member at any time from their profile.",
+            },
+          },
+          "staff-home": {
+            step1: {
+              title: "Welcome to your staff portal!",
+              body: "Here's a quick overview of your home page as a staff member.",
+            },
+            step2: {
+              title: "Your workplace",
+              body: "This is the business you work at. Tap the icon to view the public business page.",
+            },
+            step3: {
+              title: "Assigned services",
+              body: "These are the services you're assigned to perform. Customers can book you for these.",
+            },
+            step4: {
+              title: "Next appointment",
+              body: "Your next upcoming appointment is shown here at a glance.",
+            },
+            step5: {
+              title: "Quick stats",
+              body: "A summary of your upcoming workload — appointments today and this week.",
+            },
+            step6: {
+              title: "Manage your schedule",
+              body: "Use the schedule editor to set your own availability so customers only see slots when you're truly available.",
+            },
+          },
+          "staff-schedule-editor": {
+            step1: {
+              title: "Weekly availability",
+              body: "Set the days and hours you're available to take appointments.",
+            },
+            step2: {
+              title: "Break times",
+              body: "Block out breaks so you're not booked during lunch or downtime.",
+            },
+            step3: {
+              title: "Date exceptions",
+              body: "Block specific dates when you're unavailable — holiday, day off, etc.",
+            },
+            step4: {
+              title: "Save your schedule",
+              body: "Save your schedule so customers only see slots when you're truly available.",
+            },
+          },
+          "date-exceptions": {
+            step1: {
+              title: "Block dates",
+              body: "Tap a date to mark it as unavailable — e.g. public holidays or vacations. No slots will be generated on blocked dates.",
+            },
+            step2: {
+              title: "Date exceptions",
+              body: "Set custom working hours for a single day — useful for shorter or longer days on specific dates.",
+            },
+            step3: {
+              title: "Recurring rules",
+              body: "Override your weekly hours for a date range — handy for seasonal schedule changes.",
+            },
+          },
+          "customer-dashboard": {
+            step1: {
+              title: "Your upcoming appointments",
+              body: "Your next bookings are shown here so you always know what's coming up.",
+            },
+            step2: {
+              title: "Followed businesses",
+              body: "Businesses you follow appear here for quick access — tap one to view their page or book again.",
+            },
+            step3: {
+              title: "Quick links",
+              body: "Jump straight to your full appointment history, invitations, or the search page from here.",
+            },
+          },
+        },
+
+        // ============ FOOTER ============
+        footer: {
+          copyright: "© {{year}} BizSlot. All rights reserved.",
+          contact: {
+            title: "Contact & Feedback",
+            tagline: "We read every message.",
+            bugLabel: "Report a bug",
+            bugAriaLabel: "Report a bug — opens your mail client",
+            featureLabel: "Suggest a feature",
+            featureAriaLabel: "Suggest a feature — opens your mail client",
+          },
+          legal: {
+            title: "Legal",
+            privacy: "Privacy Policy",
+            terms: "Terms of Service",
+          },
+        },
+
+        // ============ PRIVACY POLICY ============
+        privacy: {
+          title: "Privacy Policy",
+          lastUpdated: "Last Updated: January 1, 2026",
+          intro: {
+            heading: "Introduction",
+            body: "BizSlot is an appointment booking platform that connects small businesses — such as barbers, nail artists, and personal trainers — with their customers. This Privacy Policy applies to all visitors, registered users, and business owners who use the BizSlot platform. By using BizSlot you agree to the collection and use of information as described below.",
+          },
+          dataCollected: {
+            heading: "Data We Collect",
+            body: "We collect information you provide directly when you create an account or use the platform: your full name, email address, and role (Business Owner or Customer). Business owners additionally provide business details such as business name, address, phone number, category, service descriptions, and working hours. We record appointment data including the business, service, date, time, and status of each booking. We may also collect basic usage and analytics data (pages visited, actions taken) to help us improve the product.",
+          },
+          howWeUse: {
+            heading: "How We Use Your Data",
+            body: "We use your data solely to operate and improve the BizSlot service. This includes: authenticating your account and maintaining your session, displaying your business page and services to prospective customers, facilitating appointment bookings and sending booking confirmations, enabling businesses to manage their schedules and appointments, and analysing aggregate usage patterns to improve product features. We do not use your data for targeted advertising.",
+          },
+          dataSharing: {
+            heading: "Data Sharing",
+            body: "We do not sell, rent, or trade your personal data to third parties. We may share limited data with trusted infrastructure providers — such as our hosting and database services — strictly to the extent necessary to operate the platform. Any such providers are contractually required to keep your data confidential and to use it only for the purposes we specify.",
+          },
+          dataRetention: {
+            heading: "Data Retention",
+            body: "We retain your account data for as long as your account is active. If you request account deletion, we will remove your personal data within 30 days, except where we are required to retain it by law (for example, for accounting or fraud-prevention purposes). Appointment records associated with a deleted account are anonymised rather than deleted to preserve business reporting integrity.",
+          },
+          yourRights: {
+            heading: "Your Rights",
+            body: "You have the right to access, correct, or delete the personal data we hold about you. To exercise any of these rights, please email us at AppointmentBizSlot@gmail.com. We will respond within 30 days. You also have the right to withdraw consent at any time where processing is based on consent, and to lodge a complaint with your local data protection authority.",
+          },
+          cookies: {
+            heading: "Cookies",
+            body: "BizSlot uses a single HTTP-only cookie to store your authentication token (JWT). This cookie is essential for the service to function and cannot be disabled without logging out. We do not use any third-party tracking cookies, advertising cookies, or analytics cookies. No cookie consent banner is required because we set only the strictly necessary authentication cookie.",
+          },
+          contact: {
+            heading: "Contact",
+            body: "If you have any questions or concerns about this Privacy Policy or the way we handle your data, please contact us at AppointmentBizSlot@gmail.com. We are committed to resolving privacy queries promptly and transparently.",
+          },
+        },
+
+        // ============ TERMS OF SERVICE ============
+        terms: {
+          title: "Terms of Service",
+          lastUpdated: "Last Updated: January 1, 2026",
+          acceptance: {
+            heading: "Acceptance of Terms",
+            body: "By accessing or using BizSlot you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you must not use the platform. We may update these terms from time to time; continued use of the platform after changes are published constitutes acceptance of the updated terms.",
+          },
+          description: {
+            heading: "Description of Service",
+            body: "BizSlot is an online appointment booking platform that enables small businesses to publish their services and availability, and enables customers to discover those businesses and book appointments. BizSlot acts solely as a technology intermediary and is not a party to the appointment contract between a business and its customer.",
+          },
+          accounts: {
+            heading: "User Accounts",
+            body: "You must be at least 16 years of age to create an account. You agree to provide accurate, current, and complete information during registration and to keep your account information updated. You are responsible for maintaining the confidentiality of your password and for all activity that occurs under your account. Notify us immediately at AppointmentBizSlot@gmail.com if you suspect unauthorised use of your account.",
+          },
+          ownerResponsibilities: {
+            heading: "Business Owner Responsibilities",
+            body: "Business owners are responsible for maintaining accurate and up-to-date service listings, prices, and availability. You must honour confirmed appointments unless you notify the customer of a cancellation in advance with reasonable notice. You agree to conduct yourself professionally and to treat customers with respect. Inaccurate listings or repeated no-shows may result in account suspension.",
+          },
+          customerResponsibilities: {
+            heading: "Customer Responsibilities",
+            body: "Customers are responsible for attending booked appointments on time. If you need to cancel, please do so as early as possible to allow the business to fill the slot. Repeated late cancellations or no-shows may result in restrictions on your ability to book. You agree to treat business owners and staff with respect.",
+          },
+          prohibitedConduct: {
+            heading: "Prohibited Conduct",
+            body: "You must not use BizSlot to: create fake accounts or impersonate other individuals or businesses; send spam or unsolicited commercial messages; scrape, harvest, or otherwise extract data from the platform in bulk; attempt to circumvent any access controls or security measures; post false or defamatory reviews; or use the platform for any unlawful purpose. We reserve the right to remove content and suspend accounts that violate these rules.",
+          },
+          ip: {
+            heading: "Intellectual Property",
+            body: "BizSlot and its original content, features, and functionality are owned by BizSlot and are protected by copyright, trademark, and other intellectual property laws. You retain ownership of all content you upload to the platform (such as business logos, photos, and service descriptions). By uploading content you grant BizSlot a non-exclusive, royalty-free licence to display and distribute that content solely for the purpose of operating the service.",
+          },
+          liability: {
+            heading: "Limitation of Liability",
+            body: "BizSlot is provided 'as is' without warranties of any kind. To the fullest extent permitted by applicable law, BizSlot shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the platform. In particular, BizSlot is not liable for disputes between businesses and customers, missed appointments, or losses resulting from inaccurate business listings. Our total liability to you in any circumstance shall not exceed the amount you paid to use the platform (if any) in the preceding 12 months.",
+          },
+          termination: {
+            heading: "Termination",
+            body: "BizSlot reserves the right to suspend or permanently terminate your account at any time if you violate these Terms of Service, engage in fraudulent activity, or pose a risk to other users or the platform. You may delete your account at any time by contacting AppointmentBizSlot@gmail.com. Termination does not affect any rights or obligations that arose before the effective date of termination.",
+          },
+          changes: {
+            heading: "Changes to Terms",
+            body: "We may revise these Terms of Service at any time. When we make material changes we will update the 'Last Updated' date at the top of this page and, where appropriate, notify you by email or via an in-app notification. Your continued use of BizSlot after changes take effect constitutes your acceptance of the revised terms.",
+          },
+          contact: {
+            heading: "Contact",
+            body: "If you have any questions about these Terms of Service, please contact us at AppointmentBizSlot@gmail.com.",
+          },
+        },
       },
     },
 
@@ -1460,6 +1853,12 @@ i18n.use(initReactI18next).init({
         theme: {
           switchToDark: "עבור למצב כהה",
           switchToLight: "עבור למצב בהיר",
+        },
+
+        // ============ ACCESSIBILITY ============
+        a11y: {
+          skipToMain: "דלג לתוכן הראשי",
+          skipToNav: "דלג לניווט",
         },
 
         // ============ NAVIGATION ============
@@ -1513,6 +1912,9 @@ i18n.use(initReactI18next).init({
           error: "ההרשמה נכשלה",
           networkError: "שגיאת רשת. בחזור שוב.",
           orContinueWith: "או המשך עם",
+          inviteBanner: "הוזמנת להצטרף לצוות עסק! צור חשבון למטה וההזמנה תאושר אוטומטית.",
+          inviteExpired: "קישור ההזמנה פג תוקף. בקש מבעל העסק לשלוח הזמנה חדשה.",
+          inviteInvalid: "קישור ההזמנה אינו תקין. בקש מבעל העסק הזמנה חדשה.",
           validation: {
             nameRequired: "שם מלא הוא שדה חובה",
             emailInvalid: "יש להזין כתובת דוא״ל תקינה",
@@ -1710,15 +2112,28 @@ i18n.use(initReactI18next).init({
         partnerHome: {
           greeting: "שלום, {{name}}!",
           workingAt: "עובד ב{{name}}",
-          todaySchedule: {
-            label: "פגישות היום",
-            viewAll: "צפה בכל המשמרות",
-            empty: "אין פגישות היום.",
-            more: "+{{count}} נוספים",
+          nextAppointment: {
+            label: "הפגישה הקרובה",
+            viewAll: "צפה בכל הפגישות",
+            empty: "אין פגישות קרובות. תהנה מהזמן החופשי!",
           },
-          quickActions: {
-            label: "פעולות מהירות",
-            dashboard: "לוח בקרה לצוות",
+          stats: {
+            today: "היום",
+            thisWeek: "השבוע",
+          },
+          assignedServices: {
+            label: "השירותים שלי",
+            empty: "לא הוקצו שירותים עדיין.",
+          },
+          workplace: {
+            label: "מקום העבודה שלי",
+            viewPage: "צפה בדף העסק",
+          },
+          becomeOwner: {
+            title: "פתח עסק משלך",
+            subtitle: "שדרג את חשבונך לבעל עסק והוסף את השירותים שלך ל-BizSlot.",
+            cta: "הפוך לבעל עסק",
+            error: "אירעה שגיאה. נסה שוב.",
           },
         },
 
@@ -1985,6 +2400,10 @@ i18n.use(initReactI18next).init({
             title: "איך היה הביקור?",
             body: "איך היה התור שלך אצל {{businessName}}? השאר ביקורת!",
           },
+          invitationReceived: {
+            title: "קיבלת הזמנה!",
+            body: "{{businessName}} הזמינו אותך להצטרף לצוות שלהם. לחץ לצפייה.",
+          },
         },
 
         // ============ COMMON ============
@@ -2081,6 +2500,8 @@ i18n.use(initReactI18next).init({
             searchResults: "תוצאות חיפוש",
             loadingMore: "טוען תוצאות נוספות...",
             noMoreResults: "אין תוצאות נוספות",
+            resultCount_one: "{{count}} תוצאה",
+            resultCount_other: "{{count}} תוצאות",
           },
           map: {
             loadFailed: "הטעינה של המפה נכשלה",
@@ -2143,6 +2564,12 @@ i18n.use(initReactI18next).init({
             message: "להסיר את {{name}} מהעסק שלך? הם יאבדו גישה מיידית.",
             confirmLabel: "הסר",
           },
+          inactiveSection: "חברים לשעבר",
+          inactive: {
+            removed: "הוסר",
+            declined: "דחה הזמנה",
+            expired: "ההזמנה פגה",
+          },
         },
 
         // ============ INVITATIONS ============
@@ -2190,6 +2617,8 @@ i18n.use(initReactI18next).init({
             errorSubmit: "שליחת הביקורת נכשלה. אנא נסה שוב.",
             starAriaLabel_one: "דרג {{count}} כוכב",
             starAriaLabel_other: "דרג {{count}} כוכבים",
+            ratingLabel: "דירוג כוכבים",
+            commentLabel: "תגובה (אופציונלי)",
           },
           viewModal: {
             title: "ביקורת לקוח",
@@ -2386,6 +2815,14 @@ i18n.use(initReactI18next).init({
             confirm: "כן, בטל",
             cancel: "השאר",
           },
+        },
+
+        // ============ ADD TO CALENDAR ============
+        addToCalendar: {
+          button: "הוסף ליומן",
+          ariaLabel: "הוסף תור ליומן",
+          google: "Google Calendar",
+          ics: "הורד .ics",
         },
 
         // ============ STAFF DASHBOARD ============
@@ -2784,6 +3221,7 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} עוקבים",
           themeColorLabel: "צבע ערכת נושא",
           themeColorHint: "תצוגה מקדימה חיה מעדכנת את צבעי הדף",
+          themeColorContrastWarning: "ייתכן שצבע זה אינו עומד בדרישות ניגודיות WCAG AA. שקול גוון כהה יותר או בהיר יותר.",
           saveChanges: "שמור שינויים",
           servicesTitle: "שירותים",
           addServiceLink: "הוסף שירות",
@@ -2811,6 +3249,9 @@ i18n.use(initReactI18next).init({
           copyFallback: "העתק קישור זה:",
           qrDescription: "תן ללקוחות לסרוק את הקוד כדי לפתוח את הדף שלך.",
           downloadQR: "הורד קוד QR",
+          closeAriaLabel: "סגור חלון שיתוף",
+          tabsLabel: "אפשרויות שיתוף",
+          qrAriaLabel: "קוד QR עבור {{name}}",
         },
 
         // ============ BUSINESS SCHEDULE PAGE ============
@@ -2867,6 +3308,351 @@ i18n.use(initReactI18next).init({
           canceled: "בוטל",
           completed: "הושלם",
           scheduled: "מתוכנן",
+        },
+
+        // ============ ACCESSIBILITY ============
+        accessibility: {
+          buttonLabel: "הגדרות נגישות",
+          panelTitle: "נגישות",
+          fontSize: {
+            label: "גודל גופן",
+            sm: "קטן",
+            default: "רגיל",
+            lg: "גדול",
+            xl: "גדול מאוד",
+          },
+          highContrast: {
+            label: "ניגודיות גבוהה",
+            description: "מגביר ניגודיות לקריאות טובה יותר",
+          },
+          reduceMotion: {
+            label: "הפחתת תנועה",
+            description: "מבטל אנימציות ומעברים",
+          },
+          reset: "איפוס להגדרות ברירת מחדל",
+        },
+
+        // ============ TUTORIALS ============
+        tutorials: {
+          common: {
+            back: "חזור",
+            next: "הבא",
+            skip: "דלג",
+            finish: "הבנתי!",
+            stepOf: "שלב {{current}} מתוך {{total}}",
+          },
+          search: {
+            step1: {
+              title: "חפש עסק",
+              body: "הקלד שם עסק או מילת מפתח בשורת החיפוש כדי למצוא את מה שאתה מחפש.",
+            },
+            step2: {
+              title: "סנן לפי קטגוריה",
+              body: "השתמש בצ'יפים של הקטגוריות כדי לצמצם את התוצאות לפי סוג שירות.",
+            },
+            step3: {
+              title: "החלף תצוגה",
+              body: "עבור בין תצוגת רשימה לתצוגת מפה כדי לגלות עסקים ליד מיקומך.",
+            },
+          },
+          booking: {
+            step1: {
+              title: "בחר תאריך",
+              body: "בחר תאריך מהלוח כדי לראות את המשבצות הפנויות לשירות זה.",
+            },
+            step2: {
+              title: "בחר משבצת זמן",
+              body: "הקש על כל זמן פנוי כדי לבחור אותו. הוא ישמר לזמן קצר בזמן שתאשר.",
+            },
+            step3: {
+              title: "אשר את ההזמנה",
+              body: "עיין בסיכום והקש על אשר הזמנה. תקבל אישור מיד.",
+            },
+          },
+          onboarding: {
+            step1: {
+              title: "ברוך הבא! בואו נקים את העסק שלך",
+              body: "בואו נגדיר את פרופיל העסק שלך. זה לוקח רק כמה דקות.",
+            },
+            step2: {
+              title: "שם העסק וקטגוריה",
+              body: "תן שם לעסק שלך ובחר את הקטגוריה המתאימה ביותר.",
+            },
+            step3: {
+              title: "מיקום",
+              body: "הוסף את הכתובת שלך כדי שלקוחות יוכלו למצוא אותך במפה.",
+            },
+            step4: {
+              title: "שירותים",
+              body: "הוסף את השירותים שאתה מציע — שם, משך זמן ומחיר.",
+            },
+            step5: {
+              title: "סיימנו!",
+              body: "זהו! תמיד תוכל לעדכן את הפרטים האלה מלוח הבקרה שלך.",
+            },
+          },
+          "owner-dashboard": {
+            step1: {
+              title: "העסק שלך במבט אחד",
+              body: "כאן סיכום של העסק שלך — פגישות כוללות, הכנסות ועוד.",
+            },
+            step2: {
+              title: "פגישות קרובות",
+              body: "נהל את הפגישות של היום והפגישות הקרובות מכאן.",
+            },
+            step3: {
+              title: "ערוך את דף העסק",
+              body: "עבור לדף העסק הציבורי שלך כדי לעדכן שירותים, תמונות ומידע.",
+            },
+            step4: {
+              title: "ניהול לוח זמנים",
+              body: "הגדר את שעות העבודה וכללי הזמינות שלך כאן.",
+            },
+            step5: {
+              title: "מדור הצוות",
+              body: "הזמן ונהל את חברי הצוות שלך מהכרטיסייה 'צוות'.",
+            },
+          },
+          "business-edit": {
+            step1: {
+              title: "אתה במצב עריכה",
+              body: "אתה עורך כעת את דף העסק הציבורי שלך. השינויים נשמרים תוך כדי.",
+            },
+            step2: {
+              title: "לוגו ובאנר",
+              body: "העלה לוגו ותמונת באנר כדי שהדף שלך יבלוט.",
+            },
+            step3: {
+              title: "צבע הנושא",
+              body: "בחר צבע כדי להתאים אישית את דף העסק שלך.",
+            },
+            step4: {
+              title: "רשימת שירותים",
+              body: "הוסף, ערוך או הסר את השירותים שאתה מציע כאן.",
+            },
+            step5: {
+              title: "תצוגה מקדימה",
+              body: "צא ממצב עריכה כדי לראות איך לקוחות יראו את הדף שלך.",
+            },
+          },
+          "schedule-editor": {
+            step1: {
+              title: "שעות עבודה שבועיות",
+              body: "הגדר את שעות העבודה הרגילות שלך לכל יום בשבוע.",
+            },
+            step2: {
+              title: "הפסקות",
+              body: "הוסף הפסקות (למשל, צהריים) בתוך שעות העבודה — לא ייווצרו משבצות בזמן הפסקות.",
+            },
+            step3: {
+              title: "חריגות תאריך",
+              body: "חסום תאריכים ספציפיים — חגים, חופשות, או ימי חופש.",
+            },
+            step4: {
+              title: "שמור את הלוח",
+              body: "אל תשכח לשמור את הלוח כדי שלקוחות יראו זמינות מדויקת.",
+            },
+          },
+          "staff-management": {
+            step1: {
+              title: "הצוות שלך",
+              body: "חברי הצוות הנוכחיים שלך מופיעים כאן.",
+            },
+            step2: {
+              title: "הזמן עובד",
+              body: "הזמן עובד חדש בדוא״ל. הם יקבלו קישור להצטרף.",
+            },
+            step3: {
+              title: "הזמנות ממתינות",
+              body: "הזמנות שנשלחו מופיעות כאן עד שהתקבלו או פגו.",
+            },
+            step4: {
+              title: "הקצאת שירותים",
+              body: "הקצה חברי צוות לשירותים שהם מבצעים.",
+            },
+            step5: {
+              title: "הסרת חבר",
+              body: "תוכל להסיר חבר צוות בכל עת מהפרופיל שלו.",
+            },
+          },
+          "staff-home": {
+            step1: {
+              title: "ברוך הבא לפורטל הצוות שלך!",
+              body: "הנה סקירה מהירה של דף הבית שלך כחבר צוות.",
+            },
+            step2: {
+              title: "מקום העבודה שלך",
+              body: "זהו העסק שאתה עובד בו. הקש על הסמל כדי לצפות בדף העסק הציבורי.",
+            },
+            step3: {
+              title: "שירותים מוקצים",
+              body: "אלה השירותים שהוקצו לך לביצוע. לקוחות יכולים להזמין אצלך שירותים אלה.",
+            },
+            step4: {
+              title: "הפגישה הבאה",
+              body: "הפגישה הקרובה הבאה שלך מוצגת כאן במבט מהיר.",
+            },
+            step5: {
+              title: "סטטיסטיקות מהירות",
+              body: "סיכום עומס העבודה הקרוב שלך — פגישות היום ובשבוע זה.",
+            },
+            step6: {
+              title: "נהל את הלוח שלך",
+              body: "השתמש בעורך הלוח כדי להגדיר את הזמינות שלך, כך שלקוחות יראו רק משבצות כשאתה באמת זמין.",
+            },
+          },
+          "staff-schedule-editor": {
+            step1: {
+              title: "זמינות שבועית",
+              body: "הגדר את הימים והשעות שבהם אתה זמין לקבל פגישות.",
+            },
+            step2: {
+              title: "הפסקות",
+              body: "חסום הפסקות כדי שלא יזמינו אותך בצהריים או בזמן מנוחה.",
+            },
+            step3: {
+              title: "חריגות תאריך",
+              body: "חסום תאריכים ספציפיים שבהם אינך זמין — חג, יום חופש וכדומה.",
+            },
+            step4: {
+              title: "שמור את הלוח",
+              body: "שמור את הלוח כדי שלקוחות יראו רק משבצות כשאתה באמת זמין.",
+            },
+          },
+          "date-exceptions": {
+            step1: {
+              title: "חסום תאריכים",
+              body: "הקש על תאריך כדי לסמן אותו כלא זמין — למשל, חגים או חופשות. לא ייווצרו משבצות בתאריכים חסומים.",
+            },
+            step2: {
+              title: "חריגות תאריך",
+              body: "הגדר שעות עבודה מותאמות אישית ליום בודד — שימושי לימים קצרים או ארוכים יותר בתאריכים ספציפיים.",
+            },
+            step3: {
+              title: "כללים חוזרים",
+              body: "עקוף את שעות השבועיות הרגילות לטווח תאריכים — נוח לשינויי לוח זמנים עונתיים.",
+            },
+          },
+          "customer-dashboard": {
+            step1: {
+              title: "הפגישות הקרובות שלך",
+              body: "ההזמנות הבאות שלך מוצגות כאן כדי שתמיד תדע מה בפתח.",
+            },
+            step2: {
+              title: "עסקים שעוקב אחריהם",
+              body: "עסקים שאתה עוקב אחריהם מופיעים כאן לגישה מהירה — הקש על אחד כדי לראות את הדף שלו או להזמין שוב.",
+            },
+            step3: {
+              title: "קישורים מהירים",
+              body: "קפוץ ישירות להיסטוריית הפגישות המלאה, הזמנות, או לדף החיפוש מכאן.",
+            },
+          },
+        },
+
+        // ============ FOOTER ============
+        footer: {
+          copyright: "© {{year}} BizSlot. כל הזכויות שמורות.",
+          contact: {
+            title: "צור קשר ומשוב",
+            tagline: "אנו קוראים כל הודעה.",
+            bugLabel: "דווח על באג",
+            bugAriaLabel: "דווח על באג — פותח את תוכנת הדוא״ל שלך",
+            featureLabel: "הצע תכונה",
+            featureAriaLabel: "הצע תכונה — פותח את תוכנת הדוא״ל שלך",
+          },
+          legal: {
+            title: "משפטי",
+            privacy: "מדיניות פרטיות",
+            terms: "תנאי שימוש",
+          },
+        },
+
+        // ============ PRIVACY POLICY ============
+        privacy: {
+          title: "מדיניות פרטיות",
+          lastUpdated: "עודכן לאחרונה: 1 בינואר 2026",
+          intro: {
+            heading: "מבוא",
+            body: "BizSlot היא פלטפורמת הזמנת תורים המחברת בין עסקים קטנים — כגון ספרים, מאפרים ומאמני כושר — לבין לקוחותיהם. מדיניות פרטיות זו חלה על כל המבקרים, המשתמשים הרשומים ובעלי העסקים המשתמשים בפלטפורמת BizSlot. בשימושך ב-BizSlot אתה מסכים לאיסוף ולשימוש במידע כמתואר להלן.",
+          },
+          dataCollected: {
+            heading: "המידע שאנו אוספים",
+            body: "אנו אוספים מידע שאתה מספק ישירות בעת יצירת חשבון או שימוש בפלטפורמה: שמך המלא, כתובת הדוא״ל שלך ותפקידך (בעל עסק או לקוח). בעלי עסקים מספקים בנוסף פרטי עסק כגון שם, כתובת, טלפון, קטגוריה, תיאורי שירות ושעות עבודה. אנו מתעדים נתוני פגישות כולל העסק, השירות, התאריך, השעה והסטטוס של כל הזמנה. ייתכן שנאסף גם מידע בסיסי על שימוש ואנליטיקה לצורך שיפור המוצר.",
+          },
+          howWeUse: {
+            heading: "כיצד אנו משתמשים במידע שלך",
+            body: "אנו משתמשים במידע שלך אך ורק להפעלה ולשיפור שירות BizSlot. זה כולל: אימות חשבונך ושמירת הסשן שלך, הצגת דף העסק והשירותים שלך ללקוחות פוטנציאליים, קביעת פגישות ושליחת אישורי הזמנה, מתן אפשרות לעסקים לנהל את לוחות הזמנים והפגישות שלהם, וניתוח דפוסי שימוש מצטברים לשיפור תכונות המוצר. איננו משתמשים במידע שלך לפרסום ממוקד.",
+          },
+          dataSharing: {
+            heading: "שיתוף מידע",
+            body: "אנו לא מוכרים, משכירים או סוחרים בנתונים האישיים שלך לצדדים שלישיים. ייתכן שנשתף מידע מוגבל עם ספקי תשתיות מהימנים — כגון שירותי אחסון ומסד נתונים — במידה הנדרשת להפעלת הפלטפורמה בלבד. כל ספק כזה מחויב חוזית לשמור על סודיות המידע שלך ולהשתמש בו אך ורק למטרות שאנו מציינים.",
+          },
+          dataRetention: {
+            heading: "שמירת מידע",
+            body: "אנו שומרים את נתוני החשבון שלך כל עוד החשבון פעיל. אם תבקש מחיקת חשבון, נסיר את הנתונים האישיים שלך תוך 30 יום, למעט מקרים בהם אנו נדרשים על פי חוק לשמור אותם. רשומות פגישות המשויכות לחשבון שנמחק יעברו אנונימיזציה במקום מחיקה כדי לשמור על שלמות הדיווח.",
+          },
+          yourRights: {
+            heading: "הזכויות שלך",
+            body: "יש לך הזכות לגשת, לתקן או למחוק את הנתונים האישיים שאנו מחזיקים עליך. לממש זכויות אלה, שלח אלינו דוא״ל ל-AppointmentBizSlot@gmail.com. נשיב תוך 30 יום. יש לך גם הזכות לבטל הסכמה בכל עת במקרים בהם העיבוד מבוסס על הסכמה, ולהגיש תלונה לרשות הגנת המידע המקומית שלך.",
+          },
+          cookies: {
+            heading: "עוגיות (Cookies)",
+            body: "BizSlot משתמשת בעוגייה HTTP-only אחת לאחסון אסימון האימות שלך (JWT). עוגייה זו חיונית לתפקוד השירות ולא ניתן להשביתה מבלי להתנתק. אנו לא משתמשים בעוגיות מעקב של צד שלישי, עוגיות פרסום או עוגיות אנליטיקה. אין צורך בבאנר הסכמה לעוגיות מכיוון שאנו מגדירים רק את עוגיית האימות ההכרחית.",
+          },
+          contact: {
+            heading: "צור קשר",
+            body: "אם יש לך שאלות או חששות בנוגע למדיניות פרטיות זו או לאופן הטיפול במידע שלך, צור קשר ב-AppointmentBizSlot@gmail.com. אנו מחויבים לטפל בפניות פרטיות במהירות ובשקיפות.",
+          },
+        },
+
+        // ============ TERMS OF SERVICE ============
+        terms: {
+          title: "תנאי שימוש",
+          lastUpdated: "עודכן לאחרונה: 1 בינואר 2026",
+          acceptance: {
+            heading: "קבלת התנאים",
+            body: "בגישה לשימוש ב-BizSlot אתה מסכים להיות מחויב לתנאי שימוש אלה ולמדיניות הפרטיות שלנו. אם אינך מסכים לחלק כלשהו מתנאים אלה, עליך להפסיק להשתמש בפלטפורמה. אנו עשויים לעדכן תנאים אלה מעת לעת; המשך שימוש בפלטפורמה לאחר פרסום השינויים מהווה קבלה של התנאים המעודכנים.",
+          },
+          description: {
+            heading: "תיאור השירות",
+            body: "BizSlot היא פלטפורמת הזמנת תורים מקוונת המאפשרת לעסקים קטנים לפרסם שירותים וזמינות, ומאפשרת ללקוחות לגלות עסקים אלה ולקבוע פגישות. BizSlot פועלת אך ורק כמתווכת טכנולוגית ואינה צד בחוזה הפגישה בין עסק ללקוחו.",
+          },
+          accounts: {
+            heading: "חשבונות משתמש",
+            body: "עליך להיות בן 16 לפחות כדי ליצור חשבון. אתה מסכים לספק מידע מדויק, עדכני ומלא בעת ההרשמה ולשמור על עדכניות פרטי החשבון. אתה אחראי לשמירת סודיות הסיסמה שלך ולכל פעילות המתרחשת תחת חשבונך. הודע לנו מיד ב-AppointmentBizSlot@gmail.com אם אתה חושד בשימוש בלתי מורשה בחשבונך.",
+          },
+          ownerResponsibilities: {
+            heading: "אחריות בעל העסק",
+            body: "בעלי עסקים אחראים לשמור על רשומות שירות, מחירים וזמינות מדויקות ועדכניות. עליך לכבד פגישות מאושרות אלא אם הודעת ללקוח על ביטול מראש עם הודעה סבירה. אתה מסכים להתנהל באופן מקצועי ולהתייחס ללקוחות בכבוד. רשומות לא מדויקות או אי-הגעות חוזרות עלולות לגרור השעיית חשבון.",
+          },
+          customerResponsibilities: {
+            heading: "אחריות הלקוח",
+            body: "לקוחות אחראים להגיע לפגישות שנקבעו בזמן. אם אתה צריך לבטל, נא עשה זאת מוקדם ככל האפשר כדי לאפשר לעסק למלא את המשבצת. ביטולים מאוחרים חוזרים או אי-הגעות עלולים לגרום להגבלות על יכולת ההזמנה שלך. אתה מסכים להתייחס לבעלי עסקים ולצוות בכבוד.",
+          },
+          prohibitedConduct: {
+            heading: "התנהגות אסורה",
+            body: "אסור לך להשתמש ב-BizSlot כדי: ליצור חשבונות מזויפים או להתחזות לאנשים או עסקים אחרים; לשלוח ספאם או הודעות מסחריות לא רצויות; לשרוט, לאסוף או לחלץ נתונים מהפלטפורמה בכמות גדולה; לנסות לעקוף בקרות גישה או אמצעי אבטחה; לפרסם ביקורות שקריות או משמיצות; או להשתמש בפלטפורמה לכל מטרה בלתי חוקית. אנו שומרים לעצמנו את הזכות להסיר תוכן ולהשעות חשבונות המפרים כללים אלה.",
+          },
+          ip: {
+            heading: "קניין רוחני",
+            body: "BizSlot ותכניה, תכונותיה ופונקציונליותה המקוריות הן בבעלות BizSlot ומוגנות על ידי זכויות יוצרים, סימנים מסחריים וחוקי קניין רוחני אחרים. אתה שומר על בעלות כל התוכן שאתה מעלה לפלטפורמה (כגון לוגואים, תמונות ותיאורי שירות). בהעלאת תוכן אתה מעניק ל-BizSlot רישיון לא בלעדי, ללא תמלוגים, להצגה והפצה של תוכן זה אך ורק לצורך הפעלת השירות.",
+          },
+          liability: {
+            heading: "הגבלת אחריות",
+            body: "BizSlot מסופקת 'כפי שהיא' ללא אחריות מכל סוג. במידה המרבית המותרת על פי החוק החל, BizSlot לא תהיה אחראית לכל נזק עקיף, מקרי, מיוחד או תוצאתי הנובע מהשימוש שלך בפלטפורמה. בפרט, BizSlot אינה אחראית לסכסוכים בין עסקים ולקוחות, פגישות שהוחמצו, או הפסדים הנובעים מרשומות עסקיות לא מדויקות. האחריות הכוללת שלנו כלפיך בכל נסיבה לא תעלה על הסכום ששילמת עבור שימוש בפלטפורמה (אם בכלל) ב-12 החודשים הקודמים.",
+          },
+          termination: {
+            heading: "סיום שימוש",
+            body: "BizSlot שומרת לעצמה את הזכות להשעות או לסיים לצמיתות את חשבונך בכל עת אם הפרת תנאי שימוש אלה, עסקת בפעילות הונאה, או מהווה סיכון למשתמשים אחרים או לפלטפורמה. תוכל למחוק את חשבונך בכל עת על ידי פנייה ל-AppointmentBizSlot@gmail.com. סיום השימוש אינו משפיע על זכויות או חובות שנוצרו לפני תאריך הסיום.",
+          },
+          changes: {
+            heading: "שינויים בתנאים",
+            body: "אנו עשויים לתקן תנאי שימוש אלה בכל עת. כאשר נבצע שינויים מהותיים נעדכן את תאריך 'עודכן לאחרונה' בראש דף זה ובמידת הצורך נודיע לך בדוא״ל או בהודעה בתוך האפליקציה. המשך השימוש שלך ב-BizSlot לאחר כניסת שינויים לתוקף מהווה קבלה של התנאים המתוקנים.",
+          },
+          contact: {
+            heading: "צור קשר",
+            body: "אם יש לך שאלות לגבי תנאי שימוש אלה, צור קשר ב-AppointmentBizSlot@gmail.com.",
+          },
         },
       },
     },
