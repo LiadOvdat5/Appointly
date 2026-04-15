@@ -111,11 +111,13 @@ export const getPartnerStats = async (): Promise<PartnerStats> => {
   return res.data;
 };
 
-export enum InactiveStaffEntryType {
-  RemovedStaff = 0,
-  DeclinedInvitation = 1,
-  ExpiredInvitation = 2,
-}
+export const InactiveStaffEntryType = {
+  RemovedStaff: 0,
+  DeclinedInvitation: 1,
+  ExpiredInvitation: 2,
+} as const;
+
+export type InactiveStaffEntryType = typeof InactiveStaffEntryType[keyof typeof InactiveStaffEntryType];
 
 export interface InactiveStaffEntry {
   entryType: InactiveStaffEntryType;
