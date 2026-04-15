@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useA11yPrefs, type FontSize } from "../hooks/useA11yPrefs";
 import { Toggle } from "./UI/Toggle";
@@ -103,7 +104,7 @@ export function AccessibilityMenu({
     setReduceMotion(false);
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50" dir="ltr">
       {/* Backdrop */}
       <button
@@ -215,7 +216,8 @@ export function AccessibilityMenu({
           {t("accessibility.reset")}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
