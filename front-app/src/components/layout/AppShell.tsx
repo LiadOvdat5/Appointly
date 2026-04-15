@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Header } from "./Header";
 import { RoleSidebar } from "./RoleSidebar";
 import { OfflineBanner } from "./OfflineBanner";
+import { Footer } from "./Footer";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 export function AppShell() {
@@ -43,6 +44,9 @@ export function AppShell() {
       >
         <Outlet />
       </main>
+
+      {/* Footer — scrolls with page, not sticky */}
+      <Footer />
 
       {/* Sidebar overlay (always available; contents filter by role) */}
       <SidebarOverlay

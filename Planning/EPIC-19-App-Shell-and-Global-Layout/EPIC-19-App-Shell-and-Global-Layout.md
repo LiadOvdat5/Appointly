@@ -1,7 +1,7 @@
 # EPIC-19: App Shell & Global Layout
 
 **Goal:** Provide a consistent, polished app shell across all pages — global header behaviour, a site-wide footer with contact and legal information, and any other layout chrome that spans the entire application.
-**Status:** 🔲 Not Started (F-19-A 🔲)
+**Status:** ✅ Done (F-19-A ✅)
 
 ← [[README|Planning Index]]
 
@@ -11,7 +11,7 @@
 
 | # | Feature | Status |
 |---|---------|--------|
-| A | [[F-19-A-Global-Footer\|Feature A: Global Footer]] | 🔲 Not Started |
+| A | [[F-19-A-Global-Footer\|Feature A: Global Footer]] | ✅ Done |
 
 ---
 

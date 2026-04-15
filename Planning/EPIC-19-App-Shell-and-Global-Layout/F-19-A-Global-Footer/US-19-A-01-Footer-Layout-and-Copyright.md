@@ -2,7 +2,7 @@
 
 **Feature:** [[F-19-A-Global-Footer|F-19-A: Global Footer]]
 **Epic:** [[EPIC-19-App-Shell-and-Global-Layout|EPIC-19: App Shell & Global Layout]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
