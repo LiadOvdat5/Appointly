@@ -165,7 +165,7 @@ export default function RegisterPage() {
         {googleIdToken ? (
           <div className="flex flex-col gap-4">
             <Paragraph className="text-center font-medium">
-              How will you use BizSlot?
+              How will you use Appointly?
             </Paragraph>
             <Button
               onClick={() => handleGoogleRoleSelect(Role.Owner)}

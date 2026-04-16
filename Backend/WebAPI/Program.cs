@@ -174,7 +174,7 @@ try
         {
             Id = Guid.NewGuid(),
             Name = "Admin",
-            Email = "admin@bizslot.com",
+            Email = "admin@appointly.com",
             Role = WebAPI.Models.UserRole.admin,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
@@ -198,7 +198,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference(options =>
     {
-        options.Title = "BizSlot API";
+        options.Title = "Appointly API";
         options.Theme = ScalarTheme.Kepler;
     });
 }

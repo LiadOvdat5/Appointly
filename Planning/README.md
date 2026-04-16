@@ -1,4 +1,4 @@
-# BizSlot – Planning Index
+# Appointly – Planning Index
 
 ## Legend
 | Symbol | Meaning |

@@ -90,7 +90,7 @@ i18n.use(initReactI18next).init({
 
         // ============ SELECTION PAGE ============
         selection: {
-          title: "How would you like to use BizSlot?",
+          title: "How would you like to use Appointly?",
           subtitle: "Select your account type to get started.",
           businessOwner: {
             title: "Business Owner",
@@ -180,7 +180,7 @@ i18n.use(initReactI18next).init({
           hero: {
             headline: "Book appointments with local businesses, effortlessly.",
             description:
-              "BizSlot connects customers with local businesses for quick, hassle-free appointment booking — and gives owners the tools to manage it all.",
+              "Appointly connects customers with local businesses for quick, hassle-free appointment booking — and gives owners the tools to manage it all.",
             ctaFind: "Find a Business",
             ctaList: "List Your Business",
             alreadyHaveAccount: "Already have an account?",
@@ -224,7 +224,7 @@ i18n.use(initReactI18next).init({
             steps: {
               signUp: {
                 title: "Sign Up",
-                description: "Create your BizSlot account as a business owner.",
+                description: "Create your Appointly account as a business owner.",
               },
               create: {
                 title: "Create Your Business",
@@ -298,7 +298,7 @@ i18n.use(initReactI18next).init({
           },
           becomeOwner: {
             title: "Start your own business",
-            subtitle: "Upgrade your account to Business Owner and list your own services on BizSlot.",
+            subtitle: "Upgrade your account to Business Owner and list your own services on Appointly.",
             cta: "Become a Business Owner",
             error: "Something went wrong. Please try again.",
           },
@@ -1774,7 +1774,7 @@ i18n.use(initReactI18next).init({
 
         // ============ FOOTER ============
         footer: {
-          copyright: "© {{year}} BizSlot. All rights reserved.",
+          copyright: "© {{year}} Appointly. All rights reserved.",
           contact: {
             title: "Contact & Feedback",
             tagline: "We read every message.",
@@ -1796,7 +1796,7 @@ i18n.use(initReactI18next).init({
           lastUpdated: "Last Updated: January 1, 2026",
           intro: {
             heading: "Introduction",
-            body: "BizSlot is an appointment booking platform that connects small businesses — such as barbers, nail artists, and personal trainers — with their customers. This Privacy Policy applies to all visitors, registered users, and business owners who use the BizSlot platform. By using BizSlot you agree to the collection and use of information as described below.",
+            body: "Appointly is an appointment booking platform that connects small businesses — such as barbers, nail artists, and personal trainers — with their customers. This Privacy Policy applies to all visitors, registered users, and business owners who use the Appointly platform. By using Appointly you agree to the collection and use of information as described below.",
           },
           dataCollected: {
             heading: "Data We Collect",
@@ -1804,7 +1804,7 @@ i18n.use(initReactI18next).init({
           },
           howWeUse: {
             heading: "How We Use Your Data",
-            body: "We use your data solely to operate and improve the BizSlot service. This includes: authenticating your account and maintaining your session, displaying your business page and services to prospective customers, facilitating appointment bookings and sending booking confirmations, enabling businesses to manage their schedules and appointments, and analysing aggregate usage patterns to improve product features. We do not use your data for targeted advertising.",
+            body: "We use your data solely to operate and improve the Appointly service. This includes: authenticating your account and maintaining your session, displaying your business page and services to prospective customers, facilitating appointment bookings and sending booking confirmations, enabling businesses to manage their schedules and appointments, and analysing aggregate usage patterns to improve product features. We do not use your data for targeted advertising.",
           },
           dataSharing: {
             heading: "Data Sharing",
@@ -1816,15 +1816,15 @@ i18n.use(initReactI18next).init({
           },
           yourRights: {
             heading: "Your Rights",
-            body: "You have the right to access, correct, or delete the personal data we hold about you. To exercise any of these rights, please email us at AppointmentBizSlot@gmail.com. We will respond within 30 days. You also have the right to withdraw consent at any time where processing is based on consent, and to lodge a complaint with your local data protection authority.",
+            body: "You have the right to access, correct, or delete the personal data we hold about you. To exercise any of these rights, please email us at AppointmentAppointly@gmail.com. We will respond within 30 days. You also have the right to withdraw consent at any time where processing is based on consent, and to lodge a complaint with your local data protection authority.",
           },
           cookies: {
             heading: "Cookies",
-            body: "BizSlot uses a single HTTP-only cookie to store your authentication token (JWT). This cookie is essential for the service to function and cannot be disabled without logging out. We do not use any third-party tracking cookies, advertising cookies, or analytics cookies. No cookie consent banner is required because we set only the strictly necessary authentication cookie.",
+            body: "Appointly uses a single HTTP-only cookie to store your authentication token (JWT). This cookie is essential for the service to function and cannot be disabled without logging out. We do not use any third-party tracking cookies, advertising cookies, or analytics cookies. No cookie consent banner is required because we set only the strictly necessary authentication cookie.",
           },
           contact: {
             heading: "Contact",
-            body: "If you have any questions or concerns about this Privacy Policy or the way we handle your data, please contact us at AppointmentBizSlot@gmail.com. We are committed to resolving privacy queries promptly and transparently.",
+            body: "If you have any questions or concerns about this Privacy Policy or the way we handle your data, please contact us at AppointmentAppointly@gmail.com. We are committed to resolving privacy queries promptly and transparently.",
           },
         },
 
@@ -1834,15 +1834,15 @@ i18n.use(initReactI18next).init({
           lastUpdated: "Last Updated: January 1, 2026",
           acceptance: {
             heading: "Acceptance of Terms",
-            body: "By accessing or using BizSlot you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you must not use the platform. We may update these terms from time to time; continued use of the platform after changes are published constitutes acceptance of the updated terms.",
+            body: "By accessing or using Appointly you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree with any part of these terms, you must not use the platform. We may update these terms from time to time; continued use of the platform after changes are published constitutes acceptance of the updated terms.",
           },
           description: {
             heading: "Description of Service",
-            body: "BizSlot is an online appointment booking platform that enables small businesses to publish their services and availability, and enables customers to discover those businesses and book appointments. BizSlot acts solely as a technology intermediary and is not a party to the appointment contract between a business and its customer.",
+            body: "Appointly is an online appointment booking platform that enables small businesses to publish their services and availability, and enables customers to discover those businesses and book appointments. Appointly acts solely as a technology intermediary and is not a party to the appointment contract between a business and its customer.",
           },
           accounts: {
             heading: "User Accounts",
-            body: "You must be at least 16 years of age to create an account. You agree to provide accurate, current, and complete information during registration and to keep your account information updated. You are responsible for maintaining the confidentiality of your password and for all activity that occurs under your account. Notify us immediately at AppointmentBizSlot@gmail.com if you suspect unauthorised use of your account.",
+            body: "You must be at least 16 years of age to create an account. You agree to provide accurate, current, and complete information during registration and to keep your account information updated. You are responsible for maintaining the confidentiality of your password and for all activity that occurs under your account. Notify us immediately at AppointmentAppointly@gmail.com if you suspect unauthorised use of your account.",
           },
           ownerResponsibilities: {
             heading: "Business Owner Responsibilities",
@@ -1854,27 +1854,27 @@ i18n.use(initReactI18next).init({
           },
           prohibitedConduct: {
             heading: "Prohibited Conduct",
-            body: "You must not use BizSlot to: create fake accounts or impersonate other individuals or businesses; send spam or unsolicited commercial messages; scrape, harvest, or otherwise extract data from the platform in bulk; attempt to circumvent any access controls or security measures; post false or defamatory reviews; or use the platform for any unlawful purpose. We reserve the right to remove content and suspend accounts that violate these rules.",
+            body: "You must not use Appointly to: create fake accounts or impersonate other individuals or businesses; send spam or unsolicited commercial messages; scrape, harvest, or otherwise extract data from the platform in bulk; attempt to circumvent any access controls or security measures; post false or defamatory reviews; or use the platform for any unlawful purpose. We reserve the right to remove content and suspend accounts that violate these rules.",
           },
           ip: {
             heading: "Intellectual Property",
-            body: "BizSlot and its original content, features, and functionality are owned by BizSlot and are protected by copyright, trademark, and other intellectual property laws. You retain ownership of all content you upload to the platform (such as business logos, photos, and service descriptions). By uploading content you grant BizSlot a non-exclusive, royalty-free licence to display and distribute that content solely for the purpose of operating the service.",
+            body: "Appointly and its original content, features, and functionality are owned by Appointly and are protected by copyright, trademark, and other intellectual property laws. You retain ownership of all content you upload to the platform (such as business logos, photos, and service descriptions). By uploading content you grant Appointly a non-exclusive, royalty-free licence to display and distribute that content solely for the purpose of operating the service.",
           },
           liability: {
             heading: "Limitation of Liability",
-            body: "BizSlot is provided 'as is' without warranties of any kind. To the fullest extent permitted by applicable law, BizSlot shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the platform. In particular, BizSlot is not liable for disputes between businesses and customers, missed appointments, or losses resulting from inaccurate business listings. Our total liability to you in any circumstance shall not exceed the amount you paid to use the platform (if any) in the preceding 12 months.",
+            body: "Appointly is provided 'as is' without warranties of any kind. To the fullest extent permitted by applicable law, Appointly shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the platform. In particular, Appointly is not liable for disputes between businesses and customers, missed appointments, or losses resulting from inaccurate business listings. Our total liability to you in any circumstance shall not exceed the amount you paid to use the platform (if any) in the preceding 12 months.",
           },
           termination: {
             heading: "Termination",
-            body: "BizSlot reserves the right to suspend or permanently terminate your account at any time if you violate these Terms of Service, engage in fraudulent activity, or pose a risk to other users or the platform. You may delete your account at any time by contacting AppointmentBizSlot@gmail.com. Termination does not affect any rights or obligations that arose before the effective date of termination.",
+            body: "Appointly reserves the right to suspend or permanently terminate your account at any time if you violate these Terms of Service, engage in fraudulent activity, or pose a risk to other users or the platform. You may delete your account at any time by contacting AppointmentAppointly@gmail.com. Termination does not affect any rights or obligations that arose before the effective date of termination.",
           },
           changes: {
             heading: "Changes to Terms",
-            body: "We may revise these Terms of Service at any time. When we make material changes we will update the 'Last Updated' date at the top of this page and, where appropriate, notify you by email or via an in-app notification. Your continued use of BizSlot after changes take effect constitutes your acceptance of the revised terms.",
+            body: "We may revise these Terms of Service at any time. When we make material changes we will update the 'Last Updated' date at the top of this page and, where appropriate, notify you by email or via an in-app notification. Your continued use of Appointly after changes take effect constitutes your acceptance of the revised terms.",
           },
           contact: {
             heading: "Contact",
-            body: "If you have any questions about these Terms of Service, please contact us at AppointmentBizSlot@gmail.com.",
+            body: "If you have any questions about these Terms of Service, please contact us at AppointmentAppointly@gmail.com.",
           },
         },
       },
@@ -1965,7 +1965,7 @@ i18n.use(initReactI18next).init({
 
         // ============ SELECTION PAGE ============
         selection: {
-          title: "איך היית רוצה להשתמש ב-BizSlot?",
+          title: "איך היית רוצה להשתמש ב-Appointly?",
           subtitle: "בחר את סוג החשבון שלך כדי להתחיל.",
           businessOwner: {
             title: "בעל עסק",
@@ -2053,7 +2053,7 @@ i18n.use(initReactI18next).init({
           hero: {
             headline: "הזמן פגישות עם עסקים מקומיים, בקלות.",
             description:
-              "BizSlot מחבר לקוחות עם עסקים מקומיים להזמנת פגישות מהירה וחלקה — ונותן לבעלי העסק את הכלים לנהל הכל.",
+              "Appointly מחבר לקוחות עם עסקים מקומיים להזמנת פגישות מהירה וחלקה — ונותן לבעלי העסק את הכלים לנהל הכל.",
             ctaFind: "מצא עסק",
             ctaList: "הוסף את העסק שלך",
             alreadyHaveAccount: "כבר יש לך חשבון?",
@@ -2097,7 +2097,7 @@ i18n.use(initReactI18next).init({
             steps: {
               signUp: {
                 title: "הירשם",
-                description: "צור חשבון BizSlot כבעל עסק.",
+                description: "צור חשבון Appointly כבעל עסק.",
               },
               create: {
                 title: "צור את העסק שלך",
@@ -2171,7 +2171,7 @@ i18n.use(initReactI18next).init({
           },
           becomeOwner: {
             title: "פתח עסק משלך",
-            subtitle: "שדרג את חשבונך לבעל עסק והוסף את השירותים שלך ל-BizSlot.",
+            subtitle: "שדרג את חשבונך לבעל עסק והוסף את השירותים שלך ל-Appointly.",
             cta: "הפוך לבעל עסק",
             error: "אירעה שגיאה. נסה שוב.",
           },
@@ -3631,7 +3631,7 @@ i18n.use(initReactI18next).init({
 
         // ============ FOOTER ============
         footer: {
-          copyright: "© {{year}} BizSlot. כל הזכויות שמורות.",
+          copyright: "© {{year}} Appointly. כל הזכויות שמורות.",
           contact: {
             title: "צור קשר ומשוב",
             tagline: "אנו קוראים כל הודעה.",
@@ -3653,7 +3653,7 @@ i18n.use(initReactI18next).init({
           lastUpdated: "עודכן לאחרונה: 1 בינואר 2026",
           intro: {
             heading: "מבוא",
-            body: "BizSlot היא פלטפורמת הזמנת תורים המחברת בין עסקים קטנים — כגון ספרים, מאפרים ומאמני כושר — לבין לקוחותיהם. מדיניות פרטיות זו חלה על כל המבקרים, המשתמשים הרשומים ובעלי העסקים המשתמשים בפלטפורמת BizSlot. בשימושך ב-BizSlot אתה מסכים לאיסוף ולשימוש במידע כמתואר להלן.",
+            body: "Appointly היא פלטפורמת הזמנת תורים המחברת בין עסקים קטנים — כגון ספרים, מאפרים ומאמני כושר — לבין לקוחותיהם. מדיניות פרטיות זו חלה על כל המבקרים, המשתמשים הרשומים ובעלי העסקים המשתמשים בפלטפורמת Appointly. בשימושך ב-Appointly אתה מסכים לאיסוף ולשימוש במידע כמתואר להלן.",
           },
           dataCollected: {
             heading: "המידע שאנו אוספים",
@@ -3661,7 +3661,7 @@ i18n.use(initReactI18next).init({
           },
           howWeUse: {
             heading: "כיצד אנו משתמשים במידע שלך",
-            body: "אנו משתמשים במידע שלך אך ורק להפעלה ולשיפור שירות BizSlot. זה כולל: אימות חשבונך ושמירת הסשן שלך, הצגת דף העסק והשירותים שלך ללקוחות פוטנציאליים, קביעת פגישות ושליחת אישורי הזמנה, מתן אפשרות לעסקים לנהל את לוחות הזמנים והפגישות שלהם, וניתוח דפוסי שימוש מצטברים לשיפור תכונות המוצר. איננו משתמשים במידע שלך לפרסום ממוקד.",
+            body: "אנו משתמשים במידע שלך אך ורק להפעלה ולשיפור שירות Appointly. זה כולל: אימות חשבונך ושמירת הסשן שלך, הצגת דף העסק והשירותים שלך ללקוחות פוטנציאליים, קביעת פגישות ושליחת אישורי הזמנה, מתן אפשרות לעסקים לנהל את לוחות הזמנים והפגישות שלהם, וניתוח דפוסי שימוש מצטברים לשיפור תכונות המוצר. איננו משתמשים במידע שלך לפרסום ממוקד.",
           },
           dataSharing: {
             heading: "שיתוף מידע",
@@ -3673,15 +3673,15 @@ i18n.use(initReactI18next).init({
           },
           yourRights: {
             heading: "הזכויות שלך",
-            body: "יש לך הזכות לגשת, לתקן או למחוק את הנתונים האישיים שאנו מחזיקים עליך. לממש זכויות אלה, שלח אלינו דוא״ל ל-AppointmentBizSlot@gmail.com. נשיב תוך 30 יום. יש לך גם הזכות לבטל הסכמה בכל עת במקרים בהם העיבוד מבוסס על הסכמה, ולהגיש תלונה לרשות הגנת המידע המקומית שלך.",
+            body: "יש לך הזכות לגשת, לתקן או למחוק את הנתונים האישיים שאנו מחזיקים עליך. לממש זכויות אלה, שלח אלינו דוא״ל ל-AppointmentAppointly@gmail.com. נשיב תוך 30 יום. יש לך גם הזכות לבטל הסכמה בכל עת במקרים בהם העיבוד מבוסס על הסכמה, ולהגיש תלונה לרשות הגנת המידע המקומית שלך.",
           },
           cookies: {
             heading: "עוגיות (Cookies)",
-            body: "BizSlot משתמשת בעוגייה HTTP-only אחת לאחסון אסימון האימות שלך (JWT). עוגייה זו חיונית לתפקוד השירות ולא ניתן להשביתה מבלי להתנתק. אנו לא משתמשים בעוגיות מעקב של צד שלישי, עוגיות פרסום או עוגיות אנליטיקה. אין צורך בבאנר הסכמה לעוגיות מכיוון שאנו מגדירים רק את עוגיית האימות ההכרחית.",
+            body: "Appointly משתמשת בעוגייה HTTP-only אחת לאחסון אסימון האימות שלך (JWT). עוגייה זו חיונית לתפקוד השירות ולא ניתן להשביתה מבלי להתנתק. אנו לא משתמשים בעוגיות מעקב של צד שלישי, עוגיות פרסום או עוגיות אנליטיקה. אין צורך בבאנר הסכמה לעוגיות מכיוון שאנו מגדירים רק את עוגיית האימות ההכרחית.",
           },
           contact: {
             heading: "צור קשר",
-            body: "אם יש לך שאלות או חששות בנוגע למדיניות פרטיות זו או לאופן הטיפול במידע שלך, צור קשר ב-AppointmentBizSlot@gmail.com. אנו מחויבים לטפל בפניות פרטיות במהירות ובשקיפות.",
+            body: "אם יש לך שאלות או חששות בנוגע למדיניות פרטיות זו או לאופן הטיפול במידע שלך, צור קשר ב-AppointmentAppointly@gmail.com. אנו מחויבים לטפל בפניות פרטיות במהירות ובשקיפות.",
           },
         },
 
@@ -3691,15 +3691,15 @@ i18n.use(initReactI18next).init({
           lastUpdated: "עודכן לאחרונה: 1 בינואר 2026",
           acceptance: {
             heading: "קבלת התנאים",
-            body: "בגישה לשימוש ב-BizSlot אתה מסכים להיות מחויב לתנאי שימוש אלה ולמדיניות הפרטיות שלנו. אם אינך מסכים לחלק כלשהו מתנאים אלה, עליך להפסיק להשתמש בפלטפורמה. אנו עשויים לעדכן תנאים אלה מעת לעת; המשך שימוש בפלטפורמה לאחר פרסום השינויים מהווה קבלה של התנאים המעודכנים.",
+            body: "בגישה לשימוש ב-Appointly אתה מסכים להיות מחויב לתנאי שימוש אלה ולמדיניות הפרטיות שלנו. אם אינך מסכים לחלק כלשהו מתנאים אלה, עליך להפסיק להשתמש בפלטפורמה. אנו עשויים לעדכן תנאים אלה מעת לעת; המשך שימוש בפלטפורמה לאחר פרסום השינויים מהווה קבלה של התנאים המעודכנים.",
           },
           description: {
             heading: "תיאור השירות",
-            body: "BizSlot היא פלטפורמת הזמנת תורים מקוונת המאפשרת לעסקים קטנים לפרסם שירותים וזמינות, ומאפשרת ללקוחות לגלות עסקים אלה ולקבוע פגישות. BizSlot פועלת אך ורק כמתווכת טכנולוגית ואינה צד בחוזה הפגישה בין עסק ללקוחו.",
+            body: "Appointly היא פלטפורמת הזמנת תורים מקוונת המאפשרת לעסקים קטנים לפרסם שירותים וזמינות, ומאפשרת ללקוחות לגלות עסקים אלה ולקבוע פגישות. Appointly פועלת אך ורק כמתווכת טכנולוגית ואינה צד בחוזה הפגישה בין עסק ללקוחו.",
           },
           accounts: {
             heading: "חשבונות משתמש",
-            body: "עליך להיות בן 16 לפחות כדי ליצור חשבון. אתה מסכים לספק מידע מדויק, עדכני ומלא בעת ההרשמה ולשמור על עדכניות פרטי החשבון. אתה אחראי לשמירת סודיות הסיסמה שלך ולכל פעילות המתרחשת תחת חשבונך. הודע לנו מיד ב-AppointmentBizSlot@gmail.com אם אתה חושד בשימוש בלתי מורשה בחשבונך.",
+            body: "עליך להיות בן 16 לפחות כדי ליצור חשבון. אתה מסכים לספק מידע מדויק, עדכני ומלא בעת ההרשמה ולשמור על עדכניות פרטי החשבון. אתה אחראי לשמירת סודיות הסיסמה שלך ולכל פעילות המתרחשת תחת חשבונך. הודע לנו מיד ב-AppointmentAppointly@gmail.com אם אתה חושד בשימוש בלתי מורשה בחשבונך.",
           },
           ownerResponsibilities: {
             heading: "אחריות בעל העסק",
@@ -3711,27 +3711,27 @@ i18n.use(initReactI18next).init({
           },
           prohibitedConduct: {
             heading: "התנהגות אסורה",
-            body: "אסור לך להשתמש ב-BizSlot כדי: ליצור חשבונות מזויפים או להתחזות לאנשים או עסקים אחרים; לשלוח ספאם או הודעות מסחריות לא רצויות; לשרוט, לאסוף או לחלץ נתונים מהפלטפורמה בכמות גדולה; לנסות לעקוף בקרות גישה או אמצעי אבטחה; לפרסם ביקורות שקריות או משמיצות; או להשתמש בפלטפורמה לכל מטרה בלתי חוקית. אנו שומרים לעצמנו את הזכות להסיר תוכן ולהשעות חשבונות המפרים כללים אלה.",
+            body: "אסור לך להשתמש ב-Appointly כדי: ליצור חשבונות מזויפים או להתחזות לאנשים או עסקים אחרים; לשלוח ספאם או הודעות מסחריות לא רצויות; לשרוט, לאסוף או לחלץ נתונים מהפלטפורמה בכמות גדולה; לנסות לעקוף בקרות גישה או אמצעי אבטחה; לפרסם ביקורות שקריות או משמיצות; או להשתמש בפלטפורמה לכל מטרה בלתי חוקית. אנו שומרים לעצמנו את הזכות להסיר תוכן ולהשעות חשבונות המפרים כללים אלה.",
           },
           ip: {
             heading: "קניין רוחני",
-            body: "BizSlot ותכניה, תכונותיה ופונקציונליותה המקוריות הן בבעלות BizSlot ומוגנות על ידי זכויות יוצרים, סימנים מסחריים וחוקי קניין רוחני אחרים. אתה שומר על בעלות כל התוכן שאתה מעלה לפלטפורמה (כגון לוגואים, תמונות ותיאורי שירות). בהעלאת תוכן אתה מעניק ל-BizSlot רישיון לא בלעדי, ללא תמלוגים, להצגה והפצה של תוכן זה אך ורק לצורך הפעלת השירות.",
+            body: "Appointly ותכניה, תכונותיה ופונקציונליותה המקוריות הן בבעלות Appointly ומוגנות על ידי זכויות יוצרים, סימנים מסחריים וחוקי קניין רוחני אחרים. אתה שומר על בעלות כל התוכן שאתה מעלה לפלטפורמה (כגון לוגואים, תמונות ותיאורי שירות). בהעלאת תוכן אתה מעניק ל-Appointly רישיון לא בלעדי, ללא תמלוגים, להצגה והפצה של תוכן זה אך ורק לצורך הפעלת השירות.",
           },
           liability: {
             heading: "הגבלת אחריות",
-            body: "BizSlot מסופקת 'כפי שהיא' ללא אחריות מכל סוג. במידה המרבית המותרת על פי החוק החל, BizSlot לא תהיה אחראית לכל נזק עקיף, מקרי, מיוחד או תוצאתי הנובע מהשימוש שלך בפלטפורמה. בפרט, BizSlot אינה אחראית לסכסוכים בין עסקים ולקוחות, פגישות שהוחמצו, או הפסדים הנובעים מרשומות עסקיות לא מדויקות. האחריות הכוללת שלנו כלפיך בכל נסיבה לא תעלה על הסכום ששילמת עבור שימוש בפלטפורמה (אם בכלל) ב-12 החודשים הקודמים.",
+            body: "Appointly מסופקת 'כפי שהיא' ללא אחריות מכל סוג. במידה המרבית המותרת על פי החוק החל, Appointly לא תהיה אחראית לכל נזק עקיף, מקרי, מיוחד או תוצאתי הנובע מהשימוש שלך בפלטפורמה. בפרט, Appointly אינה אחראית לסכסוכים בין עסקים ולקוחות, פגישות שהוחמצו, או הפסדים הנובעים מרשומות עסקיות לא מדויקות. האחריות הכוללת שלנו כלפיך בכל נסיבה לא תעלה על הסכום ששילמת עבור שימוש בפלטפורמה (אם בכלל) ב-12 החודשים הקודמים.",
           },
           termination: {
             heading: "סיום שימוש",
-            body: "BizSlot שומרת לעצמה את הזכות להשעות או לסיים לצמיתות את חשבונך בכל עת אם הפרת תנאי שימוש אלה, עסקת בפעילות הונאה, או מהווה סיכון למשתמשים אחרים או לפלטפורמה. תוכל למחוק את חשבונך בכל עת על ידי פנייה ל-AppointmentBizSlot@gmail.com. סיום השימוש אינו משפיע על זכויות או חובות שנוצרו לפני תאריך הסיום.",
+            body: "Appointly שומרת לעצמה את הזכות להשעות או לסיים לצמיתות את חשבונך בכל עת אם הפרת תנאי שימוש אלה, עסקת בפעילות הונאה, או מהווה סיכון למשתמשים אחרים או לפלטפורמה. תוכל למחוק את חשבונך בכל עת על ידי פנייה ל-AppointmentAppointly@gmail.com. סיום השימוש אינו משפיע על זכויות או חובות שנוצרו לפני תאריך הסיום.",
           },
           changes: {
             heading: "שינויים בתנאים",
-            body: "אנו עשויים לתקן תנאי שימוש אלה בכל עת. כאשר נבצע שינויים מהותיים נעדכן את תאריך 'עודכן לאחרונה' בראש דף זה ובמידת הצורך נודיע לך בדוא״ל או בהודעה בתוך האפליקציה. המשך השימוש שלך ב-BizSlot לאחר כניסת שינויים לתוקף מהווה קבלה של התנאים המתוקנים.",
+            body: "אנו עשויים לתקן תנאי שימוש אלה בכל עת. כאשר נבצע שינויים מהותיים נעדכן את תאריך 'עודכן לאחרונה' בראש דף זה ובמידת הצורך נודיע לך בדוא״ל או בהודעה בתוך האפליקציה. המשך השימוש שלך ב-Appointly לאחר כניסת שינויים לתוקף מהווה קבלה של התנאים המתוקנים.",
           },
           contact: {
             heading: "צור קשר",
-            body: "אם יש לך שאלות לגבי תנאי שימוש אלה, צור קשר ב-AppointmentBizSlot@gmail.com.",
+            body: "אם יש לך שאלות לגבי תנאי שימוש אלה, צור קשר ב-AppointmentAppointly@gmail.com.",
           },
         },
       },

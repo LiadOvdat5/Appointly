@@ -11,8 +11,8 @@ As a **visitor or user**, I want to **see a consistent footer at the bottom of e
 
 ## Tasks
 - `[FE]` Create a `Footer` component in `components/layout/Footer.tsx`
-- `[FE]` Render the BizSlot logo/wordmark (small) on the left side
-- `[FE]` Display dynamic copyright line: `© {currentYear} BizSlot. All rights reserved.`
+- `[FE]` Render the Appointly logo/wordmark (small) on the left side
+- `[FE]` Display dynamic copyright line: `© {currentYear} Appointly. All rights reserved.`
 - `[FE]` Mount `<Footer />` inside `AppShell` so it appears on every route
 - `[FE]` Footer should be full-width, pinned to the bottom of the content flow (not sticky/fixed — scrolls with the page)
 - `[FE]` Responsive layout: stacks vertically on mobile, horizontal columns on desktop

@@ -70,12 +70,12 @@ export function buildIcsBlob(appointment: AppointmentCalendarData): Blob {
   const now = new Date();
 
   const eventTitle = `${appointment.serviceName} at ${appointment.businessName}`;
-  const uid = `${appointment.id}@bizslot`;
+  const uid = `${appointment.id}@appointly`;
 
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//BizSlot//BizSlot Calendar//EN",
+    "PRODID:-//Appointly//Appointly Calendar//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

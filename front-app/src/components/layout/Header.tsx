@@ -24,7 +24,7 @@ export const Header = ({
       <div className="w-10" />
 
       {/* Center */}
-      <H1 className="flex-1 text-center">BizSlot</H1>
+      <H1 className="flex-1 text-center">Appointly</H1>
 
       {/* Right: Dark mode toggle, language toggle, accessibility, notification bell (auth only), menu */}
       <div className="flex items-center gap-1 w-auto justify-end">

@@ -43,7 +43,7 @@ export default function UIShowcasePage() {
   return (
     <div className="min-h-screen bg-background-light font-display text-[#111418] dark:bg-background-dark dark:text-gray-100">
       <TopNavBar
-        title="BizSlot UI Style Guide"
+        title="Appointly UI Style Guide"
         version="v1.0.0"
         onBack={() => history.back()}
       />
@@ -56,7 +56,7 @@ export default function UIShowcasePage() {
           <div className="space-y-1 bg-white p-4 dark:bg-gray-900/50">
             <div>
               <Label>Headline H1 - 32px Bold</Label>
-              <H1>BizSlot App</H1>
+              <H1>Appointly App</H1>
             </div>
 
             <div className="pt-4">
@@ -72,7 +72,7 @@ export default function UIShowcasePage() {
             <div className="pt-4">
               <Label>Body Text - 16px Regular</Label>
               <Paragraph>
-                BizSlot connects clients with professionals. Easily manage your
+                Appointly connects clients with professionals. Easily manage your
                 schedule and appointments in one place.
               </Paragraph>
             </div>

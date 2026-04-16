@@ -1,7 +1,7 @@
-# BizSlot – Claude Code Project Guide
+# Appointly – Claude Code Project Guide
 
 ## What is this project?
-BizSlot is an appointment booking platform for small businesses (barbers, nail artists, trainers, etc.).
+Appointly is an appointment booking platform for small businesses (barbers, nail artists, trainers, etc.).
 Two user roles: **Business Owner** and **Customer**.
 Owners create a business page, manage services and schedules.
 Customers discover businesses, view their pages, and book appointments.
@@ -32,7 +32,7 @@ dotnet run
 ```
 - API: `http://localhost:5142`
 - API docs (Scalar): `http://localhost:5142/scalar/`
-- DB: SQL Server Express — `MSI\SQLEXPRESS`, database `BizSlot`, Windows auth
+- DB: SQL Server Express — `MSI\SQLEXPRESS`, database `Appointly`, Windows auth
 
 ### Frontend
 ```bash
@@ -47,7 +47,7 @@ npm run dev
 ## Folder Structure
 
 ```
-BizSlot/
+Appointly/
   Backend/
     WebAPI/
       Controllers/       # API endpoints
@@ -86,7 +86,7 @@ BizSlot/
 
 ## Database Schema (SQL Server)
 
-Tables currently in BizSlot DB:
+Tables currently in Appointly DB:
 - `Users` — id, name, email, passwordHash, role (BusinessOwner / Customer)
 - `Businesses` — id, ownerId, name, description, categoryId, themeColor, logoUrl
 - `Categories` — id, name, iconName
@@ -102,7 +102,7 @@ Tables currently in BizSlot DB:
 - `BusinessInvitations` — invitations for workers to join a business
 - `BusinessPartners` — worker-business associations
 
-MCP database connection: `sqlserver://bizslot_mcp:BizSlot1234@MSI:50474/BizSlot?trustServerCertificate=true`
+MCP database connection: `sqlserver://bizslot_mcp:BizSlot1234@MSI:50474/Appointly?trustServerCertificate=true`
 
 ---
 
@@ -181,7 +181,7 @@ Each user story file contains: story, tasks tagged `[BE]`/`[FE]`/`[DB]`, and acc
 
 | MCP | What it does |
 |---|---|
-| `database` | Query the BizSlot SQL Server DB directly — use to inspect data, verify migrations |
+| `database` | Query the Appointly SQL Server DB directly — use to inspect data, verify migrations |
 | `browser` | Open and interact with the running app via Playwright |
 | `github` | Manage PRs, issues, branches on GitHub (LiadOvdat5) |
 

@@ -35,7 +35,7 @@ Yes — several options work for a small app at no cost:
 | **Gmail SMTP** | Unlimited (personal quota) via App Password; easiest for local dev |
 | **Mailgun** | 1 000 emails/month free |
 
-**Recommended:** Gmail SMTP for development (no signup needed), Resend or SendGrid for production — both have a generous free tier more than enough for a small app like BizSlot.
+**Recommended:** Gmail SMTP for development (no signup needed), Resend or SendGrid for production — both have a generous free tier more than enough for a small app like Appointly.
 
 ### Token strategy
 

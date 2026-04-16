@@ -287,13 +287,13 @@ namespace WebAPI.Repositories
             await _context.SaveChangesAsync();
 
             var resetLink = $"{frontendBaseUrl}/reset-password?token={Uri.EscapeDataString(rawToken)}";
-            var subject = "Reset your BizSlot password";
+            var subject = "Reset your Appointly password";
             var body = $"""
                 <p>Hi {user.Name},</p>
-                <p>We received a request to reset your BizSlot password.</p>
+                <p>We received a request to reset your Appointly password.</p>
                 <p><a href="{resetLink}">Click here to reset your password</a></p>
                 <p>This link expires in 1 hour. If you didn't request a reset, you can safely ignore this email.</p>
-                <p>— The BizSlot Team</p>
+                <p>— The Appointly Team</p>
                 """;
 
             await _emailService.SendEmailAsync(email, subject, body);

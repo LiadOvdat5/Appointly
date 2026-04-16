@@ -1,6 +1,6 @@
 # EPIC-13: Progressive Web App (PWA)
 
-**Goal:** Make BizSlot installable as a native-like app on any phone or desktop, with offline shell support, mobile-optimized UX, and a foundation for future push notifications.
+**Goal:** Make Appointly installable as a native-like app on any phone or desktop, with offline shell support, mobile-optimized UX, and a foundation for future push notifications.
 **Status:** ✅ Done
 
 ← [[README|Planning Index]]

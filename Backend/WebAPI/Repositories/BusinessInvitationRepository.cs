@@ -112,11 +112,11 @@ namespace WebAPI.Repositories
             {
                 var frontendBaseUrl = _config["FrontendBaseUrl"] ?? "http://localhost:5173";
                 var registrationLink = $"{frontendBaseUrl}/register?inviteToken={Uri.EscapeDataString(inviteToken)}";
-                var subject = $"You're invited to join {business.Name} on BizSlot";
+                var subject = $"You're invited to join {business.Name} on Appointly";
                 var htmlBody = $"""
                     <div style="font-family:sans-serif;max-width:480px;margin:auto;">
                       <h2>You've been invited to join {System.Net.WebUtility.HtmlEncode(business.Name)}!</h2>
-                      <p>You've been invited to join their team on <strong>BizSlot</strong>.</p>
+                      <p>You've been invited to join their team on <strong>Appointly</strong>.</p>
                       {(dto.Message != null ? $"<blockquote style=\"border-left:3px solid #ccc;padding-left:12px;color:#555;\">{System.Net.WebUtility.HtmlEncode(dto.Message)}</blockquote>" : "")}
                       <p>Click the button below to create your account and accept the invitation:</p>
                       <a href="{registrationLink}"

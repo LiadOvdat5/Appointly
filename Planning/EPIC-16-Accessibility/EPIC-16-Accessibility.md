@@ -3,7 +3,7 @@
 **Status:** ✅ Done
 
 ## Goal
-Make the entire BizSlot app accessible to users with disabilities, conforming to WCAG 2.1 AA standards, and provide an in-app accessibility menu so users can configure their experience (font size, contrast, motion, etc.).
+Make the entire Appointly app accessible to users with disabilities, conforming to WCAG 2.1 AA standards, and provide an in-app accessibility menu so users can configure their experience (font size, contrast, motion, etc.).
 
 ---
 

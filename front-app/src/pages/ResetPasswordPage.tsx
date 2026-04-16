@@ -72,7 +72,7 @@ export default function ResetPasswordPage() {
       <main className="flex-1 flex flex-col px-6 max-w-md mx-auto w-full">
         <div className="pt-4 pb-8 text-center">
           <H1>Set a new password</H1>
-          <Paragraph>Choose a strong password for your BizSlot account.</Paragraph>
+          <Paragraph>Choose a strong password for your Appointly account.</Paragraph>
         </div>
 
         {success && (

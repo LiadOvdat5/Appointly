@@ -83,7 +83,7 @@ It combines **appointment management** and **business discovery** into a single 
 
 - **Schedly**
 - **Bookify**
-- **BizSlot** ✅ _(Most unique)_
+- **Appointly** ✅ _(Most unique)_
 - **Meetly**
 - **Click2Book**
 - **MyTime**
