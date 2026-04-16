@@ -7,7 +7,7 @@
 ---
 
 ## Story
-As a **mobile user**, I want to **use BizSlot comfortably on my phone** so that **booking and browsing work as well as on desktop**.
+As a **mobile user**, I want to **use Appointly comfortably on my phone** so that **booking and browsing work as well as on desktop**.
 
 ## Tasks
 - `[FE]` Test each page at 375px width (iPhone SE) and 390px (iPhone 14): `SelectionPage`, `SearchPage`, `PublicBusinessPage`, `BookingPage`, `CustomerDashboard`, `DashboardPage`

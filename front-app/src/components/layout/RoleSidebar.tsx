@@ -41,7 +41,7 @@ type Props = {
 };
 
 export function RoleSidebar({
-  brand = <span className="font-bold tracking-tight">BizSlot</span>,
+  brand = <span className="font-bold tracking-tight">Appointly</span>,
   className,
   expandedWidth = "w-[279px]",
   sections,

@@ -19,14 +19,14 @@ As a **user**, I want to **find links to the Privacy Policy and Terms of Service
 ### Privacy Policy page (`/privacy`)
 - `[FE]` Create `PrivacyPolicyPage.tsx` under `pages/`
 - `[FE]` Sections to include:
-  1. **Introduction** — what BizSlot is and who this policy applies to
+  1. **Introduction** — what Appointly is and who this policy applies to
   2. **Data We Collect** — account info (name, email, role), business details, appointment data, usage/analytics
   3. **How We Use Your Data** — operating the service, sending booking confirmations, improving the product
   4. **Data Sharing** — we do not sell data; limited sharing with infrastructure providers (e.g. hosting, email)
   5. **Data Retention** — how long data is kept; account deletion process
-  6. **Your Rights** — access, correction, deletion requests via `support@bizslot.app`
+  6. **Your Rights** — access, correction, deletion requests via `support@appointly.app`
   7. **Cookies** — HTTP-only JWT cookie for auth; no third-party tracking cookies
-  8. **Contact** — `support@bizslot.app` for privacy questions
+  8. **Contact** — `support@appointly.app` for privacy questions
   9. **Last Updated** date
 - `[FE]` Add i18n keys for all Privacy Policy content
 
@@ -39,11 +39,11 @@ As a **user**, I want to **find links to the Privacy Policy and Terms of Service
   4. **Business Owner Responsibilities** — accurate service listings, honouring appointments, professional conduct
   5. **Customer Responsibilities** — honouring bookings, reasonable cancellation behaviour
   6. **Prohibited Conduct** — spam, fake accounts, scraping, misuse of the platform
-  7. **Intellectual Property** — BizSlot owns the platform; users own their own content
-  8. **Limitation of Liability** — BizSlot is not liable for missed appointments or business disputes
-  9. **Termination** — BizSlot may suspend accounts that violate these terms
+  7. **Intellectual Property** — Appointly owns the platform; users own their own content
+  8. **Limitation of Liability** — Appointly is not liable for missed appointments or business disputes
+  9. **Termination** — Appointly may suspend accounts that violate these terms
   10. **Changes to Terms** — notice will be given; continued use = acceptance
-  11. **Contact** — `support@bizslot.app` for legal questions
+  11. **Contact** — `support@appointly.app` for legal questions
   12. **Last Updated** date
 - `[FE]` Add i18n keys for all Terms of Service content
 

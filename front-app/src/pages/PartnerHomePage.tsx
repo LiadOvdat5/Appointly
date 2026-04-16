@@ -290,7 +290,7 @@ function WorkplaceCard({
             <p className="font-bold text-[#111418] dark:text-white truncate">{biz.name}</p>
             {biz.slug && (
               <p className="text-xs text-[#4e7397] dark:text-gray-400 mt-0.5 truncate">
-                bizslot.co/{biz.slug}
+                appointly.co/{biz.slug}
               </p>
             )}
           </div>

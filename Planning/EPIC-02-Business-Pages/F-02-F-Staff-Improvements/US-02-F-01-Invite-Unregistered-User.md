@@ -7,7 +7,7 @@
 ---
 
 ## Story
-As a **business owner**, I want to **invite someone to my staff by email even if they haven't registered on BizSlot yet** so that **I can grow my team without needing them to sign up first**.
+As a **business owner**, I want to **invite someone to my staff by email even if they haven't registered on Appointly yet** so that **I can grow my team without needing them to sign up first**.
 
 ## Background
 Current behavior: the invitation endpoint checks whether the email belongs to an existing user and fails if not. The invite should instead be stored as pending and the person should receive an email with a registration + acceptance link.

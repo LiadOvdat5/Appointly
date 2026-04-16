@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "bizslot-theme";
+const STORAGE_KEY = "appointly-theme";
 
 type Theme = "light" | "dark";
 

@@ -2,8 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(claude mcp:*)",
-      "Bash(cmd /c \"npx -y @bytebase/dbhub --dsn \"\"Server=MSI\\\\SQLEXPRESS;Database=BizSlot;Trusted_Connection=true;TrustServerCertificate=true;\"\"\")",
-      "Bash(node \"C:/Users/liado/AppData/Local/npm-cache/_npx/e23b069b9efbbb8f/node_modules/@bytebase/dbhub/dist/index.js\" --dsn \"sqlserver://MSI:50474/BizSlot?authentication=ntlm&domain=MSI&trustServerCertificate=true\")",
+      "Bash(cmd /c \"npx -y @bytebase/dbhub --dsn \"\"Server=MSI\\\\SQLEXPRESS;Database=Appointly;Trusted_Connection=true;TrustServerCertificate=true;\"\"\")",
+      "Bash(node \"C:/Users/liado/AppData/Local/npm-cache/_npx/e23b069b9efbbb8f/node_modules/@bytebase/dbhub/dist/index.js\" --dsn \"sqlserver://MSI:50474/Appointly?authentication=ntlm&domain=MSI&trustServerCertificate=true\")",
       "Bash(sqlcmd -S \"MSI\\\\SQLEXPRESS\" -Q \"SELECT SERVERPROPERTY\\(''''IsIntegratedSecurityOnly''''\\) as WindowsAuthOnly\")",
       "Bash(cmd /c \"sc query MSSQL$SQLEXPRESS\")",
       "Bash(powershell -Command \"Get-ItemProperty ''HKLM:\\\\SOFTWARE\\\\Microsoft\\\\Microsoft SQL Server\\\\MSSQL16.SQLEXPRESS\\\\MSSQLServer'' -Name LoginMode | Select-Object LoginMode\")",

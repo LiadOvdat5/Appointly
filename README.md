@@ -1,4 +1,4 @@
-# BizSlot
+# Appointly
 
 An appointment booking and business discovery platform for small businesses — barbers, nail artists, beauty salons, fitness trainers, and more. Business owners get a customizable public page and a full scheduling system. Customers can discover businesses, book appointments, and manage everything from one place.
 
@@ -78,7 +78,7 @@ Browser (React SPA)
     └── Models        — EF Core entities
     │
     ▼
-SQL Server (BizSlot database)
+SQL Server (Appointly database)
 ```
 
 The frontend never talks directly to the database. All state changes flow through the API. JWT is stored server-side as an HTTP-only cookie — it is never accessible from JavaScript.
@@ -235,7 +235,7 @@ dotnet ef database update
 ## Project Structure
 
 ```
-BizSlot/
+Appointly/
 ├── Backend/
 │   └── WebAPI/
 │       ├── Controllers/       # HTTP endpoints

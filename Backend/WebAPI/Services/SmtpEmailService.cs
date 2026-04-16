@@ -23,7 +23,7 @@ namespace WebAPI.Services
             var username = smtp["Username"] ?? throw new InvalidOperationException("Smtp:Username is not configured.");
             var password = smtp["Password"] ?? throw new InvalidOperationException("Smtp:Password is not configured.");
             var fromEmail = smtp["FromEmail"] ?? username;
-            var fromName = smtp["FromName"] ?? "BizSlot";
+            var fromName = smtp["FromName"] ?? "Appointly";
 
             using var client = new SmtpClient(host, port)
             {

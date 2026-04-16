@@ -7,12 +7,12 @@
 ---
 
 ## Story
-As a **user who encountered a bug or has a feature idea**, I want to **find a clear contact email in the footer** so that **I know exactly how to reach the BizSlot team without hunting through the site**.
+As a **user who encountered a bug or has a feature idea**, I want to **find a clear contact email in the footer** so that **I know exactly how to reach the Appointly team without hunting through the site**.
 
 ## Tasks
 - `[FE]` Add a "Contact / Feedback" section to the footer
-- `[FE]` Display a `mailto:` link for bug reports: label **"Report a bug"** → `support@bizslot.app`
-- `[FE]` Display a `mailto:` link for feature requests: label **"Suggest a feature"** → `feedback@bizslot.app` (can point to the same address initially — just use separate labels for clarity)
+- `[FE]` Display a `mailto:` link for bug reports: label **"Report a bug"** → `support@appointly.app`
+- `[FE]` Display a `mailto:` link for feature requests: label **"Suggest a feature"** → `feedback@appointly.app` (can point to the same address initially — just use separate labels for clarity)
 - `[FE]` Optionally pre-fill email subject via `mailto:` query params (e.g. `?subject=Bug Report` / `?subject=Feature Request`)
 - `[FE]` Add a short tagline in the section, e.g. *"We read every message."*
 - `[FE]` Add i18n keys for labels and tagline

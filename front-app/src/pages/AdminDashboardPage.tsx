@@ -136,7 +136,7 @@ export default function AdminDashboardPage() {
     },
     {
       label: "Appointments",
-      description: "All bookings made through BizSlot",
+      description: "All bookings made through Appointly",
       icon: "calendar_month",
       iconColor: "text-purple-600",
       iconBg: "bg-purple-100 dark:bg-purple-900/30",

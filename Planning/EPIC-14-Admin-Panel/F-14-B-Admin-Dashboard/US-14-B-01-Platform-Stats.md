@@ -7,7 +7,7 @@
 ---
 
 ## Story
-As an **admin**, I want to **see key platform metrics on a single dashboard page** so that **I can quickly understand the health and activity of BizSlot**.
+As an **admin**, I want to **see key platform metrics on a single dashboard page** so that **I can quickly understand the health and activity of Appointly**.
 
 ## Tasks
 - `[BE]` `GET /admin/stats` — returns: total users, total businesses, total appointments, total reviews, count of flagged-and-pending reviews

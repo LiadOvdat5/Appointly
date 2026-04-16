@@ -10,7 +10,7 @@
 As a **user with no internet connection**, I want to **see a friendly offline message rather than a browser error** so that **the app feels polished even when offline**.
 
 ## Tasks
-- `[FE]` Create an `offline.html` page with the BizSlot branding and a message: "You're offline — please check your internet connection"
+- `[FE]` Create an `offline.html` page with the Appointly branding and a message: "You're offline — please check your internet connection"
 - `[FE]` Configure the service worker to serve `offline.html` as a fallback for any navigation request that fails due to network unavailability
 - `[FE]` Optionally: show an in-app banner when the app detects it has gone offline (using `navigator.onLine` + `online`/`offline` events)
 

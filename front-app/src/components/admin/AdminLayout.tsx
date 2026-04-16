@@ -16,7 +16,7 @@ export function AdminLayout() {
       <aside className="w-56 shrink-0 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700">
         <div className="px-5 py-5 border-b border-slate-200 dark:border-slate-700">
           <span className="text-sm font-bold tracking-widest uppercase text-primary">
-            BizSlot Admin
+            Appointly Admin
           </span>
         </div>
         <nav className="flex-1 py-4 flex flex-col gap-1 px-2">

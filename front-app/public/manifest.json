@@ -1,6 +1,6 @@
 {
-  "name": "BizSlot",
-  "short_name": "BizSlot",
+  "name": "Appointly",
+  "short_name": "Appointly",
   "description": "Appointment booking for small businesses",
   "start_url": "/",
   "display": "standalone",

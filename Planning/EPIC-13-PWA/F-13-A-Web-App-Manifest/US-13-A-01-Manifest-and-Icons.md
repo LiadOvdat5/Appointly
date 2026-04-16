@@ -7,7 +7,7 @@
 ---
 
 ## Story
-As a **mobile user**, I want to **add BizSlot to my home screen** so that **I can open it like a native app without going through the browser**.
+As a **mobile user**, I want to **add Appointly to my home screen** so that **I can open it like a native app without going through the browser**.
 
 ## Tasks
 - `[FE]` Create `public/manifest.json` with: `name`, `short_name`, `description`, `start_url` (`/`), `display: standalone`, `background_color`, `theme_color`, icons array (192×192 and 512×512 PNG)
