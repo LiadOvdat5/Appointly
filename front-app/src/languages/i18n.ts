@@ -2037,7 +2037,7 @@ i18n.use(initReactI18next).init({
               book: {
                 title: "הזמן פגישה",
                 description:
-                  "בחר משבצת זמן פנויה ואשר מיידית — תקבל התראה מיד.",
+                  "בחר תור פנוי ואשר מיידית — תקבל התראה מיד.",
               },
             },
             features: {
@@ -2865,7 +2865,7 @@ i18n.use(initReactI18next).init({
           errorLoadFailed: "טעינת פרטי ההזמנה נכשלה.",
           errorSomethingWrong: "משהו השתבש.",
           goBack: "חזרה",
-          slotTaken: "המשבצת כבר נלקחה. אנא בחר זמן אחר.",
+          slotTaken: "התור כבר נלקח. אנא בחר זמן אחר.",
           errorTryAgain: "משהו השתבש. אנא נסה שוב.",
           confirmed: {
             header: "ההזמנה אושרה",
@@ -3059,8 +3059,8 @@ i18n.use(initReactI18next).init({
           blockDateButton: "חסום תאריך",
           scheduleChangeTitle: "זוהה שינוי בלוח הזמנים",
           reviewBeforeSaving: "סקור את ההשפעה לפני השמירה.",
-          freeSlots_one: "משבצת זמינה 1",
-          freeSlots_other: "{{count}} משבצות זמינות",
+          freeSlots_one: "תור זמין 1",
+          freeSlots_other: "{{count}} תורים זמינים",
           willBeRemovedIfDelete: "תוסרנה אם תבחר למחוק משבצות פנויות.",
           appointmentsBooked_one: "פגישה 1 מוזמנת",
           appointmentsBooked_other: "{{count}} פגישות מוזמנות",
@@ -3068,16 +3068,16 @@ i18n.use(initReactI18next).init({
           notCanceled: "אינן מבוטלות אוטומטית",
           cancelIndividuallyFrom: "— בטל אותן בנפרד מ-",
           schedulePage: "דף לוח הזמנים",
-          deleteAndSave_one: "מחק משבצת פנויה 1 ושמור",
-          deleteAndSave_other: "מחק {{count}} משבצות פנויות ושמור",
+          deleteAndSave_one: "מחק תור פנוי 1 ושמור",
+          deleteAndSave_other: "מחק {{count}} תורים פנויים ושמור",
           keepSlotsAndSave: "שמור משבצות קיימות ושמור",
           understoodSave: "הבנתי, שמור בכל זאת",
           gotItSave: "הבנתי, שמור",
           goBack: "חזרה",
           blockDateTitle: "לחסום {{date}}?",
           reasonPrefix: "סיבה: {{reason}}",
-          freeSlotsHidden_one: "משבצת זמינה 1",
-          freeSlotsHidden_other: "{{count}} משבצות זמינות",
+          freeSlotsHidden_one: "תור זמין 1",
+          freeSlotsHidden_other: "{{count}} תורים זמינים",
           willBeHiddenAutoRestored:
             "תוסתרנה אוטומטית ותשוחזרנה אם תבטל את חסימת התאריך.",
           appointmentsOnDate_one: "פגישה 1",
@@ -3096,9 +3096,9 @@ i18n.use(initReactI18next).init({
           failedDeleteException: "מחיקת חריגת התאריך נכשלה.",
           addRecurringRuleTitle: "להוסיף כלל חוזר?",
           removeRecurringRuleTitle: "להסיר כלל חוזר?",
-          reviewImpact: "סקור את ההשפעה על משבצות קיימות.",
-          freeSlotsRule_one: "משבצת פנויה 1",
-          freeSlotsRule_other: "{{count}} משבצות פנויות",
+          reviewImpact: "סקור את ההשפעה על תורים קיימים.",
+          freeSlotsRule_one: "תור פנוי 1",
+          freeSlotsRule_other: "{{count}} תורים פנויים",
           fallOutsideNewRuleHours_one:
             "נמצאת מחוץ לשעות הכלל החדש וניתן להסירה.",
           fallOutsideNewRuleHours_other:
@@ -3109,10 +3109,10 @@ i18n.use(initReactI18next).init({
           appointmentsPeriod_other: "{{count}} פגישות מוזמנות",
           inPeriodNotCanceled:
             "בתקופה זו — אינן מבוטלות אוטומטית. בטל בנפרד מ-",
-          deleteAndAddRule_one: "מחק משבצת פנויה 1 והוסף כלל",
-          deleteAndAddRule_other: "מחק {{count}} משבצות פנויות והוסף כלל",
-          deleteAndRemoveRule_one: "מחק משבצת פנויה 1 והסר כלל",
-          deleteAndRemoveRule_other: "מחק {{count}} משבצות פנויות והסר כלל",
+          deleteAndAddRule_one: "מחק תור פנוי 1 והוסף כלל",
+          deleteAndAddRule_other: "מחק {{count}} תורים פנויים והוסף כלל",
+          deleteAndRemoveRule_one: "מחק תור פנוי 1 והסר כלל",
+          deleteAndRemoveRule_other: "מחק {{count}} תורים פנויים והסר כלל",
           keepSlotsAndAddRule: "שמור משבצות והוסף כלל",
           keepSlotsAndRemoveRule: "שמור משבצות והסר כלל",
           understoodAddRule: "הבנתי, הוסף כלל",
@@ -3124,8 +3124,8 @@ i18n.use(initReactI18next).init({
             "משבצות זמינות הוסתרו אוטומטית. בטל פגישות מוזמנות בנפרד מ-",
           addExceptionTitle: "להוסיף חריגת תאריך?",
           removeExceptionTitle: "להסיר חריגת תאריך?",
-          freeSlotsExc_one: "משבצת פנויה 1",
-          freeSlotsExc_other: "{{count}} משבצות פנויות",
+          freeSlotsExc_one: "תור פנוי 1",
+          freeSlotsExc_other: "{{count}} תורים פנויים",
           fallOutsideExcHours_one: "נמצאת מחוץ לשעות החריגה.",
           fallOutsideExcHours_other: "נמצאות מחוץ לשעות החריגה.",
           existWithinExcPeriod_one: "קיימת בתקופת החריגה.",
@@ -3134,13 +3134,13 @@ i18n.use(initReactI18next).init({
           appointmentsExc_other: "{{count}} פגישות",
           bookedNotCanceledCancelFrom:
             "מוזמנות בתאריך זה — אינן מבוטלות אוטומטית. בטל מ-",
-          deleteAndAddException_one: "מחק משבצת פנויה 1 והוסף חריגה",
+          deleteAndAddException_one: "מחק תור פנוי 1 והוסף חריגה",
           deleteAndAddException_other:
-            "מחק {{count}} משבצות פנויות והוסף חריגה",
-          deleteAndRemoveException_one: "מחק משבצת פנויה 1 והסר חריגה",
+            "מחק {{count}} תורים פנויים והוסף חריגה",
+          deleteAndRemoveException_one: "מחק תור פנוי 1 והסר חריגה",
           deleteAndRemoveException_other:
-            "מחק {{count}} משבצות פנויות והסר חריגה",
-          keepSlotsAndAddException: "שמור משבצות והוסף חריגה",
+            "מחק {{count}} תורים פנויים והסר חריגה",
+          keepSlotsAndAddException: "שמור תורים והוסף חריגה",
           keepSlotsAndRemoveException: "שמור משבצות והסר חריגה",
           understoodAddException: "הבנתי, הוסף חריגה",
           understoodRemoveException: "הבנתי, הסר חריגה",
@@ -3361,7 +3361,7 @@ i18n.use(initReactI18next).init({
               body: "בחר תאריך מהלוח כדי לראות את המשבצות הפנויות לשירות זה.",
             },
             step2: {
-              title: "בחר משבצת זמן",
+              title: "בחר תור",
               body: "הקש על כל זמן פנוי כדי לבחור אותו. הוא ישמר לזמן קצר בזמן שתאשר.",
             },
             step3: {
@@ -3627,7 +3627,7 @@ i18n.use(initReactI18next).init({
           },
           customerResponsibilities: {
             heading: "אחריות הלקוח",
-            body: "לקוחות אחראים להגיע לפגישות שנקבעו בזמן. אם אתה צריך לבטל, נא עשה זאת מוקדם ככל האפשר כדי לאפשר לעסק למלא את המשבצת. ביטולים מאוחרים חוזרים או אי-הגעות עלולים לגרום להגבלות על יכולת ההזמנה שלך. אתה מסכים להתייחס לבעלי עסקים ולצוות בכבוד.",
+            body: "לקוחות אחראים להגיע לפגישות שנקבעו בזמן. אם אתה צריך לבטל, נא עשה זאת מוקדם ככל האפשר כדי לאפשר לעסק למלא את התור. ביטולים מאוחרים חוזרים או אי-הגעות עלולים לגרום להגבלות על יכולת ההזמנה שלך. אתה מסכים להתייחס לבעלי עסקים ולצוות בכבוד.",
           },
           prohibitedConduct: {
             heading: "התנהגות אסורה",
