@@ -22,8 +22,19 @@ namespace WebAPI.Mappers
             };
         }
 
-        public static ServiceDTO ToServiceDTO(Service service)
+        public static ServiceDTO ToServiceDTO(Service service, bool? ownerIdForBadge = null, Guid? businessOwnerId = null)
         {
+            AssignedStaffDTO? assignedStaff = null;
+            if (service.AssignedStaffId.HasValue && service.AssignedStaff != null)
+            {
+                assignedStaff = new AssignedStaffDTO
+                {
+                    Id = service.AssignedStaff.Id,
+                    Name = service.AssignedStaff.Name,
+                    IsOwner = businessOwnerId.HasValue && service.AssignedStaff.Id == businessOwnerId.Value
+                };
+            }
+
             return new ServiceDTO
             {
                 Id = service.Id,
@@ -33,6 +44,8 @@ namespace WebAPI.Mappers
                 Description = service.Description,
                 Duration = service.Duration,
                 Price = service.Price,
+                BlockOnBooking = service.BlockOnBooking,
+                AssignedStaff = assignedStaff,
                 CreatedAt = service.CreatedAt,
                 UpdatedAt = service.UpdatedAt,
                 CategoryId = service.CategoryId

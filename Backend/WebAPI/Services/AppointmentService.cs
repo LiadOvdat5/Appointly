@@ -201,12 +201,15 @@ namespace WebAPI.Services
                 throw new SlotUnavailableException(dto.ServiceScheduleId);
             }
 
+            // US-02-G-01: prefer AssignedStaffId; fall back to legacy UserId
+            var partnerId = service.AssignedStaffId ?? service.UserId;
+
             // Create appointment
             var appointment = AppointmentMapper.ToEntity(
                 dto,
                 clientId,
                 service.BusinessId,
-                service.UserId, // Partner is the service owner
+                partnerId,
                 schedule.StartDateTime,
                 schedule.EndDateTime
             );
@@ -217,6 +220,18 @@ namespace WebAPI.Services
             schedule.Status = ScheduleStatus.BOOKED;
             schedule.AppointmentId = createdAppointment.Id;
             await _scheduleRepository.UpdateAsync(schedule);
+
+            // US-02-G-03: block overlapping slots on sibling services
+            if (service.BlockOnBooking && service.AssignedStaffId.HasValue)
+            {
+                await BlockSiblingServiceSlotsAsync(
+                    service.BusinessId,
+                    service.Id,
+                    service.AssignedStaffId.Value,
+                    schedule.StartDateTime,
+                    schedule.EndDateTime,
+                    createdAppointment.Id);
+            }
 
             // ── Notifications ────────────────────────────────────────────────
             var clientName   = createdAppointment.Client?.Name   ?? string.Empty;
@@ -315,6 +330,9 @@ namespace WebAPI.Services
                 schedule.AppointmentId = null;
                 await _scheduleRepository.UpdateAsync(schedule);
             }
+
+            // US-02-G-03: release any sibling slots that were blocked by this appointment
+            await ReleaseSiblingBlockedSlotsAsync(appointment.Id);
 
             // ── Cancellation notifications ────────────────────────────────────
             var appt              = updatedAppointment;
@@ -446,6 +464,242 @@ namespace WebAPI.Services
         {
             var appointments = await _appointmentRepository.GetPendingReviewsForClientAsync(clientId, limit);
             return appointments.Select(AppointmentMapper.ToDTO).ToList();
+        }
+
+        // ── US-02-G-03: Parallel booking conflict helpers ─────────────────────
+
+        /// <summary>
+        /// When a service is booked and its BlockOnBooking flag is true, find all other
+        /// services assigned to the same staff member and block any of their schedule slots
+        /// that overlap with the booked time window.
+        /// </summary>
+        private async Task BlockSiblingServiceSlotsAsync(
+            Guid businessId,
+            Guid bookedServiceId,
+            Guid staffId,
+            DateTime start,
+            DateTime end,
+            Guid blockingAppointmentId)
+        {
+            // Find sibling services (same staff, same business, different service)
+            var siblingServiceIds = await _context.Services
+                .Where(s => s.BusinessId == businessId
+                         && s.AssignedStaffId == staffId
+                         && s.Id != bookedServiceId)
+                .Select(s => s.Id)
+                .ToListAsync();
+
+            if (!siblingServiceIds.Any()) return;
+
+            // Find available schedule slots on sibling services that overlap the booking window
+            var overlapping = await _context.ServiceSchedules
+                .Where(ss => siblingServiceIds.Contains(ss.ServiceId)
+                          && ss.Status == ScheduleStatus.AVAILABLE
+                          && ss.StartDateTime < end
+                          && ss.EndDateTime > start)
+                .ToListAsync();
+
+            foreach (var slot in overlapping)
+            {
+                slot.Status = ScheduleStatus.BLOCKED;
+                slot.BlockingAppointmentId = blockingAppointmentId;
+                slot.UpdatedAt = DateTime.UtcNow;
+            }
+
+            if (overlapping.Any())
+                await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Called when a service's AssignedStaffId changes (US-02-G-01 + US-02-G-03).
+        /// Releases all conflict-blocks tied to the old sibling relationships, then
+        /// re-applies blocks based on the new sibling relationships.
+        /// </summary>
+        public async Task ReevaluateServiceAssignmentBlocksAsync(Guid serviceId, Guid? newStaffId)
+        {
+            var service = await _context.Services.FindAsync(serviceId);
+            if (service == null) return;
+
+            var now = DateTime.UtcNow;
+
+            // Step 1: Release BLOCKED slots on THIS service that were blocked by old sibling appointments
+            var thisServiceBlockedSlots = await _context.ServiceSchedules
+                .Where(ss => ss.ServiceId == serviceId
+                          && ss.Status == ScheduleStatus.BLOCKED
+                          && ss.BlockingAppointmentId != null)
+                .ToListAsync();
+
+            foreach (var slot in thisServiceBlockedSlots)
+            {
+                slot.Status = ScheduleStatus.AVAILABLE;
+                slot.BlockingAppointmentId = null;
+                slot.UpdatedAt = now;
+            }
+
+            // Step 2: Release BLOCKED slots on OTHER services that were blocked by THIS service's appointments
+            var thisServiceApptIds = await _context.Appointments
+                .Where(a => a.ServiceId == serviceId
+                         && a.Status == AppointmentStatus.scheduled
+                         && a.EndDateTime > now)
+                .Select(a => a.Id)
+                .ToListAsync();
+
+            if (thisServiceApptIds.Any())
+            {
+                var siblingBlockedSlots = await _context.ServiceSchedules
+                    .Where(ss => ss.BlockingAppointmentId.HasValue
+                              && thisServiceApptIds.Contains(ss.BlockingAppointmentId.Value)
+                              && ss.Status == ScheduleStatus.BLOCKED)
+                    .ToListAsync();
+
+                foreach (var slot in siblingBlockedSlots)
+                {
+                    slot.Status = ScheduleStatus.AVAILABLE;
+                    slot.BlockingAppointmentId = null;
+                    slot.UpdatedAt = now;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (!newStaffId.HasValue) return;
+
+            // Step 3a: For each future BOOKED appointment on THIS service, block overlapping
+            // AVAILABLE slots on new siblings (respects THIS service's BlockOnBooking setting)
+            if (service.BlockOnBooking && thisServiceApptIds.Any())
+            {
+                var thisAppts = await _context.Appointments
+                    .Where(a => thisServiceApptIds.Contains(a.Id))
+                    .ToListAsync();
+
+                foreach (var appt in thisAppts)
+                {
+                    await BlockSiblingServiceSlotsAsync(
+                        service.BusinessId, serviceId, newStaffId.Value,
+                        appt.StartDateTime, appt.EndDateTime, appt.Id);
+                }
+            }
+
+            // Step 3b: For each future BOOKED appointment on NEW sibling services,
+            // block overlapping AVAILABLE slots on THIS service (respects each sibling's BlockOnBooking)
+            var newSiblings = await _context.Services
+                .Where(s => s.BusinessId == service.BusinessId
+                         && s.AssignedStaffId == newStaffId
+                         && s.Id != serviceId)
+                .ToListAsync();
+
+            if (newSiblings.Any())
+            {
+                var newSiblingIds = newSiblings.Select(s => s.Id).ToList();
+                var siblingAppts = await _context.Appointments
+                    .Where(a => newSiblingIds.Contains(a.ServiceId)
+                             && a.Status == AppointmentStatus.scheduled
+                             && a.EndDateTime > now)
+                    .ToListAsync();
+
+                foreach (var appt in siblingAppts)
+                {
+                    var sibling = newSiblings.First(s => s.Id == appt.ServiceId);
+                    if (!sibling.BlockOnBooking) continue;
+
+                    var overlapping = await _context.ServiceSchedules
+                        .Where(ss => ss.ServiceId == serviceId
+                                  && ss.Status == ScheduleStatus.AVAILABLE
+                                  && ss.StartDateTime < appt.EndDateTime
+                                  && ss.EndDateTime > appt.StartDateTime)
+                        .ToListAsync();
+
+                    foreach (var slot in overlapping)
+                    {
+                        slot.Status = ScheduleStatus.BLOCKED;
+                        slot.BlockingAppointmentId = appt.Id;
+                        slot.UpdatedAt = now;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Called when BlockOnBooking changes on a service (US-02-G-03 fix).
+        /// Turning off: releases all blocks this service's appointments created on sibling services.
+        /// Turning on: re-applies conflict blocks for all future booked appointments on this service.
+        /// </summary>
+        public async Task ReevaluateBlockOnBookingChangeAsync(Guid serviceId, bool newBlockOnBooking)
+        {
+            var service = await _context.Services.FindAsync(serviceId);
+            if (service == null || !service.AssignedStaffId.HasValue) return;
+
+            var now = DateTime.UtcNow;
+
+            if (!newBlockOnBooking)
+            {
+                // Turning OFF: release all blocks on siblings caused by THIS service's appointments
+                var apptIds = await _context.Appointments
+                    .Where(a => a.ServiceId == serviceId
+                             && a.Status == AppointmentStatus.scheduled
+                             && a.EndDateTime > now)
+                    .Select(a => a.Id)
+                    .ToListAsync();
+
+                if (apptIds.Any())
+                {
+                    var blocked = await _context.ServiceSchedules
+                        .Where(ss => ss.BlockingAppointmentId.HasValue
+                                  && apptIds.Contains(ss.BlockingAppointmentId.Value)
+                                  && ss.Status == ScheduleStatus.BLOCKED)
+                        .ToListAsync();
+
+                    foreach (var slot in blocked)
+                    {
+                        slot.Status = ScheduleStatus.AVAILABLE;
+                        slot.BlockingAppointmentId = null;
+                        slot.UpdatedAt = now;
+                    }
+
+                    if (blocked.Any())
+                        await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                // Turning ON: apply new blocks for future booked appointments on this service
+                var appts = await _context.Appointments
+                    .Where(a => a.ServiceId == serviceId
+                             && a.Status == AppointmentStatus.scheduled
+                             && a.EndDateTime > now)
+                    .ToListAsync();
+
+                foreach (var appt in appts)
+                {
+                    await BlockSiblingServiceSlotsAsync(
+                        service.BusinessId, serviceId, service.AssignedStaffId.Value,
+                        appt.StartDateTime, appt.EndDateTime, appt.Id);
+                }
+            }
+        }
+
+        /// <summary>
+        /// When an appointment is cancelled, release any schedule slots that were
+        /// blocked due to this appointment (parallel booking conflict).
+        /// </summary>
+        private async Task ReleaseSiblingBlockedSlotsAsync(Guid appointmentId)
+        {
+            var blocked = await _context.ServiceSchedules
+                .Where(ss => ss.BlockingAppointmentId == appointmentId
+                          && ss.Status == ScheduleStatus.BLOCKED)
+                .ToListAsync();
+
+            foreach (var slot in blocked)
+            {
+                slot.Status = ScheduleStatus.AVAILABLE;
+                slot.BlockingAppointmentId = null;
+                slot.UpdatedAt = DateTime.UtcNow;
+            }
+
+            if (blocked.Any())
+                await _context.SaveChangesAsync();
         }
     }
 }

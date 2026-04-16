@@ -710,6 +710,8 @@ i18n.use(initReactI18next).init({
             messagePlaceholder: "Add a personal note...",
             submitButton: "Send Invitation",
           },
+          ownerBadge: "Owner",
+          ownerSection: "Business Owner",
           detail: {
             performance: "Performance (This Month)",
             appointments: "Appointments",
@@ -722,9 +724,12 @@ i18n.use(initReactI18next).init({
             comingSoon: "Coming soon",
             noData: "No data available.",
             serviceAssignments: "Service Assignments",
+            assignmentNote: "Selecting a service assigns this person to it. A service can only have one assignee — selecting one already assigned elsewhere will replace the previous person.",
             noServices: "No services available for this business.",
             saveAssignments: "Save Assignments",
+            saveSuccess: "Assignments saved successfully.",
             removeFromBusiness: "Remove from business",
+            replacesAssignee: "Currently assigned to {{name}} — will replace",
           },
           remove: {
             title: "Remove Staff Member",
@@ -737,6 +742,18 @@ i18n.use(initReactI18next).init({
             removed: "Removed",
             declined: "Declined invitation",
             expired: "Invitation expired",
+          },
+          blockingDialog: {
+            title: "How should overlapping slots be handled?",
+            description: "If {{staffName}} gets booked for {{serviceName}}, automatically block the matching time slot on their other services?",
+            toggleLabel: "Block the other slot when one is booked",
+          },
+          conflictBanner: {
+            active: "Parallel booking protection is active",
+            activeBody: "When one of {{name}}'s services is booked, the same time slot is automatically blocked on their other services. This prevents double-booking.",
+            partiallyOff: "Parallel booking protection is partially off",
+            partiallyOffBody: "One or more of {{name}}'s services do not automatically block overlapping slots when booked. Review the settings below.",
+            goToServices: "Services & Hours →",
           },
         },
 
@@ -1157,6 +1174,13 @@ i18n.use(initReactI18next).init({
           durationLabel: "Duration (min) *",
           priceLabel: "Price (₪)",
           categoryLabel: "Category *",
+          assignedToLabel: "Assigned To",
+          unassigned: "Unassigned",
+          changeAssignee: "Change",
+          unassign: "Unassign",
+          blockOnBookingLabel: "If this service is booked, automatically block overlapping slots for {{name}}'s other services",
+          conflictProtectionOn: "Conflict protection on",
+          conflictProtectionOff: "Conflict protection off",
           saveButton: "Save Changes",
           savedSuccess: "Service updated successfully.",
           error: {
@@ -1172,7 +1196,7 @@ i18n.use(initReactI18next).init({
           subtitle: "Select a service to manage its schedule",
           empty: {
             title: "No services yet",
-            text: "Add services from your business page first.",
+            text: "Add your first service to get started.",
             goToBusinessPage: "Go to business page →",
           },
           error: {
@@ -1182,6 +1206,12 @@ i18n.use(initReactI18next).init({
           editService: "Edit service details",
           editAvailability: "Edit availability & working hours",
           hint: "Use the calendar icon to manage working hours. Use the edit icon to update service details.",
+          addService: {
+            button: "Add Service",
+            title: "Add New Service",
+            confirm: "Add Service",
+            error: "Failed to add service. Please try again.",
+          },
         },
 
         // ============ SCHEDULE EDITOR ============
@@ -1351,6 +1381,12 @@ i18n.use(initReactI18next).init({
           addRuleHeader: "Add rule",
           daysOfWeekLabel: "Days of week",
           addRecurringRuleButton: "Add Recurring Rule",
+          blockedByConflict: {
+            title: "Conflict-Blocked Slots",
+            desc: "These slots are blocked because another service assigned to the same staff member is booked during this time.",
+            reason: "Blocked — \"{{serviceName}}\" is booked during this time.",
+            reasonUnknown: "Blocked due to a parallel booking conflict.",
+          },
         },
 
         // ============ PUBLIC BUSINESS PAGE ============
@@ -1485,6 +1521,10 @@ i18n.use(initReactI18next).init({
           refresh: "Refresh",
           bookedCount: "{{count}} booked",
           freeCount: "{{count}} free",
+          blockedCount: "{{count}} blocked",
+          blockedSlot: "Conflict-blocked slot",
+          blockedByService: "Blocked — \"{{serviceName}}\" is booked at this time.",
+          blockedByConflict: "Blocked due to a parallel booking conflict.",
           noServicesConfigured: "No services configured yet.",
           noSlotsInRange: "No slots in this range",
           generateSlotsHint: "Generate slots for this service from Services & Hours.",
@@ -2543,6 +2583,8 @@ i18n.use(initReactI18next).init({
             messagePlaceholder: "הוסף הערה אישית...",
             submitButton: "שלח הזמנה",
           },
+          ownerBadge: "בעלים",
+          ownerSection: "בעל העסק",
           detail: {
             performance: "ביצועים (החודש)",
             appointments: "פגישות",
@@ -2555,9 +2597,12 @@ i18n.use(initReactI18next).init({
             comingSoon: "בקרוב",
             noData: "אין נתונים זמינים.",
             serviceAssignments: "הקצאת שירותים",
+            assignmentNote: "בחירת שירות מקצה את האדם אליו. שירות יכול להיות מוקצה רק לאדם אחד — בחירה בשירות שמוקצה כבר תחליף את האדם הקודם.",
             noServices: "אין שירותים זמינים לעסק זה.",
             saveAssignments: "שמור הקצאות",
+            saveSuccess: "ההקצאות נשמרו בהצלחה.",
             removeFromBusiness: "הסר מהעסק",
+            replacesAssignee: "מוקצה כרגע ל{{name}} — יוחלף",
           },
           remove: {
             title: "הסר חבר צוות",
@@ -2569,6 +2614,18 @@ i18n.use(initReactI18next).init({
             removed: "הוסר",
             declined: "דחה הזמנה",
             expired: "ההזמנה פגה",
+          },
+          blockingDialog: {
+            title: "כיצד לטפל בחריצים חופפים?",
+            description: "אם {{staffName}} מוזמן לשירות {{serviceName}}, לחסום אוטומטית את החריץ המתאים בשירותיהם האחרים?",
+            toggleLabel: "חסום את החריץ האחר כשאחד מוזמן",
+          },
+          conflictBanner: {
+            active: "הגנת הזמנות מקבילות פעילה",
+            activeBody: "כאשר אחד מהשירותים של {{name}} מוזמן, אותו חריץ זמן נחסם אוטומטית בשירותיהם האחרים. זה מונע הזמנה כפולה.",
+            partiallyOff: "הגנת הזמנות מקבילות כבויה חלקית",
+            partiallyOffBody: "אחד או יותר מהשירותים של {{name}} אינם חוסמים אוטומטית חריצים חופפים. בדוק את ההגדרות למטה.",
+            goToServices: "שירותים ושעות ←",
           },
         },
 
@@ -2982,6 +3039,13 @@ i18n.use(initReactI18next).init({
           durationLabel: "משך (דקות) *",
           priceLabel: "מחיר (₪)",
           categoryLabel: "קטגוריה *",
+          assignedToLabel: "מוקצה ל",
+          unassigned: "לא מוקצה",
+          changeAssignee: "שנה",
+          unassign: "הסר הקצאה",
+          blockOnBookingLabel: "אם שירות זה מוזמן, חסום אוטומטית חריצים חופפים עבור שירותיהם האחרים של {{name}}",
+          conflictProtectionOn: "הגנה מפני קונפליקטים פעילה",
+          conflictProtectionOff: "הגנה מפני קונפליקטים כבויה",
           saveButton: "שמור שינויים",
           savedSuccess: "השירות עודכן בהצלחה.",
           error: {
@@ -2997,7 +3061,7 @@ i18n.use(initReactI18next).init({
           subtitle: "בחר שירות לניהול הלוח שלו",
           empty: {
             title: "אין שירותים עדיין",
-            text: "הוסף שירותים מדף העסק שלך תחילה.",
+            text: "הוסף את השירות הראשון שלך כדי להתחיל.",
             goToBusinessPage: "עבור לדף העסק ←",
           },
           error: {
@@ -3007,6 +3071,12 @@ i18n.use(initReactI18next).init({
           editService: "עריכת פרטי שירות",
           editAvailability: "עריכת זמינות ושעות עבודה",
           hint: "לחץ על סמל הלוח לניהול שעות עבודה. לחץ על סמל העריכה לעדכון פרטי השירות.",
+          addService: {
+            button: "הוסף שירות",
+            title: "הוספת שירות חדש",
+            confirm: "הוסף שירות",
+            error: "הוספת השירות נכשלה. נסה שוב.",
+          },
         },
 
         // ============ SCHEDULE EDITOR ============
@@ -3168,6 +3238,12 @@ i18n.use(initReactI18next).init({
           addRuleHeader: "הוסף כלל",
           daysOfWeekLabel: "ימי שבוע",
           addRecurringRuleButton: "הוסף כלל חוזר",
+          blockedByConflict: {
+            title: "משבצות חסומות עקב קונפליקט",
+            desc: "משבצות אלה חסומות מכיוון ששירות אחר המוקצה לאותו איש צוות מוזמן באותה שעה.",
+            reason: "חסום — \"{{serviceName}}\" מוזמן באותה שעה.",
+            reasonUnknown: "חסום עקב הזמנה מקבילה.",
+          },
         },
 
         // ============ PUBLIC BUSINESS PAGE ============
@@ -3302,6 +3378,10 @@ i18n.use(initReactI18next).init({
           refresh: "רענן",
           bookedCount: "{{count}} מוזמן",
           freeCount: "{{count}} פנוי",
+          blockedCount: "{{count}} חסום",
+          blockedSlot: "משבצת חסומה עקב קונפליקט",
+          blockedByService: "חסום — \"{{serviceName}}\" מוזמן בשעה זו.",
+          blockedByConflict: "חסום עקב הזמנה מקבילה.",
           noServicesConfigured: "אין שירותים מוגדרים עדיין.",
           noSlotsInRange: "אין מקומות בטווח זה",
           generateSlotsHint: "צור מקומות עבור שירות זה מתוך שירותים ושעות.",

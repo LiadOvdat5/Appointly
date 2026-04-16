@@ -89,6 +89,7 @@ export default function StaffPage() {
   const { businessSlug } = useParams<{ businessSlug: string }>();
 
   const [bid, setBid] = useState<string>("");
+  // owner entry (isOwner === true) is first in the list from the API
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [invitations, setInvitations] = useState<StaffInvitation[]>([]);
   const [inactive, setInactive] = useState<InactiveStaffEntry[]>([]);
@@ -151,9 +152,10 @@ export default function StaffPage() {
   }
 
   async function handleRemoveMember(userId: string) {
+    const member = staff.find((m) => m.userId === userId);
+    if (member?.isOwner) return; // owner cannot be removed
     setRemovingId(userId);
     try {
-      const member = staff.find((m) => m.userId === userId);
       await removeStaff(bid, userId);
       setStaff((prev) => prev.filter((m) => m.userId !== userId));
       setSelectedMember(null);
@@ -222,7 +224,8 @@ export default function StaffPage() {
                 {t("staff.title")}
               </h1>
               <p className="text-xs text-gray-500">
-                {staff.length} {staff.length !== 1 ? t("nav.staff").toLowerCase() : t("nav.staff").toLowerCase()}
+                {staff.filter((m) => !m.isOwner).length}{" "}
+                {t("nav.staff").toLowerCase()}
               </p>
             </div>
           </div>
@@ -240,13 +243,52 @@ export default function StaffPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+
+        {/* ── Owner section (US-02-G-02) ── */}
+        {staff.filter((m) => m.isOwner).map((owner) => (
+          <section key={owner.userId}>
+            <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
+              {t("staff.ownerSection")}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setSelectedMember(owner)}
+              className="w-full text-left"
+            >
+              <Card className="p-4 flex items-center gap-4 hover:shadow-md transition cursor-pointer border-primary/20">
+                <div className="h-11 w-11 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                  <span className="text-primary font-bold text-sm">
+                    {getInitials(owner.name)}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
+                      {owner.name}
+                    </p>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary uppercase tracking-wide shrink-0">
+                      {t("staff.ownerBadge")}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 truncate">{owner.email}</p>
+                  <span className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                    <MaterialIcon name="design_services" className="text-xs" />
+                    {owner.assignedServicesCount} {t("business.myServices").toLowerCase()}
+                  </span>
+                </div>
+                <MaterialIcon name="chevron_right" className="text-gray-400 shrink-0" />
+              </Card>
+            </button>
+          </section>
+        ))}
+
         {/* ── Active Staff (US-02-E-01) ── */}
         <section data-tutorial="staff-list">
           <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide mb-4">
             {t("staff.teamMembers")}
           </h2>
 
-          {staff.length === 0 ? (
+          {staff.filter((m) => !m.isOwner).length === 0 ? (
             <Card className="p-8 flex flex-col items-center gap-3 text-center">
               <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                 <MaterialIcon
@@ -273,7 +315,7 @@ export default function StaffPage() {
             </Card>
           ) : (
             <div className="space-y-3">
-              {staff.map((member) => (
+              {staff.filter((m) => !m.isOwner).map((member) => (
                 <button
                   key={member.userId}
                   type="button"
@@ -282,14 +324,11 @@ export default function StaffPage() {
                   className="w-full text-left"
                 >
                   <Card className="p-4 flex items-center gap-4 hover:shadow-md transition cursor-pointer">
-                    {/* Avatar */}
                     <div className="h-11 w-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                       <span className="text-primary font-bold text-sm">
                         {getInitials(member.name)}
                       </span>
                     </div>
-
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-[#111418] dark:text-white text-sm truncate">
                         {member.name}
@@ -299,23 +338,16 @@ export default function StaffPage() {
                       </p>
                       <div className="flex items-center gap-3 mt-1">
                         <span className="text-xs text-gray-400 flex items-center gap-1">
-                          <MaterialIcon
-                            name="calendar_today"
-                            className="text-xs"
-                          />
+                          <MaterialIcon name="calendar_today" className="text-xs" />
                           {t("staff.joined", { date: formatDate(member.joinedAt) })}
                         </span>
                         <span className="text-xs text-gray-400 flex items-center gap-1">
                           <MaterialIcon name="design_services" className="text-xs" />
-                          {member.assignedServicesCount} {member.assignedServicesCount !== 1 ? t("business.myServices").toLowerCase() : t("business.myServices").toLowerCase()}
+                          {member.assignedServicesCount} {t("business.myServices").toLowerCase()}
                         </span>
                       </div>
                     </div>
-
-                    <MaterialIcon
-                      name="chevron_right"
-                      className="text-gray-400 shrink-0"
-                    />
+                    <MaterialIcon name="chevron_right" className="text-gray-400 shrink-0" />
                   </Card>
                 </button>
               ))}

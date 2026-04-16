@@ -7,5 +7,7 @@ export interface MergedSlot {
   startISO: string;
   endISO: string;
   isBooked: boolean;
+  isBlocked?: boolean;
+  blockingServiceName?: string;
   appointment?: AppointmentDTO;
 }

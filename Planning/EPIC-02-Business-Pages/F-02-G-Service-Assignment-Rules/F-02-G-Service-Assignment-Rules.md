@@ -1,7 +1,7 @@
 # F-02-G: Service Assignment Rules & Parallel Booking
 
 **Epic:** [[EPIC-02-Business-Pages|EPIC-02: Business Pages & Services]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -23,8 +23,8 @@ This feature refines how services are assigned to staff members and introduces a
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-02-G-01-One-Staff-Per-Service\|US-02-G-01]] | Enforce one-staff-per-service assignment | 🔲 Not Started |
-| [[US-02-G-02-Owner-As-Staff\|US-02-G-02]] | Owner visible and assignable in Staff Management | 🔲 Not Started |
-| [[US-02-G-03-Parallel-Booking-Conflict-Preference\|US-02-G-03]] | Configure parallel booking conflict preference | 🔲 Not Started |
-| [[US-02-G-04-Assignment-On-Services-Hours-Page\|US-02-G-04]] | Show assigned person & conflict setting on Services & Hours | 🔲 Not Started |
-| [[US-02-G-05-Conflict-Banner-On-Staff-Management\|US-02-G-05]] | Informational banner on Staff Management for multi-service staff | 🔲 Not Started |
+| [[US-02-G-01-One-Staff-Per-Service\|US-02-G-01]] | Enforce one-staff-per-service assignment | ✅ Done |
+| [[US-02-G-02-Owner-As-Staff\|US-02-G-02]] | Owner visible and assignable in Staff Management | ✅ Done |
+| [[US-02-G-03-Parallel-Booking-Conflict-Preference\|US-02-G-03]] | Configure parallel booking conflict preference | ✅ Done |
+| [[US-02-G-04-Assignment-On-Services-Hours-Page\|US-02-G-04]] | Show assigned person & conflict setting on Services & Hours | ✅ Done |
+| [[US-02-G-05-Conflict-Banner-On-Staff-Management\|US-02-G-05]] | Informational banner on Staff Management for multi-service staff | ✅ Done |

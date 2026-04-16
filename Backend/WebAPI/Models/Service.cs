@@ -30,6 +30,19 @@ namespace WebAPI.Models
         public Guid CategoryId { get; set; }
         public Category? Category { get; set; }
 
+        /// <summary>
+        /// The single staff member assigned to perform this service.
+        /// Nullable — null means no one is explicitly assigned.
+        /// Replaces the legacy many-to-many BusinessPartner.Services list.
+        /// </summary>
+        public Guid? AssignedStaffId { get; set; }
+
+        /// <summary>
+        /// When true (default), booking this service automatically blocks the same
+        /// time slot on all sibling services assigned to the same staff member.
+        /// </summary>
+        public bool BlockOnBooking { get; set; } = true;
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [Required]
@@ -38,6 +51,7 @@ namespace WebAPI.Models
         // Navigation properties
         public Business? Business { get; set; }
         public User? User { get; set; }
+        public User? AssignedStaff { get; set; }
         public ICollection<ServiceSchedule> ServiceSchedules { get; set; } = new List<ServiceSchedule>();
     }
 }

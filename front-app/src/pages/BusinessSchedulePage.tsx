@@ -10,6 +10,7 @@ import {
 } from "../services/appointmentService";
 import {
   getAvailableSlotsForService,
+  getBlockedSlotsForService,
   type SlotDTO,
 } from "../services/scheduleService";
 import {
@@ -105,6 +106,7 @@ export default function BusinessSchedulePage() {
     useState<string>(preselectedServiceId);
   const [gridPreset, setGridPreset] = useState<RangePreset>("week");
   const [gridSlots, setGridSlots] = useState<SlotDTO[]>([]);
+  const [gridBlockedSlots, setGridBlockedSlots] = useState<SlotDTO[]>([]);
   const [gridAppts, setGridAppts] = useState<AppointmentDTO[]>([]);
   const [gridLoading, setGridLoading] = useState(false);
   const [gridError, setGridError] = useState<string | null>(null);
@@ -183,11 +185,13 @@ export default function BusinessSchedulePage() {
       const toEnd = new Date(to);
       toEnd.setHours(23, 59, 59);
 
-      const [slots, appts] = await Promise.all([
+      const [slots, blocked, appts] = await Promise.all([
         getAvailableSlotsForService(gridServiceId, from, toEnd),
+        getBlockedSlotsForService(gridServiceId, from, toEnd).catch(() => [] as SlotDTO[]),
         getBusinessAppointmentsByRange(businessId, from, toEnd),
       ]);
       setGridSlots(slots);
+      setGridBlockedSlots(blocked);
       setGridAppts(
         appts.filter(
           (a) =>
@@ -263,7 +267,7 @@ export default function BusinessSchedulePage() {
     );
   }, [allAppointments, showCanceled, selectedServiceId, timeFrom, timeTo]);
 
-  // ── Grid merge: available slots + booked appointments, grouped by day ─────
+  // ── Grid merge: available + blocked slots + booked appointments, grouped by day ─────
   const gridDays = useMemo(() => {
     // Build a map from date string → merged slots
     const byDay = new Map<string, MergedSlot[]>();
@@ -277,6 +281,20 @@ export default function BusinessSchedulePage() {
         startISO: slot.startDateTime,
         endISO: slot.endDateTime,
         isBooked: false,
+      });
+    }
+
+    // Blocked slots (conflict-blocked by parallel booking)
+    for (const slot of gridBlockedSlots) {
+      const key = dateKey(slot.startDateTime);
+      if (!byDay.has(key)) byDay.set(key, []);
+      byDay.get(key)!.push({
+        key: `blocked-${slot.id}`,
+        startISO: slot.startDateTime,
+        endISO: slot.endDateTime,
+        isBooked: false,
+        isBlocked: true,
+        blockingServiceName: slot.blockingServiceName,
       });
     }
 

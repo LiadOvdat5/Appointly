@@ -71,5 +71,19 @@ namespace WebAPI.Interfaces
         /// Get completed appointments for a client that have no associated review, newest first.
         /// </summary>
         Task<List<AppointmentDTO>> GetPendingReviewsAsync(Guid clientId, int limit = 3);
+
+        /// <summary>
+        /// Called when a service's AssignedStaffId changes.
+        /// Releases all conflict-blocks tied to the old sibling relationships, then
+        /// re-applies blocks for the new sibling relationships.
+        /// </summary>
+        Task ReevaluateServiceAssignmentBlocksAsync(Guid serviceId, Guid? newStaffId);
+
+        /// <summary>
+        /// Called when a service's BlockOnBooking preference is toggled.
+        /// If turning off: releases all blocks this service's appointments created on siblings.
+        /// If turning on: re-applies blocks for future booked appointments.
+        /// </summary>
+        Task ReevaluateBlockOnBookingChangeAsync(Guid serviceId, bool newBlockOnBooking);
     }
 }

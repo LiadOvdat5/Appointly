@@ -31,48 +31,73 @@ namespace WebAPI.Repositories
             return business;
         }
 
-        // ── US-02-E-01: View Staff ────────────────────────────────────────────
+        // ── US-02-E-01 / US-02-G-02: View Staff (includes owner) ────────────────
 
         public async Task<IEnumerable<StaffMemberDTO>> GetStaffAsync(Guid businessId, Guid callerId)
         {
             var business = await GetBusinessAndVerifyOwnerAsync(businessId, callerId);
 
-            var acceptedPartners = business.Partners
-                .Where(p => p.Status == InvitationStatus.Accepted && p.UserId != business.OwnerId)
-                .ToList();
-
-            if (!acceptedPartners.Any())
-                return Enumerable.Empty<StaffMemberDTO>();
-
-            var partnerUserIds = acceptedPartners.Select(p => p.UserId).ToList();
-
-            var users = await _context.Users
-                .Where(u => partnerUserIds.Contains(u.Id))
-                .ToDictionaryAsync(u => u.Id);
-
-            // Load all services for this business once
+            // Load all services for this business, using AssignedStaffId as truth
             var allServices = await _context.Services
                 .Where(s => s.BusinessId == businessId)
-                .ToDictionaryAsync(s => s.Id, s => s.Name);
+                .ToListAsync();
+
+            var serviceById = allServices.ToDictionary(s => s.Id);
 
             var result = new List<StaffMemberDTO>();
-            foreach (var partner in acceptedPartners)
-            {
-                if (!users.TryGetValue(partner.UserId, out var user)) continue;
 
-                var assignedNames = partner.Services
-                    .Where(sid => allServices.ContainsKey(sid))
-                    .Select(sid => allServices[sid])
+            // ── Owner entry (US-02-G-02) ─────────────────────────────────────
+            var owner = await _context.Users.FindAsync(business.OwnerId);
+            if (owner != null)
+            {
+                var ownerServiceNames = allServices
+                    .Where(s => s.AssignedStaffId == owner.Id)
+                    .Select(s => s.Name)
                     .ToList();
 
                 result.Add(new StaffMemberDTO
                 {
-                    UserId = user.Id,
-                    Name = user.Name,
-                    Email = user.Email,
-                    JoinedAt = partner.JoinedAt,
-                    AssignedServiceNames = assignedNames
+                    UserId = owner.Id,
+                    Name = owner.Name,
+                    Email = owner.Email,
+                    JoinedAt = business.CreatedAt,
+                    AssignedServiceNames = ownerServiceNames,
+                    IsOwner = true
                 });
+            }
+
+            // ── Accepted partners ────────────────────────────────────────────
+            var acceptedPartners = business.Partners
+                .Where(p => p.Status == InvitationStatus.Accepted && p.UserId != business.OwnerId)
+                .ToList();
+
+            if (acceptedPartners.Any())
+            {
+                var partnerUserIds = acceptedPartners.Select(p => p.UserId).ToList();
+                var users = await _context.Users
+                    .Where(u => partnerUserIds.Contains(u.Id))
+                    .ToDictionaryAsync(u => u.Id);
+
+                foreach (var partner in acceptedPartners)
+                {
+                    if (!users.TryGetValue(partner.UserId, out var user)) continue;
+
+                    // Use AssignedStaffId on Service as authoritative source
+                    var assignedNames = allServices
+                        .Where(s => s.AssignedStaffId == user.Id)
+                        .Select(s => s.Name)
+                        .ToList();
+
+                    result.Add(new StaffMemberDTO
+                    {
+                        UserId = user.Id,
+                        Name = user.Name,
+                        Email = user.Email,
+                        JoinedAt = partner.JoinedAt,
+                        AssignedServiceNames = assignedNames,
+                        IsOwner = false
+                    });
+                }
             }
 
             return result;
@@ -149,10 +174,20 @@ namespace WebAPI.Repositories
             partner.Services = new List<Guid>();
             partner.UpdatedAt = DateTime.UtcNow;
 
+            // Clear AssignedStaffId from all services this person was assigned to
+            var assignedServices = await _context.Services
+                .Where(s => s.BusinessId == businessId && s.AssignedStaffId == userId)
+                .ToListAsync();
+            foreach (var svc in assignedServices)
+            {
+                svc.AssignedStaffId = null;
+                svc.UpdatedAt = DateTime.UtcNow;
+            }
+
             await _context.SaveChangesAsync();
         }
 
-        // ── US-02-E-04: Service Assignments ──────────────────────────────────
+        // ── US-02-E-04 / US-02-G-01: Service Assignments ─────────────────────
 
         public async Task<IEnumerable<Guid>> GetStaffServicesAsync(Guid businessId, Guid userId, Guid callerId)
         {
@@ -161,26 +196,34 @@ namespace WebAPI.Repositories
                 .FirstOrDefaultAsync(b => b.Id == businessId)
                 ?? throw new KeyNotFoundException($"Business {businessId} not found.");
 
-            // Allow owner OR the partner reading their own assignments
+            // Allow owner OR the person reading their own assignments
             bool isOwner = business.OwnerId == callerId;
             bool isSelf = callerId == userId;
             if (!isOwner && !isSelf)
                 throw new UnauthorizedAccessException("Only the business owner or the staff member themselves can view service assignments.");
 
-            var partner = await _context.BusinessPartners
-                .FirstOrDefaultAsync(p => p.BusinessId == businessId && p.UserId == userId && p.Status == InvitationStatus.Accepted)
-                ?? throw new KeyNotFoundException("Staff member not found.");
+            // US-02-G-01: use AssignedStaffId as authoritative source
+            // For the owner, no partner record is required
+            bool isMember = business.OwnerId == userId
+                || business.Partners.Any(p => p.UserId == userId && p.Status == InvitationStatus.Accepted);
+            if (!isMember)
+                throw new KeyNotFoundException("Staff member not found.");
 
-            return partner.Services;
+            return await _context.Services
+                .Where(s => s.BusinessId == businessId && s.AssignedStaffId == userId)
+                .Select(s => s.Id)
+                .ToListAsync();
         }
 
         public async Task UpdateStaffServicesAsync(Guid businessId, Guid userId, Guid callerId, List<Guid> serviceIds)
         {
-            await GetBusinessAndVerifyOwnerAsync(businessId, callerId);
+            var business = await GetBusinessAndVerifyOwnerAsync(businessId, callerId);
 
-            var partner = await _context.BusinessPartners
-                .FirstOrDefaultAsync(p => p.BusinessId == businessId && p.UserId == userId && p.Status == InvitationStatus.Accepted)
-                ?? throw new KeyNotFoundException("Staff member not found.");
+            // Ensure the person exists in this business (owner or accepted partner)
+            bool isMember = business.OwnerId == userId
+                || business.Partners.Any(p => p.UserId == userId && p.Status == InvitationStatus.Accepted);
+            if (!isMember)
+                throw new KeyNotFoundException("Staff member not found.");
 
             // Validate that all provided serviceIds belong to this business
             if (serviceIds.Any())
@@ -195,8 +238,39 @@ namespace WebAPI.Repositories
                     throw new KeyNotFoundException($"Services not found in this business: {string.Join(", ", invalid)}");
             }
 
-            partner.Services = serviceIds;
-            partner.UpdatedAt = DateTime.UtcNow;
+            // US-02-G-01: update AssignedStaffId on service entities (enforces 1-to-1)
+            // First clear this person from any services they currently hold
+            var currentlyAssigned = await _context.Services
+                .Where(s => s.BusinessId == businessId && s.AssignedStaffId == userId)
+                .ToListAsync();
+            foreach (var svc in currentlyAssigned)
+            {
+                svc.AssignedStaffId = null;
+                svc.UpdatedAt = DateTime.UtcNow;
+            }
+
+            // Then assign to the new list
+            if (serviceIds.Any())
+            {
+                var toAssign = await _context.Services
+                    .Where(s => s.BusinessId == businessId && serviceIds.Contains(s.Id))
+                    .ToListAsync();
+                foreach (var svc in toAssign)
+                {
+                    svc.AssignedStaffId = userId;
+                    svc.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            // Keep legacy partner.Services list in sync (for partner dashboard)
+            var partner = await _context.BusinessPartners
+                .FirstOrDefaultAsync(p => p.BusinessId == businessId && p.UserId == userId && p.Status == InvitationStatus.Accepted);
+            if (partner != null)
+            {
+                partner.Services = serviceIds;
+                partner.UpdatedAt = DateTime.UtcNow;
+            }
+
             await _context.SaveChangesAsync();
         }
 
@@ -216,20 +290,17 @@ namespace WebAPI.Repositories
             // Business info
             var business = await _context.Businesses.FindAsync(businessId);
 
-            // Assigned services
-            var assignedServiceIds = partnerRecord.Services;
-            var assignedServices = assignedServiceIds.Any()
-                ? await _context.Services
-                    .Where(s => assignedServiceIds.Contains(s.Id))
-                    .Select(s => new PartnerAssignedServiceDTO
-                    {
-                        ServiceId = s.Id,
-                        Name = s.Name,
-                        DurationMinutes = s.Duration,
-                        Price = s.Price
-                    })
-                    .ToListAsync()
-                : new List<PartnerAssignedServiceDTO>();
+            // Assigned services — use AssignedStaffId as authoritative source (US-02-G-01)
+            var assignedServices = await _context.Services
+                .Where(s => s.BusinessId == businessId && s.AssignedStaffId == partnerId)
+                .Select(s => new PartnerAssignedServiceDTO
+                {
+                    ServiceId = s.Id,
+                    Name = s.Name,
+                    DurationMinutes = s.Duration,
+                    Price = s.Price
+                })
+                .ToListAsync();
 
             // Today range (UTC)
             var todayStart = now.Date;

@@ -33,6 +33,7 @@ import {
 import { getPublicServicesForBusiness } from "../services/businessManagementService";
 import {
   getAvailableSlotsForService,
+  getBlockedSlotsForService,
   deleteAvailableSlotsInWindow,
   type SlotDTO,
 } from "../services/scheduleService";
@@ -129,6 +130,8 @@ export default function ScheduleEditorPage() {
   // ── Impact analysis state ─────────────────────────────────────────────────
   const originalDayStatesRef = useRef<DayState[]>([]);
   const [upcomingSlots, setUpcomingSlots] = useState<SlotDTO[]>([]);
+  const [blockedSlots, setBlockedSlots] = useState<SlotDTO[]>([]);
+  const [expandedBlockedSlotId, setExpandedBlockedSlotId] = useState<string | null>(null);
   const [upcomingAppts, setUpcomingAppts] = useState<AppointmentDTO[]>([]);
   const [pendingImpact, setPendingImpact] = useState<ImpactInfo | null>(null);
 
@@ -149,13 +152,14 @@ export default function ScheduleEditorPage() {
       const now = new Date();
       const future90 = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
 
-      const [services, rules, breaks, exceptions, recurring, slots, allAppts] = await Promise.all([
+      const [services, rules, breaks, exceptions, recurring, slots, blocked, allAppts] = await Promise.all([
         getPublicServicesForBusiness(businessId),
         getWeeklyRules(serviceId),
         getBreakRules(serviceId),
         getDateExceptions(serviceId),
         getRecurringRules(serviceId),
         getAvailableSlotsForService(serviceId, now, future90),
+        getBlockedSlotsForService(serviceId, now, future90).catch(() => [] as SlotDTO[]),
         getBusinessAppointments(businessId, 1, 500),
       ]);
 
@@ -168,6 +172,7 @@ export default function ScheduleEditorPage() {
       setDateExceptions(exceptions);
       setRecurringRules(recurring);
       setUpcomingSlots(slots);
+      setBlockedSlots(blocked);
       setUpcomingAppts(
         allAppts.filter(
           (a) =>
@@ -699,6 +704,62 @@ export default function ScheduleEditorPage() {
           {t("scheduleEditor.generateButton")}
         </Button>
       </div>
+
+      {/* Conflict-blocked slots (US-02-G-03) */}
+      {blockedSlots.length > 0 && (
+        <>
+          <div className="border-t border-gray-200 dark:border-gray-700" />
+          <div className="flex flex-col gap-3">
+            <div>
+              <h2 className="text-base font-semibold text-[#111418] dark:text-white flex items-center gap-2">
+                <MaterialIcon name="block" className="text-base text-red-500" />
+                {t("scheduleEditor.blockedByConflict.title")}
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">{t("scheduleEditor.blockedByConflict.desc")}</p>
+            </div>
+            <div className="rounded-xl border border-red-200 dark:border-red-800 overflow-hidden">
+              {blockedSlots.map((slot) => {
+                const start = new Date(slot.startDateTime);
+                const end = new Date(slot.endDateTime);
+                const isExpanded = expandedBlockedSlotId === slot.id;
+                const dateLabel = start.toLocaleDateString(undefined, { month: "short", day: "numeric", weekday: "short" });
+                const timeLabel = `${start.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })} – ${end.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}`;
+                return (
+                  <div key={slot.id} className="border-b border-red-100 dark:border-red-900 last:border-0">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedBlockedSlotId(isExpanded ? null : slot.id)}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+                    >
+                      <MaterialIcon name="cancel" className="text-base text-red-500 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-red-700 dark:text-red-300">{dateLabel}</p>
+                        <p className="text-xs text-red-500">{timeLabel}</p>
+                      </div>
+                      <MaterialIcon
+                        name={isExpanded ? "expand_less" : "expand_more"}
+                        className="text-base text-red-400 shrink-0"
+                      />
+                    </button>
+                    {isExpanded && (
+                      <div className="px-4 pb-3 pt-0">
+                        <div className="flex items-start gap-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-3 py-2.5">
+                          <MaterialIcon name="info" className="text-red-500 text-sm shrink-0 mt-0.5" />
+                          <p className="text-xs text-red-700 dark:text-red-300">
+                            {slot.blockingServiceName
+                              ? t("scheduleEditor.blockedByConflict.reason", { serviceName: slot.blockingServiceName })
+                              : t("scheduleEditor.blockedByConflict.reasonUnknown")}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -8,5 +8,6 @@ namespace WebAPI.DTOs
         public DateTime JoinedAt { get; set; }
         public List<string> AssignedServiceNames { get; set; } = new();
         public int AssignedServicesCount => AssignedServiceNames.Count;
+        public bool IsOwner { get; set; }
     }
 }
