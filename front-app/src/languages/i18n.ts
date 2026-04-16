@@ -710,6 +710,8 @@ i18n.use(initReactI18next).init({
             messagePlaceholder: "Add a personal note...",
             submitButton: "Send Invitation",
           },
+          ownerBadge: "Owner",
+          ownerSection: "Business Owner",
           detail: {
             performance: "Performance (This Month)",
             appointments: "Appointments",
@@ -722,9 +724,12 @@ i18n.use(initReactI18next).init({
             comingSoon: "Coming soon",
             noData: "No data available.",
             serviceAssignments: "Service Assignments",
+            assignmentNote: "Selecting a service assigns this person to it. A service can only have one assignee — selecting one already assigned elsewhere will replace the previous person.",
             noServices: "No services available for this business.",
             saveAssignments: "Save Assignments",
+            saveSuccess: "Assignments saved successfully.",
             removeFromBusiness: "Remove from business",
+            replacesAssignee: "Currently assigned to {{name}} — will replace",
           },
           remove: {
             title: "Remove Staff Member",
@@ -737,6 +742,18 @@ i18n.use(initReactI18next).init({
             removed: "Removed",
             declined: "Declined invitation",
             expired: "Invitation expired",
+          },
+          blockingDialog: {
+            title: "How should overlapping slots be handled?",
+            description: "If {{staffName}} gets booked for {{serviceName}}, automatically block the matching time slot on their other services?",
+            toggleLabel: "Block the other slot when one is booked",
+          },
+          conflictBanner: {
+            active: "Parallel booking protection is active",
+            activeBody: "When one of {{name}}'s services is booked, the same time slot is automatically blocked on their other services. This prevents double-booking.",
+            partiallyOff: "Parallel booking protection is partially off",
+            partiallyOffBody: "One or more of {{name}}'s services do not automatically block overlapping slots when booked. Review the settings below.",
+            goToServices: "Services & Hours →",
           },
         },
 
@@ -1157,6 +1174,13 @@ i18n.use(initReactI18next).init({
           durationLabel: "Duration (min) *",
           priceLabel: "Price (₪)",
           categoryLabel: "Category *",
+          assignedToLabel: "Assigned To",
+          unassigned: "Unassigned",
+          changeAssignee: "Change",
+          unassign: "Unassign",
+          blockOnBookingLabel: "If this service is booked, automatically block overlapping slots for {{name}}'s other services",
+          conflictProtectionOn: "Conflict protection on",
+          conflictProtectionOff: "Conflict protection off",
           saveButton: "Save Changes",
           savedSuccess: "Service updated successfully.",
           error: {
@@ -1172,7 +1196,7 @@ i18n.use(initReactI18next).init({
           subtitle: "Select a service to manage its schedule",
           empty: {
             title: "No services yet",
-            text: "Add services from your business page first.",
+            text: "Add your first service to get started.",
             goToBusinessPage: "Go to business page →",
           },
           error: {
@@ -1182,6 +1206,12 @@ i18n.use(initReactI18next).init({
           editService: "Edit service details",
           editAvailability: "Edit availability & working hours",
           hint: "Use the calendar icon to manage working hours. Use the edit icon to update service details.",
+          addService: {
+            button: "Add Service",
+            title: "Add New Service",
+            confirm: "Add Service",
+            error: "Failed to add service. Please try again.",
+          },
         },
 
         // ============ SCHEDULE EDITOR ============
@@ -1351,6 +1381,12 @@ i18n.use(initReactI18next).init({
           addRuleHeader: "Add rule",
           daysOfWeekLabel: "Days of week",
           addRecurringRuleButton: "Add Recurring Rule",
+          blockedByConflict: {
+            title: "Conflict-Blocked Slots",
+            desc: "These slots are blocked because another service assigned to the same staff member is booked during this time.",
+            reason: "Blocked — \"{{serviceName}}\" is booked during this time.",
+            reasonUnknown: "Blocked due to a parallel booking conflict.",
+          },
         },
 
         // ============ PUBLIC BUSINESS PAGE ============
@@ -1485,6 +1521,10 @@ i18n.use(initReactI18next).init({
           refresh: "Refresh",
           bookedCount: "{{count}} booked",
           freeCount: "{{count}} free",
+          blockedCount: "{{count}} blocked",
+          blockedSlot: "Conflict-blocked slot",
+          blockedByService: "Blocked — \"{{serviceName}}\" is booked at this time.",
+          blockedByConflict: "Blocked due to a parallel booking conflict.",
           noServicesConfigured: "No services configured yet.",
           noSlotsInRange: "No slots in this range",
           generateSlotsHint: "Generate slots for this service from Services & Hours.",
@@ -2037,7 +2077,7 @@ i18n.use(initReactI18next).init({
               book: {
                 title: "הזמן פגישה",
                 description:
-                  "בחר משבצת זמן פנויה ואשר מיידית — תקבל התראה מיד.",
+                  "בחר תור פנוי ואשר מיידית — תקבל התראה מיד.",
               },
             },
             features: {
@@ -2543,6 +2583,8 @@ i18n.use(initReactI18next).init({
             messagePlaceholder: "הוסף הערה אישית...",
             submitButton: "שלח הזמנה",
           },
+          ownerBadge: "בעלים",
+          ownerSection: "בעל העסק",
           detail: {
             performance: "ביצועים (החודש)",
             appointments: "פגישות",
@@ -2555,9 +2597,12 @@ i18n.use(initReactI18next).init({
             comingSoon: "בקרוב",
             noData: "אין נתונים זמינים.",
             serviceAssignments: "הקצאת שירותים",
+            assignmentNote: "בחירת שירות מקצה את האדם אליו. שירות יכול להיות מוקצה רק לאדם אחד — בחירה בשירות שמוקצה כבר תחליף את האדם הקודם.",
             noServices: "אין שירותים זמינים לעסק זה.",
             saveAssignments: "שמור הקצאות",
+            saveSuccess: "ההקצאות נשמרו בהצלחה.",
             removeFromBusiness: "הסר מהעסק",
+            replacesAssignee: "מוקצה כרגע ל{{name}} — יוחלף",
           },
           remove: {
             title: "הסר חבר צוות",
@@ -2569,6 +2614,18 @@ i18n.use(initReactI18next).init({
             removed: "הוסר",
             declined: "דחה הזמנה",
             expired: "ההזמנה פגה",
+          },
+          blockingDialog: {
+            title: "כיצד לטפל בחריצים חופפים?",
+            description: "אם {{staffName}} מוזמן לשירות {{serviceName}}, לחסום אוטומטית את החריץ המתאים בשירותיהם האחרים?",
+            toggleLabel: "חסום את החריץ האחר כשאחד מוזמן",
+          },
+          conflictBanner: {
+            active: "הגנת הזמנות מקבילות פעילה",
+            activeBody: "כאשר אחד מהשירותים של {{name}} מוזמן, אותו חריץ זמן נחסם אוטומטית בשירותיהם האחרים. זה מונע הזמנה כפולה.",
+            partiallyOff: "הגנת הזמנות מקבילות כבויה חלקית",
+            partiallyOffBody: "אחד או יותר מהשירותים של {{name}} אינם חוסמים אוטומטית חריצים חופפים. בדוק את ההגדרות למטה.",
+            goToServices: "שירותים ושעות ←",
           },
         },
 
@@ -2865,7 +2922,7 @@ i18n.use(initReactI18next).init({
           errorLoadFailed: "טעינת פרטי ההזמנה נכשלה.",
           errorSomethingWrong: "משהו השתבש.",
           goBack: "חזרה",
-          slotTaken: "המשבצת כבר נלקחה. אנא בחר זמן אחר.",
+          slotTaken: "התור כבר נלקח. אנא בחר זמן אחר.",
           errorTryAgain: "משהו השתבש. אנא נסה שוב.",
           confirmed: {
             header: "ההזמנה אושרה",
@@ -2982,6 +3039,13 @@ i18n.use(initReactI18next).init({
           durationLabel: "משך (דקות) *",
           priceLabel: "מחיר (₪)",
           categoryLabel: "קטגוריה *",
+          assignedToLabel: "מוקצה ל",
+          unassigned: "לא מוקצה",
+          changeAssignee: "שנה",
+          unassign: "הסר הקצאה",
+          blockOnBookingLabel: "אם שירות זה מוזמן, חסום אוטומטית חריצים חופפים עבור שירותיהם האחרים של {{name}}",
+          conflictProtectionOn: "הגנה מפני קונפליקטים פעילה",
+          conflictProtectionOff: "הגנה מפני קונפליקטים כבויה",
           saveButton: "שמור שינויים",
           savedSuccess: "השירות עודכן בהצלחה.",
           error: {
@@ -2997,7 +3061,7 @@ i18n.use(initReactI18next).init({
           subtitle: "בחר שירות לניהול הלוח שלו",
           empty: {
             title: "אין שירותים עדיין",
-            text: "הוסף שירותים מדף העסק שלך תחילה.",
+            text: "הוסף את השירות הראשון שלך כדי להתחיל.",
             goToBusinessPage: "עבור לדף העסק ←",
           },
           error: {
@@ -3007,6 +3071,12 @@ i18n.use(initReactI18next).init({
           editService: "עריכת פרטי שירות",
           editAvailability: "עריכת זמינות ושעות עבודה",
           hint: "לחץ על סמל הלוח לניהול שעות עבודה. לחץ על סמל העריכה לעדכון פרטי השירות.",
+          addService: {
+            button: "הוסף שירות",
+            title: "הוספת שירות חדש",
+            confirm: "הוסף שירות",
+            error: "הוספת השירות נכשלה. נסה שוב.",
+          },
         },
 
         // ============ SCHEDULE EDITOR ============
@@ -3059,8 +3129,8 @@ i18n.use(initReactI18next).init({
           blockDateButton: "חסום תאריך",
           scheduleChangeTitle: "זוהה שינוי בלוח הזמנים",
           reviewBeforeSaving: "סקור את ההשפעה לפני השמירה.",
-          freeSlots_one: "משבצת זמינה 1",
-          freeSlots_other: "{{count}} משבצות זמינות",
+          freeSlots_one: "תור זמין 1",
+          freeSlots_other: "{{count}} תורים זמינים",
           willBeRemovedIfDelete: "תוסרנה אם תבחר למחוק משבצות פנויות.",
           appointmentsBooked_one: "פגישה 1 מוזמנת",
           appointmentsBooked_other: "{{count}} פגישות מוזמנות",
@@ -3068,16 +3138,16 @@ i18n.use(initReactI18next).init({
           notCanceled: "אינן מבוטלות אוטומטית",
           cancelIndividuallyFrom: "— בטל אותן בנפרד מ-",
           schedulePage: "דף לוח הזמנים",
-          deleteAndSave_one: "מחק משבצת פנויה 1 ושמור",
-          deleteAndSave_other: "מחק {{count}} משבצות פנויות ושמור",
+          deleteAndSave_one: "מחק תור פנוי 1 ושמור",
+          deleteAndSave_other: "מחק {{count}} תורים פנויים ושמור",
           keepSlotsAndSave: "שמור משבצות קיימות ושמור",
           understoodSave: "הבנתי, שמור בכל זאת",
           gotItSave: "הבנתי, שמור",
           goBack: "חזרה",
           blockDateTitle: "לחסום {{date}}?",
           reasonPrefix: "סיבה: {{reason}}",
-          freeSlotsHidden_one: "משבצת זמינה 1",
-          freeSlotsHidden_other: "{{count}} משבצות זמינות",
+          freeSlotsHidden_one: "תור זמין 1",
+          freeSlotsHidden_other: "{{count}} תורים זמינים",
           willBeHiddenAutoRestored:
             "תוסתרנה אוטומטית ותשוחזרנה אם תבטל את חסימת התאריך.",
           appointmentsOnDate_one: "פגישה 1",
@@ -3096,9 +3166,9 @@ i18n.use(initReactI18next).init({
           failedDeleteException: "מחיקת חריגת התאריך נכשלה.",
           addRecurringRuleTitle: "להוסיף כלל חוזר?",
           removeRecurringRuleTitle: "להסיר כלל חוזר?",
-          reviewImpact: "סקור את ההשפעה על משבצות קיימות.",
-          freeSlotsRule_one: "משבצת פנויה 1",
-          freeSlotsRule_other: "{{count}} משבצות פנויות",
+          reviewImpact: "סקור את ההשפעה על תורים קיימים.",
+          freeSlotsRule_one: "תור פנוי 1",
+          freeSlotsRule_other: "{{count}} תורים פנויים",
           fallOutsideNewRuleHours_one:
             "נמצאת מחוץ לשעות הכלל החדש וניתן להסירה.",
           fallOutsideNewRuleHours_other:
@@ -3109,10 +3179,10 @@ i18n.use(initReactI18next).init({
           appointmentsPeriod_other: "{{count}} פגישות מוזמנות",
           inPeriodNotCanceled:
             "בתקופה זו — אינן מבוטלות אוטומטית. בטל בנפרד מ-",
-          deleteAndAddRule_one: "מחק משבצת פנויה 1 והוסף כלל",
-          deleteAndAddRule_other: "מחק {{count}} משבצות פנויות והוסף כלל",
-          deleteAndRemoveRule_one: "מחק משבצת פנויה 1 והסר כלל",
-          deleteAndRemoveRule_other: "מחק {{count}} משבצות פנויות והסר כלל",
+          deleteAndAddRule_one: "מחק תור פנוי 1 והוסף כלל",
+          deleteAndAddRule_other: "מחק {{count}} תורים פנויים והוסף כלל",
+          deleteAndRemoveRule_one: "מחק תור פנוי 1 והסר כלל",
+          deleteAndRemoveRule_other: "מחק {{count}} תורים פנויים והסר כלל",
           keepSlotsAndAddRule: "שמור משבצות והוסף כלל",
           keepSlotsAndRemoveRule: "שמור משבצות והסר כלל",
           understoodAddRule: "הבנתי, הוסף כלל",
@@ -3124,8 +3194,8 @@ i18n.use(initReactI18next).init({
             "משבצות זמינות הוסתרו אוטומטית. בטל פגישות מוזמנות בנפרד מ-",
           addExceptionTitle: "להוסיף חריגת תאריך?",
           removeExceptionTitle: "להסיר חריגת תאריך?",
-          freeSlotsExc_one: "משבצת פנויה 1",
-          freeSlotsExc_other: "{{count}} משבצות פנויות",
+          freeSlotsExc_one: "תור פנוי 1",
+          freeSlotsExc_other: "{{count}} תורים פנויים",
           fallOutsideExcHours_one: "נמצאת מחוץ לשעות החריגה.",
           fallOutsideExcHours_other: "נמצאות מחוץ לשעות החריגה.",
           existWithinExcPeriod_one: "קיימת בתקופת החריגה.",
@@ -3134,13 +3204,13 @@ i18n.use(initReactI18next).init({
           appointmentsExc_other: "{{count}} פגישות",
           bookedNotCanceledCancelFrom:
             "מוזמנות בתאריך זה — אינן מבוטלות אוטומטית. בטל מ-",
-          deleteAndAddException_one: "מחק משבצת פנויה 1 והוסף חריגה",
+          deleteAndAddException_one: "מחק תור פנוי 1 והוסף חריגה",
           deleteAndAddException_other:
-            "מחק {{count}} משבצות פנויות והוסף חריגה",
-          deleteAndRemoveException_one: "מחק משבצת פנויה 1 והסר חריגה",
+            "מחק {{count}} תורים פנויים והוסף חריגה",
+          deleteAndRemoveException_one: "מחק תור פנוי 1 והסר חריגה",
           deleteAndRemoveException_other:
-            "מחק {{count}} משבצות פנויות והסר חריגה",
-          keepSlotsAndAddException: "שמור משבצות והוסף חריגה",
+            "מחק {{count}} תורים פנויים והסר חריגה",
+          keepSlotsAndAddException: "שמור תורים והוסף חריגה",
           keepSlotsAndRemoveException: "שמור משבצות והסר חריגה",
           understoodAddException: "הבנתי, הוסף חריגה",
           understoodRemoveException: "הבנתי, הסר חריגה",
@@ -3168,6 +3238,12 @@ i18n.use(initReactI18next).init({
           addRuleHeader: "הוסף כלל",
           daysOfWeekLabel: "ימי שבוע",
           addRecurringRuleButton: "הוסף כלל חוזר",
+          blockedByConflict: {
+            title: "משבצות חסומות עקב קונפליקט",
+            desc: "משבצות אלה חסומות מכיוון ששירות אחר המוקצה לאותו איש צוות מוזמן באותה שעה.",
+            reason: "חסום — \"{{serviceName}}\" מוזמן באותה שעה.",
+            reasonUnknown: "חסום עקב הזמנה מקבילה.",
+          },
         },
 
         // ============ PUBLIC BUSINESS PAGE ============
@@ -3302,6 +3378,10 @@ i18n.use(initReactI18next).init({
           refresh: "רענן",
           bookedCount: "{{count}} מוזמן",
           freeCount: "{{count}} פנוי",
+          blockedCount: "{{count}} חסום",
+          blockedSlot: "משבצת חסומה עקב קונפליקט",
+          blockedByService: "חסום — \"{{serviceName}}\" מוזמן בשעה זו.",
+          blockedByConflict: "חסום עקב הזמנה מקבילה.",
           noServicesConfigured: "אין שירותים מוגדרים עדיין.",
           noSlotsInRange: "אין מקומות בטווח זה",
           generateSlotsHint: "צור מקומות עבור שירות זה מתוך שירותים ושעות.",
@@ -3361,7 +3441,7 @@ i18n.use(initReactI18next).init({
               body: "בחר תאריך מהלוח כדי לראות את המשבצות הפנויות לשירות זה.",
             },
             step2: {
-              title: "בחר משבצת זמן",
+              title: "בחר תור",
               body: "הקש על כל זמן פנוי כדי לבחור אותו. הוא ישמר לזמן קצר בזמן שתאשר.",
             },
             step3: {
@@ -3627,7 +3707,7 @@ i18n.use(initReactI18next).init({
           },
           customerResponsibilities: {
             heading: "אחריות הלקוח",
-            body: "לקוחות אחראים להגיע לפגישות שנקבעו בזמן. אם אתה צריך לבטל, נא עשה זאת מוקדם ככל האפשר כדי לאפשר לעסק למלא את המשבצת. ביטולים מאוחרים חוזרים או אי-הגעות עלולים לגרום להגבלות על יכולת ההזמנה שלך. אתה מסכים להתייחס לבעלי עסקים ולצוות בכבוד.",
+            body: "לקוחות אחראים להגיע לפגישות שנקבעו בזמן. אם אתה צריך לבטל, נא עשה זאת מוקדם ככל האפשר כדי לאפשר לעסק למלא את התור. ביטולים מאוחרים חוזרים או אי-הגעות עלולים לגרום להגבלות על יכולת ההזמנה שלך. אתה מסכים להתייחס לבעלי עסקים ולצוות בכבוד.",
           },
           prohibitedConduct: {
             heading: "התנהגות אסורה",

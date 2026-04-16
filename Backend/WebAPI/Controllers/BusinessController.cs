@@ -3,6 +3,7 @@ using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
@@ -14,17 +15,20 @@ namespace WebAPI.Controllers
         private readonly IBusinessInvitationRepository _businessInvitationRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly IStaffRepository _staffRepository;
+        private readonly IAppointmentService _appointmentService;
 
         public BusinessController(
             IBusinessRepository businessRepository,
             IBusinessInvitationRepository businessInvitationRepository,
             IServiceRepository serviceRepository,
-            IStaffRepository staffRepository)
+            IStaffRepository staffRepository,
+            IAppointmentService appointmentService)
         {
             _businessRepository = businessRepository;
             _businessInvitationRepository = businessInvitationRepository;
             _serviceRepository = serviceRepository;
             _staffRepository = staffRepository;
+            _appointmentService = appointmentService;
         }
 
         // Define endpoints for business operations here
@@ -440,6 +444,76 @@ namespace WebAPI.Controllers
             {
                 return BadRequest(new { error = ex.Message });
             }
+        }
+
+        // ── Service Assignment (US-02-G-01) ──────────────────────────────────────
+
+        [Authorize]
+        [HttpGet("{businessId}/services/{serviceId}/assignment")]
+        [EndpointSummary("Get Service Assignment")]
+        [EndpointDescription("Returns the staff member assigned to a service, or null if unassigned. Authorization: Only the business owner.")]
+        public async Task<IActionResult> GetServiceAssignment(Guid businessId, Guid serviceId)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var assignment = await _serviceRepository.GetAssignmentAsync(businessId, serviceId, userId);
+                return Ok(assignment);
+            }
+            catch (UnauthorizedAccessException ex) { return Forbid(ex.Message); }
+            catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
+            catch (Exception ex) { return BadRequest(new { error = ex.Message }); }
+        }
+
+        [Authorize]
+        [HttpPut("{businessId}/services/{serviceId}/assignment")]
+        [EndpointSummary("Set Service Assignment")]
+        [EndpointDescription("Assign or unassign a staff member to a service (1-to-1). Body: { staffId: guid | null }. Authorization: Only the business owner.")]
+        public async Task<IActionResult> SetServiceAssignment(Guid businessId, Guid serviceId, [FromBody] SetServiceAssignmentDTO dto)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                var result = await _serviceRepository.SetAssignmentAsync(businessId, serviceId, userId, dto.StaffId);
+
+                // Re-evaluate conflict blocks whenever the assignment changes (Bug fix #3)
+                await _appointmentService.ReevaluateServiceAssignmentBlocksAsync(serviceId, dto.StaffId);
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex) { return Forbid(ex.Message); }
+            catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
+            catch (Exception ex) { return BadRequest(new { error = ex.Message }); }
+        }
+
+        [Authorize]
+        [HttpPatch("{businessId}/services/{serviceId}/assignment/preferences")]
+        [EndpointSummary("Update Assignment Preferences")]
+        [EndpointDescription("Update the blockOnBooking preference for a service. Body: { blockOnBooking: bool }. Authorization: Only the business owner.")]
+        public async Task<IActionResult> UpdateAssignmentPreferences(Guid businessId, Guid serviceId, [FromBody] UpdateAssignmentPreferencesDTO dto)
+        {
+            try
+            {
+                var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdString == null) return Unauthorized();
+                Guid userId = Guid.Parse(userIdString);
+
+                await _serviceRepository.UpdateAssignmentPreferencesAsync(businessId, serviceId, userId, dto.BlockOnBooking);
+
+                // Re-evaluate conflict blocks when BlockOnBooking changes (Bug fix)
+                await _appointmentService.ReevaluateBlockOnBookingChangeAsync(serviceId, dto.BlockOnBooking);
+
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException ex) { return Forbid(ex.Message); }
+            catch (KeyNotFoundException ex) { return NotFound(new { error = ex.Message }); }
+            catch (Exception ex) { return BadRequest(new { error = ex.Message }); }
         }
 
         [Authorize]

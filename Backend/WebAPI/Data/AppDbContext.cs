@@ -239,6 +239,23 @@ namespace WebAPI.Data
                 .WithMany(ss => ss.Appointments)
                 .HasForeignKey(a => a.ServiceScheduleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Service → AssignedStaff (User) — nullable 1-to-1 from service's side
+            // NoAction: SQL Server disallows SET NULL when there are multiple cascade paths via Users
+            modelBuilder.Entity<Service>()
+                .HasOne(s => s.AssignedStaff)
+                .WithMany()
+                .HasForeignKey(s => s.AssignedStaffId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired(false);
+
+            // ServiceSchedule → blocking appointment (conflict FK, nullable)
+            modelBuilder.Entity<ServiceSchedule>()
+                .HasOne<Appointment>()
+                .WithMany()
+                .HasForeignKey(ss => ss.BlockingAppointmentId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .IsRequired(false);
         }
     }
 }

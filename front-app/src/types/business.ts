@@ -52,6 +52,12 @@ export interface UpdateBusinessInput {
   longitude?: number;
 }
 
+export interface AssignedStaffInfo {
+  id: string;
+  name: string;
+  isOwner: boolean;
+}
+
 export interface ServiceProfile {
   id: string;
   name: string;
@@ -60,6 +66,8 @@ export interface ServiceProfile {
   price?: number;
   categoryId: string;
   userId: string;
+  blockOnBooking: boolean;
+  assignedStaff?: AssignedStaffInfo | null;
 }
 
 export interface CreateServiceInput {

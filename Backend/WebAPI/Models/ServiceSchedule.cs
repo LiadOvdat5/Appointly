@@ -30,6 +30,13 @@ namespace WebAPI.Models
         // Optional: Track which appointment booked this slot
         public Guid? AppointmentId { get; set; }
 
+        /// <summary>
+        /// Set when this slot is blocked (Status = BLOCKED) due to a parallel-booking
+        /// conflict. Points to the appointment on the sibling service that caused
+        /// the block. Cleared when that appointment is cancelled.
+        /// </summary>
+        public Guid? BlockingAppointmentId { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

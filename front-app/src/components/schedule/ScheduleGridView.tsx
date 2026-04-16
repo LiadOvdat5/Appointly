@@ -49,7 +49,8 @@ export function ScheduleGridView({
   const { t } = useTranslation();
 
   const totalBooked = gridDays.reduce((s, d) => s + d.slots.filter((sl) => sl.isBooked).length, 0);
-  const totalFree = gridDays.reduce((s, d) => s + d.slots.filter((sl) => !sl.isBooked).length, 0);
+  const totalBlocked = gridDays.reduce((s, d) => s + d.slots.filter((sl) => sl.isBlocked).length, 0);
+  const totalFree = gridDays.reduce((s, d) => s + d.slots.filter((sl) => !sl.isBooked && !sl.isBlocked).length, 0);
 
   const presets: { value: RangePreset; label: string }[] = [
     { value: "week", label: t("businessSchedule.thisWeek") },
@@ -112,6 +113,12 @@ export function ScheduleGridView({
             <span className="inline-block w-3 h-3 rounded-sm bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600" />
             {t("businessSchedule.freeCount", { count: totalFree })}
           </span>
+          {totalBlocked > 0 && (
+            <span className="flex items-center gap-1.5 text-xs text-red-500">
+              <span className="inline-block w-3 h-3 rounded-sm bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700" />
+              {t("businessSchedule.blockedCount", { count: totalBlocked })}
+            </span>
+          )}
         </div>
       )}
 
@@ -149,7 +156,8 @@ export function ScheduleGridView({
         !error &&
         gridDays.map((day) => {
           const bookedCount = day.slots.filter((s) => s.isBooked).length;
-          const freeCount = day.slots.filter((s) => !s.isBooked).length;
+          const blockedCount = day.slots.filter((s) => s.isBlocked).length;
+          const freeCount = day.slots.filter((s) => !s.isBooked && !s.isBlocked).length;
 
           return (
             <div key={day.dateStr} className="space-y-2">
@@ -162,6 +170,12 @@ export function ScheduleGridView({
                     <span className="flex items-center gap-1">
                       <span className="inline-block w-2 h-2 rounded-full bg-primary" />
                       {t("businessSchedule.bookedCount", { count: bookedCount })}
+                    </span>
+                  )}
+                  {blockedCount > 0 && (
+                    <span className="flex items-center gap-1 text-red-400">
+                      <span className="inline-block w-2 h-2 rounded-full bg-red-400" />
+                      {t("businessSchedule.blockedCount", { count: blockedCount })}
                     </span>
                   )}
                   {freeCount > 0 && <span className="text-gray-300 dark:text-gray-600">·</span>}
@@ -178,7 +192,7 @@ export function ScheduleGridView({
                     isExpanded={expandedSlotKey === slot.key}
                     cancelingId={cancelingId}
                     review={slot.appointment ? reviewMap[slot.appointment.id] : undefined}
-                    onToggle={() => slot.isBooked && onToggleExpand(slot.key)}
+                    onToggle={() => (slot.isBooked || slot.isBlocked) && onToggleExpand(slot.key)}
                     onRequestCancel={onRequestCancel}
                     onRequestDidntHappen={onRequestDidntHappen}
                     onViewReview={onViewReview}

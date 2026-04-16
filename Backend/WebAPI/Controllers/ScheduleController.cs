@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebAPI.Data;
 using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Models;
@@ -16,15 +18,18 @@ namespace WebAPI.Controllers
         private readonly IServiceScheduleRepository _serviceScheduleRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly SlotGenerationService _slotGenerationService;
+        private readonly AppDbContext _context;
 
         public ScheduleController(
             IServiceScheduleRepository serviceScheduleRepository,
             IServiceRepository serviceRepository,
-            SlotGenerationService slotGenerationService)
+            SlotGenerationService slotGenerationService,
+            AppDbContext context)
         {
             _serviceScheduleRepository = serviceScheduleRepository;
             _serviceRepository = serviceRepository;
             _slotGenerationService = slotGenerationService;
+            _context = context;
         }
 
         private Guid? GetCurrentUserId()
@@ -107,15 +112,14 @@ namespace WebAPI.Controllers
         [AllowAnonymous]
         [HttpGet("service/{serviceId}/slots/range")]
         [EndpointSummary("Get Service Slots by Date Range")]
-        [EndpointDescription("Retrieve available slots for a service within a specified date range. " +
-            "Query parameters: startDate (yyyy-MM-dd), endDate (yyyy-MM-dd). " +
-            "Returns all slots that fall within the date range, useful for UI slot pickers. " +
-            "Authorization: Authorized users can view any service's slots. " +
-            "Example: /api/schedule/service/550e8400-e29b-41d4-a716-446655440000/slots/range?startDate=2026-01-10&endDate=2026-01-20")]
+        [EndpointDescription("Retrieve slots for a service within a specified date range. " +
+            "Query parameters: startDate, endDate, includeBlocked (bool, default false — owner use). " +
+            "When includeBlocked=true, BLOCKED slots are also returned with BlockingServiceName populated.")]
         public async Task<ActionResult<List<ServiceScheduleDTO>>> GetServiceSlotsByDateRange(
             Guid serviceId,
             [FromQuery] DateTime startDate,
-            [FromQuery] DateTime endDate)
+            [FromQuery] DateTime endDate,
+            [FromQuery] bool includeBlocked = false)
         {
             try
             {
@@ -123,19 +127,64 @@ namespace WebAPI.Controllers
                 if (service == null)
                     return NotFound($"Service not found: {serviceId}");
 
-                var slots = await _serviceScheduleRepository.GetAvailableSlotsAsync(serviceId, startDate, endDate);
-                var dtos = slots.Select(s => new ServiceScheduleDTO
+                if (!includeBlocked)
+                {
+                    var slots = await _serviceScheduleRepository.GetAvailableSlotsAsync(serviceId, startDate, endDate);
+                    var dtos = slots.Select(s => new ServiceScheduleDTO
+                    {
+                        Id = s.Id,
+                        ServiceId = s.ServiceId,
+                        StartDateTime = s.StartDateTime,
+                        EndDateTime = s.EndDateTime,
+                        Status = s.Status,
+                        CreatedAt = s.CreatedAt,
+                        UpdatedAt = s.UpdatedAt
+                    }).ToList();
+                    return Ok(dtos);
+                }
+
+                // Owner view: include AVAILABLE + BLOCKED slots with blocking service name
+                var allSlots = await _context.ServiceSchedules
+                    .Where(ss => ss.ServiceId == serviceId
+                              && (ss.Status == ScheduleStatus.AVAILABLE || ss.Status == ScheduleStatus.BLOCKED)
+                              && ss.StartDateTime >= startDate
+                              && ss.EndDateTime <= endDate)
+                    .OrderBy(ss => ss.StartDateTime)
+                    .ToListAsync();
+
+                // Resolve blocking service names in bulk
+                var blockingApptIds = allSlots
+                    .Where(s => s.BlockingAppointmentId.HasValue)
+                    .Select(s => s.BlockingAppointmentId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                Dictionary<Guid, string> apptIdToServiceName = new();
+                if (blockingApptIds.Any())
+                {
+                    apptIdToServiceName = await _context.Appointments
+                        .Where(a => blockingApptIds.Contains(a.Id))
+                        .Join(_context.Services, a => a.ServiceId, s => s.Id,
+                            (a, s) => new { ApptId = a.Id, ServiceName = s.Name })
+                        .ToDictionaryAsync(x => x.ApptId, x => x.ServiceName);
+                }
+
+                var ownerDtos = allSlots.Select(s => new ServiceScheduleDTO
                 {
                     Id = s.Id,
                     ServiceId = s.ServiceId,
                     StartDateTime = s.StartDateTime,
                     EndDateTime = s.EndDateTime,
                     Status = s.Status,
+                    BlockingAppointmentId = s.BlockingAppointmentId,
+                    BlockingServiceName = s.BlockingAppointmentId.HasValue
+                        && apptIdToServiceName.TryGetValue(s.BlockingAppointmentId.Value, out var svcName)
+                        ? svcName : null,
                     CreatedAt = s.CreatedAt,
                     UpdatedAt = s.UpdatedAt
                 }).ToList();
 
-                return Ok(dtos);
+                return Ok(ownerDtos);
             }
             catch (Exception ex)
             {

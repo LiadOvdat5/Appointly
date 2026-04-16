@@ -31,6 +31,43 @@ export function SlotChip({
   const time = formatTime(slot.startISO);
   const appt = slot.appointment;
 
+  if (slot.isBlocked) {
+    return (
+      <div className="flex flex-col">
+        <button
+          type="button"
+          onClick={onToggle}
+          className={[
+            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition-all",
+            isExpanded
+              ? "bg-red-500 text-white border-red-500 shadow-md"
+              : "bg-red-50 dark:bg-red-900/20 text-red-500 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40",
+          ].join(" ")}
+        >
+          <MaterialIcon name="block" className="text-xs leading-none" />
+          {time}
+          <MaterialIcon
+            name={isExpanded ? "expand_less" : "expand_more"}
+            className="text-xs leading-none opacity-70"
+          />
+        </button>
+        {isExpanded && (
+          <div className="mt-2 w-64 rounded-xl border border-red-200 dark:border-red-800 bg-white dark:bg-gray-900 shadow-lg p-3 space-y-2 z-10">
+            <p className="text-xs font-semibold text-red-600 dark:text-red-400 flex items-center gap-1.5">
+              <MaterialIcon name="block" className="text-sm" />
+              {t("businessSchedule.blockedSlot")}
+            </p>
+            <p className="text-xs text-gray-500">
+              {slot.blockingServiceName
+                ? t("businessSchedule.blockedByService", { serviceName: slot.blockingServiceName })
+                : t("businessSchedule.blockedByConflict")}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   if (!slot.isBooked) {
     return (
       <div className="px-2.5 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-400 dark:text-gray-500 font-medium select-none">

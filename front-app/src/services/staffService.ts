@@ -7,6 +7,14 @@ export interface StaffMember {
   joinedAt: string;
   assignedServiceNames: string[];
   assignedServicesCount: number;
+  isOwner: boolean;
+}
+
+export interface ServiceAssignment {
+  staffId: string | null;
+  staffName: string | null;
+  isOwner: boolean;
+  blockOnBooking: boolean;
 }
 
 export interface StaffInvitation {
@@ -145,4 +153,39 @@ export const getStaffReport = async (
     params,
   });
   return res.data;
+};
+
+// ── US-02-G-01: Service assignment endpoints ──────────────────────────────────
+
+export const getServiceAssignment = async (
+  businessId: string,
+  serviceId: string,
+): Promise<ServiceAssignment | null> => {
+  const res = await apiClient.get<ServiceAssignment | null>(
+    `/businesses/${businessId}/services/${serviceId}/assignment`,
+  );
+  return res.data;
+};
+
+export const setServiceAssignment = async (
+  businessId: string,
+  serviceId: string,
+  staffId: string | null,
+): Promise<ServiceAssignment> => {
+  const res = await apiClient.put<ServiceAssignment>(
+    `/businesses/${businessId}/services/${serviceId}/assignment`,
+    { staffId },
+  );
+  return res.data;
+};
+
+export const updateAssignmentPreferences = async (
+  businessId: string,
+  serviceId: string,
+  blockOnBooking: boolean,
+): Promise<void> => {
+  await apiClient.patch(
+    `/businesses/${businessId}/services/${serviceId}/assignment/preferences`,
+    { blockOnBooking },
+  );
 };

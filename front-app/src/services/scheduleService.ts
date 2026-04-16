@@ -13,6 +13,8 @@ export interface SlotDTO {
   startDateTime: string;
   endDateTime: string;
   status: number;
+  blockingAppointmentId?: string;
+  blockingServiceName?: string;
 }
 
 export const getAvailableSlotsForService = async (
@@ -81,6 +83,26 @@ export const deleteAvailableSlotsInWindow = async (
     { params },
   );
   return response.data.deletedCount;
+};
+
+/**
+ * Returns BLOCKED slots for a service (due to parallel-booking conflict).
+ * Owner-facing — includes BlockingServiceName to explain why the slot is blocked.
+ */
+export const getBlockedSlotsForService = async (
+  serviceId: string,
+  startDate: Date,
+  endDate: Date,
+): Promise<SlotDTO[]> => {
+  const params = new URLSearchParams({
+    startDate: startDate.toISOString(),
+    endDate: endDate.toISOString(),
+    includeBlocked: "true",
+  });
+  const response = await apiClient.get<SlotDTO[]>(
+    `/api/schedule/service/${serviceId}/slots/range?${params.toString()}`,
+  );
+  return response.data.filter((s) => s.status === ScheduleStatus.BLOCKED);
 };
 
 /**
