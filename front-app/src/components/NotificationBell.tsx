@@ -105,7 +105,6 @@ export function NotificationBell() {
     const next = !open;
     if (next && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      const isRtl = document.documentElement.dir === "rtl";
       setPanelStyle({ position: "fixed", top: rect.bottom + 8, right: window.innerWidth - rect.right });
     }
     setOpen(next);

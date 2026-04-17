@@ -1,7 +1,7 @@
 # US-09-D-03: Manage Push Notification Preferences
 
 **Feature:** [[F-09-D-Push-Notifications|F-09-D: Push Notifications (PWA)]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 

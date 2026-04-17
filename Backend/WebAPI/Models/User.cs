@@ -61,5 +61,12 @@ namespace WebAPI.Models
 
         // Tutorial seen-state stored as JSON: { "search": true, "booking": true, ... }
         public string? SeenTutorials { get; set; }
+
+        // ── Push notification preferences (all default ON) ────────────────────
+        public bool PushBookingConfirm { get; set; } = true;
+        public bool PushCancellations { get; set; } = true;
+        public bool PushReminders24h { get; set; } = true;
+        public bool PushReminders1h { get; set; } = true;
+        public bool PushReviewPrompt { get; set; } = true;
     }
 }

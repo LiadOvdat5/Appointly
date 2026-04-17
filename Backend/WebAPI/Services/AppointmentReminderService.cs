@@ -7,12 +7,14 @@ using WebAPI.Models;
 namespace WebAPI.Services
 {
     /// <summary>
-    /// Background service that runs every hour and sends reminder notifications
-    /// for appointments starting in approximately 24 hours.
+    /// Background service that runs every 15 minutes:
+    ///  - Sends 24h in-app + push reminder for upcoming appointments
+    ///  - Sends 1h push-only reminder for imminent appointments
+    ///  - Sends post-appointment review prompt notifications
     /// </summary>
     public class AppointmentReminderService : BackgroundService
     {
-        private static readonly TimeSpan CheckInterval = TimeSpan.FromHours(1);
+        private static readonly TimeSpan CheckInterval = TimeSpan.FromMinutes(15);
 
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<AppointmentReminderService> _logger;
@@ -37,7 +39,16 @@ namespace WebAPI.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error occurred while sending appointment reminders.");
+                    _logger.LogError(ex, "Error occurred while sending 24h appointment reminders.");
+                }
+
+                try
+                {
+                    await Send1hPushRemindersAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred while sending 1h push reminders.");
                 }
 
                 try
@@ -58,14 +69,14 @@ namespace WebAPI.Services
         private async Task SendPendingRemindersAsync()
         {
             using var scope = _scopeFactory.CreateScope();
-            var appointmentRepo  = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
+            var appointmentRepo     = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+            var pushService         = scope.ServiceProvider.GetRequiredService<IPushNotificationService>();
 
             var due = await appointmentRepo.GetDueForReminderAsync();
-
             if (due.Count == 0) return;
 
-            _logger.LogInformation("Sending {Count} appointment reminder(s).", due.Count);
+            _logger.LogInformation("Sending {Count} 24h appointment reminder(s).", due.Count);
 
             foreach (var appointment in due)
             {
@@ -87,8 +98,42 @@ namespace WebAPI.Services
                         ["date"]         = dateLabel
                     });
 
-                // Mark reminder sent — prevents duplicates on next run
+                await pushService.SendAsync(
+                    appointment.ClientId,
+                    "Reminder",
+                    $"Your {serviceName} at {businessName} is tomorrow at {appointment.StartDateTime.ToLocalTime():h:mm tt}.",
+                    "/customer-dashboard",
+                    PushCategory.Reminders24h);
+
                 appointment.ReminderSentAt = DateTime.UtcNow;
+                await appointmentRepo.UpdateAsync(appointment);
+            }
+        }
+
+        private async Task Send1hPushRemindersAsync()
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var appointmentRepo = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
+            var pushService     = scope.ServiceProvider.GetRequiredService<IPushNotificationService>();
+
+            var due = await appointmentRepo.GetDueFor1hReminderAsync();
+            if (due.Count == 0) return;
+
+            _logger.LogInformation("Sending {Count} 1h push reminder(s).", due.Count);
+
+            foreach (var appointment in due)
+            {
+                var serviceName  = appointment.Service?.Name  ?? string.Empty;
+                var businessName = appointment.Business?.Name ?? string.Empty;
+
+                await pushService.SendAsync(
+                    appointment.ClientId,
+                    "Reminder",
+                    $"Your {serviceName} at {businessName} starts in 1 hour.",
+                    "/customer-dashboard",
+                    PushCategory.Reminders1h);
+
+                appointment.ReminderSent1hAt = DateTime.UtcNow;
                 await appointmentRepo.UpdateAsync(appointment);
             }
         }
@@ -98,9 +143,9 @@ namespace WebAPI.Services
             using var scope = _scopeFactory.CreateScope();
             var appointmentRepo     = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+            var pushService         = scope.ServiceProvider.GetRequiredService<IPushNotificationService>();
 
             var due = await appointmentRepo.GetDueForReviewPromptAsync();
-
             if (due.Count == 0) return;
 
             _logger.LogInformation("Sending {Count} review prompt(s).", due.Count);
@@ -108,6 +153,7 @@ namespace WebAPI.Services
             foreach (var appointment in due)
             {
                 var businessName = appointment.Business?.Name ?? string.Empty;
+                var businessId   = appointment.BusinessId;
 
                 await notificationService.CreateNotificationAsync(
                     userId: appointment.ClientId,
@@ -121,7 +167,13 @@ namespace WebAPI.Services
                         ["businessName"] = businessName
                     });
 
-                // Mark prompt sent — prevents duplicates on next run
+                await pushService.SendAsync(
+                    appointment.ClientId,
+                    "How was it?",
+                    $"Leave a review for {businessName}.",
+                    $"/business/{businessId}#reviews",
+                    PushCategory.ReviewPrompt);
+
                 appointment.ReviewPromptSentAt = DateTime.UtcNow;
                 await appointmentRepo.UpdateAsync(appointment);
             }

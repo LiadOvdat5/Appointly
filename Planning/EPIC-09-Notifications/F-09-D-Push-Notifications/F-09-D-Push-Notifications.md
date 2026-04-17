@@ -1,7 +1,7 @@
 # F-09-D: Push Notifications (PWA)
 
 **Epic:** [[EPIC-09-Notifications|EPIC-09: Notifications]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,9 +17,9 @@ This feature extends the existing in-app notification system (F-09-A, F-09-B, F-
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-09-D-01-Push-Subscription\|US-09-D-01]] | Subscribe device to push notifications | 🔲 Not Started |
-| [[US-09-D-02-Push-Triggers\|US-09-D-02]] | Send push on appointment events | 🔲 Not Started |
-| [[US-09-D-03-Push-Preferences\|US-09-D-03]] | Manage push notification preferences | 🔲 Not Started |
+| [[US-09-D-01-Push-Subscription\|US-09-D-01]] | Subscribe device to push notifications | ✅ Done |
+| [[US-09-D-02-Push-Triggers\|US-09-D-02]] | Send push on appointment events | ✅ Done |
+| [[US-09-D-03-Push-Preferences\|US-09-D-03]] | Manage push notification preferences | ✅ Done |
 
 ---
 

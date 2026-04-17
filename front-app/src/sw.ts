@@ -35,6 +35,40 @@ registerRoute(
   })
 );
 
+// ── Push Notifications ────────────────────────────────────────────────────────
+// Receives push payloads from the backend (VAPID) and shows a native notification.
+self.addEventListener("push", (event: PushEvent) => {
+  const data = event.data?.json() ?? {};
+  const title: string = data.title ?? "Appointly";
+  const options: NotificationOptions = {
+    body: data.body ?? "",
+    icon: "/icons/icon-192.png",
+    badge: "/icons/badge-72.png",
+    data: { url: data.url ?? "/" },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Opens the relevant app URL when the user taps a notification.
+self.addEventListener("notificationclick", (event: NotificationEvent) => {
+  event.notification.close();
+  const url: string = event.notification.data?.url ?? "/";
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((windowClients: readonly WindowClient[]) => {
+        // Focus an existing open window/tab if available
+        for (const client of windowClients) {
+          if (client.url.includes(self.location.origin) && "focus" in client) {
+            client.navigate(url);
+            return client.focus();
+          }
+        }
+        return self.clients.openWindow(url);
+      }),
+  );
+});
+
 // Static assets: serve from cache immediately, update in background
 registerRoute(
   ({ request }) =>

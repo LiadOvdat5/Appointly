@@ -288,6 +288,26 @@ namespace WebAPI.Repositories
         }
 
         /// <summary>
+        /// Get scheduled appointments whose start time falls in the 45–75 minute window
+        /// from now and have not yet received a 1-hour push reminder.
+        /// </summary>
+        public async Task<List<Appointment>> GetDueFor1hReminderAsync()
+        {
+            var now = DateTime.UtcNow;
+            var windowStart = now.AddMinutes(45);
+            var windowEnd   = now.AddMinutes(75);
+
+            return await _context.Appointments
+                .Include(a => a.Service)
+                .Include(a => a.Business)
+                .Where(a => a.Status == AppointmentStatus.scheduled
+                    && a.ReminderSent1hAt == null
+                    && a.StartDateTime >= windowStart
+                    && a.StartDateTime <= windowEnd)
+                .ToListAsync();
+        }
+
+        /// <summary>
         /// Get completed appointments whose end time was 1–2 hours ago, have not yet received a
         /// review prompt, the customer has not reviewed that business yet, and no other appointment
         /// from the same customer+business has already triggered a review prompt.

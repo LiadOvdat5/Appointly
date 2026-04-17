@@ -9,6 +9,12 @@ import {
   AppointmentStatus,
   type AppointmentDTO,
 } from "../services/appointmentService";
+import {
+  getPushPreferences,
+  updatePushPreferences,
+  type PushPreferences,
+} from "../services/notificationService";
+import { usePushSubscription } from "../hooks/usePushSubscription";
 import { Card } from "../components/UI/Card";
 import { Badge } from "../components/UI/Badge";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
@@ -36,7 +42,7 @@ function statusBadgeVariant(
   return "pending"; // completed
 }
 
-type Tab = "upcoming" | "past";
+type Tab = "upcoming" | "past" | "settings";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -61,6 +67,11 @@ export default function CustomerDashboardPage() {
   // Business IDs that still have no review from this customer
   const [unreviewedBusinessIds, setUnreviewedBusinessIds] = useState<Set<string>>(new Set());
 
+  // Push preferences state
+  const { isSubscribed, permission, isLoading: pushLoading, subscribe, unsubscribe } = usePushSubscription();
+  const [pushPrefs, setPushPrefs] = useState<PushPreferences | null>(null);
+  const [prefsSaving, setPrefsSaving] = useState(false);
+
   useEffect(() => {
     setLoading(true);
     Promise.all([getClientAppointments(1, 100), getPendingReviews(50)])
@@ -82,6 +93,34 @@ export default function CustomerDashboardPage() {
   // searchParams intentionally excluded — only run on mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t]);
+
+  useEffect(() => {
+    if (tab === "settings" && pushPrefs === null) {
+      getPushPreferences().then(setPushPrefs).catch(() => {});
+    }
+  }, [tab, pushPrefs]);
+
+  async function handlePrefToggle(key: keyof PushPreferences, value: boolean) {
+    if (!pushPrefs) return;
+    const next = { ...pushPrefs, [key]: value };
+    setPushPrefs(next);
+    setPrefsSaving(true);
+    try {
+      await updatePushPreferences({ [key]: value });
+    } catch {
+      setPushPrefs(pushPrefs);
+    } finally {
+      setPrefsSaving(false);
+    }
+  }
+
+  async function handleMasterToggle() {
+    if (isSubscribed) {
+      await unsubscribe();
+    } else {
+      await subscribe();
+    }
+  }
 
   const now = new Date();
 
@@ -192,7 +231,7 @@ export default function CustomerDashboardPage() {
 
         {/* Tabs */}
         <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 flex">
-          {(["upcoming", "past"] as Tab[]).map((tabKey) => (
+          {(["upcoming", "past", "settings"] as Tab[]).map((tabKey) => (
             <button
               key={tabKey}
               type="button"
@@ -206,7 +245,9 @@ export default function CustomerDashboardPage() {
             >
               {tabKey === "upcoming"
                 ? t("customerAppointments.tabs.upcoming")
-                : t("customerAppointments.tabs.past")}
+                : tabKey === "past"
+                  ? t("customerAppointments.tabs.past")
+                  : t("customerAppointments.tabs.settings")}
               {tabKey === "upcoming" && upcoming.length > 0 && (
                 <span className="ml-1.5 rounded-full bg-primary/10 text-primary text-[10px] px-1.5 py-0.5">
                   {upcoming.length}
@@ -217,6 +258,73 @@ export default function CustomerDashboardPage() {
         </div>
 
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+
+          {/* ── Settings Tab ─────────────────────────────────────────────────── */}
+          {tab === "settings" && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-1">
+                  {t("pushPreferences.sectionTitle")}
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {t("pushPreferences.sectionDesc")}
+                </p>
+              </div>
+
+              {permission === "unsupported" && (
+                <p className="text-sm text-slate-500 dark:text-slate-400 rounded-xl bg-slate-50 dark:bg-slate-800 p-4">
+                  {t("pushPreferences.unsupported")}
+                </p>
+              )}
+
+              {permission === "denied" && (
+                <p className="text-sm text-amber-700 dark:text-amber-400 rounded-xl bg-amber-50 dark:bg-amber-900/20 p-4">
+                  {t("pushPreferences.permissionDenied")}
+                </p>
+              )}
+
+              {permission !== "unsupported" && (
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark divide-y divide-gray-100 dark:divide-gray-800 px-5">
+                  {/* Master toggle */}
+                  <PushToggleRow
+                    label={t("pushPreferences.masterToggle")}
+                    description={t("pushPreferences.masterToggleDesc")}
+                    enabled={isSubscribed ?? false}
+                    onChange={handleMasterToggle}
+                    disabled={pushLoading || permission === "denied"}
+                  />
+                </div>
+              )}
+
+              {/* Per-category toggles — only shown when subscribed */}
+              {isSubscribed && pushPrefs && (
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark divide-y divide-gray-100 dark:divide-gray-800 px-5">
+                  {(
+                    [
+                      ["pushBookingConfirm", "bookingConfirm", "bookingConfirmDesc"],
+                      ["pushCancellations", "cancellations", "cancellationsDesc"],
+                      ["pushReminders24h", "reminders24h", "reminders24hDesc"],
+                      ["pushReminders1h", "reminders1h", "reminders1hDesc"],
+                      ["pushReviewPrompt", "reviewPrompt", "reviewPromptDesc"],
+                    ] as [keyof PushPreferences, string, string][]
+                  ).map(([key, labelKey, descKey]) => (
+                    <PushToggleRow
+                      key={key}
+                      label={t(`pushPreferences.${labelKey}`)}
+                      description={t(`pushPreferences.${descKey}`)}
+                      enabled={pushPrefs[key]}
+                      onChange={(v) => handlePrefToggle(key, v)}
+                      disabled={prefsSaving}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Appointments Tab ──────────────────────────────────────────────── */}
+          {tab !== "settings" && (
+            <>
           {/* Loading */}
           {loading && (
             <div className="flex justify-center py-16">
@@ -386,8 +494,50 @@ export default function CustomerDashboardPage() {
                 </Card>
               );
             })}
+            </>
+          )}
         </div>
       </div>
     </>
+  );
+}
+
+// ── PushToggleRow (local to this page) ────────────────────────────────────────
+function PushToggleRow({
+  label,
+  description,
+  enabled,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  description: string;
+  enabled: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-4">
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
+        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{description}</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={enabled}
+        disabled={disabled}
+        onClick={() => onChange(!enabled)}
+        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-50 ${
+          enabled ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+            enabled ? "translate-x-6" : "translate-x-1"
+          }`}
+        />
+      </button>
+    </div>
   );
 }

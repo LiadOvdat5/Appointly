@@ -65,3 +65,23 @@ export async function updateBusinessNotificationSettings(
   );
   return response.data;
 }
+
+export interface PushPreferences {
+  pushBookingConfirm: boolean;
+  pushCancellations: boolean;
+  pushReminders24h: boolean;
+  pushReminders1h: boolean;
+  pushReviewPrompt: boolean;
+}
+
+export async function getPushPreferences(): Promise<PushPreferences> {
+  const res = await apiClient.get<PushPreferences>("/users/me/push-preferences");
+  return res.data;
+}
+
+export async function updatePushPreferences(
+  prefs: Partial<PushPreferences>,
+): Promise<PushPreferences> {
+  const res = await apiClient.put<PushPreferences>("/users/me/push-preferences", prefs);
+  return res.data;
+}

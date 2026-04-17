@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Data;
 
@@ -11,9 +12,11 @@ using WebAPI.Data;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260417201110_AddPushSubscriptions")]
+    partial class AddPushSubscriptions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,9 +54,6 @@ namespace WebAPI.Migrations
 
                     b.Property<Guid>("PartnerId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("ReminderSent1hAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ReminderSentAt")
                         .HasColumnType("datetime2");
@@ -875,21 +875,6 @@ namespace WebAPI.Migrations
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("PushBookingConfirm")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PushCancellations")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PushReminders1h")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PushReminders24h")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("PushReviewPrompt")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime?>("RefreshTokenExpiry")
                         .HasColumnType("datetime2");

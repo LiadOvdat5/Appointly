@@ -13,5 +13,7 @@ namespace WebAPI.Interfaces
         Task UpdateUserRoleToOwnerAsync(Guid userId);
         Task<Dictionary<string, bool>> GetSeenTutorialsAsync(Guid userId);
         Task MarkTutorialSeenAsync(Guid userId, string tutorialKey);
+        Task<PushPreferencesDTO> GetPushPreferencesAsync(Guid userId);
+        Task<PushPreferencesDTO> UpdatePushPreferencesAsync(Guid userId, UpdatePushPreferencesDTO dto);
     }
 }

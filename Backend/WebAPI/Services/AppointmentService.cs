@@ -19,6 +19,7 @@ namespace WebAPI.Services
         private readonly IServiceRepository _serviceRepository;
         private readonly IBusinessRepository _businessRepository;
         private readonly INotificationService _notificationService;
+        private readonly IPushNotificationService _pushService;
         private readonly AppointmentValidator _validator;
         private readonly AppDbContext _context;
 
@@ -28,6 +29,7 @@ namespace WebAPI.Services
             IServiceRepository serviceRepository,
             IBusinessRepository businessRepository,
             INotificationService notificationService,
+            IPushNotificationService pushService,
             AppointmentValidator validator,
             AppDbContext context)
         {
@@ -36,6 +38,7 @@ namespace WebAPI.Services
             _serviceRepository = serviceRepository;
             _businessRepository = businessRepository;
             _notificationService = notificationService;
+            _pushService = pushService;
             _validator = validator;
             _context = context;
         }
@@ -258,6 +261,12 @@ namespace WebAPI.Services
                         ["serviceName"]  = serviceName,
                         ["date"]         = dateLabel
                     });
+                await _pushService.SendAsync(
+                    ownerId.Value,
+                    $"New Booking",
+                    $"{clientName} booked {serviceName} on {dateLabel}.",
+                    $"/dashboard/{businessSlug}",
+                    PushCategory.BookingConfirm);
             }
 
             // Notify customer
@@ -274,6 +283,12 @@ namespace WebAPI.Services
                     ["businessName"] = businessName,
                     ["date"]         = dateLabel
                 });
+            await _pushService.SendAsync(
+                clientId,
+                "Booking Confirmed",
+                $"Your {serviceName} at {businessName} on {dateLabel} is confirmed.",
+                "/customer-dashboard",
+                PushCategory.BookingConfirm);
 
             return AppointmentMapper.ToDTO(createdAppointment);
         }
@@ -360,6 +375,12 @@ namespace WebAPI.Services
                         ["businessName"] = bName,
                         ["date"]         = dateCancel
                     });
+                await _pushService.SendAsync(
+                    appt.ClientId,
+                    "Appointment Cancelled",
+                    $"Your {sName} at {bName} on {dateCancel} was cancelled.",
+                    "/customer-dashboard",
+                    PushCategory.Cancellations);
             }
             else if (isClient && !isBusinessMember && ownerIdCancel.HasValue && notifyCancel)
             {
@@ -377,6 +398,12 @@ namespace WebAPI.Services
                         ["serviceName"] = sName,
                         ["date"]        = dateCancel
                     });
+                await _pushService.SendAsync(
+                    ownerIdCancel.Value,
+                    "Booking Cancelled",
+                    $"{cName} cancelled their {sName} on {dateCancel}.",
+                    $"/dashboard/{bSlug}",
+                    PushCategory.Cancellations);
             }
 
             return AppointmentMapper.ToDTO(updatedAppointment);

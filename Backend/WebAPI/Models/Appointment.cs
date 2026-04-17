@@ -58,6 +58,12 @@ namespace WebAPI.Models
         public DateTime? ReminderSentAt { get; set; }
 
         /// <summary>
+        /// Set when a 1-hour push reminder has been sent for this appointment.
+        /// Null means no 1h reminder has been sent yet.
+        /// </summary>
+        public DateTime? ReminderSent1hAt { get; set; }
+
+        /// <summary>
         /// Set when a post-appointment review prompt notification has been sent.
         /// Null means no prompt has been sent yet.
         /// </summary>
