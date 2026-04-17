@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -12,6 +13,9 @@ import { useTranslation } from "react-i18next";
 export function LanguageToggle({ compact = false }: { compact?: boolean }) {
   const { i18n } = useTranslation();
   const [showDialog, setShowDialog] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const compactButtonRef = useRef<HTMLButtonElement>(null);
 
   // Derive isHebrew from i18n.language instead of managing it as separate state
   const isHebrew = i18n.language === "he";
@@ -40,12 +44,21 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
 
   const currentLang = isHebrew ? "עברית" : "English";
 
+  const handleCompactToggle = () => {
+    const next = !showDialog;
+    if (next && compactButtonRef.current) {
+      const rect = compactButtonRef.current.getBoundingClientRect();
+      setDropdownStyle({ position: "fixed", top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    }
+    setShowDialog(next);
+  };
+
   if (compact) {
-    // Compact button version
     return (
       <>
         <button
-          onClick={() => setShowDialog(!showDialog)}
+          ref={compactButtonRef}
+          onClick={handleCompactToggle}
           className="flex items-center justify-center size-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors relative"
           aria-label="Toggle language"
           aria-expanded={showDialog}
@@ -55,25 +68,15 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
           </span>
         </button>
 
-        {/* Language Selection Popup */}
-        {showDialog && (
+        {showDialog && createPortal(
           <>
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setShowDialog(false)}
-              aria-label="Close dialog"
-            />
-
-            {/* Dialog */}
-            <div className="fixed top-16 right-4 z-50 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 min-w-50">
+            <div className="fixed inset-0 z-9998" onClick={() => setShowDialog(false)} aria-label="Close dialog" />
+            <div style={dropdownStyle} className="z-9999 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 min-w-50">
               <div className="p-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
                   Select Language
                 </h3>
-
                 <div className="space-y-2">
-                  {/* English Option */}
                   <button
                     onClick={() => handleLanguageSelect("en")}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
@@ -89,8 +92,6 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
                       </span>
                     )}
                   </button>
-
-                  {/* Hebrew Option */}
                   <button
                     onClick={() => handleLanguageSelect("he")}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
@@ -109,17 +110,28 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
                 </div>
               </div>
             </div>
-          </>
+          </>,
+          document.body,
         )}
       </>
     );
   }
 
+  const handleFullToggle = () => {
+    const next = !showDialog;
+    if (next && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownStyle({ position: "fixed", top: rect.bottom + 4, left: rect.left, minWidth: rect.width });
+    }
+    setShowDialog(next);
+  };
+
   // Full version with label (for sidebar)
   return (
     <div
+      ref={triggerRef}
       className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
-      onClick={() => setShowDialog(!showDialog)}
+      onClick={handleFullToggle}
     >
       <span className="material-symbols-outlined text-slate-900 dark:text-white">
         language
@@ -137,18 +149,11 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
       </span>
 
       {/* Language Selection Dropdown */}
-      {showDialog && (
+      {showDialog && createPortal(
         <>
-          {/* Backdrop for mobile */}
-          <div
-            className="fixed inset-0 z-40 lg:hidden"
-            onClick={() => setShowDialog(false)}
-          />
-
-          {/* Dropdown Menu */}
-          <div className="absolute left-0 top-full mt-2 z-50 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 min-w-50">
+          <div className="fixed inset-0 z-9998" onClick={() => setShowDialog(false)} />
+          <div style={dropdownStyle} className="z-9999 bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
             <div className="p-2">
-              {/* English Option */}
               <button
                 onClick={() => handleLanguageSelect("en")}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
@@ -164,8 +169,6 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
                   </span>
                 )}
               </button>
-
-              {/* Hebrew Option */}
               <button
                 onClick={() => handleLanguageSelect("he")}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-left ${
@@ -183,7 +186,8 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
               </button>
             </div>
           </div>
-        </>
+        </>,
+        document.body,
       )}
     </div>
   );
