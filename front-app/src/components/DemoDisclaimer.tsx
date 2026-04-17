@@ -2,66 +2,78 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const DISMISSED_KEY = "appointly_demo_dismissed";
+const PASSWORD = "Demo1234!";
+
+type Role = "owner" | "customer" | "staff";
 
 interface DemoUser {
-  label: string;
+  name: string;
   email: string;
-  password: string;
-  role: "owner" | "customer" | "admin";
+  business?: string;
 }
 
-const DEMO_USERS: DemoUser[] = [
+interface DemoGroup {
+  role: Role;
+  label: string;
+  users: DemoUser[];
+}
+
+const DEMO_GROUPS: DemoGroup[] = [
   {
-    label: "Business Owner",
-    email: "owner@demo.appointly.com",
-    password: "Demo1234!",
     role: "owner",
+    label: "Business Owners",
+    users: [
+      { name: "Marco Rossi",    email: "marco@demo.com",    business: "Marco's Barbershop" },
+      { name: "Isabella Cohen", email: "isabella@demo.com", business: "Bella Nail Studio" },
+      { name: "Yasmin Azouri",  email: "yasmin@demo.com",   business: "Glow Facial Spa" },
+      { name: "Sophie Levin",   email: "sophie@demo.com",   business: "Coloriste Hair Salon" },
+    ],
   },
   {
-    label: "Customer",
-    email: "customer@demo.appointly.com",
-    password: "Demo1234!",
     role: "customer",
+    label: "Customers",
+    users: [
+      { name: "David Katz",       email: "david@demo.com" },
+      { name: "Miriam Goldstein", email: "miriam@demo.com" },
+      { name: "Avi Cohen",        email: "avi@demo.com" },
+    ],
   },
   {
-    label: "Admin",
-    email: "admin@demo.appointly.com",
-    password: "Demo1234!",
-    role: "admin",
+    role: "staff",
+    label: "Staff",
+    users: [
+      { name: "Dani Ben-David", email: "dani@demo.com",  business: "Marco's Barbershop" },
+      { name: "Yossi Stern",    email: "yossi@demo.com", business: "Marco's Barbershop" },
+      { name: "Rivka Mizrahi",  email: "rivka@demo.com", business: "Bella Nail Studio" },
+      { name: "Tali Shapiro",   email: "tali@demo.com",  business: "Glow Facial Spa" },
+      { name: "Hila Peretz",    email: "hila@demo.com",  business: "Glow Facial Spa" },
+      { name: "Noa Levi",       email: "noa@demo.com",   business: "Coloriste Hair Salon" },
+    ],
   },
 ];
 
+const ROLE_COLORS: Record<Role, string> = {
+  owner:    "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  customer: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  staff:    "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+};
+
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
-
   const handleCopy = async () => {
     await navigator.clipboard.writeText(value);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
-
   return (
     <button
       type="button"
       onClick={handleCopy}
-      className="ml-2 rounded px-1.5 py-0.5 text-[10px] font-semibold transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
+      className="shrink-0 rounded px-1.5 py-0.5 text-[10px] font-semibold transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300"
       aria-label={copied ? "Copied" : `Copy ${value}`}
     >
       {copied ? "✓" : "Copy"}
     </button>
-  );
-}
-
-function RoleBadge({ role }: { role: DemoUser["role"] }) {
-  const colors = {
-    owner: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-    customer: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
-    admin: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
-  };
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${colors[role]}`}>
-      {role}
-    </span>
   );
 }
 
@@ -73,6 +85,7 @@ export function DemoDisclaimer() {
     () => localStorage.getItem(DISMISSED_KEY) === "true",
   );
   const [expanded, setExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<Role>("owner");
 
   if (dismissed) return null;
 
@@ -80,6 +93,8 @@ export function DemoDisclaimer() {
     localStorage.setItem(DISMISSED_KEY, "true");
     setDismissed(true);
   };
+
+  const activeGroup = DEMO_GROUPS.find((g) => g.role === activeTab)!;
 
   return (
     <div
@@ -97,10 +112,7 @@ export function DemoDisclaimer() {
                 {t("demo.title", "Demo Environment")}
               </p>
               <p className="text-xs text-amber-700 dark:text-amber-300">
-                {t(
-                  "demo.subtitle",
-                  "This is a demo build. Data may be reset at any time.",
-                )}
+                {t("demo.subtitle", "This is a demo build. Data may be reset at any time.")}
               </p>
             </div>
           </div>
@@ -127,43 +139,52 @@ export function DemoDisclaimer() {
           </div>
         </div>
 
-        {/* Expanded demo users */}
+        {/* Expanded panel */}
         {expanded && (
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
-            {DEMO_USERS.map((user) => (
-              <div
-                key={user.email}
-                className="rounded-xl border border-amber-200 dark:border-amber-700/50 bg-white dark:bg-gray-900/80 p-3 text-xs"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="font-semibold text-gray-800 dark:text-gray-100">
-                    {user.label}
-                  </span>
-                  <RoleBadge role={user.role} />
-                </div>
+          <div className="mt-3">
+            {/* Shared password row */}
+            <div className="mb-3 flex items-center gap-2 rounded-lg border border-amber-200 dark:border-amber-700/50 bg-white dark:bg-gray-900/80 px-3 py-2 text-xs">
+              <span className="text-gray-500 dark:text-gray-400 shrink-0">Password (all accounts)</span>
+              <span className="font-mono font-semibold text-gray-800 dark:text-gray-200 ml-auto">{PASSWORD}</span>
+              <CopyButton value={PASSWORD} />
+            </div>
 
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-gray-500 dark:text-gray-400">Email</span>
-                    <div className="flex items-center min-w-0">
-                      <span className="truncate text-gray-800 dark:text-gray-200 font-mono text-[10px]">
-                        {user.email}
-                      </span>
-                      <CopyButton value={user.email} />
-                    </div>
+            {/* Tabs */}
+            <div className="flex gap-1 mb-2">
+              {DEMO_GROUPS.map((g) => (
+                <button
+                  key={g.role}
+                  type="button"
+                  onClick={() => setActiveTab(g.role)}
+                  className={[
+                    "flex-1 rounded-lg px-2 py-1 text-xs font-semibold transition-colors",
+                    activeTab === g.role
+                      ? ROLE_COLORS[g.role]
+                      : "bg-white dark:bg-gray-900/80 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 border border-amber-200 dark:border-amber-700/50",
+                  ].join(" ")}
+                >
+                  {g.label} ({g.users.length})
+                </button>
+              ))}
+            </div>
+
+            {/* User rows */}
+            <div className="rounded-xl border border-amber-200 dark:border-amber-700/50 bg-white dark:bg-gray-900/80 divide-y divide-gray-100 dark:divide-gray-800 overflow-hidden">
+              {activeGroup.users.map((user) => (
+                <div key={user.email} className="flex items-center gap-3 px-3 py-2 text-xs">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-800 dark:text-gray-100 truncate">{user.name}</p>
+                    {user.business && (
+                      <p className="text-[10px] text-gray-400 truncate">{user.business}</p>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="text-gray-500 dark:text-gray-400">Password</span>
-                    <div className="flex items-center">
-                      <span className="font-mono text-[10px] text-gray-800 dark:text-gray-200">
-                        {user.password}
-                      </span>
-                      <CopyButton value={user.password} />
-                    </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="font-mono text-[10px] text-gray-600 dark:text-gray-300">{user.email}</span>
+                    <CopyButton value={user.email} />
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>
