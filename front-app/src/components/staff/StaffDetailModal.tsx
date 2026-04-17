@@ -59,9 +59,8 @@ function BlockingDialog({ staffName, serviceName, onConfirm, onCancel }: Blockin
             }`}
           >
             <span
-              className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                block ? "translate-x-4" : "translate-x-0"
-              }`}
+              style={{ left: block ? "20px" : "4px", transition: "left 150ms" }}
+              className="absolute top-1 h-4 w-4 rounded-full bg-white shadow"
             />
           </div>
           <span className="text-sm font-medium text-[#111418] dark:text-white">

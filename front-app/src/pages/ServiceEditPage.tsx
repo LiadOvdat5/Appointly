@@ -354,9 +354,8 @@ export default function ServiceEditPage() {
                       }`}
                     >
                       <span
-                        className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                          assignment.blockOnBooking ? "translate-x-4" : "translate-x-0"
-                        }`}
+                        style={{ left: assignment.blockOnBooking ? "20px" : "4px", transition: "left 150ms" }}
+                        className="absolute top-1 h-4 w-4 rounded-full bg-white shadow"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
