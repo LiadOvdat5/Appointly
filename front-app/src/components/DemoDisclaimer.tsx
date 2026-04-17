@@ -82,7 +82,7 @@ export function DemoDisclaimer() {
   const isHe = i18n.language.startsWith("he");
 
   const [dismissed, setDismissed] = useState(
-    () => localStorage.getItem(DISMISSED_KEY) === "true",
+    () => sessionStorage.getItem(DISMISSED_KEY) === "true",
   );
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<Role>("owner");
@@ -90,7 +90,7 @@ export function DemoDisclaimer() {
   if (dismissed) return null;
 
   const handleDismiss = () => {
-    localStorage.setItem(DISMISSED_KEY, "true");
+    sessionStorage.setItem(DISMISSED_KEY, "true");
     setDismissed(true);
   };
 
