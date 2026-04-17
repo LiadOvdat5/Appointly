@@ -105,12 +105,7 @@ export function NotificationBell() {
     const next = !open;
     if (next && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      const isRtl = document.documentElement.dir === "rtl";
-      if (isRtl) {
-        setPanelStyle({ position: "fixed", top: rect.bottom + 8, left: rect.left });
-      } else {
-        setPanelStyle({ position: "fixed", top: rect.bottom + 8, right: window.innerWidth - rect.right });
-      }
+      setPanelStyle({ position: "fixed", top: rect.bottom + 8, right: window.innerWidth - rect.right });
     }
     setOpen(next);
     if (next) loadNotifications();

@@ -108,6 +108,10 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 
+// Register Push Notification Repository and Service
+builder.Services.AddScoped<IPushSubscriptionRepository, PushSubscriptionRepository>();
+builder.Services.AddScoped<IPushNotificationService, PushNotificationService>();
+
 // Register Email Service
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 

@@ -89,9 +89,15 @@ namespace WebAPI.Interfaces
 
         /// <summary>
         /// Get scheduled appointments whose start time is between now+23h and now+25h
-        /// and have not yet had a reminder sent (ReminderSentAt is null).
+        /// and have not yet had a 24h reminder sent (ReminderSentAt is null).
         /// </summary>
         Task<List<Appointment>> GetDueForReminderAsync();
+
+        /// <summary>
+        /// Get scheduled appointments whose start time is between now+45m and now+75m
+        /// and have not yet had a 1-hour push reminder sent (ReminderSent1hAt is null).
+        /// </summary>
+        Task<List<Appointment>> GetDueFor1hReminderAsync();
 
         /// <summary>
         /// Get completed appointments whose end time was 1–2 hours ago,

@@ -28,6 +28,7 @@ namespace WebAPI.Data
         public DbSet<Follow> Follows => Set<Follow>();
         public DbSet<Review> Reviews => Set<Review>();
         public DbSet<Notification> Notifications => Set<Notification>();
+        public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
         public DbSet<CategoryRequest> CategoryRequests => Set<CategoryRequest>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -172,6 +173,21 @@ namespace WebAPI.Data
                 .HasIndex(n => new { n.UserId, n.CreatedAt });
             modelBuilder.Entity<Notification>()
                 .HasIndex(n => new { n.UserId, n.IsRead });
+
+            // =====================================================
+            // PushSubscription Relationships
+            // =====================================================
+
+            modelBuilder.Entity<PushSubscription>()
+                .HasOne(ps => ps.User)
+                .WithMany()
+                .HasForeignKey(ps => ps.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // One subscription row per browser endpoint (globally unique)
+            modelBuilder.Entity<PushSubscription>()
+                .HasIndex(ps => ps.Endpoint)
+                .IsUnique();
 
             // =====================================================
             // Appointment Relationships

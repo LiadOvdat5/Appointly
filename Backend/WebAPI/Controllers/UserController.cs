@@ -7,6 +7,7 @@ using WebAPI.DTOs;
 using WebAPI.Interfaces;
 using WebAPI.Models;
 using System.Text.RegularExpressions;
+using WebAPI.Utilities;
 
 namespace WebAPI.Controllers
 {
@@ -111,6 +112,48 @@ namespace WebAPI.Controllers
             {
                 await _userRepository.MarkTutorialSeenAsync(currentUserId, dto.TutorialKey);
                 return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("me/push-preferences")]
+        [EndpointSummary("Get Push Notification Preferences")]
+        [EndpointDescription("Returns the current push notification preference flags for the authenticated user.")]
+        public async Task<IActionResult> GetPushPreferences()
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                var prefs = await _userRepository.GetPushPreferencesAsync(currentUserId);
+                return Ok(prefs);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPut("me/push-preferences")]
+        [EndpointSummary("Update Push Notification Preferences")]
+        [EndpointDescription("Partially updates push notification preferences for the authenticated user. Only include fields to change.")]
+        public async Task<IActionResult> UpdatePushPreferences([FromBody] UpdatePushPreferencesDTO dto)
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                var prefs = await _userRepository.UpdatePushPreferencesAsync(currentUserId, dto);
+                return Ok(prefs);
             }
             catch (Exception ex)
             {

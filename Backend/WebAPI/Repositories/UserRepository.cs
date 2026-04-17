@@ -128,5 +128,47 @@ namespace WebAPI.Repositories
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<PushPreferencesDTO> GetPushPreferencesAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            return new PushPreferencesDTO
+            {
+                PushBookingConfirm = user.PushBookingConfirm,
+                PushCancellations  = user.PushCancellations,
+                PushReminders24h   = user.PushReminders24h,
+                PushReminders1h    = user.PushReminders1h,
+                PushReviewPrompt   = user.PushReviewPrompt,
+            };
+        }
+
+        public async Task<PushPreferencesDTO> UpdatePushPreferencesAsync(Guid userId, UpdatePushPreferencesDTO dto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            if (dto.PushBookingConfirm.HasValue) user.PushBookingConfirm = dto.PushBookingConfirm.Value;
+            if (dto.PushCancellations.HasValue)  user.PushCancellations  = dto.PushCancellations.Value;
+            if (dto.PushReminders24h.HasValue)   user.PushReminders24h   = dto.PushReminders24h.Value;
+            if (dto.PushReminders1h.HasValue)    user.PushReminders1h    = dto.PushReminders1h.Value;
+            if (dto.PushReviewPrompt.HasValue)   user.PushReviewPrompt   = dto.PushReviewPrompt.Value;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return new PushPreferencesDTO
+            {
+                PushBookingConfirm = user.PushBookingConfirm,
+                PushCancellations  = user.PushCancellations,
+                PushReminders24h   = user.PushReminders24h,
+                PushReminders1h    = user.PushReminders1h,
+                PushReviewPrompt   = user.PushReviewPrompt,
+            };
+        }
     }
 }

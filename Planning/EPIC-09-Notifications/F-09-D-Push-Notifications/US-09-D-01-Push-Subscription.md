@@ -1,7 +1,7 @@
 # US-09-D-01: Subscribe Device to Push Notifications
 
 **Feature:** [[F-09-D-Push-Notifications|F-09-D: Push Notifications (PWA)]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 

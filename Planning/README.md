@@ -27,7 +27,7 @@
 | 06 | [[EPIC-06-Dashboards\|Dashboards]] | ✅ Done |
 | 07 | [[EPIC-07-Follow-System\|Follow System]] | ✅ Done |
 | 08 | [[EPIC-08-Reviews-and-Ratings\|Reviews & Ratings]] | ✅ Done |
-| 09 | [[EPIC-09-Notifications\|Notifications]] | 🔄 In Progress (F-09-A ✅, F-09-B ✅, F-09-C ✅, F-09-D 🔲) |
+| 09 | [[EPIC-09-Notifications\|Notifications]] | ✅ Done |
 | 10 | [[EPIC-10-Internationalization\|Internationalization (i18n) Hardening]] | ✅ Done |
 | 11 | [[EPIC-11-Sharing-and-URLs\|Sharing & URL Improvements]] | 🔲 Not Started |
 | 12 | [[EPIC-12-Smart-Categories\|Smart Categories]] | ✅ Done |

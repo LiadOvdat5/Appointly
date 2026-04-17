@@ -4,8 +4,12 @@ import { useTranslation } from "react-i18next";
 import { getPublicBusinessBySlug } from "../services/businessManagementService";
 import {
   updateBusinessNotificationSettings,
+  getPushPreferences,
+  updatePushPreferences,
   type BusinessNotificationSettings,
+  type PushPreferences,
 } from "../services/notificationService";
+import { usePushSubscription } from "../hooks/usePushSubscription";
 import type { BusinessProfile } from "../types/business";
 
 // ── Toggle row component ──────────────────────────────────────────────────────
@@ -63,6 +67,11 @@ export default function BusinessNotificationSettingsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Push preferences
+  const { isSubscribed, permission, isLoading: pushLoading, subscribe, unsubscribe } = usePushSubscription();
+  const [pushPrefs, setPushPrefs] = useState<PushPreferences | null>(null);
+  const [prefsSaving, setPrefsSaving] = useState(false);
+
   useEffect(() => {
     if (!businessSlug) return;
     getPublicBusinessBySlug(businessSlug).then((b) => {
@@ -72,7 +81,30 @@ export default function BusinessNotificationSettingsPage() {
         notifyOnCancellation: b.notifyOnCancellation ?? true,
       });
     });
+    getPushPreferences().then(setPushPrefs).catch(() => {});
   }, [businessSlug]);
+
+  async function handlePushPrefToggle(key: keyof PushPreferences, value: boolean) {
+    if (!pushPrefs) return;
+    const next = { ...pushPrefs, [key]: value };
+    setPushPrefs(next);
+    setPrefsSaving(true);
+    try {
+      await updatePushPreferences({ [key]: value });
+    } catch {
+      setPushPrefs(pushPrefs);
+    } finally {
+      setPrefsSaving(false);
+    }
+  }
+
+  async function handleMasterToggle() {
+    if (isSubscribed) {
+      await unsubscribe();
+    } else {
+      await subscribe();
+    }
+  }
 
   const handleToggle = async (
     key: keyof BusinessNotificationSettings,
@@ -149,6 +181,62 @@ export default function BusinessNotificationSettingsPage() {
             onChange={(v) => handleToggle("notifyOnCancellation", v)}
             disabled={saving}
           />
+        </div>
+
+        {/* Push Notifications section */}
+        <div className="mt-8">
+          <h2 className="mb-1 text-sm font-bold text-slate-900 dark:text-white">
+            {t("pushPreferences.sectionTitle")}
+          </h2>
+          <p className="mb-4 text-xs text-slate-500 dark:text-slate-400">
+            {t("pushPreferences.sectionDesc")}
+          </p>
+
+          {permission === "unsupported" && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 rounded-xl bg-slate-50 dark:bg-slate-800 p-4">
+              {t("pushPreferences.unsupported")}
+            </p>
+          )}
+          {permission === "denied" && (
+            <p className="text-sm text-amber-700 dark:text-amber-400 rounded-xl bg-amber-50 dark:bg-amber-900/20 p-4">
+              {t("pushPreferences.permissionDenied")}
+            </p>
+          )}
+
+          {permission !== "unsupported" && (
+            <div className="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white px-5 dark:divide-gray-800 dark:border-gray-700 dark:bg-surface-dark">
+              <ToggleRow
+                label={t("pushPreferences.masterToggle")}
+                description={t("pushPreferences.masterToggleDesc")}
+                enabled={isSubscribed ?? false}
+                onChange={handleMasterToggle}
+                disabled={pushLoading || permission === "denied"}
+              />
+            </div>
+          )}
+
+          {isSubscribed && pushPrefs && (
+            <div className="mt-3 divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white px-5 dark:divide-gray-800 dark:border-gray-700 dark:bg-surface-dark">
+              {(
+                [
+                  ["pushBookingConfirm", "bookingConfirm", "bookingConfirmDesc"],
+                  ["pushCancellations", "cancellations", "cancellationsDesc"],
+                  ["pushReminders24h", "reminders24h", "reminders24hDesc"],
+                  ["pushReminders1h", "reminders1h", "reminders1hDesc"],
+                  ["pushReviewPrompt", "reviewPrompt", "reviewPromptDesc"],
+                ] as [keyof PushPreferences, string, string][]
+              ).map(([key, labelKey, descKey]) => (
+                <ToggleRow
+                  key={key}
+                  label={t(`pushPreferences.${labelKey}`)}
+                  description={t(`pushPreferences.${descKey}`)}
+                  enabled={pushPrefs[key]}
+                  onChange={(v) => handlePushPrefToggle(key, v)}
+                  disabled={prefsSaving}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

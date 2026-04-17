@@ -993,11 +993,31 @@ i18n.use(initReactI18next).init({
         },
 
         // ============ CUSTOMER APPOINTMENTS PAGE ============
+        pushPreferences: {
+          sectionTitle: "Push Notifications",
+          sectionDesc: "Receive native phone notifications even when the app is closed.",
+          masterToggle: "Enable push notifications",
+          masterToggleDesc: "Allow Appointly to send notifications to this device",
+          permissionDenied: "Notifications are blocked in your browser settings. To enable, update your browser permissions.",
+          unsupported: "Push notifications are not supported on this browser.",
+          bookingConfirm: "Booking confirmed",
+          bookingConfirmDesc: "Get notified when a booking is successfully created",
+          cancellations: "Cancellations",
+          cancellationsDesc: "Get notified when an appointment is cancelled",
+          reminders24h: "24-hour reminder",
+          reminders24hDesc: "Reminder the day before your appointment",
+          reminders1h: "1-hour reminder",
+          reminders1hDesc: "Reminder one hour before your appointment",
+          reviewPrompt: "Review prompts",
+          reviewPromptDesc: "Prompt to leave a review after a completed appointment",
+        },
+
         customerAppointments: {
           title: "My Appointments",
           tabs: {
             upcoming: "Upcoming",
             past: "Past",
+            settings: "Settings",
           },
           status: {
             confirmed: "Confirmed",
@@ -2890,12 +2910,32 @@ i18n.use(initReactI18next).init({
           },
         },
 
+        pushPreferences: {
+          sectionTitle: "התראות פוש",
+          sectionDesc: "קבל התראות טלפוניות גם כאשר האפליקציה סגורה.",
+          masterToggle: "אפשר התראות פוש",
+          masterToggleDesc: "אפשר ל-Appointly לשלוח התראות למכשיר זה",
+          permissionDenied: "ההתראות חסומות בהגדרות הדפדפן. כדי לאפשר, עדכן את הרשאות הדפדפן.",
+          unsupported: "התראות פוש אינן נתמכות בדפדפן זה.",
+          bookingConfirm: "אישור הזמנה",
+          bookingConfirmDesc: "קבל התראה כאשר הזמנה נוצרה בהצלחה",
+          cancellations: "ביטולים",
+          cancellationsDesc: "קבל התראה כאשר פגישה מבוטלת",
+          reminders24h: "תזכורת של 24 שעות",
+          reminders24hDesc: "תזכורת יום לפני הפגישה",
+          reminders1h: "תזכורת של שעה",
+          reminders1hDesc: "תזכורת שעה לפני הפגישה",
+          reviewPrompt: "בקשות לביקורת",
+          reviewPromptDesc: "בקש לכתוב ביקורת לאחר פגישה שהושלמה",
+        },
+
         // ============ CUSTOMER APPOINTMENTS PAGE ============
         customerAppointments: {
           title: "הפגישות שלי",
           tabs: {
             upcoming: "קרובות",
             past: "עבר",
+            settings: "הגדרות",
           },
           status: {
             confirmed: "מאושר",
