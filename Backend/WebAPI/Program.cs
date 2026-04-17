@@ -168,6 +168,7 @@ try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
     if (!db.Users.Any(u => u.Role == WebAPI.Models.UserRole.admin))
     {
         var adminPassword = app.Configuration["Admin:SeedPassword"]
