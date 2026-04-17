@@ -6,6 +6,9 @@
 /* Tailwind v4 theme tokens */
 @theme {
   --color-primary: #197fe6;
+  /* Text color to use on top of a solid --color-primary background.
+     Overridden per-business on PublicBusinessPage via inline style. */
+  --color-on-primary: #ffffff;
   --color-background-light: #f6f7f8;
   --color-background-dark: #111921;
   /* Card/panel surface in dark mode — slightly lighter than the page background */
@@ -15,6 +18,14 @@
   --color-danger: #ef4444;
 
   --font-display: Inter, system-ui, sans-serif;
+}
+
+/* Never underline icon glyphs even when the parent link/button has hover:underline.
+   inline-block breaks the parent's text-decoration line — text-decoration: none alone
+   cannot cancel a parent's underline on inline children. */
+.material-symbols-outlined {
+  display: inline-block;
+  text-decoration: none;
 }
 
 /* optional, matches your old HTML behavior */

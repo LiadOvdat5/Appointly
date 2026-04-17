@@ -179,7 +179,7 @@ export default function ServiceEditPage() {
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate(`/dashboard/${businessSlug}/services`)}
             className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             aria-label={t("common.back")}
           >

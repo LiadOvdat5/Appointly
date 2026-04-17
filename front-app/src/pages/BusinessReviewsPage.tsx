@@ -143,7 +143,7 @@ export default function BusinessReviewsPage() {
           <div className="max-w-3xl mx-auto flex items-center gap-3">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(`/dashboard/${paramBusinessSlug}`)}
               className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             >
               <MaterialIcon name="arrow_back" className="text-xl" />

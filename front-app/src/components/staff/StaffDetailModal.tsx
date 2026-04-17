@@ -406,9 +406,9 @@ export function StaffDetailModal({
                         onClose();
                         navigate("../services");
                       }}
-                      className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                      className="text-xs font-semibold text-primary flex items-center gap-1 group"
                     >
-                      {t("staff.conflictBanner.goToServices")}
+                      <span className="group-hover:underline">{t("staff.conflictBanner.goToServices")}</span>
                       <MaterialIcon name="arrow_forward" className="text-xs" />
                     </button>
                   </div>

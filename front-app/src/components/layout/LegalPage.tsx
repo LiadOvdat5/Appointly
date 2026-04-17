@@ -21,13 +21,13 @@ export function LegalPage({ title, lastUpdated, sections }: LegalPageProps) {
       {/* Back link */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 flex items-center gap-1 text-sm text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+        className="mb-6 flex items-center gap-1 text-sm text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded group"
         aria-label={t("buttons.back", "Go back")}
       >
         <span className="material-symbols-outlined text-base" aria-hidden="true">
           arrow_back
         </span>
-        {t("buttons.back", "Back")}
+        <span className="group-hover:underline">{t("buttons.back", "Back")}</span>
       </button>
 
       {/* Page heading */}

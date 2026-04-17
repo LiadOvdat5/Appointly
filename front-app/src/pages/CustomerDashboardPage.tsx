@@ -177,7 +177,7 @@ export default function CustomerDashboardPage() {
         <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4 flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             aria-label={t("common.back")}
           >
@@ -372,13 +372,13 @@ export default function CustomerDashboardPage() {
                           <button
                             type="button"
                             onClick={() => setReviewingAppt(appt)}
-                            className="flex items-center gap-1 text-xs text-primary hover:underline font-medium"
+                            className="flex items-center gap-1 text-xs text-primary font-medium group"
                           >
                             <MaterialIcon
                               name="star_border"
                               className="text-sm"
                             />
-                            {t("customerAppointments.leaveReview")}
+                            <span className="group-hover:underline">{t("customerAppointments.leaveReview")}</span>
                           </button>
                         ))}
                     </div>

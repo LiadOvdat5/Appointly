@@ -32,7 +32,7 @@ export function Button({
 
   const variants: Record<Variant, string> = {
     primary:
-      "bg-primary text-white hover:brightness-95 active:brightness-90 active:scale-[0.99]",
+      "bg-primary text-on-primary hover:brightness-95 active:brightness-90 active:scale-[0.99]",
     secondary:
       "bg-primary/20 text-primary hover:bg-primary/25 active:bg-primary/30 active:scale-[0.99]",
     outline:
@@ -63,7 +63,7 @@ export function Button({
       {...rest}
     >
       {isLoading && (
-        <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        <span className="h-5 w-5 animate-spin rounded-full border-2 border-on-primary/30 border-t-on-primary" />
       )}
       {children}
     </button>

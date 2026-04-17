@@ -150,7 +150,7 @@ export default function BookingPage() {
         </p>
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/business/${businessSlug}`)}
           className="text-primary text-sm underline"
         >
           {t("booking.goBack")}

@@ -214,7 +214,7 @@ export function AvailableDatePicker({ serviceId, selectedDate, onDateSelect }: P
                   : isDisabled
                   ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
                   : isSelected
-                  ? "bg-primary text-white shadow"
+                  ? "bg-primary text-on-primary shadow"
                   : "text-gray-800 dark:text-gray-100 hover:bg-primary/10 cursor-pointer",
               ]
                 .filter(Boolean)

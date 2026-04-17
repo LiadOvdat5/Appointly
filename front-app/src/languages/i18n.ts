@@ -77,13 +77,17 @@ i18n.use(initReactI18next).init({
           error: "Registration failed",
           networkError: "Network error. Please try again.",
           orContinueWith: "Or continue with",
-          inviteBanner: "You've been invited to join a business team! Create your account below and your invitation will be accepted automatically.",
-          inviteExpired: "This invitation link has expired. Please ask the business owner to send a new one.",
-          inviteInvalid: "This invitation link is invalid. Please ask the business owner for a new invitation.",
+          inviteBanner:
+            "You've been invited to join a business team! Create your account below and your invitation will be accepted automatically.",
+          inviteExpired:
+            "This invitation link has expired. Please ask the business owner to send a new one.",
+          inviteInvalid:
+            "This invitation link is invalid. Please ask the business owner for a new invitation.",
           validation: {
             nameRequired: "Full name is required",
             emailInvalid: "Please enter a valid email address",
-            passwordTooShort: "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit",
+            passwordTooShort:
+              "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit",
             passwordMismatch: "Passwords do not match",
           },
         },
@@ -189,12 +193,14 @@ i18n.use(initReactI18next).init({
           customers: {
             label: "For Customers",
             title: "Booking made simple",
-            subtitle: "From searching to confirmed — it takes less than a minute.",
+            subtitle:
+              "From searching to confirmed — it takes less than a minute.",
             howItWorksTitle: "How it works",
             steps: {
               signUp: {
                 title: "Sign Up",
-                description: "Create a free account in seconds — no credit card required.",
+                description:
+                  "Create a free account in seconds — no credit card required.",
               },
               search: {
                 title: "Search a Business",
@@ -208,7 +214,8 @@ i18n.use(initReactI18next).init({
               },
             },
             features: {
-              categories: "Browse by category (barbers, trainers, nail artists & more)",
+              categories:
+                "Browse by category (barbers, trainers, nail artists & more)",
               map: "Map view to find businesses near you",
               slots: "See real-time available slots",
               confirmation: "Instant booking confirmation",
@@ -224,7 +231,8 @@ i18n.use(initReactI18next).init({
             steps: {
               signUp: {
                 title: "Sign Up",
-                description: "Create your Appointly account as a business owner.",
+                description:
+                  "Create your Appointly account as a business owner.",
               },
               create: {
                 title: "Create Your Business",
@@ -257,7 +265,8 @@ i18n.use(initReactI18next).init({
         customerHome: {
           greeting: "Hello, {{name}}!",
           greetingSubUpcoming: "You have an upcoming appointment.",
-          greetingSubEmpty: "No appointments yet — find a business to get started.",
+          greetingSubEmpty:
+            "No appointments yet — find a business to get started.",
           searchPlaceholder: "Search for a business...",
           nextAppointment: {
             label: "Next Appointment",
@@ -298,7 +307,8 @@ i18n.use(initReactI18next).init({
           },
           becomeOwner: {
             title: "Start your own business",
-            subtitle: "Upgrade your account to Business Owner and list your own services on Appointly.",
+            subtitle:
+              "Upgrade your account to Business Owner and list your own services on Appointly.",
             cta: "Become a Business Owner",
             error: "Something went wrong. Please try again.",
           },
@@ -363,7 +373,8 @@ i18n.use(initReactI18next).init({
         admin: {
           categoryRequests: {
             title: "Category Requests",
-            subtitle: "Review and approve AI-suggested categories from business owners",
+            subtitle:
+              "Review and approve AI-suggested categories from business owners",
             loadError: "Failed to load category requests.",
             approveError: "Failed to approve request. Please try again.",
             rejectError: "Failed to reject request. Please try again.",
@@ -388,11 +399,13 @@ i18n.use(initReactI18next).init({
 
         // ============ NOTIFICATION SETTINGS PAGE ============
         notificationSettings: {
-          description: "Choose which in-app notifications you receive for your business.",
+          description:
+            "Choose which in-app notifications you receive for your business.",
           newBooking: "New Booking",
           newBookingDesc: "Get notified when a customer books an appointment",
           cancellation: "Cancellation",
-          cancellationDesc: "Get notified when a customer cancels their appointment",
+          cancellationDesc:
+            "Get notified when a customer cancels their appointment",
         },
 
         // ============ BUTTONS ============
@@ -419,7 +432,8 @@ i18n.use(initReactI18next).init({
         forms: {
           required: "This field is required",
           invalidEmail: "Please enter a valid email",
-          passwordTooShort: "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit",
+          passwordTooShort:
+            "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit",
           passwordMismatch: "Passwords do not match",
           confirmPassword: "Confirm Password",
           selectOption: "Select an option",
@@ -515,7 +529,8 @@ i18n.use(initReactI18next).init({
             emailRequired: "Email is required.",
             currentPasswordRequired: "Current password is required.",
             newPasswordRequired: "New password is required.",
-            passwordTooShort: "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit.",
+            passwordTooShort:
+              "Password must be at least 8 characters and include an uppercase letter, a lowercase letter, and a digit.",
             passwordMismatch: "Passwords do not match.",
           },
           success: {
@@ -551,13 +566,16 @@ i18n.use(initReactI18next).init({
             ownerTitle: "New Appointment",
             ownerBody: "{{clientName}} booked {{serviceName}} on {{date}}",
             customerTitle: "Booking Confirmed",
-            customerBody: "Your {{serviceName}} appointment at {{businessName}} on {{date}} is confirmed",
+            customerBody:
+              "Your {{serviceName}} appointment at {{businessName}} on {{date}} is confirmed",
           },
           appointmentCancelled: {
             ownerTitle: "Appointment Cancelled",
-            ownerBody: "{{clientName}} cancelled their {{serviceName}} appointment on {{date}}",
+            ownerBody:
+              "{{clientName}} cancelled their {{serviceName}} appointment on {{date}}",
             customerTitle: "Appointment Cancelled",
-            customerBody: "Your {{serviceName}} appointment at {{businessName}} on {{date}} was cancelled by the business",
+            customerBody:
+              "Your {{serviceName}} appointment at {{businessName}} on {{date}} was cancelled by the business",
           },
           appointmentReminder: {
             title: "Appointment Reminder",
@@ -724,7 +742,8 @@ i18n.use(initReactI18next).init({
             comingSoon: "Coming soon",
             noData: "No data available.",
             serviceAssignments: "Service Assignments",
-            assignmentNote: "Selecting a service assigns this person to it. A service can only have one assignee — selecting one already assigned elsewhere will replace the previous person.",
+            assignmentNote:
+              "Selecting a service assigns this person to it. A service can only have one assignee — selecting one already assigned elsewhere will replace the previous person.",
             noServices: "No services available for this business.",
             saveAssignments: "Save Assignments",
             saveSuccess: "Assignments saved successfully.",
@@ -745,14 +764,17 @@ i18n.use(initReactI18next).init({
           },
           blockingDialog: {
             title: "How should overlapping slots be handled?",
-            description: "If {{staffName}} gets booked for {{serviceName}}, automatically block the matching time slot on their other services?",
+            description:
+              "If {{staffName}} gets booked for {{serviceName}}, automatically block the matching time slot on their other services?",
             toggleLabel: "Block the other slot when one is booked",
           },
           conflictBanner: {
             active: "Parallel booking protection is active",
-            activeBody: "When one of {{name}}'s services is booked, the same time slot is automatically blocked on their other services. This prevents double-booking.",
+            activeBody:
+              "When one of {{name}}'s services is booked, the same time slot is automatically blocked on their other services. This prevents double-booking.",
             partiallyOff: "Parallel booking protection is partially off",
-            partiallyOffBody: "One or more of {{name}}'s services do not automatically block overlapping slots when booked. Review the settings below.",
+            partiallyOffBody:
+              "One or more of {{name}}'s services do not automatically block overlapping slots when booked. Review the settings below.",
             goToServices: "Services & Hours →",
           },
         },
@@ -895,7 +917,7 @@ i18n.use(initReactI18next).init({
           upcomingAppointments: "Upcoming Appointments",
           completedAppointments: "Completed Appointments",
           viewAll: "View all",
-          viewAllAppointments: "+{{count}} more — View all",
+          viewAllAppointments: "+{{count}} more - View all",
           manageAll: "Manage all appointments →",
           noUpcoming: {
             title: "No upcoming appointments",
@@ -1129,24 +1151,32 @@ i18n.use(initReactI18next).init({
             categoryNotFound: "Can't find your category? Describe it →",
             categoryNotFoundComingSoon: "AI category suggestions — coming soon",
             categorySuggestTitle: "Describe your service",
-            categorySuggestPlaceholder: "e.g. I cut men's hair and style beards",
+            categorySuggestPlaceholder:
+              "e.g. I cut men's hair and style beards",
             categorySuggestButton: "Find matching categories",
             categorySuggestLoading: "Finding matches…",
-            categorySuggestError: "AI is unavailable. Please pick a category manually.",
-            categorySuggestNoneMatch: "None of these fit → Request a new category",
+            categorySuggestError:
+              "AI is unavailable. Please pick a category manually.",
+            categorySuggestNoneMatch:
+              "None of these fit → Request a new category",
             categorySuggestBack: "← Back to list",
             categoryPreviewTitle: "No match found — AI suggestion",
             categoryPreviewSubtext: "Suggested new category",
-            categoryPreviewFailed: "Could not generate a suggestion. You can still pick manually.",
-            categoryPreviewBody: "This name will be submitted for admin review. Your service will be listed as Uncategorized in the meantime.",
+            categoryPreviewFailed:
+              "Could not generate a suggestion. You can still pick manually.",
+            categoryPreviewBody:
+              "This name will be submitted for admin review. Your service will be listed as Uncategorized in the meantime.",
             categoryPreviewPickManually: "Pick manually",
             categoryRequestTitle: "Request a new category",
-            categoryRequestBody: "We'll suggest a generic name based on your description and submit it for admin review. You can skip category assignment for now or pick the closest existing one.",
+            categoryRequestBody:
+              "We'll suggest a generic name based on your description and submit it for admin review. You can skip category assignment for now or pick the closest existing one.",
             categoryRequestConfirm: "Submit for review",
             categoryRequestLoading: "Submitting…",
-            categoryRequestSuccess: "Request submitted — an admin will review it soon.",
+            categoryRequestSuccess:
+              "Request submitted — an admin will review it soon.",
             categoryRequestError: "Failed to submit request. Please try again.",
-            categoryUncategorizedNote: "Your service is set to Uncategorized until the request is approved.",
+            categoryUncategorizedNote:
+              "Your service is set to Uncategorized until the request is approved.",
             addServiceButton: "Add service",
             serviceNamePlaceholder: "e.g. Haircut",
             serviceDescPlaceholder: "e.g. Classic haircut with wash and dry",
@@ -1178,7 +1208,8 @@ i18n.use(initReactI18next).init({
           unassigned: "Unassigned",
           changeAssignee: "Change",
           unassign: "Unassign",
-          blockOnBookingLabel: "If this service is booked, automatically block overlapping slots for {{name}}'s other services",
+          blockOnBookingLabel:
+            "If this service is booked, automatically block overlapping slots for {{name}}'s other services",
           conflictProtectionOn: "Conflict protection on",
           conflictProtectionOff: "Conflict protection off",
           saveButton: "Save Changes",
@@ -1384,7 +1415,7 @@ i18n.use(initReactI18next).init({
           blockedByConflict: {
             title: "Conflict-Blocked Slots",
             desc: "These slots are blocked because another service assigned to the same staff member is booked during this time.",
-            reason: "Blocked — \"{{serviceName}}\" is booked during this time.",
+            reason: 'Blocked — "{{serviceName}}" is booked during this time.',
             reasonUnknown: "Blocked due to a parallel booking conflict.",
           },
         },
@@ -1440,7 +1471,8 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} followers",
           themeColorLabel: "Theme Color",
           themeColorHint: "Live preview updates the page colors",
-          themeColorContrastWarning: "This color may not meet WCAG AA contrast requirements. Consider a darker or lighter shade.",
+          themeColorContrastWarning:
+            "This color may not meet WCAG AA contrast requirements. Consider a darker or lighter shade.",
           saveChanges: "Save changes",
           servicesTitle: "Services",
           addServiceLink: "Add service",
@@ -1480,8 +1512,10 @@ i18n.use(initReactI18next).init({
           failedVoid: "Failed to void appointment. Please try again.",
           markDidntHappenTitle: "Mark as didn't happen?",
           cancelTitle: "Cancel appointment?",
-          markDidntHappenMsg: "This will void the completed appointment and notify the record. Use only if the service did not take place.",
-          cancelMsg: "Are you sure you want to cancel this appointment? This action cannot be undone.",
+          markDidntHappenMsg:
+            "This will void the completed appointment and notify the record. Use only if the service did not take place.",
+          cancelMsg:
+            "Are you sure you want to cancel this appointment? This action cannot be undone.",
           yesVoidIt: "Yes, void it",
           yesCancelIt: "Yes, cancel it",
           keepIt: "Keep it",
@@ -1505,7 +1539,8 @@ i18n.use(initReactI18next).init({
           appointmentCount_other: "{{count}} appointments",
           noAppointmentsFound: "No appointments found",
           noAppointments: "No appointments",
-          tryAdjusting: "Try adjusting your filters or expanding the date range.",
+          tryAdjusting:
+            "Try adjusting your filters or expanding the date range.",
           viewReview: "View review",
           noReviewLeft: "No review left",
           markedNotCompleted: "Marked as not completed",
@@ -1523,11 +1558,13 @@ i18n.use(initReactI18next).init({
           freeCount: "{{count}} free",
           blockedCount: "{{count}} blocked",
           blockedSlot: "Conflict-blocked slot",
-          blockedByService: "Blocked — \"{{serviceName}}\" is booked at this time.",
+          blockedByService:
+            'Blocked — "{{serviceName}}" is booked at this time.',
           blockedByConflict: "Blocked due to a parallel booking conflict.",
           noServicesConfigured: "No services configured yet.",
           noSlotsInRange: "No slots in this range",
-          generateSlotsHint: "Generate slots for this service from Services & Hours.",
+          generateSlotsHint:
+            "Generate slots for this service from Services & Hours.",
           canceled: "Canceled",
           completed: "Completed",
           scheduled: "Scheduled",
@@ -1952,13 +1989,16 @@ i18n.use(initReactI18next).init({
           error: "ההרשמה נכשלה",
           networkError: "שגיאת רשת. בחזור שוב.",
           orContinueWith: "או המשך עם",
-          inviteBanner: "הוזמנת להצטרף לצוות עסק! צור חשבון למטה וההזמנה תאושר אוטומטית.",
-          inviteExpired: "קישור ההזמנה פג תוקף. בקש מבעל העסק לשלוח הזמנה חדשה.",
+          inviteBanner:
+            "הוזמנת להצטרף לצוות עסק! צור חשבון למטה וההזמנה תאושר אוטומטית.",
+          inviteExpired:
+            "קישור ההזמנה פג תוקף. בקש מבעל העסק לשלוח הזמנה חדשה.",
           inviteInvalid: "קישור ההזמנה אינו תקין. בקש מבעל העסק הזמנה חדשה.",
           validation: {
             nameRequired: "שם מלא הוא שדה חובה",
             emailInvalid: "יש להזין כתובת דוא״ל תקינה",
-            passwordTooShort: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה",
+            passwordTooShort:
+              "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה",
             passwordMismatch: "הסיסמאות אינן תואמות",
           },
         },
@@ -2076,12 +2116,12 @@ i18n.use(initReactI18next).init({
               },
               book: {
                 title: "הזמן פגישה",
-                description:
-                  "בחר תור פנוי ואשר מיידית — תקבל התראה מיד.",
+                description: "בחר תור פנוי ואשר מיידית — תקבל התראה מיד.",
               },
             },
             features: {
-              categories: "עיין לפי קטגוריה (מספרות, מאמנים, אמני ציפורניים ועוד)",
+              categories:
+                "עיין לפי קטגוריה (מספרות, מאמנים, אמני ציפורניים ועוד)",
               map: "תצוגת מפה למציאת עסקים בסביבתך",
               slots: "ראה משבצות זמן פנויות בזמן אמת",
               confirmation: "אישור הזמנה מיידי",
@@ -2101,8 +2141,7 @@ i18n.use(initReactI18next).init({
               },
               create: {
                 title: "צור את העסק שלך",
-                description:
-                  "הגדר דף עסק ציבורי עם שם, קטגוריה, לוגו ותיאור.",
+                description: "הגדר דף עסק ציבורי עם שם, קטגוריה, לוגו ותיאור.",
               },
               services: {
                 title: "הוסף שירותים ולוח זמנים",
@@ -2171,7 +2210,8 @@ i18n.use(initReactI18next).init({
           },
           becomeOwner: {
             title: "פתח עסק משלך",
-            subtitle: "שדרג את חשבונך לבעל עסק והוסף את השירותים שלך ל-Appointly.",
+            subtitle:
+              "שדרג את חשבונך לבעל עסק והוסף את השירותים שלך ל-Appointly.",
             cta: "הפוך לבעל עסק",
             error: "אירעה שגיאה. נסה שוב.",
           },
@@ -2292,7 +2332,8 @@ i18n.use(initReactI18next).init({
         forms: {
           required: "שדה זה חובה",
           invalidEmail: "אנא הזן דוא״ל תקף",
-          passwordTooShort: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה",
+          passwordTooShort:
+            "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה",
           passwordMismatch: "הסיסמאות לא תואמות",
           confirmPassword: "אשר סיסמה",
           selectOption: "בחר אפשרות",
@@ -2388,7 +2429,8 @@ i18n.use(initReactI18next).init({
             emailRequired: "דוא״ל חובה.",
             currentPasswordRequired: "סיסמה נוכחית חובה.",
             newPasswordRequired: "סיסמה חדשה חובה.",
-            passwordTooShort: "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה.",
+            passwordTooShort:
+              "הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה, אות קטנה וספרה.",
             passwordMismatch: "הסיסמאות לא תואמות.",
           },
           success: {
@@ -2422,15 +2464,19 @@ i18n.use(initReactI18next).init({
 
           appointmentBooked: {
             ownerTitle: "תור חדש",
-            ownerBody: "{{clientName}} קבע תור ל{{serviceName}} בתאריך {{date}}",
+            ownerBody:
+              "{{clientName}} קבע תור ל{{serviceName}} בתאריך {{date}}",
             customerTitle: "ההזמנה אושרה",
-            customerBody: "תורך ל{{serviceName}} אצל {{businessName}} בתאריך {{date}} אושר",
+            customerBody:
+              "תורך ל{{serviceName}} אצל {{businessName}} בתאריך {{date}} אושר",
           },
           appointmentCancelled: {
             ownerTitle: "תור בוטל",
-            ownerBody: "{{clientName}} ביטל את תור ה{{serviceName}} בתאריך {{date}}",
+            ownerBody:
+              "{{clientName}} ביטל את תור ה{{serviceName}} בתאריך {{date}}",
             customerTitle: "תור בוטל",
-            customerBody: "תורך ל{{serviceName}} אצל {{businessName}} בתאריך {{date}} בוטל על ידי העסק",
+            customerBody:
+              "תורך ל{{serviceName}} אצל {{businessName}} בתאריך {{date}} בוטל על ידי העסק",
           },
           appointmentReminder: {
             title: "תזכורת לתור",
@@ -2597,7 +2643,8 @@ i18n.use(initReactI18next).init({
             comingSoon: "בקרוב",
             noData: "אין נתונים זמינים.",
             serviceAssignments: "הקצאת שירותים",
-            assignmentNote: "בחירת שירות מקצה את האדם אליו. שירות יכול להיות מוקצה רק לאדם אחד — בחירה בשירות שמוקצה כבר תחליף את האדם הקודם.",
+            assignmentNote:
+              "בחירת שירות מקצה את האדם אליו. שירות יכול להיות מוקצה רק לאדם אחד — בחירה בשירות שמוקצה כבר תחליף את האדם הקודם.",
             noServices: "אין שירותים זמינים לעסק זה.",
             saveAssignments: "שמור הקצאות",
             saveSuccess: "ההקצאות נשמרו בהצלחה.",
@@ -2616,15 +2663,18 @@ i18n.use(initReactI18next).init({
             expired: "ההזמנה פגה",
           },
           blockingDialog: {
-            title: "כיצד לטפל בחריצים חופפים?",
-            description: "אם {{staffName}} מוזמן לשירות {{serviceName}}, לחסום אוטומטית את החריץ המתאים בשירותיהם האחרים?",
-            toggleLabel: "חסום את החריץ האחר כשאחד מוזמן",
+            title: "כיצד לטפל בתורים חופפים?",
+            description:
+              "אם {{staffName}} מוזמן לשירות {{serviceName}}, לחסום אוטומטית את התור המתאים בשירותיהם האחרים?",
+            toggleLabel: "חסום את התור האחר כשאחד מוזמן",
           },
           conflictBanner: {
-            active: "הגנת הזמנות מקבילות פעילה",
-            activeBody: "כאשר אחד מהשירותים של {{name}} מוזמן, אותו חריץ זמן נחסם אוטומטית בשירותיהם האחרים. זה מונע הזמנה כפולה.",
-            partiallyOff: "הגנת הזמנות מקבילות כבויה חלקית",
-            partiallyOffBody: "אחד או יותר מהשירותים של {{name}} אינם חוסמים אוטומטית חריצים חופפים. בדוק את ההגדרות למטה.",
+            active: "הגנת תורים מקבילים פעילה",
+            activeBody:
+              "כאשר אחד מהשירותים של {{name}} מוזמן, אותו תור נחסם אוטומטית בשירותיהם האחרים. זה מונע הזמנה כפולה.",
+            partiallyOff: "הגנת תורים מקבילים כבויה חלקית",
+            partiallyOffBody:
+              "אחד או יותר מהשירותים של {{name}} אינם חוסמים אוטומטית תורים חופפים. בדוק את ההגדרות למטה.",
             goToServices: "שירותים ושעות ←",
           },
         },
@@ -2711,7 +2761,8 @@ i18n.use(initReactI18next).init({
             alreadyFlagged: "כבר דווח",
             flagAsInappropriate: "דווח כלא מתאים",
             pendingNote: "ממתין לבדיקת מנהל — עדיין גלוי בדף הציבורי עד לבדיקה",
-            dismissedNote: "הדיווח נבדק ונדחה על ידי מנהל — לא ניתן לדווח שוב על ביקורת זו",
+            dismissedNote:
+              "הדיווח נבדק ונדחה על ידי מנהל — לא ניתן לדווח שוב על ביקורת זו",
           },
           badge: {
             flagged: "מדווח",
@@ -2764,7 +2815,7 @@ i18n.use(initReactI18next).init({
           upcomingAppointments: "פגישות קרובות",
           completedAppointments: "פגישות שהושלמו",
           viewAll: "הצג הכל",
-          viewAllAppointments: "+{{count}} נוספות — הצג הכל",
+          viewAllAppointments: "{{count}}+ נוספות - הצג הכל",
           manageAll: "נהל את כל הפגישות ←",
           noUpcoming: {
             title: "אין פגישות קרובות",
@@ -2994,24 +3045,29 @@ i18n.use(initReactI18next).init({
             categoryNotFound: "לא מוצאים את הקטגוריה שלכם? תארו אותה ←",
             categoryNotFoundComingSoon: "הצעות קטגוריה חכמות — בקרוב",
             categorySuggestTitle: "תארו את השירות שלכם",
-            categorySuggestPlaceholder: "לדוגמה: אני מספר שיער לגברים ומעצב זקנים",
+            categorySuggestPlaceholder:
+              "לדוגמה: אני מספר שיער לגברים ומעצב זקנים",
             categorySuggestButton: "מצא קטגוריות מתאימות",
             categorySuggestLoading: "מחפש התאמות…",
-            categorySuggestError: "הבינה המלאכותית אינה זמינה. בחרו קטגוריה ידנית.",
+            categorySuggestError:
+              "הבינה המלאכותית אינה זמינה. בחרו קטגוריה ידנית.",
             categorySuggestNoneMatch: "אף אחת לא מתאימה ← בקשו קטגוריה חדשה",
             categorySuggestBack: "← חזרה לרשימה",
             categoryPreviewTitle: "לא נמצאה התאמה — הצעת AI",
             categoryPreviewSubtext: "קטגוריה חדשה מוצעת",
             categoryPreviewFailed: "לא ניתן היה ליצור הצעה. תוכלו לבחור ידנית.",
-            categoryPreviewBody: "השם יוגש לאישור מנהל. השירות יופיע כ'לא מסווג' בינתיים.",
+            categoryPreviewBody:
+              "השם יוגש לאישור מנהל. השירות יופיע כ'לא מסווג' בינתיים.",
             categoryPreviewPickManually: "בחרו ידנית",
             categoryRequestTitle: "בקשת קטגוריה חדשה",
-            categoryRequestBody: "נציע שם גנרי על פי התיאור שלכם ונשלח לאישור מנהל. תוכלו לדלג על בחירת הקטגוריה לעת עתה או לבחור את הקרובה ביותר.",
+            categoryRequestBody:
+              "נציע שם גנרי על פי התיאור שלכם ונשלח לאישור מנהל. תוכלו לדלג על בחירת הקטגוריה לעת עתה או לבחור את הקרובה ביותר.",
             categoryRequestConfirm: "שלח לאישור",
             categoryRequestLoading: "שולח…",
             categoryRequestSuccess: "הבקשה נשלחה — מנהל יבדוק אותה בקרוב.",
             categoryRequestError: "שליחת הבקשה נכשלה. נסו שוב.",
-            categoryUncategorizedNote: "השירות מוגדר כ'לא מסווג' עד לאישור הבקשה.",
+            categoryUncategorizedNote:
+              "השירות מוגדר כ'לא מסווג' עד לאישור הבקשה.",
             addServiceButton: "הוסף שירות",
             serviceNamePlaceholder: "לדוגמה: תספורת",
             serviceDescPlaceholder: "לדוגמה: תספורת קלאסית עם חפיפה וייבוש",
@@ -3043,7 +3099,8 @@ i18n.use(initReactI18next).init({
           unassigned: "לא מוקצה",
           changeAssignee: "שנה",
           unassign: "הסר הקצאה",
-          blockOnBookingLabel: "אם שירות זה מוזמן, חסום אוטומטית חריצים חופפים עבור שירותיהם האחרים של {{name}}",
+          blockOnBookingLabel:
+            "אם שירות זה מוזמן, חסום אוטומטית תורים חופפים עבור שירותיהם האחרים של {{name}}",
           conflictProtectionOn: "הגנה מפני קונפליקטים פעילה",
           conflictProtectionOff: "הגנה מפני קונפליקטים כבויה",
           saveButton: "שמור שינויים",
@@ -3205,8 +3262,7 @@ i18n.use(initReactI18next).init({
           bookedNotCanceledCancelFrom:
             "מוזמנות בתאריך זה — אינן מבוטלות אוטומטית. בטל מ-",
           deleteAndAddException_one: "מחק תור פנוי 1 והוסף חריגה",
-          deleteAndAddException_other:
-            "מחק {{count}} תורים פנויים והוסף חריגה",
+          deleteAndAddException_other: "מחק {{count}} תורים פנויים והוסף חריגה",
           deleteAndRemoveException_one: "מחק תור פנוי 1 והסר חריגה",
           deleteAndRemoveException_other:
             "מחק {{count}} תורים פנויים והסר חריגה",
@@ -3241,7 +3297,7 @@ i18n.use(initReactI18next).init({
           blockedByConflict: {
             title: "משבצות חסומות עקב קונפליקט",
             desc: "משבצות אלה חסומות מכיוון ששירות אחר המוקצה לאותו איש צוות מוזמן באותה שעה.",
-            reason: "חסום — \"{{serviceName}}\" מוזמן באותה שעה.",
+            reason: 'חסום — "{{serviceName}}" מוזמן באותה שעה.',
             reasonUnknown: "חסום עקב הזמנה מקבילה.",
           },
         },
@@ -3297,7 +3353,8 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} עוקבים",
           themeColorLabel: "צבע ערכת נושא",
           themeColorHint: "תצוגה מקדימה חיה מעדכנת את צבעי הדף",
-          themeColorContrastWarning: "ייתכן שצבע זה אינו עומד בדרישות ניגודיות WCAG AA. שקול גוון כהה יותר או בהיר יותר.",
+          themeColorContrastWarning:
+            "ייתכן שצבע זה אינו עומד בדרישות ניגודיות WCAG AA. שקול גוון כהה יותר או בהיר יותר.",
           saveChanges: "שמור שינויים",
           servicesTitle: "שירותים",
           addServiceLink: "הוסף שירות",
@@ -3332,20 +3389,22 @@ i18n.use(initReactI18next).init({
 
         // ============ BUSINESS SCHEDULE PAGE ============
         businessSchedule: {
-          failedLoadSlots: "טעינת נתוני המקומות נכשלה.",
+          failedLoadSlots: "טעינת נתוני התורים נכשלה.",
           failedLoadAppointments: "טעינת הפגישות נכשלה.",
           failedVoid: "ביטול הפגישה נכשל. נסה שנית.",
           markDidntHappenTitle: "לסמן כלא התרחש?",
           cancelTitle: "לבטל פגישה?",
-          markDidntHappenMsg: "פעולה זו תבטל את הפגישה שהושלמה ותעדכן את הרישום. השתמש רק אם השירות לא התקיים.",
-          cancelMsg: "האם אתה בטוח שברצונך לבטל פגישה זו? לא ניתן לבטל פעולה זו.",
+          markDidntHappenMsg:
+            "פעולה זו תבטל את הפגישה שהושלמה ותעדכן את הרישום. השתמש רק אם השירות לא התקיים.",
+          cancelMsg:
+            "האם אתה בטוח שברצונך לבטל פגישה זו? לא ניתן לבטל פעולה זו.",
           yesVoidIt: "כן, בטל",
           yesCancelIt: "כן, בטל",
           keepIt: "השאר",
           scheduleLabel: "לוח זמנים",
-          appointmentsSlots: "פגישות ומקומות",
+          appointmentsSlots: "פגישות ותורים",
           listView: "רשימה",
-          slotsView: "מקומות",
+          slotsView: "תורים",
           viewPage: "צפה בדף",
           filters: "סינון",
           dateRange: "טווח תאריכים",
@@ -3380,11 +3439,11 @@ i18n.use(initReactI18next).init({
           freeCount: "{{count}} פנוי",
           blockedCount: "{{count}} חסום",
           blockedSlot: "משבצת חסומה עקב קונפליקט",
-          blockedByService: "חסום — \"{{serviceName}}\" מוזמן בשעה זו.",
+          blockedByService: 'חסום — "{{serviceName}}" מוזמן בשעה זו.',
           blockedByConflict: "חסום עקב הזמנה מקבילה.",
           noServicesConfigured: "אין שירותים מוגדרים עדיין.",
-          noSlotsInRange: "אין מקומות בטווח זה",
-          generateSlotsHint: "צור מקומות עבור שירות זה מתוך שירותים ושעות.",
+          noSlotsInRange: "אין תורים בטווח זה",
+          generateSlotsHint: "צור תורים עבור שירות זה מתוך שירותים ושעות.",
           canceled: "בוטל",
           completed: "הושלם",
           scheduled: "מתוכנן",

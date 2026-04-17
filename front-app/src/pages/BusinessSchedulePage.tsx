@@ -416,7 +416,7 @@ export default function BusinessSchedulePage() {
           <div className="max-w-4xl mx-auto flex items-center gap-3">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(`/dashboard/${slug}`)}
               className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
               aria-label={t("common.back")}
             >
@@ -427,47 +427,40 @@ export default function BusinessSchedulePage() {
               <h1 className="font-bold text-[#111418] dark:text-white text-base truncate">
                 {business?.name ?? t("business.title")} — {t("businessSchedule.scheduleLabel")}
               </h1>
-              <p className="text-xs text-gray-500">{t("businessSchedule.appointmentsSlots")}</p>
             </div>
 
-            {/* View toggle */}
+            {/* View toggle — icons-only on mobile, labelled on larger screens */}
             <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-xl p-1 gap-1 shrink-0">
               <button
                 type="button"
                 onClick={() => setViewMode("list")}
                 className={[
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors",
                   viewMode === "list"
                     ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
                     : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300",
                 ].join(" ")}
+                aria-label={t("businessSchedule.listView")}
               >
                 <MaterialIcon name="view_list" className="text-sm" />
-                {t("businessSchedule.listView")}
+                <span className="hidden sm:inline">{t("businessSchedule.listView")}</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode("grid")}
                 className={[
-                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors",
                   viewMode === "grid"
                     ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
                     : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300",
                 ].join(" ")}
+                aria-label={t("businessSchedule.slotsView")}
               >
                 <MaterialIcon name="grid_view" className="text-sm" />
-                {t("businessSchedule.slotsView")}
+                <span className="hidden sm:inline">{t("businessSchedule.slotsView")}</span>
               </button>
             </div>
 
-            <button
-              type="button"
-              onClick={() => navigate(`/business/${business?.slug ?? slug}`)}
-              className="text-xs text-primary hover:underline flex items-center gap-1 shrink-0"
-            >
-              {t("businessSchedule.viewPage")}
-              <MaterialIcon name="open_in_new" className="text-xs" />
-            </button>
           </div>
         </div>
 

@@ -38,9 +38,9 @@ export function DashboardUpcomingSection({
         <button
           type="button"
           onClick={() => navigate(`/business/${businessSlug}/schedule`)}
-          className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+          className="text-xs text-primary font-semibold flex items-center gap-1 group"
         >
-          {t("dashboard.viewAll")}
+          <span className="group-hover:underline">{t("dashboard.viewAll")}</span>
           <MaterialIcon name="chevron_right" className="text-sm" />
         </button>
       </div>
@@ -115,13 +115,6 @@ export function DashboardUpcomingSection({
             </Card>
           ))}
 
-          <button
-            type="button"
-            onClick={() => navigate(`/business/${businessSlug}/schedule`)}
-            className="w-full text-center text-sm text-primary font-semibold py-2 hover:underline"
-          >
-            {t("dashboard.manageAll")}
-          </button>
         </div>
       )}
     </section>

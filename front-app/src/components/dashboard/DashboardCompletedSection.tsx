@@ -44,15 +44,6 @@ export function DashboardCompletedSection({
         <h2 className="font-bold text-[#111418] dark:text-white text-sm uppercase tracking-wide">
           {t("dashboard.completedAppointments")}
         </h2>
-        {!loading && appointments.length > 0 && (
-          <a
-            href={viewAllHref}
-            className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
-          >
-            {t("dashboard.viewAll")}
-            <MaterialIcon name="chevron_right" className="text-sm leading-none" />
-          </a>
-        )}
       </div>
 
       {loading ? (
@@ -157,9 +148,9 @@ export function DashboardCompletedSection({
           {hasMore && (
             <a
               href={viewAllHref}
-              className="flex items-center justify-center gap-1 py-3 text-xs font-semibold text-primary hover:underline"
+              className="flex items-center justify-center gap-1 py-3 text-xs font-semibold text-primary group"
             >
-              {t("dashboard.viewAllAppointments", { count: appointments.length - PREVIEW_COUNT })}
+              <span className="group-hover:underline">{t("dashboard.viewAllAppointments", { count: appointments.length - PREVIEW_COUNT })}</span>
               <MaterialIcon name="chevron_right" className="text-sm leading-none" />
             </a>
           )}

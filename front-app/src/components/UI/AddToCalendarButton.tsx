@@ -72,10 +72,10 @@ export function AddToCalendarButton({
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+        className="flex items-center gap-1.5 text-xs font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded group"
       >
         <MaterialIcon name="calendar_add_on" className="text-sm leading-none" />
-        {t("addToCalendar.button")}
+        <span className="group-hover:underline">{t("addToCalendar.button")}</span>
       </button>
 
       {open && (

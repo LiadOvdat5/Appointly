@@ -173,7 +173,7 @@ export default function CustomerDashboardOverviewPage() {
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
             aria-label={t("common.back")}
           >

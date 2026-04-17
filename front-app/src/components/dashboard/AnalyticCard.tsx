@@ -35,8 +35,12 @@ export function AnalyticCard({ def, report, t }: AnalyticCardProps) {
         </p>
       </div>
 
-      <div className="shrink-0 text-right">
-        <p className="text-3xl font-black text-[#0e141b] dark:text-white leading-tight truncate max-w-45">
+      <div className="shrink-0 text-right max-w-[45%]">
+        <p className={[
+          "font-black text-[#0e141b] dark:text-white leading-tight wrap-break-word",
+          // Use smaller text for long strings (e.g. service names), large for numbers/short values
+          String(value).length > 8 ? "text-base" : String(value).length > 4 ? "text-xl" : "text-3xl",
+        ].join(" ")}>
           {value}
         </p>
       </div>
