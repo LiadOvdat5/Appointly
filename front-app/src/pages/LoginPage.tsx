@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,17 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const googleWrapperRef = useRef<HTMLDivElement>(null);
+  const [googleButtonWidth, setGoogleButtonWidth] = useState(400);
+
+  useEffect(() => {
+    const el = googleWrapperRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => setGoogleButtonWidth(el.offsetWidth));
+    observer.observe(el);
+    setGoogleButtonWidth(el.offsetWidth);
+    return () => observer.disconnect();
+  }, []);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -161,7 +172,7 @@ export default function LoginPage() {
             <Paragraph>Signing in with Google...</Paragraph>
           </div>
         ) : (
-          <div className="flex justify-center">
+          <div ref={googleWrapperRef} className="w-full">
             <GoogleLogin
               onSuccess={(credentialResponse) => {
                 if (credentialResponse.credential) {
@@ -171,7 +182,7 @@ export default function LoginPage() {
               onError={() => setError("Google sign-in failed. Please try again.")}
               text="signin_with"
               shape="rectangular"
-              width="400"
+              width={String(googleButtonWidth)}
             />
           </div>
         )}
