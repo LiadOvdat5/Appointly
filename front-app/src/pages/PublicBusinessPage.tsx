@@ -41,7 +41,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { AddressAutocomplete } from "../components/UI/AddressAutocomplete";
 import type { AddressResult } from "../components/UI/AddressAutocomplete";
 import { ShareModal } from "../components/UI/ShareModal";
-import { meetsAALarge } from "../utils/colorContrast";
+import { meetsAALarge, getReadableTextColor } from "../utils/colorContrast";
 import { ServiceCard } from "../components/business/ServiceCard";
 import { ServiceFormFields, emptyServiceDraft, type DraftService } from "../components/business/ServiceFormFields";
 import { BusinessReviewsSection } from "../components/business/BusinessReviewsSection";
@@ -837,7 +837,7 @@ export default function PublicBusinessPage() {
           variant="outline"
           size="sm"
           className="w-auto px-6"
-          onClick={() => navigate(-1)}
+          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/search"))}
         >
           {t("publicBusiness.goBack")}
         </Button>
@@ -861,7 +861,7 @@ export default function PublicBusinessPage() {
           variant="outline"
           size="sm"
           className="w-auto px-6"
-          onClick={() => navigate(-1)}
+          onClick={() => (window.history.length > 1 ? navigate(-1) : navigate("/search"))}
         >
           {t("publicBusiness.goBack")}
         </Button>
@@ -899,7 +899,10 @@ export default function PublicBusinessPage() {
     ? draft.themeColor
     : (business.themeColor ?? undefined);
   const themeStyle: React.CSSProperties | undefined = activeThemeColor
-    ? ({ "--color-primary": activeThemeColor } as React.CSSProperties)
+    ? ({
+        "--color-primary": activeThemeColor,
+        "--color-on-primary": getReadableTextColor(activeThemeColor),
+      } as React.CSSProperties)
     : undefined;
 
   // Displayed logo/banner/search-image (preview overrides persisted value in edit mode)
@@ -932,7 +935,7 @@ export default function PublicBusinessPage() {
         <button
           type="button"
           onClick={() =>
-            isEditing ? dispatch({ type: "EXIT_EDIT" }) : navigate(-1)
+            isEditing ? dispatch({ type: "EXIT_EDIT" }) : (window.history.length > 1 ? navigate(-1) : navigate("/search"))
           }
           className="inline-flex items-center justify-center rounded-lg p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
           aria-label={
@@ -1096,7 +1099,7 @@ export default function PublicBusinessPage() {
                   >
                     <MaterialIcon
                       name="photo_camera"
-                      className="text-white text-xs"
+                      className="text-on-primary text-xs"
                     />
                   </button>
                 </>
@@ -1410,7 +1413,7 @@ export default function PublicBusinessPage() {
                     "flex items-center gap-2 self-start rounded-full px-5 py-2 text-sm font-semibold transition-all disabled:opacity-50",
                     isFollowing
                       ? "bg-primary/10 text-primary border border-primary/30 hover:bg-red-50 hover:text-red-500 hover:border-red-200 dark:hover:bg-red-900/20"
-                      : "bg-primary text-white hover:brightness-95 shadow-sm",
+                      : "bg-primary text-on-primary hover:brightness-95 shadow-sm",
                   ].join(" ")}
                 >
                   {isFollowLoading ? (
@@ -1511,10 +1514,10 @@ export default function PublicBusinessPage() {
                 onClick={() =>
                   dispatch({ type: "EDIT_SERVICE", serviceId: "new" })
                 }
-                className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-sm font-semibold text-primary group"
               >
                 <MaterialIcon name="add" className="text-base" />
-                {t("publicBusiness.addServiceLink")}
+                <span className="group-hover:underline">{t("publicBusiness.addServiceLink")}</span>
               </button>
             )}
           </div>

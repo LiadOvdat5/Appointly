@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -66,7 +67,9 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [loading, setLoading] = useState(false);
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
 
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
   // ── Poll unread count ──────────────────────────────────────────────────────
@@ -100,20 +103,39 @@ export function NotificationBell() {
 
   const handleToggle = () => {
     const next = !open;
+    if (next && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const isRtl = document.documentElement.dir === "rtl";
+      if (isRtl) {
+        setPanelStyle({ position: "fixed", top: rect.bottom + 8, left: rect.left });
+      } else {
+        setPanelStyle({ position: "fixed", top: rect.bottom + 8, right: window.innerWidth - rect.right });
+      }
+    }
     setOpen(next);
     if (next) loadNotifications();
   };
 
-  // ── Close on outside click ────────────────────────────────────────────────
+  // ── Close on outside click or scroll ─────────────────────────────────────
   useEffect(() => {
     if (!open) return;
     const handler = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
+    const onScroll = () => setOpen(false);
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    window.addEventListener("scroll", onScroll, true);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("scroll", onScroll, true);
+    };
   }, [open]);
 
   // ── Click a notification ──────────────────────────────────────────────────
@@ -156,9 +178,10 @@ export function NotificationBell() {
   };
 
   return (
-    <div className="relative" ref={panelRef}>
+    <div className="relative">
       {/* Bell button */}
       <button
+        ref={buttonRef}
         onClick={handleToggle}
         className="relative flex size-10 items-center justify-center rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-slate-800"
         aria-label={t("notifications.title")}
@@ -178,9 +201,13 @@ export function NotificationBell() {
         )}
       </button>
 
-      {/* Panel */}
-      {open && (
-        <div className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
+      {/* Panel — rendered via portal so it always sits above all stacking contexts */}
+      {open && createPortal(
+        <div
+          ref={panelRef}
+          style={panelStyle}
+          className="z-9999 w-80 max-w-[calc(100vw-1rem)] rounded-xl border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900"
+        >
           {/* Header row */}
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
             <span className="font-semibold text-slate-900 dark:text-white">
@@ -251,7 +278,8 @@ export function NotificationBell() {
               ))
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

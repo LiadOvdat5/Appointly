@@ -81,7 +81,7 @@ export function ConfirmDialog({
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               destructive
                 ? "bg-red-500 hover:bg-red-600 text-white"
-                : "bg-primary hover:bg-primary/90 text-white",
+                : "bg-primary hover:bg-primary/90 text-on-primary",
             ].join(" ")}
           >
             {resolvedConfirm}

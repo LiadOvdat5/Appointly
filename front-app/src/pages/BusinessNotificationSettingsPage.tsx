@@ -102,7 +102,7 @@ export default function BusinessNotificationSettingsPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-200 bg-white/90 px-4 py-3 backdrop-blur-sm dark:border-gray-800 dark:bg-background-dark/90">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/dashboard/${businessSlug}`)}
           className="flex size-9 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
           aria-label={t("buttons.back")}
         >

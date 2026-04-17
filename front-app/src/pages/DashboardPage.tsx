@@ -367,43 +367,45 @@ export default function DashboardPage() {
         {/* ── Header ── */}
         <div className="bg-white dark:bg-surface-dark border-b border-gray-200 dark:border-gray-800 px-4 py-4">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"
-                onClick={() => navigate(-1)}
-                className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                onClick={() => navigate("/")}
+                className="shrink-0 p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
                 aria-label={t("common.back")}
               >
                 <MaterialIcon name="arrow_back" className="text-xl" />
               </button>
-              <div>
-                <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight">
+              <div className="min-w-0">
+                <h1 className="font-bold text-[#111418] dark:text-white text-base leading-tight truncate">
                   {business.name}
                 </h1>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 truncate">
                   {authUser?.name ?? t("dashboard.businessDashboard")}
                 </p>
               </div>
             </div>
 
-            {/* Header actions */}
-            <div className="flex items-center gap-3 shrink-0">
+            {/* Header actions — icon-only on mobile, labelled on sm+ */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setIsShareOpen(true)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition sm:p-0 sm:rounded-none sm:hover:bg-transparent dark:sm:hover:bg-transparent"
+                aria-label={t("share.button")}
               >
                 <MaterialIcon name="share" className="text-base" />
-                {t("share.button")}
+                <span className="hidden sm:inline">{t("share.button")}</span>
               </button>
               <button
                 data-tutorial="dashboard-edit-link"
                 type="button"
                 onClick={() => navigate(`/business/${business.slug}?edit=true`)}
-                className="flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline"
+                className="flex items-center gap-1.5 text-sm font-semibold text-primary p-1.5 rounded-lg hover:bg-primary/10 transition sm:p-0 sm:rounded-none sm:hover:bg-transparent group"
+                aria-label={t("dashboard.editPage")}
               >
                 <MaterialIcon name="edit" className="text-base" />
-                {t("dashboard.editPage")}
+                <span className="hidden sm:inline group-hover:underline">{t("dashboard.editPage")}</span>
               </button>
             </div>
           </div>

@@ -133,9 +133,9 @@ function NextAppointmentWidget({
             <button
               type="button"
               onClick={() => navigate("/dashboard/customer")}
-              className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+              className="text-xs text-primary font-semibold flex items-center gap-1 group"
             >
-              {t("customerHome.nextAppointment.viewAll")}
+              <span className="group-hover:underline">{t("customerHome.nextAppointment.viewAll")}</span>
               <MaterialIcon name="arrow_forward" className="text-sm" />
             </button>
           </div>

@@ -190,7 +190,7 @@ export default function StaffPage() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50 dark:bg-background-dark p-6">
         <MaterialIcon name="error_outline" className="text-5xl text-gray-400" />
         <p className="text-gray-600 dark:text-gray-400">{error}</p>
-        <Button variant="outline" onClick={() => navigate(-1)}>
+        <Button variant="outline" onClick={() => navigate(`/dashboard/${businessSlug}`)}>
           {t("buttons.goBack")}
         </Button>
       </div>
@@ -213,7 +213,7 @@ export default function StaffPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(`/dashboard/${businessSlug}`)}
               className="p-1 -ml-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition"
               aria-label={t("common.back")}
             >

@@ -71,7 +71,7 @@ export function ServiceCard({
         <div className="flex items-start gap-2">
           <div className="flex flex-col items-end gap-1 shrink-0">
             {service.price != null && (
-              <span className="font-bold text-primary text-base">${service.price.toFixed(2)}</span>
+              <span className="font-bold text-[#111418] dark:text-white text-base">${service.price.toFixed(2)}</span>
             )}
             <span className="text-xs text-gray-400 flex items-center gap-1">
               <MaterialIcon name="schedule" className="text-sm leading-none" />
@@ -121,7 +121,7 @@ export function ServiceCard({
                     key={slot.id}
                     type="button"
                     onClick={() => handleBook(`?slotId=${slot.id}&slotDate=${encodeURIComponent(slot.startDateTime)}`)}
-                    className="rounded-lg border border-primary/30 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/10 active:scale-95 transition-all"
+                    className="rounded-lg border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-[#111418] dark:text-white hover:bg-primary/20 active:scale-95 transition-all"
                   >
                     {formatSlotDate(slot.startDateTime)}{" "}
                     <span className="font-bold">{formatTime(slot.startDateTime)}</span>

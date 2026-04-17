@@ -119,8 +119,11 @@ export function CustomerStatsSection({
                       {def.getSubtext(report, t)}
                     </p>
                   </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-3xl font-black text-[#0e141b] dark:text-white leading-tight truncate max-w-45">
+                  <div className="shrink-0 text-right max-w-[45%]">
+                    <p className={[
+                      "font-black text-[#0e141b] dark:text-white leading-tight wrap-break-word",
+                      String(def.getValue(report)).length > 8 ? "text-base" : String(def.getValue(report)).length > 4 ? "text-xl" : "text-3xl",
+                    ].join(" ")}>
                       {def.getValue(report)}
                     </p>
                   </div>

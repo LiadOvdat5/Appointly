@@ -127,10 +127,10 @@ export default function AdminReviewsPage() {
         {!loading && pendingFlags > 0 && (
           <Link
             to="/admin/flagged-reviews"
-            className="mt-2 inline-flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 font-medium hover:underline"
+            className="mt-2 inline-flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 font-medium group"
           >
             <MaterialIcon name="open_in_new" className="text-xs" />
-            Review {pendingFlags} pending flag{pendingFlags !== 1 ? "s" : ""}
+            <span className="group-hover:underline">Review {pendingFlags} pending flag{pendingFlags !== 1 ? "s" : ""}</span>
           </Link>
         )}
       </Card>

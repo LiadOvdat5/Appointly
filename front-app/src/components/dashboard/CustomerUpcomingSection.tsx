@@ -36,9 +36,9 @@ export function CustomerUpcomingSection({
         <button
           type="button"
           onClick={() => navigate("/dashboard/customer")}
-          className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+          className="text-xs text-primary font-semibold flex items-center gap-1 group"
         >
-          {t("customerDashboard.viewAll")}
+          <span className="group-hover:underline">{t("customerDashboard.viewAll")}</span>
           <MaterialIcon name="chevron_right" className="text-sm" />
         </button>
       </div>
