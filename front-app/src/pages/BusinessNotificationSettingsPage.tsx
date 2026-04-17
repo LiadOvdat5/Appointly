@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Toggle } from "../components/UI/Toggle";
 import { useTranslation } from "react-i18next";
 import { getPublicBusinessBySlug } from "../services/businessManagementService";
 import {
@@ -32,22 +33,7 @@ function ToggleRow({
         <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
         <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{description}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={enabled}
-        disabled={disabled}
-        onClick={() => onChange(!enabled)}
-        className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-50 ${
-          enabled ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"
-        }`}
-      >
-        <span
-          className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-[left] duration-200 ${
-            enabled ? "left-6" : "left-1"
-          }`}
-        />
-      </button>
+      <Toggle checked={enabled} onChange={onChange} disabled={disabled} />
     </div>
   );
 }

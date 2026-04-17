@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Toggle } from "../components/UI/Toggle";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { formatTime } from "../utils/formatTime";
@@ -522,22 +523,7 @@ function PushToggleRow({
         <p className="text-sm font-semibold text-slate-900 dark:text-white">{label}</p>
         <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{description}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={enabled}
-        disabled={disabled}
-        onClick={() => onChange(!enabled)}
-        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-50 ${
-          enabled ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"
-        }`}
-      >
-        <span
-          className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
-            enabled ? "translate-x-6" : "translate-x-1"
-          }`}
-        />
-      </button>
+      <Toggle checked={enabled} onChange={onChange} disabled={disabled} />
     </div>
   );
 }
