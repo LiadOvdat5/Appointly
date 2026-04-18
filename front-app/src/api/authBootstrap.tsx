@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { AxiosError } from "axios";
 import { me } from "../api/auth";
 import { useAppDispatch } from "../redux/hooks";
 import { setSession, setGuest } from "../redux/authSlice";
@@ -38,8 +39,15 @@ export function AuthBootstrap({ children }: { children: React.ReactNode }) {
             expiresAt: toEpochMs(session.expiresAt),
           }),
         );
-      } catch {
-        dispatch(setGuest());
+      } catch (err) {
+        const status = (err as AxiosError).response?.status;
+        if (status === 401 || status === 403) {
+          // Token is definitively invalid — the user is a guest.
+          dispatch(setGuest());
+        }
+        // Any other error (5xx, network, timeout) means the server is
+        // temporarily unavailable. Leave status as "unknown" so the spinner
+        // stays visible; the user can reload once the server wakes up.
       }
     })();
   }, [dispatch]);
