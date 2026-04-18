@@ -45,11 +45,12 @@ http.interceptors.response.use(
 
     const is401 = error.response?.status === 401;
     const isRefreshEndpoint = originalRequest?.url?.includes("/auth/refresh");
+    const isBootstrapEndpoint = originalRequest?.url?.includes("/auth/me");
     const alreadyRetried = originalRequest?._retried;
 
-    // Don't attempt refresh if: not a 401, already retried, or it IS the
-    // refresh endpoint (avoids infinite loop)
-    if (!is401 || isRefreshEndpoint || alreadyRetried) {
+    // Don't attempt refresh if: not a 401, already retried, the refresh
+    // endpoint itself, or the bootstrap /me call (AuthBootstrap handles that).
+    if (!is401 || isRefreshEndpoint || isBootstrapEndpoint || alreadyRetried) {
       return Promise.reject(error);
     }
 
@@ -87,7 +88,9 @@ http.interceptors.response.use(
       // session so the user isn't kicked to /login on a server cold start.
       if ((refreshError as AxiosError).response?.status === 401) {
         store.dispatch(clearSession());
-        window.location.href = "/login";
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
       }
       return Promise.reject(refreshError);
     } finally {
