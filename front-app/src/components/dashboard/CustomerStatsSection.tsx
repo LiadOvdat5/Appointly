@@ -1,7 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { MaterialIcon } from "../UI/MaterialIcon";
-import { CUSTOMER_METRIC_DEFS, type CustomerMetricKey } from "./customerMetricDefs";
+import { CUSTOMER_METRIC_DEFS, type CustomerMetricKey, type CurrencyOpts } from "./customerMetricDefs";
 import type { CustomerReportDTO } from "../../services/appointmentService";
+import { useCurrency, CURRENCY_SYMBOLS } from "../../hooks/useCurrency";
 
 interface CustomerStatsSectionProps {
   report: CustomerReportDTO | null;
@@ -25,6 +26,12 @@ export function CustomerStatsSection({
   onToggleMetric,
 }: CustomerStatsSectionProps) {
   const { t } = useTranslation();
+  const { preferredCurrency, convert } = useCurrency();
+  const currencyOpts: CurrencyOpts = {
+    symbol: CURRENCY_SYMBOLS[preferredCurrency],
+    code: preferredCurrency,
+    convert,
+  };
 
   return (
     <section>
@@ -116,15 +123,15 @@ export function CustomerStatsSection({
                       {t(def.labelKey)}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                      {def.getSubtext(report, t)}
+                      {def.getSubtext(report, t, currencyOpts)}
                     </p>
                   </div>
                   <div className="shrink-0 text-right max-w-[45%]">
                     <p className={[
                       "font-black text-[#0e141b] dark:text-white leading-tight wrap-break-word",
-                      String(def.getValue(report)).length > 8 ? "text-base" : String(def.getValue(report)).length > 4 ? "text-xl" : "text-3xl",
+                      String(def.getValue(report, currencyOpts)).length > 8 ? "text-base" : String(def.getValue(report, currencyOpts)).length > 4 ? "text-xl" : "text-3xl",
                     ].join(" ")}>
-                      {def.getValue(report)}
+                      {def.getValue(report, currencyOpts)}
                     </p>
                   </div>
                 </div>

@@ -17,6 +17,9 @@ namespace WebAPI.DTOs
 
         public string? Description { get; set; }
 
+        [MaxLength(3)]
+        public string Currency { get; set; } = "ILS";
+
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
     }

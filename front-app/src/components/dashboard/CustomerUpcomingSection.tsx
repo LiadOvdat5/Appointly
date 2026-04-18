@@ -5,7 +5,9 @@ import { Card } from "../UI/Card";
 import { Badge } from "../UI/Badge";
 import { Button } from "../UI/Button";
 import { MaterialIcon } from "../UI/MaterialIcon";
+import { PriceDisplay } from "../UI/PriceDisplay";
 import type { AppointmentDTO } from "../../services/appointmentService";
+import type { CurrencyCode } from "../../hooks/useCurrency";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -93,7 +95,10 @@ export function CustomerUpcomingSection({
                     {appt.servicePrice != null && (
                       <span className="flex items-center gap-1 text-primary font-semibold">
                         <MaterialIcon name="payments" className="text-sm leading-none" />
-                        ${appt.servicePrice.toFixed(2)}
+                        <PriceDisplay
+                          amount={appt.servicePrice}
+                          businessCurrency={(appt.businessCurrency as CurrencyCode) ?? "ILS"}
+                        />
                       </span>
                     )}
                   </div>

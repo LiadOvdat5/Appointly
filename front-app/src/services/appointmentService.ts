@@ -15,6 +15,7 @@ export interface AppointmentDTO {
   businessId: string;
   businessName: string;
   businessSlug: string;
+  businessCurrency: string;
   businessLogoUrl?: string;
   businessAddress?: string;
   serviceScheduleId: string;
@@ -122,6 +123,7 @@ export interface CustomerReportDTO {
   completedBookings: number;
   canceledBookings: number;
   totalSpent: number;
+  totalSpentByCurrency: Record<string, number>;
   favoriteBusinessName: string | null;
   favoriteBusinessCount: number;
   favoriteServiceName: string | null;

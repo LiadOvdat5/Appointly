@@ -3,9 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../UI/Button";
 import { Card } from "../UI/Card";
 import { MaterialIcon } from "../UI/MaterialIcon";
+import { PriceDisplay } from "../UI/PriceDisplay";
 import { formatTime } from "../../utils/formatTime";
 import type { ServiceProfile } from "../../types/business";
 import type { SlotDTO } from "../../services/scheduleService";
+import type { CurrencyCode } from "../../hooks/useCurrency";
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} min`;
@@ -22,6 +24,7 @@ function formatSlotDate(iso: string): string {
 interface ServiceCardProps {
   service: ServiceProfile;
   businessSlug: string;
+  businessCurrency: CurrencyCode;
   slots: SlotDTO[];
   slotsLoading: boolean;
   isAuthenticated: boolean;
@@ -35,6 +38,7 @@ interface ServiceCardProps {
 export function ServiceCard({
   service,
   businessSlug,
+  businessCurrency,
   slots,
   slotsLoading,
   isAuthenticated,
@@ -71,7 +75,11 @@ export function ServiceCard({
         <div className="flex items-start gap-2">
           <div className="flex flex-col items-end gap-1 shrink-0">
             {service.price != null && (
-              <span className="font-bold text-[#111418] dark:text-white text-base">${service.price.toFixed(2)}</span>
+              <PriceDisplay
+                amount={service.price}
+                businessCurrency={businessCurrency}
+                className="text-[#111418] dark:text-white text-base"
+              />
             )}
             <span className="text-xs text-gray-400 flex items-center gap-1">
               <MaterialIcon name="schedule" className="text-sm leading-none" />

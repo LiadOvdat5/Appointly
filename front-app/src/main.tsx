@@ -18,14 +18,17 @@ import { store } from "./redux/store";
 
 import { AuthBootstrap } from "./api/authBootstrap";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { CurrencyProvider } from "./context/CurrencyContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <Provider store={store}>
-        <AuthBootstrap>
-          <RouterProvider router={router} />
-        </AuthBootstrap>
+        <CurrencyProvider>
+          <AuthBootstrap>
+            <RouterProvider router={router} />
+          </AuthBootstrap>
+        </CurrencyProvider>
       </Provider>
     </GoogleOAuthProvider>
   </StrictMode>,

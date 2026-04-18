@@ -91,6 +91,13 @@ namespace WebAPI.Services
                 .Where(a => a.Service?.Price != null)
                 .Sum(a => a.Service!.Price!.Value);
 
+            var totalSpentByCurrency = nonCanceled
+                .Where(a => a.Service?.Price != null && a.Business != null)
+                .GroupBy(a => a.Business!.Currency)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Sum(a => a.Service!.Price!.Value));
+
             var favBusiness = nonCanceled
                 .Where(a => a.Business != null)
                 .GroupBy(a => new { a.BusinessId, a.Business!.Name })
@@ -112,6 +119,7 @@ namespace WebAPI.Services
                 CompletedBookings = nonCanceled.Count(a => a.Status == AppointmentStatus.completed),
                 CanceledBookings = canceled,
                 TotalSpent = totalSpent,
+                TotalSpentByCurrency = totalSpentByCurrency,
                 FavoriteBusinessName = favBusiness?.Key.Name,
                 FavoriteBusinessCount = favBusiness?.Count() ?? 0,
                 FavoriteServiceName = favService?.Key.Name,

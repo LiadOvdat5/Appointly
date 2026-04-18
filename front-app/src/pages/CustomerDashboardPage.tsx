@@ -19,6 +19,8 @@ import { usePushSubscription } from "../hooks/usePushSubscription";
 import { Card } from "../components/UI/Card";
 import { Badge } from "../components/UI/Badge";
 import { MaterialIcon } from "../components/UI/MaterialIcon";
+import { PriceDisplay } from "../components/UI/PriceDisplay";
+import type { CurrencyCode } from "../hooks/useCurrency";
 import { Button } from "../components/UI/Button";
 import { ConfirmDialog } from "../components/UI/ConfirmDialog";
 import { ReviewModal } from "../components/UI/ReviewModal";
@@ -417,7 +419,10 @@ export default function CustomerDashboardPage() {
                           name="payments"
                           className="text-sm leading-none"
                         />
-                        ${appt.servicePrice.toFixed(2)}
+                        <PriceDisplay
+                          amount={appt.servicePrice}
+                          businessCurrency={(appt.businessCurrency as CurrencyCode) ?? "ILS"}
+                        />
                       </span>
                     )}
                   </div>

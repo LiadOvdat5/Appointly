@@ -1,4 +1,5 @@
 import type { CustomerReportDTO } from "../../services/appointmentService";
+import type { CurrencyCode } from "../../hooks/useCurrency";
 
 export type CustomerMetricKey =
   | "totalBookings"
@@ -10,14 +11,30 @@ export type CustomerMetricKey =
 
 export type TFunc = (key: string, opts?: Record<string, unknown>) => string;
 
+export interface CurrencyOpts {
+  symbol: string;
+  code: CurrencyCode;
+  convert: (amount: number, from: CurrencyCode, to: CurrencyCode) => number;
+}
+
 export interface CustomerMetricDef {
   key: CustomerMetricKey;
   labelKey: string;
   icon: string;
   iconColor: string;
   iconBg: string;
-  getValue: (r: CustomerReportDTO) => string;
-  getSubtext: (r: CustomerReportDTO, t: TFunc) => string;
+  getValue: (r: CustomerReportDTO, currency?: CurrencyOpts) => string;
+  getSubtext: (r: CustomerReportDTO, t: TFunc, currency?: CurrencyOpts) => string;
+}
+
+/** Convert totalSpentByCurrency map → single number in the preferred currency */
+function computeTotalSpent(r: CustomerReportDTO, currency?: CurrencyOpts): number {
+  if (!currency || !r.totalSpentByCurrency || Object.keys(r.totalSpentByCurrency).length === 0) {
+    return r.totalSpent;
+  }
+  return Object.entries(r.totalSpentByCurrency).reduce((sum, [from, amount]) => {
+    return sum + currency.convert(amount, from as CurrencyCode, currency.code);
+  }, 0);
 }
 
 export const CUSTOMER_METRIC_DEFS: CustomerMetricDef[] = [
@@ -64,11 +81,18 @@ export const CUSTOMER_METRIC_DEFS: CustomerMetricDef[] = [
     icon: "payments",
     iconColor: "text-purple-600",
     iconBg: "bg-purple-100 dark:bg-purple-900/30",
-    getValue: (r) => `$${r.totalSpent.toFixed(2)}`,
-    getSubtext: (r, t) =>
-      r.totalBookings > 0
-        ? `$${(r.totalSpent / r.totalBookings).toFixed(2)} avg per visit`
-        : t("customerDashboard.metrics.noDataYet"),
+    getValue: (r, currency) => {
+      const sym = currency?.symbol ?? "$";
+      const total = computeTotalSpent(r, currency);
+      return `${sym}${total.toFixed(2)}`;
+    },
+    getSubtext: (r, t, currency) => {
+      const sym = currency?.symbol ?? "$";
+      const total = computeTotalSpent(r, currency);
+      return r.totalBookings > 0
+        ? `${sym}${(total / r.totalBookings).toFixed(2)} avg per visit`
+        : t("customerDashboard.metrics.noDataYet");
+    },
   },
   {
     key: "favBusiness",

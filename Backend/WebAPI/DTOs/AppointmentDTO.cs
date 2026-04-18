@@ -30,6 +30,7 @@ namespace WebAPI.DTOs
         public Guid BusinessId { get; set; }
         public string BusinessName { get; set; } = string.Empty;
         public string BusinessSlug { get; set; } = string.Empty;
+        public string BusinessCurrency { get; set; } = "ILS";
         public string? BusinessLogoUrl { get; set; }
         public string? BusinessAddress { get; set; }
         public string? BusinessPhone { get; set; }
