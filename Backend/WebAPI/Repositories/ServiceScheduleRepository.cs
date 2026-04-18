@@ -35,10 +35,11 @@ namespace WebAPI.Repositories
 
         public async Task<List<ServiceSchedule>> GetAvailableSlotsAsync(Guid serviceId, DateTime from, DateTime to)
         {
+            var effectiveFrom = from < DateTime.UtcNow ? DateTime.UtcNow : from;
             return await _context.ServiceSchedules
                 .Where(ss => ss.ServiceId == serviceId
                     && ss.Status == ScheduleStatus.AVAILABLE
-                    && ss.StartDateTime >= from
+                    && ss.StartDateTime >= effectiveFrom
                     && ss.EndDateTime <= to)
                 .OrderBy(ss => ss.StartDateTime)
                 .ToListAsync();

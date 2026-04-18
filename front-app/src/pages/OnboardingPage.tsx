@@ -65,6 +65,7 @@ export default function OnboardingPage() {
     phone: "",
     description: "",
     currency: "ILS",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
   const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -81,6 +82,7 @@ export default function OnboardingPage() {
         phone: businessFields.phone.trim(),
         description: businessFields.description.trim() || undefined,
         currency: businessFields.currency,
+        timezone: businessFields.timezone,
         latitude: businessFields.latitude ?? undefined,
         longitude: businessFields.longitude ?? undefined,
       });

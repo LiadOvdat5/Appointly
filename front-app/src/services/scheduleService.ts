@@ -29,7 +29,10 @@ export const getAvailableSlotsForService = async (
   const response = await apiClient.get<SlotDTO[]>(
     `/api/schedule/service/${serviceId}/slots/range?${params.toString()}`,
   );
-  return response.data.filter((s) => s.status === ScheduleStatus.AVAILABLE);
+  const now = new Date();
+  return response.data.filter(
+    (s) => s.status === ScheduleStatus.AVAILABLE && new Date(s.startDateTime) > now,
+  );
 };
 
 

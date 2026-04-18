@@ -61,14 +61,16 @@ namespace WebAPI.Services
 
                 // Use business settings for slot generation
                 var advanceBookingDays = service.Business.AdvanceBookingDays > 0 ? service.Business.AdvanceBookingDays : 90;
-                var timezone = !string.IsNullOrEmpty(service.Business.Timezone) ? service.Business.Timezone : "UTC";
+                var timezoneId = !string.IsNullOrEmpty(service.Business.Timezone) ? service.Business.Timezone : "UTC";
+                var tz = LoadTimeZone(timezoneId);
 
-                // Calculate generation range
-                var startDate = DateTime.UtcNow.Date.AddDays(1);
-                var endDate = DateTime.UtcNow.AddDays(advanceBookingDays).Date;
+                // Calculate generation range in the business's local timezone
+                var nowLocal = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+                var startDate = nowLocal.Date.AddDays(1);
+                var endDate = nowLocal.Date.AddDays(advanceBookingDays);
 
                 _logger.LogInformation($"Generating slots for service {serviceId} from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd} " +
-                    $"(duration: {service.Duration}min, timezone: {timezone})");
+                    $"(duration: {service.Duration}min, timezone: {timezoneId})");
 
                 int slotsCreated = 0;
                 for (var date = startDate; date <= endDate; date = date.AddDays(1))
@@ -95,7 +97,7 @@ namespace WebAPI.Services
                     }
 
                     // Split intervals into slots
-                    var slots = GenerateSlotsFromIntervals(date, workingIntervals, service.Duration);
+                    var slots = GenerateSlotsFromIntervals(date, workingIntervals, service.Duration, tz);
 
                     // Insert slots
                     foreach (var (startDateTime, endDateTime) in slots)
@@ -136,10 +138,11 @@ namespace WebAPI.Services
                     return 0;
                 }
 
-                var timezone = !string.IsNullOrEmpty(service.Business.Timezone) ? service.Business.Timezone : "UTC";
+                var timezoneId = !string.IsNullOrEmpty(service.Business.Timezone) ? service.Business.Timezone : "UTC";
+                var tz = LoadTimeZone(timezoneId);
 
                 _logger.LogInformation($"Generating slots for service {serviceId} from {startDate:yyyy-MM-dd} to {endDate:yyyy-MM-dd} " +
-                    $"(duration: {service.Duration}min, timezone: {timezone})");
+                    $"(duration: {service.Duration}min, timezone: {timezoneId})");
 
                 int slotsCreated = 0;
                 for (var date = startDate; date <= endDate; date = date.AddDays(1))
@@ -166,7 +169,7 @@ namespace WebAPI.Services
                     }
 
                     // Split intervals into slots
-                    var slots = GenerateSlotsFromIntervals(date, workingIntervals, service.Duration);
+                    var slots = GenerateSlotsFromIntervals(date, workingIntervals, service.Duration, tz);
 
                     // Insert slots
                     foreach (var (startDateTime, endDateTime) in slots)
@@ -306,10 +309,10 @@ namespace WebAPI.Services
         }
 
         /// <summary>
-        /// Split time intervals into service duration slots
+        /// Split time intervals into service duration slots, storing times as UTC.
         /// </summary>
         private List<(DateTime start, DateTime end)> GenerateSlotsFromIntervals(
-            DateTime date, TimeSpan[] intervals, int durationMinutes)
+            DateTime date, TimeSpan[] intervals, int durationMinutes, TimeZoneInfo tz)
         {
             var slots = new List<(DateTime start, DateTime end)>();
             var slotDuration = TimeSpan.FromMinutes(durationMinutes);
@@ -326,12 +329,22 @@ namespace WebAPI.Services
 
                 while (current.Add(slotDuration) <= end)
                 {
-                    slots.Add((current, current.Add(slotDuration)));
+                    var utcStart = TimeZoneInfo.ConvertTimeToUtc(
+                        DateTime.SpecifyKind(current, DateTimeKind.Unspecified), tz);
+                    var utcEnd = TimeZoneInfo.ConvertTimeToUtc(
+                        DateTime.SpecifyKind(current.Add(slotDuration), DateTimeKind.Unspecified), tz);
+                    slots.Add((utcStart, utcEnd));
                     current = current.Add(slotDuration);
                 }
             }
 
             return slots;
+        }
+
+        private static TimeZoneInfo LoadTimeZone(string timezoneId)
+        {
+            try { return TimeZoneInfo.FindSystemTimeZoneById(timezoneId); }
+            catch { return TimeZoneInfo.Utc; }
         }
     }
 }

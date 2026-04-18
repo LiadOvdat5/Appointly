@@ -40,6 +40,7 @@ export interface CreateBusinessInput {
   phone: string;
   description?: string;
   currency?: string;
+  timezone?: string;
   latitude?: number;
   longitude?: number;
 }

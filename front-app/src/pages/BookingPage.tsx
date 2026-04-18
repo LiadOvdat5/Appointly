@@ -23,6 +23,7 @@ import { MaterialIcon } from "../components/UI/MaterialIcon";
 import { BookingConfirmedScreen } from "../components/booking/BookingConfirmedScreen";
 import { BookingTimeSection } from "../components/booking/BookingTimeSection";
 import { BookingSummaryCard } from "../components/booking/BookingSummaryCard";
+import type { CurrencyCode } from "../hooks/useCurrency";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -272,6 +273,7 @@ export default function BookingPage() {
               selectedSlotId={selectedSlotId}
               onSelectSlot={setSelectedSlotId}
               locale={i18n.language}
+              timezone={business.timezone ?? "UTC"}
             />
           </div>
         )}
@@ -286,6 +288,8 @@ export default function BookingPage() {
             isSubmitting={isSubmitting}
             onConfirm={handleConfirmBooking}
             locale={i18n.language}
+            businessCurrency={(business.currency as CurrencyCode) ?? "USD"}
+            timezone={business.timezone ?? "UTC"}
           />
         )}
       </div>

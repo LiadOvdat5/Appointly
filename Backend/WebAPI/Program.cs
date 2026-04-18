@@ -211,6 +211,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCors("Frontend");
 
 // Security response headers
 app.Use(async (context, next) =>
@@ -225,8 +226,6 @@ app.Use(async (context, next) =>
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
-
-app.UseCors("Frontend");
 app.MapControllers();
 
 app.Run();

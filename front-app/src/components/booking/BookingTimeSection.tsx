@@ -11,6 +11,7 @@ interface BookingTimeSectionProps {
   selectedSlotId: string | null;
   onSelectSlot: (id: string | null) => void;
   locale: string;
+  timezone: string;
 }
 
 function formatDateLong(date: Date, locale: string): string {
@@ -29,6 +30,7 @@ export function BookingTimeSection({
   selectedSlotId,
   onSelectSlot,
   locale,
+  timezone,
 }: BookingTimeSectionProps) {
   const { t } = useTranslation();
 
@@ -57,7 +59,7 @@ export function BookingTimeSection({
               selected={slot.id === selectedSlotId}
               onClick={() => onSelectSlot(slot.id === selectedSlotId ? null : slot.id)}
             >
-              {formatTime(slot.startDateTime)}
+              {formatTime(slot.startDateTime, timezone)}
             </TimeSlot>
           ))}
         </div>
