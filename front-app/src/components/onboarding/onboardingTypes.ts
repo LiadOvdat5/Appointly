@@ -8,6 +8,7 @@ export interface BusinessFields {
   phone: string;
   description: string;
   currency: string;
+  timezone: string;
 }
 
 export interface ServiceDraft {

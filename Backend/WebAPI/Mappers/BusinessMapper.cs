@@ -15,6 +15,7 @@ namespace WebAPI.Mappers
                 Address = createBusinessDto.Address,
                 Phone = createBusinessDto.Phone,
                 Currency = createBusinessDto.Currency,
+                Timezone = createBusinessDto.Timezone,
                 Latitude = createBusinessDto.Latitude,
                 Longitude = createBusinessDto.Longitude,
                 CreatedAt = DateTime.UtcNow,

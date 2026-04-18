@@ -5,6 +5,8 @@ import type { ServiceProfile } from "../../types/business";
 import { Button } from "../UI/Button";
 import { Card } from "../UI/Card";
 import { MaterialIcon } from "../UI/MaterialIcon";
+import { PriceDisplay } from "../UI/PriceDisplay";
+import type { CurrencyCode } from "../../hooks/useCurrency";
 
 interface BookingSummaryCardProps {
   service: ServiceProfile;
@@ -14,6 +16,8 @@ interface BookingSummaryCardProps {
   isSubmitting: boolean;
   onConfirm: () => void;
   locale: string;
+  businessCurrency: CurrencyCode;
+  timezone: string;
 }
 
 export function BookingSummaryCard({
@@ -24,6 +28,8 @@ export function BookingSummaryCard({
   isSubmitting,
   onConfirm,
   locale,
+  businessCurrency,
+  timezone,
 }: BookingSummaryCardProps) {
   const { t } = useTranslation();
 
@@ -52,13 +58,13 @@ export function BookingSummaryCard({
         <div className="flex justify-between text-gray-600 dark:text-gray-400">
           <span>{t("booking.summaryTime")}</span>
           <span className="font-medium text-[#111418] dark:text-white">
-            {formatTime(selectedSlot.startDateTime)} – {formatTime(selectedSlot.endDateTime)}
+            {formatTime(selectedSlot.startDateTime, timezone)} – {formatTime(selectedSlot.endDateTime, timezone)}
           </span>
         </div>
         {service.price != null && (
           <div className="flex justify-between text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
             <span className="font-semibold">{t("booking.summaryTotal")}</span>
-            <span className="font-bold text-primary">${service.price.toFixed(2)}</span>
+            <PriceDisplay amount={service.price} businessCurrency={businessCurrency} className="text-primary" />
           </div>
         )}
       </div>
