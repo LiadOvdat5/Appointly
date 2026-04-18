@@ -20,6 +20,10 @@ namespace WebAPI.DTOs
         /// Only populated for owner-facing slot views (includeBlocked=true).
         /// </summary>
         public string? BlockingServiceName { get; set; }
+        /// <summary>
+        /// Optional note set when an owner or partner manually blocks this slot.
+        /// </summary>
+        public string? BlockNote { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

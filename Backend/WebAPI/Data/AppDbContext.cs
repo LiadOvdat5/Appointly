@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Models;
 
 namespace WebAPI.Data
@@ -272,6 +273,21 @@ namespace WebAPI.Data
                 .HasForeignKey(ss => ss.BlockingAppointmentId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
+
+            // =====================================================
+            // UTC DateTime Value Converter
+            // Ensures all DateTime values read from SQL Server are treated as UTC
+            // so System.Text.Json serializes them with a Z suffix, preventing
+            // browsers from misinterpreting them as local time.
+            // =====================================================
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+                v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+                foreach (var property in entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?)))
+                    property.SetValueConverter(utcConverter);
         }
     }
 }

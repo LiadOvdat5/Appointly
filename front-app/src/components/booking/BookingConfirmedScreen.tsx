@@ -71,7 +71,7 @@ export function BookingConfirmedScreen({ appointment, business }: BookingConfirm
           <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
             <span>{t("booking.confirmed.time")}</span>
             <span className="font-medium text-[#111418] dark:text-white">
-              {formatTime(appointment.startDateTime)} – {formatTime(appointment.endDateTime)}
+              {formatTime(appointment.startDateTime, business?.timezone ?? undefined)} – {formatTime(appointment.endDateTime, business?.timezone ?? undefined)}
             </span>
           </div>
           {appointment.servicePrice != null && (

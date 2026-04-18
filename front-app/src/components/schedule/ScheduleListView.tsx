@@ -6,6 +6,7 @@ import { Input } from "../UI/Input";
 import { MaterialIcon } from "../UI/MaterialIcon";
 import { StatusBadge } from "./StatusBadge";
 import { AppointmentStatus, type AppointmentDTO } from "../../services/appointmentService";
+import type { SlotDTO } from "../../services/scheduleService";
 import type { ReviewDTO } from "../../services/reviewService";
 import type { ServiceProfile } from "../../types/business";
 
@@ -21,6 +22,7 @@ function formatDate(iso: string): string {
 interface ScheduleListViewProps {
   services: ServiceProfile[];
   filtered: AppointmentDTO[];
+  blockedSlots?: SlotDTO[];
   loading: boolean;
   error: string | null;
   startDate: string;
@@ -32,6 +34,7 @@ interface ScheduleListViewProps {
   showCanceled: boolean;
   cancelingId: string | null;
   reviewMap: Record<string, ReviewDTO>;
+  timezone?: string;
   onStartDateChange: (v: string) => void;
   onEndDateChange: (v: string) => void;
   onApplyRange: () => void;
@@ -43,11 +46,13 @@ interface ScheduleListViewProps {
   onRequestCancel: (id: string) => void;
   onRequestDidntHappen: (id: string) => void;
   onViewReview: (r: ReviewDTO) => void;
+  onUnblockSlot?: (slotId: string) => Promise<void>;
 }
 
 export function ScheduleListView({
   services,
   filtered,
+  blockedSlots = [],
   loading,
   error,
   startDate,
@@ -59,6 +64,7 @@ export function ScheduleListView({
   showCanceled,
   cancelingId,
   reviewMap,
+  timezone,
   onStartDateChange,
   onEndDateChange,
   onApplyRange,
@@ -70,8 +76,30 @@ export function ScheduleListView({
   onRequestCancel,
   onRequestDidntHappen,
   onViewReview,
+  onUnblockSlot,
 }: ScheduleListViewProps) {
   const { t } = useTranslation();
+
+  // Build merged list: appointments + manually-blocked slots, sorted by time
+  type ListItem =
+    | { type: "appointment"; appt: AppointmentDTO }
+    | { type: "blocked"; slot: SlotDTO };
+
+  const mergedItems: ListItem[] = [
+    ...filtered.map((appt): ListItem => ({ type: "appointment", appt })),
+    // Only show manually-blocked slots (no blockingAppointmentId = manual block)
+    ...blockedSlots
+      .filter((s) => !s.blockingAppointmentId)
+      .map((slot): ListItem => ({ type: "blocked", slot })),
+  ].sort((a, b) => {
+    const aTime = a.type === "appointment"
+      ? new Date(a.appt.startDateTime).getTime()
+      : new Date(a.slot.startDateTime).getTime();
+    const bTime = b.type === "appointment"
+      ? new Date(b.appt.startDateTime).getTime()
+      : new Date(b.slot.startDateTime).getTime();
+    return aTime - bTime;
+  });
 
   return (
     <div className="space-y-5">
@@ -138,7 +166,7 @@ export function ScheduleListView({
 
       {!loading && !error && (
         <p className="text-xs text-gray-500 px-1">
-          {filtered.length === 0
+          {mergedItems.length === 0
             ? t("businessSchedule.noAppointmentsFound")
             : t("businessSchedule.appointmentCount", { count: filtered.length })}
         </p>
@@ -157,7 +185,7 @@ export function ScheduleListView({
         </div>
       )}
 
-      {!loading && !error && filtered.length === 0 && (
+      {!loading && !error && mergedItems.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <div className="h-14 w-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
             <MaterialIcon name="event_busy" className="text-2xl text-gray-400" />
@@ -168,7 +196,41 @@ export function ScheduleListView({
       )}
 
       {!loading &&
-        filtered.map((appt) => {
+        mergedItems.map((item) => {
+          if (item.type === "blocked") {
+            const slot = item.slot;
+            return (
+              <Card key={`blocked-${slot.id}`} className="p-4 space-y-2 border-l-4 border-l-red-400">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <MaterialIcon name="lock" className="text-red-400 text-sm shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-red-500">{t("businessSchedule.blockedLabel")}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {formatDate(slot.startDateTime)}
+                        {" · "}
+                        {formatTime(slot.startDateTime, timezone)} – {formatTime(slot.endDateTime, timezone)}
+                      </p>
+                    </div>
+                  </div>
+                  {onUnblockSlot && (
+                    <button
+                      type="button"
+                      onClick={() => onUnblockSlot(slot.id)}
+                      className="text-xs font-semibold text-primary hover:underline shrink-0"
+                    >
+                      {t("businessSchedule.unblockSlot")}
+                    </button>
+                  )}
+                </div>
+                {slot.blockNote && (
+                  <p className="text-xs text-gray-500 italic pl-6">&ldquo;{slot.blockNote}&rdquo;</p>
+                )}
+              </Card>
+            );
+          }
+
+          const appt = item.appt;
           const review = reviewMap[appt.id];
           const isCompleted = appt.status === AppointmentStatus.Completed;
           const isVoided =
@@ -192,7 +254,7 @@ export function ScheduleListView({
                 </span>
                 <span className="flex items-center gap-1">
                   <MaterialIcon name="schedule" className="text-sm leading-none" />
-                  {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                  {formatTime(appt.startDateTime, timezone)} – {formatTime(appt.endDateTime, timezone)}
                 </span>
                 {appt.servicePrice != null && (
                   <span className="flex items-center gap-1 font-semibold text-primary">

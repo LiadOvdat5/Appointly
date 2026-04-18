@@ -273,7 +273,7 @@ export default function BookingPage() {
               selectedSlotId={selectedSlotId}
               onSelectSlot={setSelectedSlotId}
               locale={i18n.language}
-              timezone={business.timezone ?? "UTC"}
+              timezone={business.timezone ?? undefined}
             />
           </div>
         )}
@@ -289,7 +289,7 @@ export default function BookingPage() {
             onConfirm={handleConfirmBooking}
             locale={i18n.language}
             businessCurrency={(business.currency as CurrencyCode) ?? "USD"}
-            timezone={business.timezone ?? "UTC"}
+            timezone={business.timezone ?? undefined}
           />
         )}
       </div>
