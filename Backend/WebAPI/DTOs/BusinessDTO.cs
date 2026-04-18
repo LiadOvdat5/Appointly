@@ -10,6 +10,7 @@ namespace WebAPI.DTOs
         public string Address { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string? ThemeColor { get; set; }
+        public string Currency { get; set; } = "ILS";
         public string? LogoUrl { get; set; }
         public string? BannerUrl { get; set; }
         public string? SearchImageUrl { get; set; }

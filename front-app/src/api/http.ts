@@ -12,8 +12,11 @@ export const http = axios.create({
 // ── Silent refresh interceptor ────────────────────────────────────────────────
 // When any request returns 401 we attempt one silent POST /auth/refresh.
 // If that succeeds the server sets new HttpOnly cookies and we retry the
-// original request transparently.  If the refresh itself fails (expired /
-// revoked refresh token) we clear the Redux session and redirect to /login.
+// original request transparently.  If the refresh itself returns 401 (expired /
+// revoked token) we clear the Redux session and redirect to /login.
+// Any other refresh failure (5xx, network error, timeout) is treated as a
+// transient server issue — we do NOT clear the session, so the user isn't
+// bounced to /login during a cold start (e.g. Azure SQL auto-pause wake-up).
 //
 // Concurrent 401s are queued: only one refresh call is ever in-flight at a
 // time and all waiting requests are retried (or rejected) once it resolves.
@@ -79,8 +82,13 @@ http.interceptors.response.use(
       return http(originalRequest);
     } catch (refreshError) {
       drainQueue(refreshError);
-      store.dispatch(clearSession());
-      window.location.href = "/login";
+      // Only a 401 from the refresh endpoint means the token is genuinely
+      // expired/revoked. Network errors and 5xx are transient — preserve the
+      // session so the user isn't kicked to /login on a server cold start.
+      if ((refreshError as AxiosError).response?.status === 401) {
+        store.dispatch(clearSession());
+        window.location.href = "/login";
+      }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

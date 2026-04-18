@@ -33,6 +33,9 @@ import {
   type SlotDTO,
 } from "../services/scheduleService";
 import type { BusinessProfile, ServiceProfile } from "../types/business";
+import { CURRENCY_SYMBOLS, type CurrencyCode } from "../hooks/useCurrency";
+
+const CURRENCIES: CurrencyCode[] = ["ILS", "EUR", "USD"];
 import type { Category } from "../types/search";
 import { Button } from "../components/UI/Button";
 import { Card } from "../components/UI/Card";
@@ -102,6 +105,7 @@ type DraftBusiness = {
   longitude: number | null;
   phone: string;
   themeColor: string;
+  currency: string;
 };
 
 type PageState =
@@ -188,6 +192,7 @@ function makeDraftFromBusiness(b: BusinessProfile): DraftBusiness {
     longitude: b.longitude ?? null,
     phone: b.phone ?? "",
     themeColor: b.themeColor ?? "#197fe6",
+    currency: b.currency ?? "ILS",
   };
 }
 
@@ -654,6 +659,7 @@ export default function PublicBusinessPage() {
         address: page.draft.address,
         phone: page.draft.phone,
         themeColor: page.draft.themeColor,
+        currency: page.draft.currency,
         latitude: page.draft.latitude ?? undefined,
         longitude: page.draft.longitude ?? undefined,
       });
@@ -1474,6 +1480,34 @@ export default function PublicBusinessPage() {
             </div>
           )}
 
+          {/* Currency picker (edit mode only) */}
+          {isEditing && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-semibold text-[#111418] dark:text-gray-200">
+                {t("publicBusiness.currencyLabel")}
+              </label>
+              <div className="flex gap-2">
+                {CURRENCIES.map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() =>
+                      dispatch({ type: "SET_DRAFT", field: "currency", value: code })
+                    }
+                    className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg border py-2.5 text-sm font-medium transition-colors ${
+                      draft.currency === code
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+                    }`}
+                  >
+                    <span>{CURRENCY_SYMBOLS[code]}</span>
+                    <span>{code}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Save error */}
           {saveError && <p className="text-sm text-danger">{saveError}</p>}
 
@@ -1555,6 +1589,7 @@ export default function PublicBusinessPage() {
                     key={svc.id}
                     service={svc}
                     businessSlug={businessSlug!}
+                    businessCurrency={(business.currency as CurrencyCode) ?? "ILS"}
                     slots={slotsByService[svc.id] ?? []}
                     slotsLoading={slotsLoadingFor.has(svc.id)}
                     isAuthenticated={isAuthenticated}

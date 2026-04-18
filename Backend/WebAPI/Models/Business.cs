@@ -37,6 +37,11 @@ namespace WebAPI.Models
         public string? BannerUrl { get; set; }
         public string? SearchImageUrl { get; set; }
 
+        // Currency used for all services in this business (ISO 4217: ILS, EUR, USD)
+        [Required]
+        [MaxLength(3)]
+        public string Currency { get; set; } = "ILS";
+
         // Schedule settings
         [Required]
         [MaxLength(100)]

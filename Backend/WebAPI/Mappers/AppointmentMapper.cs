@@ -41,6 +41,7 @@ namespace WebAPI.Mappers
                 BusinessId = appointment.BusinessId,
                 BusinessName = appointment.Business?.Name ?? string.Empty,
                 BusinessSlug = appointment.Business?.Slug ?? string.Empty,
+                BusinessCurrency = appointment.Business?.Currency ?? "ILS",
                 BusinessLogoUrl = appointment.Business?.LogoUrl,
                 BusinessAddress = appointment.Business?.Address,
                 BusinessPhone = appointment.Business?.Phone,

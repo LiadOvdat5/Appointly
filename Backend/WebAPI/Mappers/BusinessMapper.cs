@@ -14,6 +14,7 @@ namespace WebAPI.Mappers
                 Name = createBusinessDto.Name,
                 Address = createBusinessDto.Address,
                 Phone = createBusinessDto.Phone,
+                Currency = createBusinessDto.Currency,
                 Latitude = createBusinessDto.Latitude,
                 Longitude = createBusinessDto.Longitude,
                 CreatedAt = DateTime.UtcNow,
@@ -33,6 +34,7 @@ namespace WebAPI.Mappers
                 Address = business.Address ?? string.Empty,
                 Phone = business.Phone ?? string.Empty,
                 ThemeColor = business.ThemeColor,
+                Currency = business.Currency,
                 LogoUrl = business.LogoUrl,
                 BannerUrl = business.BannerUrl,
                 SearchImageUrl = business.SearchImageUrl,
@@ -64,6 +66,9 @@ namespace WebAPI.Mappers
 
             if (updateDto.ThemeColor != null)
                 business.ThemeColor = updateDto.ThemeColor;
+
+            if (updateDto.Currency != null)
+                business.Currency = updateDto.Currency;
 
             if (updateDto.Latitude.HasValue)
                 business.Latitude = updateDto.Latitude;

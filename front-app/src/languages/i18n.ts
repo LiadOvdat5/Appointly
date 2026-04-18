@@ -14,6 +14,14 @@ i18n.use(initReactI18next).init({
           selectLanguage: "Select Language",
         },
 
+        // ============ CURRENCY ============
+        currency: {
+          selectCurrency: "Select Currency",
+          ILS: "Israeli Shekel (₪)",
+          EUR: "Euro (€)",
+          USD: "US Dollar ($)",
+        },
+
         // ============ THEME ============
         theme: {
           switchToDark: "Switch to dark mode",
@@ -1148,6 +1156,7 @@ i18n.use(initReactI18next).init({
             addressLabel: "Address *",
             phoneLabel: "Phone *",
             descriptionLabel: "Description",
+            currencyLabel: "Business currency",
             businessNamePlaceholder: "e.g. John's Barbershop",
             addressPlaceholder: "e.g. 123 Main St, Tel Aviv",
             phonePlaceholder: "e.g. +972-50-0000000",
@@ -1491,6 +1500,7 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} followers",
           themeColorLabel: "Theme Color",
           themeColorHint: "Live preview updates the page colors",
+          currencyLabel: "Business Currency",
           themeColorContrastWarning:
             "This color may not meet WCAG AA contrast requirements. Consider a darker or lighter shade.",
           saveChanges: "Save changes",
@@ -1944,6 +1954,14 @@ i18n.use(initReactI18next).init({
           english: "English",
           hebrew: "עברית",
           selectLanguage: "בחר שפה",
+        },
+
+        // ============ CURRENCY ============
+        currency: {
+          selectCurrency: "בחר מטבע",
+          ILS: "שקל ישראלי (₪)",
+          EUR: "אירו (€)",
+          USD: "דולר אמריקאי ($)",
         },
 
         // ============ THEME ============
@@ -3064,6 +3082,7 @@ i18n.use(initReactI18next).init({
             addressLabel: "כתובת *",
             phoneLabel: "טלפון *",
             descriptionLabel: "תיאור",
+            currencyLabel: "מטבע העסק",
             businessNamePlaceholder: "לדוגמה: מספרת יוסי",
             addressPlaceholder: "לדוגמה: רחוב הרצל 1, תל אביב",
             phonePlaceholder: "לדוגמה: 050-0000000",
@@ -3393,6 +3412,7 @@ i18n.use(initReactI18next).init({
           followerCount_other: "{{count}} עוקבים",
           themeColorLabel: "צבע ערכת נושא",
           themeColorHint: "תצוגה מקדימה חיה מעדכנת את צבעי הדף",
+          currencyLabel: "מטבע העסק",
           themeColorContrastWarning:
             "ייתכן שצבע זה אינו עומד בדרישות ניגודיות WCAG AA. שקול גוון כהה יותר או בהיר יותר.",
           saveChanges: "שמור שינויים",

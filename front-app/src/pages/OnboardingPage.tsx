@@ -64,6 +64,7 @@ export default function OnboardingPage() {
     longitude: null,
     phone: "",
     description: "",
+    currency: "ILS",
   });
   const [createdBusinessId, setCreatedBusinessId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -79,6 +80,7 @@ export default function OnboardingPage() {
         address: businessFields.address.trim(),
         phone: businessFields.phone.trim(),
         description: businessFields.description.trim() || undefined,
+        currency: businessFields.currency,
         latitude: businessFields.latitude ?? undefined,
         longitude: businessFields.longitude ?? undefined,
       });

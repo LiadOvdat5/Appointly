@@ -7,6 +7,7 @@ export interface BusinessFields {
   longitude: number | null;
   phone: string;
   description: string;
+  currency: string;
 }
 
 export interface ServiceDraft {

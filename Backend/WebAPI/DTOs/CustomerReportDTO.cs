@@ -9,6 +9,8 @@ namespace WebAPI.DTOs
         public int CompletedBookings { get; set; }
         public int CanceledBookings { get; set; }
         public decimal TotalSpent { get; set; }
+        // Amounts grouped by the business currency they were charged in
+        public Dictionary<string, decimal> TotalSpentByCurrency { get; set; } = new();
         public string? FavoriteBusinessName { get; set; }
         public int FavoriteBusinessCount { get; set; }
         public string? FavoriteServiceName { get; set; }

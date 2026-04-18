@@ -17,6 +17,9 @@ namespace WebAPI.DTOs
         [MaxLength(20, ErrorMessage = "Theme color cannot exceed 20 characters.")]
         public string? ThemeColor { get; set; }
 
+        [MaxLength(3)]
+        public string? Currency { get; set; }
+
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
     }

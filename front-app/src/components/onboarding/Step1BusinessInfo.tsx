@@ -7,6 +7,9 @@ import { AddressAutocomplete } from "../UI/AddressAutocomplete";
 import type { AddressResult } from "../UI/AddressAutocomplete";
 import { AddressMapPreview } from "./AddressMapPreview";
 import type { BusinessFields } from "./onboardingTypes";
+import { CURRENCY_SYMBOLS, type CurrencyCode } from "../../hooks/useCurrency";
+
+const CURRENCIES: CurrencyCode[] = ["ILS", "EUR", "USD"];
 
 interface Step1Props {
   fields: BusinessFields;
@@ -101,6 +104,29 @@ export function Step1BusinessInfo({ fields, onChange, onNext, isLoading, error }
         value={fields.description}
         onValueChange={set("description")}
       />
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {t("onboarding.step1.currencyLabel")}
+        </label>
+        <div className="flex gap-2">
+          {CURRENCIES.map((code) => (
+            <button
+              key={code}
+              type="button"
+              onClick={() => onChange({ ...fields, currency: code })}
+              className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg border py-2.5 text-sm font-medium transition-colors ${
+                fields.currency === code
+                  ? "border-primary bg-primary/10 text-primary dark:border-primary dark:bg-primary/20"
+                  : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+              }`}
+            >
+              <span>{CURRENCY_SYMBOLS[code]}</span>
+              <span>{code}</span>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <Button onClick={handleSubmit} isLoading={isLoading}>
         {t("buttons.next")}

@@ -13,6 +13,7 @@ export interface BusinessProfile {
   description?: string;
   categories: BusinessCategory[];
   themeColor?: string;
+  currency: string;
   logoUrl?: string;
   bannerUrl?: string;
   searchImageUrl?: string;
@@ -38,6 +39,7 @@ export interface CreateBusinessInput {
   address: string;
   phone: string;
   description?: string;
+  currency?: string;
   latitude?: number;
   longitude?: number;
 }
@@ -48,6 +50,7 @@ export interface UpdateBusinessInput {
   phone?: string;
   description?: string;
   themeColor?: string;
+  currency?: string;
   latitude?: number;
   longitude?: number;
 }
