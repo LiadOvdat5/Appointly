@@ -21,7 +21,7 @@
 |---|------|--------|
 | 01 | [[EPIC-01-Authentication\|Authentication & User Management]] | ✅ Done |
 | 02 | [[EPIC-02-Business-Pages\|Business Pages & Services]] | ✅ Done |
-| 03 | [[EPIC-03-Schedule-and-Availability\|Schedule & Availability]] | ✅ Done (F-03-A ✅, F-03-B ✅, F-03-C ✅) |
+| 03 | [[EPIC-03-Schedule-and-Availability\|Schedule & Availability]] | ✅ Done |
 | 04 | [[EPIC-04-Booking-Flow\|Booking Flow]] | ✅ Done |
 | 05 | [[EPIC-05-Search-and-Discovery\|Search & Discovery]] | ✅ Done |
 | 06 | [[EPIC-06-Dashboards\|Dashboards]] | ✅ Done |

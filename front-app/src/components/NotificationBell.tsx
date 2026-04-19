@@ -25,6 +25,8 @@ function typeIcon(type: NotificationType): string {
       return "star";
     case NotificationType.InvitationReceived:
       return "mail";
+    case NotificationType.BusinessBroadcast:
+      return "campaign";
     default:
       return "notifications";
   }
@@ -57,6 +59,106 @@ function timeAgo(isoString: string, t: TFunction): string {
   return t("notifications.timeAgo.daysAgo", { count: diffD });
 }
 
+// ── Broadcast detail popup ────────────────────────────────────────────────────
+function BroadcastDetailPopup({
+  notification,
+  onClose,
+  onNavigate,
+  t,
+}: {
+  notification: NotificationDTO;
+  onClose: () => void;
+  onNavigate: (path: string) => void;
+  t: TFunction;
+}) {
+  const businessName = notification.bodyParams?.businessName ?? "";
+  const broadcastTitle = notification.title;
+  const broadcastBody = notification.body;
+
+  function handleBackdrop(e: React.MouseEvent) {
+    if (e.target === e.currentTarget) onClose();
+  }
+
+  function handleKey(e: React.KeyboardEvent) {
+    if (e.key === "Escape") onClose();
+  }
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-10000 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/40 backdrop-blur-sm"
+      onClick={handleBackdrop}
+      onKeyDown={handleKey}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl bg-white dark:bg-surface-dark shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-gray-100 dark:border-gray-800">
+          <div className="h-10 w-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-rose-500" style={{ fontSize: "20px" }}>
+              campaign
+            </span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold text-rose-500 uppercase tracking-wide">
+              {/* New notifications have businessName in bodyParams; old ones have it in title */}
+              {businessName || broadcastTitle}
+            </p>
+            {businessName && (
+              <p className="font-bold text-[#111418] dark:text-white text-sm leading-snug">
+                {broadcastTitle}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 hover:text-gray-600 transition shrink-0"
+            aria-label={t("buttons.close")}
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-5 py-4">
+          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+            {broadcastBody}
+          </p>
+          <p className="mt-3 text-xs text-gray-400">
+            {timeAgo(notification.createdAt, t)}
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 pb-5 flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 rounded-xl border border-gray-200 dark:border-gray-700 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+          >
+            {t("buttons.close")}
+          </button>
+          {notification.targetPath && (
+            <button
+              type="button"
+              onClick={() => onNavigate(notification.targetPath!)}
+              className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-semibold text-white hover:bg-primary/90 transition"
+            >
+              {t("broadcast.viewBusinessPage")}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
 const POLL_INTERVAL_MS = 60_000;
 
 export function NotificationBell() {
@@ -68,6 +170,9 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
+
+  // Broadcast detail popup
+  const [broadcastNotification, setBroadcastNotification] = useState<NotificationDTO | null>(null);
 
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -142,8 +247,15 @@ export function NotificationBell() {
       );
       setUnreadCount((c) => Math.max(0, c - 1));
     }
-    const target =
-      notification.targetPath ?? fallbackNavTarget(notification.type);
+
+    // Broadcast: show popup instead of navigating
+    if (notification.type === NotificationType.BusinessBroadcast) {
+      setOpen(false);
+      setBroadcastNotification(notification);
+      return;
+    }
+
+    const target = notification.targetPath ?? fallbackNavTarget(notification.type);
     setOpen(false);
     if (target) navigate(target);
   };
@@ -248,18 +360,37 @@ export function NotificationBell() {
 
                   {/* Text */}
                   <div className="min-w-0 flex-1">
-                    <p
-                      className={`truncate text-sm ${
-                        !n.isRead
-                          ? "font-semibold text-slate-900 dark:text-white"
-                          : "font-medium text-slate-700 dark:text-slate-300"
-                      }`}
-                    >
-                      {renderTitle(n)}
-                    </p>
-                    <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
-                      {renderBody(n)}
-                    </p>
+                    {n.type === NotificationType.BusinessBroadcast ? (
+                      <>
+                        {/* businessName is in bodyParams for new notifications; older ones
+                            stored the business name in title directly — show whichever we have */}
+                        {n.bodyParams?.businessName && (
+                          <p className="truncate text-xs text-rose-500 font-semibold">
+                            {n.bodyParams.businessName}
+                          </p>
+                        )}
+                        <p className={`truncate text-sm ${
+                          !n.isRead
+                            ? "font-semibold text-slate-900 dark:text-white"
+                            : "font-medium text-slate-700 dark:text-slate-300"
+                        }`}>
+                          {n.title}
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className={`truncate text-sm ${
+                          !n.isRead
+                            ? "font-semibold text-slate-900 dark:text-white"
+                            : "font-medium text-slate-700 dark:text-slate-300"
+                        }`}>
+                          {renderTitle(n)}
+                        </p>
+                        <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
+                          {renderBody(n)}
+                        </p>
+                      </>
+                    )}
                     <p className="mt-0.5 text-[11px] text-slate-400">
                       {timeAgo(n.createdAt, t)}
                     </p>
@@ -275,6 +406,19 @@ export function NotificationBell() {
           </div>
         </div>,
         document.body,
+      )}
+
+      {/* Broadcast detail popup */}
+      {broadcastNotification && (
+        <BroadcastDetailPopup
+          notification={broadcastNotification}
+          onClose={() => setBroadcastNotification(null)}
+          onNavigate={(path) => {
+            setBroadcastNotification(null);
+            navigate(path);
+          }}
+          t={t}
+        />
       )}
     </div>
   );

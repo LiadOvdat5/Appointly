@@ -45,6 +45,7 @@ namespace WebAPI.Mappers
                 BusinessLogoUrl = appointment.Business?.LogoUrl,
                 BusinessAddress = appointment.Business?.Address,
                 BusinessPhone = appointment.Business?.Phone,
+                BusinessTimezone = appointment.Business?.Timezone,
 
                 // Schedule Information
                 ServiceScheduleId = appointment.ServiceScheduleId,

@@ -112,5 +112,13 @@ namespace WebAPI.Repositories
             return await _context.Follows
                 .CountAsync(f => f.BusinessId == businessId);
         }
+
+        public async Task<List<Guid>> GetFollowerIdsAsync(Guid businessId)
+        {
+            return await _context.Follows
+                .Where(f => f.BusinessId == businessId)
+                .Select(f => f.UserId)
+                .ToListAsync();
+        }
     }
 }

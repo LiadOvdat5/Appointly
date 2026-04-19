@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
 using WebAPI.DTOs;
@@ -94,6 +95,7 @@ namespace WebAPI.Controllers
                     StartDateTime = s.StartDateTime,
                     EndDateTime = s.EndDateTime,
                     Status = s.Status,
+                    BlockNote = s.BlockNote,
                     CreatedAt = s.CreatedAt,
                     UpdatedAt = s.UpdatedAt
                 }).ToList();
@@ -137,6 +139,7 @@ namespace WebAPI.Controllers
                         StartDateTime = s.StartDateTime,
                         EndDateTime = s.EndDateTime,
                         Status = s.Status,
+                        BlockNote = s.BlockNote,
                         CreatedAt = s.CreatedAt,
                         UpdatedAt = s.UpdatedAt
                     }).ToList();
@@ -180,6 +183,7 @@ namespace WebAPI.Controllers
                     BlockingServiceName = s.BlockingAppointmentId.HasValue
                         && apptIdToServiceName.TryGetValue(s.BlockingAppointmentId.Value, out var svcName)
                         ? svcName : null,
+                    BlockNote = s.BlockNote,
                     CreatedAt = s.CreatedAt,
                     UpdatedAt = s.UpdatedAt
                 }).ToList();
@@ -337,11 +341,11 @@ namespace WebAPI.Controllers
         /// </summary>
         [HttpPut("slot/{slotId}/block")]
         [EndpointSummary("Block Slot")]
-        [EndpointDescription("Mark a slot as blocked (unavailable for booking). " +
-            "Returns the updated slot. Useful for maintenance windows or administrative blocks. " +
-            "Blocked slots cannot be booked but can be unblocked. " +
-            "Authorization: Only business owners can block slots for their services.")]
-        public async Task<ActionResult<ServiceScheduleDTO>> BlockSlot(Guid slotId)
+        [EndpointDescription("Manually mark a slot as blocked (unavailable for booking). " +
+            "Body: { note?: string } — optional reason for the block (max 500 chars). " +
+            "Returns 400 if the slot is already booked. " +
+            "Authorization: Only business owners or assigned partners can block slots.")]
+        public async Task<IActionResult> BlockSlot(Guid slotId, [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] BlockSlotRequestDTO? body = null)
         {
             try
             {
@@ -353,18 +357,12 @@ namespace WebAPI.Controllers
                 if (error != null)
                     return error;
 
-                var updated = await _serviceScheduleRepository.BlockSlotAsync(slotId);
+                if (slot.Status == ScheduleStatus.BOOKED)
+                    return BadRequest("Cannot block a booked slot.");
 
-                return Ok(new ServiceScheduleDTO
-                {
-                    Id            = updated!.Id,
-                    ServiceId     = updated.ServiceId,
-                    StartDateTime = updated.StartDateTime,
-                    EndDateTime   = updated.EndDateTime,
-                    Status        = updated.Status,
-                    CreatedAt     = updated.CreatedAt,
-                    UpdatedAt     = updated.UpdatedAt,
-                });
+                var updated = await _serviceScheduleRepository.BlockSlotAsync(slotId, body?.Note);
+
+                return NoContent();
             }
             catch (Exception ex)
             {
@@ -375,12 +373,13 @@ namespace WebAPI.Controllers
         /// <summary>
         /// Unblock a time slot
         /// </summary>
-        [HttpPut("slot/{slotId}/unblock")]
+        [HttpDelete("slot/{slotId}/block")]
         [EndpointSummary("Unblock Slot")]
-        [EndpointDescription("Mark a blocked slot as available again. " +
-            "Returns the updated slot. Can only unblock slots with BLOCKED status. " +
-            "Authorization: Only business owners can unblock slots for their services.")]
-        public async Task<ActionResult<ServiceScheduleDTO>> UnblockSlot(Guid slotId)
+        [EndpointDescription("Release a manually blocked slot back to available. " +
+            "Idempotent — if the slot is not blocked, returns 204 without error. " +
+            "Clears the block note. " +
+            "Authorization: Only business owners or assigned partners can unblock slots.")]
+        public async Task<IActionResult> UnblockSlot(Guid slotId)
         {
             try
             {
@@ -392,21 +391,11 @@ namespace WebAPI.Controllers
                 if (error != null)
                     return error;
 
-                if (slot.Status != ScheduleStatus.BLOCKED)
-                    return BadRequest("Can only unblock slots with BLOCKED status");
+                // Idempotent — if already not blocked, nothing to do
+                if (slot.Status == ScheduleStatus.BLOCKED)
+                    await _serviceScheduleRepository.UnblockSlotAsync(slotId);
 
-                var updated = await _serviceScheduleRepository.UnblockSlotAsync(slotId);
-
-                return Ok(new ServiceScheduleDTO
-                {
-                    Id            = updated!.Id,
-                    ServiceId     = updated.ServiceId,
-                    StartDateTime = updated.StartDateTime,
-                    EndDateTime   = updated.EndDateTime,
-                    Status        = updated.Status,
-                    CreatedAt     = updated.CreatedAt,
-                    UpdatedAt     = updated.UpdatedAt,
-                });
+                return NoContent();
             }
             catch (Exception ex)
             {

@@ -25,6 +25,7 @@ import StaffDashboardPage from "../pages/StaffDashboardPage.tsx";
 import InvitationsPage from "../pages/InvitationsPage.tsx";
 import BusinessReviewsPage from "../pages/BusinessReviewsPage.tsx";
 import BusinessNotificationSettingsPage from "../pages/BusinessNotificationSettingsPage.tsx";
+import BroadcastsPage from "../pages/BroadcastsPage.tsx";
 import AdminCategoryRequestsPage from "../pages/AdminCategoryRequestsPage.tsx";
 import AdminDashboardPage from "../pages/AdminDashboardPage.tsx";
 import AdminFlaggedReviewsPage from "../pages/AdminFlaggedReviewsPage.tsx";
@@ -128,6 +129,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requireAuth={true} redirectTo="/login">
             <BusinessNotificationSettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard/:businessSlug/broadcasts",
+        element: (
+          <ProtectedRoute requireAuth={true} redirectTo="/login">
+            <BroadcastsPage />
           </ProtectedRoute>
         ),
       },

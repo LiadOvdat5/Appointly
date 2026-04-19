@@ -121,6 +121,12 @@ builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 // Register background service for appointment reminders
 builder.Services.AddHostedService<AppointmentReminderService>();
 
+// Register Broadcast services
+builder.Services.AddScoped<IBroadcastRepository, BroadcastRepository>();
+builder.Services.AddScoped<IBroadcastService, BroadcastService>();
+builder.Services.AddSingleton<BroadcastFanoutQueue>();
+builder.Services.AddHostedService<BroadcastFanoutWorker>();
+
 // Add authorization services
 builder.Services.AddAuthorization();
 

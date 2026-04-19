@@ -193,6 +193,38 @@ namespace WebAPI.Migrations
                     b.ToTable("BreakRules");
                 });
 
+            modelBuilder.Entity("WebAPI.Models.Broadcast", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("FollowerCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BusinessId", "SentAt");
+
+                    b.ToTable("Broadcasts");
+                });
+
             modelBuilder.Entity("WebAPI.Models.Business", b =>
                 {
                     b.Property<Guid>("Id")
@@ -808,6 +840,10 @@ namespace WebAPI.Migrations
                     b.Property<Guid?>("AppointmentId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("BlockNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<Guid?>("BlockingAppointmentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -882,6 +918,9 @@ namespace WebAPI.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("PushBookingConfirm")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PushBroadcasts")
                         .HasColumnType("bit");
 
                     b.Property<bool>("PushCancellations")
@@ -1008,6 +1047,17 @@ namespace WebAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("WebAPI.Models.Broadcast", b =>
+                {
+                    b.HasOne("WebAPI.Models.Business", "Business")
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Business");
                 });
 
             modelBuilder.Entity("WebAPI.Models.BusinessPartner", b =>

@@ -11,6 +11,8 @@ import {
 import {
   getAvailableSlotsForService,
   getBlockedSlotsForService,
+  blockSlot,
+  unblockSlot,
   type SlotDTO,
 } from "../services/scheduleService";
 import {
@@ -72,6 +74,7 @@ export default function BusinessSchedulePage() {
 
   // ── LIST VIEW state ───────────────────────────────────────────────────────
   const [allAppointments, setAllAppointments] = useState<AppointmentDTO[]>([]);
+  const [listBlockedSlots, setListBlockedSlots] = useState<SlotDTO[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState<string | null>(null);
 
@@ -207,18 +210,30 @@ export default function BusinessSchedulePage() {
   }
 
   // ── LIST fetching ─────────────────────────────────────────────────────────
+  async function fetchListBlockedSlots(svcs: ServiceProfile[], from: Date, to: Date) {
+    try {
+      const perService = await Promise.all(
+        svcs.map((s) => getBlockedSlotsForService(s.id, from, to).catch(() => [] as SlotDTO[])),
+      );
+      setListBlockedSlots(perService.flat());
+    } catch {
+      // silently ignore — blocked slots are supplemental
+    }
+  }
+
   function fetchListAppointments(bizId: string, withRange: boolean) {
     setListLoading(true);
     setListError(null);
+    const from = withRange ? new Date(startDate) : today;
+    const to = withRange ? new Date(endDate + "T23:59:59") : thirtyDaysLater;
     const req = withRange
-      ? getBusinessAppointmentsByRange(
-          bizId,
-          new Date(startDate),
-          new Date(endDate + "T23:59:59"),
-        )
+      ? getBusinessAppointmentsByRange(bizId, from, new Date(endDate + "T23:59:59"))
       : getBusinessAppointments(bizId);
     req
-      .then(setAllAppointments)
+      .then((appts) => {
+        setAllAppointments(appts);
+        if (services.length > 0) fetchListBlockedSlots(services, from, to);
+      })
       .catch(() => setListError(t("businessSchedule.failedLoadAppointments")))
       .finally(() => setListLoading(false));
   }
@@ -278,23 +293,26 @@ export default function BusinessSchedulePage() {
       if (!byDay.has(key)) byDay.set(key, []);
       byDay.get(key)!.push({
         key: `avail-${slot.id}`,
+        slotId: slot.id,
         startISO: slot.startDateTime,
         endISO: slot.endDateTime,
         isBooked: false,
       });
     }
 
-    // Blocked slots (conflict-blocked by parallel booking)
+    // Blocked slots (manual or conflict-blocked)
     for (const slot of gridBlockedSlots) {
       const key = dateKey(slot.startDateTime);
       if (!byDay.has(key)) byDay.set(key, []);
       byDay.get(key)!.push({
         key: `blocked-${slot.id}`,
+        slotId: slot.id,
         startISO: slot.startDateTime,
         endISO: slot.endDateTime,
         isBooked: false,
         isBlocked: true,
         blockingServiceName: slot.blockingServiceName,
+        blockNote: slot.blockNote,
       });
     }
 
@@ -324,7 +342,7 @@ export default function BusinessSchedulePage() {
       .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     return days;
-  }, [gridSlots, gridAppts]);
+  }, [gridSlots, gridBlockedSlots, gridAppts]);
 
   // ── Cancel helpers ────────────────────────────────────────────────────────
   function requestCancel(id: string) {
@@ -360,6 +378,43 @@ export default function BusinessSchedulePage() {
       setCancelingId(null);
     }
   }
+
+  // ── Block / unblock helpers ───────────────────────────────────────────────
+  async function handleBlockSlot(slotId: string, note: string) {
+    await blockSlot(slotId, note || undefined);
+    await loadGridData();
+  }
+
+  async function handleUnblockSlot(slotId: string) {
+    await unblockSlot(slotId);
+    if (viewMode === "grid") {
+      await loadGridData();
+    } else {
+      // Remove the unblocked slot from list state immediately
+      setListBlockedSlots((prev) => prev.filter((s) => s.id !== slotId));
+    }
+  }
+
+  // ── Filtered list blocked slots ───────────────────────────────────────────
+  const filteredBlockedSlots = useMemo(() => {
+    let list = listBlockedSlots;
+    if (selectedServiceId) list = list.filter((s) => s.serviceId === selectedServiceId);
+    if (timeFrom) {
+      const fromMin = timeToMinutes(timeFrom);
+      list = list.filter((s) => {
+        const d = new Date(s.startDateTime);
+        return d.getHours() * 60 + d.getMinutes() >= fromMin;
+      });
+    }
+    if (timeTo) {
+      const toMin = timeToMinutes(timeTo);
+      list = list.filter((s) => {
+        const d = new Date(s.startDateTime);
+        return d.getHours() * 60 + d.getMinutes() <= toMin;
+      });
+    }
+    return list;
+  }, [listBlockedSlots, selectedServiceId, timeFrom, timeTo]);
 
   // ─── Render ────────────────────────────────────────────────────────────────
   return (
@@ -470,6 +525,7 @@ export default function BusinessSchedulePage() {
             <ScheduleListView
               services={services}
               filtered={filtered}
+              blockedSlots={filteredBlockedSlots}
               loading={listLoading}
               error={listError}
               startDate={startDate}
@@ -489,9 +545,11 @@ export default function BusinessSchedulePage() {
               onTimeFromChange={setTimeFrom}
               onTimeToChange={setTimeTo}
               onShowCanceledChange={setShowCanceled}
+              timezone={business?.timezone ?? undefined}
               onRequestCancel={requestCancel}
               onRequestDidntHappen={requestDidntHappen}
               onViewReview={setViewingReview}
+              onUnblockSlot={handleUnblockSlot}
             />
           ) : (
             <ScheduleGridView
@@ -504,6 +562,7 @@ export default function BusinessSchedulePage() {
               expandedSlotKey={expandedSlotKey}
               cancelingId={cancelingId}
               reviewMap={reviewMap}
+              timezone={business?.timezone ?? undefined}
               onServiceChange={setGridServiceId}
               onPresetChange={setGridPreset}
               onRefresh={loadGridData}
@@ -513,6 +572,8 @@ export default function BusinessSchedulePage() {
               onRequestCancel={requestCancel}
               onRequestDidntHappen={requestDidntHappen}
               onViewReview={setViewingReview}
+              onBlockSlot={handleBlockSlot}
+              onUnblockSlot={handleUnblockSlot}
             />
           )}
         </div>

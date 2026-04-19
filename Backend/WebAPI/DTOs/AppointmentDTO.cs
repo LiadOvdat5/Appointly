@@ -34,6 +34,7 @@ namespace WebAPI.DTOs
         public string? BusinessLogoUrl { get; set; }
         public string? BusinessAddress { get; set; }
         public string? BusinessPhone { get; set; }
+        public string? BusinessTimezone { get; set; }
 
         // Schedule Information
         public Guid ServiceScheduleId { get; set; }

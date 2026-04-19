@@ -18,6 +18,7 @@ export interface AppointmentDTO {
   businessCurrency: string;
   businessLogoUrl?: string;
   businessAddress?: string;
+  businessTimezone?: string;
   serviceScheduleId: string;
   startDateTime: string;
   endDateTime: string;

@@ -19,6 +19,7 @@ interface ScheduleGridViewProps {
   expandedSlotKey: string | null;
   cancelingId: string | null;
   reviewMap: Record<string, ReviewDTO>;
+  timezone?: string;
   onServiceChange: (id: string) => void;
   onPresetChange: (p: RangePreset) => void;
   onRefresh: () => void;
@@ -26,6 +27,8 @@ interface ScheduleGridViewProps {
   onRequestCancel: (id: string) => void;
   onRequestDidntHappen: (id: string) => void;
   onViewReview: (r: ReviewDTO) => void;
+  onBlockSlot?: (slotId: string, note: string) => Promise<void>;
+  onUnblockSlot?: (slotId: string) => Promise<void>;
 }
 
 export function ScheduleGridView({
@@ -38,6 +41,7 @@ export function ScheduleGridView({
   expandedSlotKey,
   cancelingId,
   reviewMap,
+  timezone,
   onServiceChange,
   onPresetChange,
   onRefresh,
@@ -45,6 +49,8 @@ export function ScheduleGridView({
   onRequestCancel,
   onRequestDidntHappen,
   onViewReview,
+  onBlockSlot,
+  onUnblockSlot,
 }: ScheduleGridViewProps) {
   const { t } = useTranslation();
 
@@ -192,10 +198,13 @@ export function ScheduleGridView({
                     isExpanded={expandedSlotKey === slot.key}
                     cancelingId={cancelingId}
                     review={slot.appointment ? reviewMap[slot.appointment.id] : undefined}
-                    onToggle={() => (slot.isBooked || slot.isBlocked) && onToggleExpand(slot.key)}
+                    timezone={timezone}
+                    onToggle={() => onToggleExpand(slot.key)}
                     onRequestCancel={onRequestCancel}
                     onRequestDidntHappen={onRequestDidntHappen}
                     onViewReview={onViewReview}
+                    onBlockSlot={onBlockSlot}
+                    onUnblockSlot={onUnblockSlot}
                   />
                 ))}
               </div>

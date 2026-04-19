@@ -9,7 +9,8 @@ namespace WebAPI.Models
         AppointmentCancelled,
         AppointmentReminder,
         ReviewPrompt,
-        InvitationReceived
+        InvitationReceived,
+        BusinessBroadcast
     }
 
     public class Notification

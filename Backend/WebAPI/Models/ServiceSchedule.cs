@@ -37,6 +37,13 @@ namespace WebAPI.Models
         /// </summary>
         public Guid? BlockingAppointmentId { get; set; }
 
+        /// <summary>
+        /// Optional note set when an owner or partner manually blocks this slot.
+        /// Null for system-generated blocks (parallel-booking conflicts).
+        /// </summary>
+        [MaxLength(500)]
+        public string? BlockNote { get; set; }
+
         [Required]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

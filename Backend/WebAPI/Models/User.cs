@@ -68,5 +68,6 @@ namespace WebAPI.Models
         public bool PushReminders24h { get; set; } = true;
         public bool PushReminders1h { get; set; } = true;
         public bool PushReviewPrompt { get; set; } = true;
+        public bool PushBroadcasts { get; set; } = true;
     }
 }

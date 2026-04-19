@@ -197,12 +197,13 @@ namespace WebAPI.Repositories
             return true;
         }
 
-        public async Task<ServiceSchedule?> BlockSlotAsync(Guid slotId)
+        public async Task<ServiceSchedule?> BlockSlotAsync(Guid slotId, string? blockNote = null)
         {
             var slot = await _context.ServiceSchedules.FindAsync(slotId);
             if (slot == null) return null;
 
             slot.Status    = ScheduleStatus.BLOCKED;
+            slot.BlockNote = blockNote;
             slot.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return slot;
@@ -214,6 +215,7 @@ namespace WebAPI.Repositories
             if (slot == null) return null;
 
             slot.Status    = ScheduleStatus.AVAILABLE;
+            slot.BlockNote = null;
             slot.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return slot;

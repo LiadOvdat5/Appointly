@@ -15,6 +15,7 @@ export interface SlotDTO {
   status: number;
   blockingAppointmentId?: string;
   blockingServiceName?: string;
+  blockNote?: string;
 }
 
 export const getAvailableSlotsForService = async (
@@ -121,4 +122,19 @@ export const getAvailableSlotsForDate = async (
     : new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
   const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
   return getAvailableSlotsForService(serviceId, startDate, endDate);
+};
+
+/**
+ * Manually block a slot. Returns 204 on success.
+ * Returns 400 if the slot is booked.
+ */
+export const blockSlot = async (slotId: string, note?: string): Promise<void> => {
+  await apiClient.put(`/api/schedule/slot/${slotId}/block`, { note: note ?? null });
+};
+
+/**
+ * Unblock a manually blocked slot. Idempotent — safe to call even if not blocked.
+ */
+export const unblockSlot = async (slotId: string): Promise<void> => {
+  await apiClient.delete(`/api/schedule/slot/${slotId}/block`);
 };

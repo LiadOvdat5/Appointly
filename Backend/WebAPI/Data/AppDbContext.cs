@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebAPI.Models;
 
 namespace WebAPI.Data
@@ -26,6 +27,7 @@ namespace WebAPI.Data
         public DbSet<ServiceSchedule> ServiceSchedules => Set<ServiceSchedule>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Follow> Follows => Set<Follow>();
+        public DbSet<Broadcast> Broadcasts => Set<Broadcast>();
         public DbSet<Review> Reviews => Set<Review>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
@@ -150,6 +152,19 @@ namespace WebAPI.Data
                 .IsUnique();
 
             // =====================================================
+            // Broadcast Relationships
+            // =====================================================
+
+            modelBuilder.Entity<Broadcast>()
+                .HasOne(b => b.Business)
+                .WithMany()
+                .HasForeignKey(b => b.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Broadcast>()
+                .HasIndex(b => new { b.BusinessId, b.SentAt });
+
+            // =====================================================
             // CategoryRequest Relationships
             // =====================================================
 
@@ -272,6 +287,21 @@ namespace WebAPI.Data
                 .HasForeignKey(ss => ss.BlockingAppointmentId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
+
+            // =====================================================
+            // UTC DateTime Value Converter
+            // Ensures all DateTime values read from SQL Server are treated as UTC
+            // so System.Text.Json serializes them with a Z suffix, preventing
+            // browsers from misinterpreting them as local time.
+            // =====================================================
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+                v => v.Kind == DateTimeKind.Utc ? v : DateTime.SpecifyKind(v, DateTimeKind.Utc),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+                foreach (var property in entityType.GetProperties()
+                    .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?)))
+                    property.SetValueConverter(utcConverter);
         }
     }
 }

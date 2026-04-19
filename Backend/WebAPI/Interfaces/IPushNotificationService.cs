@@ -11,6 +11,7 @@ namespace WebAPI.Interfaces
         Reminders24h,
         Reminders1h,
         ReviewPrompt,
+        Broadcasts,
     }
 
     public interface IPushNotificationService

@@ -90,7 +90,7 @@ export function CustomerUpcomingSection({
                     </span>
                     <span className="flex items-center gap-1">
                       <MaterialIcon name="schedule" className="text-sm leading-none" />
-                      {formatTime(appt.startDateTime)} – {formatTime(appt.endDateTime)}
+                      {formatTime(appt.startDateTime, appt.businessTimezone)} – {formatTime(appt.endDateTime, appt.businessTimezone)}
                     </span>
                     {appt.servicePrice != null && (
                       <span className="flex items-center gap-1 text-primary font-semibold">
