@@ -467,6 +467,7 @@ export default function DashboardPage() {
               businessSlug={business.slug}
               reviewCount={business.reviewCount}
               averageRating={business.averageRating}
+              followerCount={followerCount}
             />
           </div>
         </div>

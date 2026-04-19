@@ -27,6 +27,7 @@ namespace WebAPI.Data
         public DbSet<ServiceSchedule> ServiceSchedules => Set<ServiceSchedule>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Follow> Follows => Set<Follow>();
+        public DbSet<Broadcast> Broadcasts => Set<Broadcast>();
         public DbSet<Review> Reviews => Set<Review>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
@@ -149,6 +150,19 @@ namespace WebAPI.Data
             modelBuilder.Entity<Review>()
                 .HasIndex(r => new { r.CustomerId, r.BusinessId })
                 .IsUnique();
+
+            // =====================================================
+            // Broadcast Relationships
+            // =====================================================
+
+            modelBuilder.Entity<Broadcast>()
+                .HasOne(b => b.Business)
+                .WithMany()
+                .HasForeignKey(b => b.BusinessId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Broadcast>()
+                .HasIndex(b => new { b.BusinessId, b.SentAt });
 
             // =====================================================
             // CategoryRequest Relationships

@@ -6,12 +6,14 @@ interface DashboardQuickLinksProps {
   businessSlug: string;
   reviewCount: number | undefined;
   averageRating: number | undefined;
+  followerCount: number | null;
 }
 
 export function DashboardQuickLinks({
   businessSlug,
   reviewCount,
   averageRating,
+  followerCount,
 }: DashboardQuickLinksProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -67,6 +69,17 @@ export function DashboardQuickLinks({
       iconBg: "bg-sky-100",
       iconColor: "text-sky-500",
       onClick: () => navigate(`/dashboard/${businessSlug}/notifications`),
+    },
+    {
+      label: t("dashboard.messageFollowers"),
+      desc:
+        followerCount === null || followerCount === 0
+          ? t("dashboard.messageFollowersDescNone")
+          : t("dashboard.messageFollowersDesc", { count: followerCount }),
+      icon: "campaign",
+      iconBg: "bg-rose-100",
+      iconColor: "text-rose-500",
+      onClick: () => navigate(`/dashboard/${businessSlug}/broadcasts`),
     },
   ];
 

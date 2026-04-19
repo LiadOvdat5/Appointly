@@ -7,6 +7,7 @@ export const NotificationType = {
   AppointmentReminder: 2,
   ReviewPrompt: 3,
   InvitationReceived: 4,
+  BusinessBroadcast: 5,
 } as const;
 export type NotificationType = typeof NotificationType[keyof typeof NotificationType];
 

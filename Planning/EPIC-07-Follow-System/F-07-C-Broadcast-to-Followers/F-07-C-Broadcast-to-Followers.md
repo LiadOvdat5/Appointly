@@ -1,7 +1,7 @@
 # F-07-C: Broadcast to Followers
 
 **Epic:** [[EPIC-07-Follow-System|EPIC-07: Follow System]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -12,10 +12,10 @@ Allow a business owner to send a message to all their followers — delivered as
 
 | ID | Title | Status |
 |----|-------|--------|
-| [[US-07-C-01-Broadcast-Backend\|US-07-C-01]] | Broadcast API — fan-out notifications to all followers | 🔲 Not Started |
-| [[US-07-C-02-Broadcast-UI\|US-07-C-02]] | "Message Followers" action in business dashboard | 🔲 Not Started |
-| [[US-07-C-03-Broadcast-Push-Delivery\|US-07-C-03]] | Push notification delivery for broadcasts | 🔲 Not Started |
-| [[US-07-C-04-Broadcast-History\|US-07-C-04]] | Broadcast history tab in dashboard | 🔲 Not Started |
+| [[US-07-C-01-Broadcast-Backend\|US-07-C-01]] | Broadcast API — fan-out notifications to all followers | ✅ Done |
+| [[US-07-C-02-Broadcast-UI\|US-07-C-02]] | "Message Followers" action in business dashboard | ✅ Done |
+| [[US-07-C-03-Broadcast-Push-Delivery\|US-07-C-03]] | Push notification delivery for broadcasts | ✅ Done |
+| [[US-07-C-04-Broadcast-History\|US-07-C-04]] | Broadcast history tab in dashboard | ✅ Done |
 
 ## Dependencies
 - EPIC-07 F-07-A (follow system) ✅

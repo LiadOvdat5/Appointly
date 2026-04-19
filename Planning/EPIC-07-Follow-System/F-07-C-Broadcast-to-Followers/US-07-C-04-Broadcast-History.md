@@ -2,7 +2,7 @@
 
 **Feature:** [[F-07-C-Broadcast-to-Followers|F-07-C: Broadcast to Followers]]
 **Epic:** [[EPIC-07-Follow-System|EPIC-07: Follow System]]
-**Status:** 🔲 Not Started
+**Status:** ✅ Done
 
 ---
 
@@ -17,7 +17,7 @@ As a **business owner**, I want to **see a history of all broadcasts I have sent
 - `[FE]` Pagination or infinite scroll for owners with many broadcasts
 
 ## Acceptance Criteria
-- [ ] All past broadcasts are listed, newest first
-- [ ] Each entry shows when it was sent and how many followers received it
-- [ ] Empty state is shown clearly when no broadcasts exist
-- [ ] The list is paginated — does not load all history at once
+- [x] All past broadcasts are listed, newest first
+- [x] Each entry shows when it was sent and how many followers received it
+- [x] Empty state is shown clearly when no broadcasts exist
+- [x] The list is paginated — does not load all history at once

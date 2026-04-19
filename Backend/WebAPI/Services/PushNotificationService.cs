@@ -50,6 +50,7 @@ namespace WebAPI.Services
                 PushCategory.Reminders24h   => user.PushReminders24h,
                 PushCategory.Reminders1h    => user.PushReminders1h,
                 PushCategory.ReviewPrompt   => user.PushReviewPrompt,
+                PushCategory.Broadcasts     => user.PushBroadcasts,
                 _                           => true,
             };
             if (!allowed) return;
