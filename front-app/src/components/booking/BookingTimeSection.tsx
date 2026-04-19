@@ -11,7 +11,7 @@ interface BookingTimeSectionProps {
   selectedSlotId: string | null;
   onSelectSlot: (id: string | null) => void;
   locale: string;
-  timezone: string;
+  timezone: string | undefined;
 }
 
 function formatDateLong(date: Date, locale: string): string {

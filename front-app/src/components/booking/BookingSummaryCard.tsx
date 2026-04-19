@@ -17,7 +17,7 @@ interface BookingSummaryCardProps {
   onConfirm: () => void;
   locale: string;
   businessCurrency: CurrencyCode;
-  timezone: string;
+  timezone: string | undefined;
 }
 
 export function BookingSummaryCard({
