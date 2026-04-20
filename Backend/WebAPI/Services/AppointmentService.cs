@@ -261,12 +261,9 @@ namespace WebAPI.Services
                         ["serviceName"]  = serviceName,
                         ["date"]         = dateLabel
                     });
-                await _pushService.SendAsync(
-                    ownerId.Value,
-                    $"New Booking",
-                    $"{clientName} booked {serviceName} on {dateLabel}.",
-                    $"/dashboard/{businessSlug}",
-                    PushCategory.BookingConfirm);
+                var ownerLang = await GetUserLang(ownerId.Value);
+                var (oTitle, oBody) = PushText.NewBookingOwner(ownerLang, clientName, serviceName, dateLabel);
+                await _pushService.SendAsync(ownerId.Value, oTitle, oBody, $"/dashboard/{businessSlug}", PushCategory.BookingConfirm);
             }
 
             // Notify customer
@@ -283,12 +280,9 @@ namespace WebAPI.Services
                     ["businessName"] = businessName,
                     ["date"]         = dateLabel
                 });
-            await _pushService.SendAsync(
-                clientId,
-                "Booking Confirmed",
-                $"Your {serviceName} at {businessName} on {dateLabel} is confirmed.",
-                "/customer-dashboard",
-                PushCategory.BookingConfirm);
+            var clientLang = await GetUserLang(clientId);
+            var (cTitle, cBody) = PushText.BookingConfirmedCustomer(clientLang, serviceName, businessName, dateLabel);
+            await _pushService.SendAsync(clientId, cTitle, cBody, "/customer-dashboard", PushCategory.BookingConfirm);
 
             return AppointmentMapper.ToDTO(createdAppointment);
         }
@@ -375,12 +369,9 @@ namespace WebAPI.Services
                         ["businessName"] = bName,
                         ["date"]         = dateCancel
                     });
-                await _pushService.SendAsync(
-                    appt.ClientId,
-                    "Appointment Cancelled",
-                    $"Your {sName} at {bName} on {dateCancel} was cancelled.",
-                    "/customer-dashboard",
-                    PushCategory.Cancellations);
+                var custLangCancel = await GetUserLang(appt.ClientId);
+                var (ctTitle, ctBody) = PushText.AppointmentCancelledCustomer(custLangCancel, sName, bName, dateCancel);
+                await _pushService.SendAsync(appt.ClientId, ctTitle, ctBody, "/customer-dashboard", PushCategory.Cancellations);
             }
             else if (isClient && !isBusinessMember && ownerIdCancel.HasValue && notifyCancel)
             {
@@ -398,12 +389,9 @@ namespace WebAPI.Services
                         ["serviceName"] = sName,
                         ["date"]        = dateCancel
                     });
-                await _pushService.SendAsync(
-                    ownerIdCancel.Value,
-                    "Booking Cancelled",
-                    $"{cName} cancelled their {sName} on {dateCancel}.",
-                    $"/dashboard/{bSlug}",
-                    PushCategory.Cancellations);
+                var ownerLangCancel = await GetUserLang(ownerIdCancel.Value);
+                var (owTitle, owBody) = PushText.BookingCancelledOwner(ownerLangCancel, cName, sName, dateCancel);
+                await _pushService.SendAsync(ownerIdCancel.Value, owTitle, owBody, $"/dashboard/{bSlug}", PushCategory.Cancellations);
             }
 
             return AppointmentMapper.ToDTO(updatedAppointment);
@@ -711,6 +699,15 @@ namespace WebAPI.Services
         /// When an appointment is cancelled, release any schedule slots that were
         /// blocked due to this appointment (parallel booking conflict).
         /// </summary>
+        private async Task<string> GetUserLang(Guid userId)
+        {
+            var lang = await _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.PreferredLanguage)
+                .FirstOrDefaultAsync();
+            return string.IsNullOrEmpty(lang) ? "en" : lang;
+        }
+
         private async Task ReleaseSiblingBlockedSlotsAsync(Guid appointmentId)
         {
             var blocked = await _context.ServiceSchedules

@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useAppSelector } from "../redux/hooks";
+import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { selectUser } from "../redux/authSelectors";
+import { setSession } from "../redux/authSlice";
+import { demoteToClient } from "../api/user";
+import { refresh } from "../api/auth";
 import {
   getBusinessAppointmentsByRange,
   AppointmentStatus,
@@ -64,10 +67,12 @@ function GreetingSection({
   firstName,
   business,
   hasMultiple,
+  onSwitchToCustomer,
 }: {
   firstName: string;
   business: OwnedBusinessDTO | null;
   hasMultiple: boolean;
+  onSwitchToCustomer: () => void;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -103,6 +108,13 @@ function GreetingSection({
             className="mt-1 px-5 h-10 rounded-xl bg-[#1980e6] text-white text-sm font-bold hover:bg-[#1670cc] transition-colors"
           >
             {t("ownerHome.completeSetup")}
+          </button>
+          <button
+            type="button"
+            onClick={onSwitchToCustomer}
+            className="text-sm text-[#4e7397] dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors underline underline-offset-2"
+          >
+            {t("ownerHome.switchToCustomer")}
           </button>
         </div>
       )}
@@ -313,7 +325,10 @@ function QuickActionsSection({ business }: { business: OwnedBusinessDTO }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function OwnerHomePage() {
+  const { t } = useTranslation();
   const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const firstName = getFirstName(user?.name ?? "");
 
   const [loadingBusinesses, setLoadingBusinesses] = useState(true);
@@ -322,6 +337,9 @@ export default function OwnerHomePage() {
 
   const [loadingAppointments, setLoadingAppointments] = useState(false);
   const [todaysAppointments, setTodaysAppointments] = useState<AppointmentDTO[]>([]);
+
+  const [showSwitchDialog, setShowSwitchDialog] = useState(false);
+  const [switching, setSwitching] = useState(false);
 
   // Load owner's businesses once
   useEffect(() => {
@@ -346,12 +364,56 @@ export default function OwnerHomePage() {
   const hasBusiness = businesses.length > 0;
   const hasMultiple = businesses.length > 1;
 
+  const handleConfirmSwitch = async () => {
+    setSwitching(true);
+    try {
+      await demoteToClient();
+      const session = await refresh();
+      dispatch(setSession({ user: session.user, expiresAt: new Date(session.expiresAt).getTime() }));
+      navigate("/");
+    } catch {
+      setSwitching(false);
+      setShowSwitchDialog(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-background-dark pb-16">
+      {showSwitchDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 flex flex-col gap-4 shadow-xl">
+            <h2 className="text-lg font-bold text-[#0e141b] dark:text-white">
+              {t("ownerHome.switchToCustomerConfirmTitle")}
+            </h2>
+            <p className="text-sm text-[#4e7397] dark:text-gray-400">
+              {t("ownerHome.switchToCustomerConfirmBody")}
+            </p>
+            <div className="flex gap-3 mt-2">
+              <button
+                type="button"
+                onClick={() => setShowSwitchDialog(false)}
+                className="flex-1 h-10 rounded-xl border border-[#d0dce8] dark:border-gray-700 text-sm font-semibold text-[#111418] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                {t("ownerHome.switchToCustomerCancel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmSwitch}
+                disabled={switching}
+                className="flex-1 h-10 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 disabled:opacity-60 transition-colors"
+              >
+                {switching ? "…" : t("ownerHome.switchToCustomerConfirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <GreetingSection
         firstName={firstName}
         business={loadingBusinesses ? null : (selectedBusiness ?? null)}
         hasMultiple={hasMultiple}
+        onSwitchToCustomer={() => setShowSwitchDialog(true)}
       />
 
       {/* Show skeleton for initial business load */}

@@ -68,6 +68,56 @@ namespace WebAPI.Controllers
         }
 
         [Authorize]
+        [HttpPatch("me/demote")]
+        [EndpointSummary("Downgrade Role to Customer")]
+        [EndpointDescription("Downgrades an owner's role back to client. Only allowed when the user has no businesses. " +
+            "After this call, the client should call POST /auth/refresh to receive a new JWT with the updated role.")]
+        public async Task<IActionResult> DemoteToClient()
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                await _userRepository.UpdateUserRoleToClientAsync(currentUserId);
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("me")]
+        [EndpointSummary("Delete Account")]
+        [EndpointDescription("Anonymizes the authenticated user's account: clears all PII and revokes sessions. " +
+            "Appointment history is preserved anonymized. This action is irreversible.")]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var currentUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(currentUserIdStr, out var currentUserId))
+                return Unauthorized();
+
+            try
+            {
+                await _userRepository.AnonymizeUserAsync(currentUserId);
+                // Clear the auth cookie so the client is immediately signed out
+                Response.Cookies.Delete("jwt");
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [Authorize]
         [HttpGet("me/tutorials")]
         [EndpointSummary("Get Seen Tutorials")]
         [EndpointDescription("Returns a map of tutorial keys the authenticated user has already seen. " +
