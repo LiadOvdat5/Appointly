@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useCurrency, CURRENCY_SYMBOLS, type CurrencyCode } from "../hooks/useCurrency";
+import { useAppSelector } from "../redux/hooks";
+import { selectUser } from "../redux/authSelectors";
+import { updateUser } from "../api/user";
 
 const CURRENCIES: CurrencyCode[] = ["ILS", "EUR", "USD"];
 
@@ -14,6 +17,7 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
   const { i18n, t } = useTranslation();
   const { preferredCurrency, setPreferredCurrency } = useCurrency();
   const [showDialog, setShowDialog] = useState(false);
+  const authUser = useAppSelector(selectUser);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
   const triggerRef = useRef<HTMLDivElement>(null);
   const compactButtonRef = useRef<HTMLButtonElement>(null);
@@ -29,6 +33,9 @@ export function LanguageToggle({ compact = false }: { compact?: boolean }) {
     if (i18n.language !== lang) {
       await i18n.changeLanguage(lang);
       localStorage.setItem("language", lang);
+      if (authUser?.id) {
+        updateUser(authUser.id, { preferredLanguage: lang }).catch(() => {});
+      }
     }
     setShowDialog(false);
   };

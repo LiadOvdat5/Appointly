@@ -1,8 +1,11 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WebAPI.Data;
 using WebAPI.Interfaces;
 using WebAPI.Models;
+using WebAPI.Utilities;
 
 namespace WebAPI.Services
 {
@@ -72,6 +75,7 @@ namespace WebAPI.Services
             var appointmentRepo     = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
             var pushService         = scope.ServiceProvider.GetRequiredService<IPushNotificationService>();
+            var db                  = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             var due = await appointmentRepo.GetDueForReminderAsync();
             if (due.Count == 0) return;
@@ -83,6 +87,7 @@ namespace WebAPI.Services
                 var serviceName  = appointment.Service?.Name  ?? string.Empty;
                 var businessName = appointment.Business?.Name ?? string.Empty;
                 var dateLabel    = appointment.StartDateTime.ToLocalTime().ToString("MMM d, h:mm tt");
+                var timeLabel    = appointment.StartDateTime.ToLocalTime().ToString("h:mm tt");
 
                 await notificationService.CreateNotificationAsync(
                     userId: appointment.ClientId,
@@ -98,12 +103,9 @@ namespace WebAPI.Services
                         ["date"]         = dateLabel
                     });
 
-                await pushService.SendAsync(
-                    appointment.ClientId,
-                    "Reminder",
-                    $"Your {serviceName} at {businessName} is tomorrow at {appointment.StartDateTime.ToLocalTime():h:mm tt}.",
-                    "/customer-dashboard",
-                    PushCategory.Reminders24h);
+                var lang = await GetUserLang(db, appointment.ClientId);
+                var (rTitle, rBody) = PushText.Reminder24h(lang, serviceName, businessName, timeLabel);
+                await pushService.SendAsync(appointment.ClientId, rTitle, rBody, "/customer-dashboard", PushCategory.Reminders24h);
 
                 appointment.ReminderSentAt = DateTime.UtcNow;
                 await appointmentRepo.UpdateAsync(appointment);
@@ -115,6 +117,7 @@ namespace WebAPI.Services
             using var scope = _scopeFactory.CreateScope();
             var appointmentRepo = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
             var pushService     = scope.ServiceProvider.GetRequiredService<IPushNotificationService>();
+            var db              = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             var due = await appointmentRepo.GetDueFor1hReminderAsync();
             if (due.Count == 0) return;
@@ -126,12 +129,9 @@ namespace WebAPI.Services
                 var serviceName  = appointment.Service?.Name  ?? string.Empty;
                 var businessName = appointment.Business?.Name ?? string.Empty;
 
-                await pushService.SendAsync(
-                    appointment.ClientId,
-                    "Reminder",
-                    $"Your {serviceName} at {businessName} starts in 1 hour.",
-                    "/customer-dashboard",
-                    PushCategory.Reminders1h);
+                var lang = await GetUserLang(db, appointment.ClientId);
+                var (rTitle, rBody) = PushText.Reminder1h(lang, serviceName, businessName);
+                await pushService.SendAsync(appointment.ClientId, rTitle, rBody, "/customer-dashboard", PushCategory.Reminders1h);
 
                 appointment.ReminderSent1hAt = DateTime.UtcNow;
                 await appointmentRepo.UpdateAsync(appointment);
@@ -144,6 +144,7 @@ namespace WebAPI.Services
             var appointmentRepo     = scope.ServiceProvider.GetRequiredService<IAppointmentRepository>();
             var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
             var pushService         = scope.ServiceProvider.GetRequiredService<IPushNotificationService>();
+            var db                  = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
             var due = await appointmentRepo.GetDueForReviewPromptAsync();
             if (due.Count == 0) return;
@@ -167,16 +168,22 @@ namespace WebAPI.Services
                         ["businessName"] = businessName
                     });
 
-                await pushService.SendAsync(
-                    appointment.ClientId,
-                    "How was it?",
-                    $"Leave a review for {businessName}.",
-                    $"/business/{businessId}#reviews",
-                    PushCategory.ReviewPrompt);
+                var lang = await GetUserLang(db, appointment.ClientId);
+                var (rpTitle, rpBody) = PushText.ReviewPrompt(lang, businessName);
+                await pushService.SendAsync(appointment.ClientId, rpTitle, rpBody, $"/business/{businessId}#reviews", PushCategory.ReviewPrompt);
 
                 appointment.ReviewPromptSentAt = DateTime.UtcNow;
                 await appointmentRepo.UpdateAsync(appointment);
             }
+        }
+
+        private static async Task<string> GetUserLang(AppDbContext db, Guid userId)
+        {
+            var lang = await db.Users
+                .Where(u => u.Id == userId)
+                .Select(u => u.PreferredLanguage)
+                .FirstOrDefaultAsync();
+            return string.IsNullOrEmpty(lang) ? "en" : lang;
         }
     }
 }

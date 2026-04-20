@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { H1, Paragraph } from "../components/UI/Typography";
 import { Input } from "../components/UI/Input";
 import { Button } from "../components/UI/Button";
 import { Alert } from "../components/UI/Alert";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectUser } from "../redux/authSelectors";
-import { setSession } from "../redux/authSlice";
-import { getUser, updateUser } from "../api/user";
+import { setSession, setGuest } from "../redux/authSlice";
+import { getUser, updateUser, deleteAccount } from "../api/user";
 
 export default function ProfilePage() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const authUser = useAppSelector(selectUser);
 
   // Profile fields
@@ -29,6 +31,12 @@ export default function ProfilePage() {
   const [saveError, setSaveError] = useState("");
   const [saveSuccess, setSaveSuccess] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Delete account state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // Field-level errors
   const [fieldErrors, setFieldErrors] = useState<{
@@ -119,8 +127,58 @@ export default function ProfilePage() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setDeleteError("");
+    setDeleting(true);
+    try {
+      await deleteAccount();
+      dispatch(setGuest());
+      navigate("/");
+    } catch {
+      setDeleteError(t("profile.error.saveFailed"));
+      setDeleting(false);
+    }
+  };
+
+  const deleteWord = t("profile.deleteAccountConfirmPlaceholder").includes("מחק") ? "מחק" : "DELETE";
+
   return (
     <div className="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-white">
+      {showDeleteDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-gray-900 p-6 flex flex-col gap-4 shadow-xl">
+            <h2 className="text-lg font-bold text-red-600">{t("profile.deleteAccountConfirmTitle")}</h2>
+            <p className="text-sm text-[#4e7397] dark:text-gray-400">{t("profile.deleteAccountConfirmBody")}</p>
+            {deleteError && (
+              <p className="text-sm text-red-500">{deleteError}</p>
+            )}
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder={t("profile.deleteAccountConfirmPlaceholder")}
+              className="w-full px-3 h-10 rounded-xl border border-gray-300 dark:border-gray-700 bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-400"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowDeleteDialog(false); setDeleteConfirmText(""); setDeleteError(""); }}
+                className="flex-1 h-10 rounded-xl border border-[#d0dce8] dark:border-gray-700 text-sm font-semibold text-[#111418] dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                {t("profile.deleteAccountCancel")}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== deleteWord || deleting}
+                className="flex-1 h-10 rounded-xl bg-red-500 text-white text-sm font-bold hover:bg-red-600 disabled:opacity-50 transition-colors"
+              >
+                {deleting ? "…" : t("profile.deleteAccountConfirm")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <main className="flex-1 flex flex-col px-6 max-w-lg mx-auto w-full py-10">
         <div className="pb-6">
           <H1>{t("profile.myProfile")}</H1>
@@ -214,6 +272,23 @@ export default function ProfilePage() {
             {t("profile.saveChanges")}
           </Button>
         </form>
+
+        {/* Danger Zone */}
+        <div className="mt-10 border-t border-red-200 dark:border-red-900 pt-6">
+          <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">
+            {t("profile.deleteAccountSectionTitle")}
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
+            {t("profile.deleteAccountDesc")}
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowDeleteDialog(true)}
+            className="px-4 h-9 rounded-xl border border-red-400 dark:border-red-600 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+          >
+            {t("profile.deleteAccount")}
+          </button>
+        </div>
       </main>
     </div>
   );

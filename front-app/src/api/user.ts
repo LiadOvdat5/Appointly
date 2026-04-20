@@ -26,3 +26,11 @@ export async function updateUser(
   const res = await http.patch<UserProfileDto>(`/users/${id}`, data);
   return res.data;
 }
+
+export async function demoteToClient(): Promise<void> {
+  await http.patch("/users/me/demote");
+}
+
+export async function deleteAccount(): Promise<void> {
+  await http.delete("/users/me");
+}

@@ -70,6 +70,14 @@ namespace WebAPI.Repositories
                 user.Password = passwordHasher.HashPassword(user, updateUserDto.NewPassword);
             }
 
+            if (!string.IsNullOrEmpty(updateUserDto.PreferredLanguage))
+            {
+                var valid = new[] { "en", "he" };
+                if (!valid.Contains(updateUserDto.PreferredLanguage))
+                    throw new ArgumentException("Invalid language code.");
+                user.PreferredLanguage = updateUserDto.PreferredLanguage;
+            }
+
             user.UpdatedAt = DateTime.UtcNow;
 
             _context.Users.Update(user);
@@ -92,6 +100,50 @@ namespace WebAPI.Repositories
 
             user.Role = UserRole.owner;
             user.UpdatedAt = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUserRoleToClientAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            var hasBusinesses = await _context.Businesses.AnyAsync(b => b.OwnerId == userId);
+            if (hasBusinesses)
+                throw new InvalidOperationException("Cannot switch to customer while you have active businesses.");
+
+            user.Role = UserRole.client;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AnonymizeUserAsync(Guid userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new Exception("User not found.");
+
+            user.Name = "Deleted User";
+            user.Email = $"deleted+{userId}@deleted.invalid";
+            user.Password = null;
+            user.GoogleId = null;
+            user.Phone = null;
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+            user.RefreshTokenHash = null;
+            user.RefreshTokenExpiry = null;
+            user.IsSuspended = true;
+            user.SuspendedReason = "__deleted__";
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // Remove all push subscriptions
+            var subs = _context.PushSubscriptions.Where(s => s.UserId == userId);
+            _context.PushSubscriptions.RemoveRange(subs);
 
             _context.Users.Update(user);
             await _context.SaveChangesAsync();

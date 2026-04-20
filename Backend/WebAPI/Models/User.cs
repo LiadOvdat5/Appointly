@@ -69,5 +69,9 @@ namespace WebAPI.Models
         public bool PushReminders1h { get; set; } = true;
         public bool PushReviewPrompt { get; set; } = true;
         public bool PushBroadcasts { get; set; } = true;
+
+        // Preferred UI language for push notification content ("en" or "he")
+        [MaxLength(5)]
+        public string PreferredLanguage { get; set; } = "en";
     }
 }
