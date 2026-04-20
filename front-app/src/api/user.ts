@@ -12,6 +12,7 @@ export type UpdateUserRequest = {
   email?: string;
   currentPassword?: string;
   newPassword?: string;
+  preferredLanguage?: string;
 };
 
 export async function getUser(id: string): Promise<UserProfileDto> {
